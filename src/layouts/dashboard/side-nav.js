@@ -90,7 +90,7 @@ export const SideNav = (props) => {
                                                   <Typography
                                                             color="error.main"
                                                             variant="h5">
-                                                            DAR
+                                                            Apoteka DAR
                                                   </Typography>
                                         </Box>
                                         <Divider sx={{ borderColor: 'neutral.700' }} />
