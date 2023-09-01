@@ -1,9 +1,9 @@
 {
-  "name": "material-kit-react",
-  "version": "3.0.0",
-  "author": "Devias",
-  "licence": "MIT",
-  "homepage": "https://devias.io",
+  "name": "Apoteka dar dashboard",
+  "version": "1.0.0",
+  "author": "Branislav Damjanovic",
+  "licence": "none",
+  "homepage": "https://dar-pharmacy-dashboard.vercel.app/",
   "private": false,
   "scripts": {
     "dev": "next",

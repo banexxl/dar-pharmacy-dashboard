@@ -15,41 +15,41 @@ const clientSideEmotionCache = createEmotionCache();
 const SplashScreen = () => null;
 
 const App = (props) => {
-  const { Component, emotionCache = clientSideEmotionCache, pageProps } = props;
+          const { Component, emotionCache = clientSideEmotionCache, pageProps } = props;
 
-  useNProgress();
+          useNProgress();
 
-  const getLayout = Component.getLayout ?? ((page) => page);
+          const getLayout = Component.getLayout ?? ((page) => page);
 
-  const theme = createTheme();
+          const theme = createTheme();
 
-  return (
-    <CacheProvider value={emotionCache}>
-      <Head>
-        <title>
-          Devias Kit
-        </title>
-        <meta
-          name="viewport"
-          content="initial-scale=1, width=device-width"
-        />
-      </Head>
-      <LocalizationProvider dateAdapter={AdapterDateFns}>
-        <AuthProvider>
-          <ThemeProvider theme={theme}>
-            <CssBaseline />
-            <AuthConsumer>
-              {
-                (auth) => auth.isLoading
-                  ? <SplashScreen />
-                  : getLayout(<Component {...pageProps} />)
-              }
-            </AuthConsumer>
-          </ThemeProvider>
-        </AuthProvider>
-      </LocalizationProvider>
-    </CacheProvider>
-  );
+          return (
+                    <CacheProvider value={emotionCache}>
+                              <Head>
+                                        <title>
+                                                  Apoteka DAR
+                                        </title>
+                                        <meta
+                                                  name="viewport"
+                                                  content="initial-scale=1, width=device-width"
+                                        />
+                              </Head>
+                              <LocalizationProvider dateAdapter={AdapterDateFns}>
+                                        <AuthProvider>
+                                                  <ThemeProvider theme={theme}>
+                                                            <CssBaseline />
+                                                            <AuthConsumer>
+                                                                      {
+                                                                                (auth) => auth.isLoading
+                                                                                          ? <SplashScreen />
+                                                                                          : getLayout(<Component {...pageProps} />)
+                                                                      }
+                                                            </AuthConsumer>
+                                                  </ThemeProvider>
+                                        </AuthProvider>
+                              </LocalizationProvider>
+                    </CacheProvider>
+          );
 };
 
 export default App;
