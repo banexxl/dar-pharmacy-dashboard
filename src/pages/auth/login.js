@@ -4,14 +4,17 @@ import NextLink from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import { Alert, Box, Button, FormHelperText, Link, Stack, Tab, Tabs, TextField, Typography } from '@mui/material';
+import { Alert, Box, Button, FormHelperText, Link, Stack, Tab, Tabs, TextField, Typography, Card, CardMedia, useMediaQuery } from '@mui/material';
 import { useAuth } from 'src/hooks/use-auth';
 import { Layout as AuthLayout } from 'src/layouts/auth/layout';
+import { useTheme } from '@mui/material/styles'
 
 const Page = () => {
           const router = useRouter();
           const auth = useAuth();
           const [method, setMethod] = useState('email');
+          const theme = useTheme();
+          const mdDown = useMediaQuery((theme) => theme.breakpoints.down('md'));
           const formik = useFormik({
                     initialValues: {
                               email: 'demo@devias.io',
@@ -57,13 +60,18 @@ const Page = () => {
           // );
 
           return (
-                    <>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', ml: mdDown ? '10px' : '200px', mt: '120px', width: mdDown ? '90dvw' : '70dvw', height: '70dvh' }}>
                               <Head>
                                         <title>
                                                   Login
                                         </title>
                               </Head>
-                              <Box sx={{ backgroundColor: 'background.paper', flex: '1 1 auto', alignItems: 'center', display: 'flex', justifyContent: 'center' }}>
+                              <Card sx={{ backgroundColor: 'background.paper', flex: '1 1 auto', alignItems: 'center', display: 'flex', justifyContent: 'center' }}>
+                                        <CardMedia
+                                                  sx={{ height: 400, width: 200, borderRadius: '8px', display: mdDown ? 'none' : 'block' }}
+                                                  image="/ailogo.png"
+                                                  title="green iguana"
+                                        />
                                         <Box
                                                   sx={{
                                                             maxWidth: 550,
@@ -157,6 +165,7 @@ const Page = () => {
                                                                                 sx={{ mt: 3 }}
                                                                                 type="submit"
                                                                                 variant="contained"
+                                                                                color='error'
                                                                       >
                                                                                 Continue
                                                                       </Button>
@@ -194,8 +203,8 @@ const Page = () => {
                                                             )} */}
                                                   </div>
                                         </Box>
-                              </Box>
-                    </>
+                              </Card>
+                    </Box>
           );
 };
 

@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import NextLink from 'next/link';
+import Image from 'next/image'
 import { Box, Typography, Unstable_Grid2 as Grid } from '@mui/material';
 import { Logo } from 'src/components/logo';
-import Image from 'next/image';
 
 // TODO: Change subtitle text
 
@@ -49,7 +49,7 @@ export const Layout = (props) => {
                                                                                 width: 32
                                                                       }}
                                                             >
-                                                                      <Image href="../../../public/dar.ico" alt='DAR Apoteka' />
+                                                                      <Image src="/dar.ico" alt='DAR Apoteka' width='60' height='70' />
                                                                       {/* <Logo /> */}
                                                             </Box>
                                                   </Box>
