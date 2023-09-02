@@ -12,8 +12,6 @@ import { ProductsSearch } from 'src/sections/products/products-search';
 import { applyPagination } from 'src/utils/apply-pagination';
 import { productsServices } from '../utils/product-services'
 
-const now = new Date();
-
 const useProducts = (data, page, rowsPerPage) => {
           return useMemo(
                     () => {
