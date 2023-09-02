@@ -49,7 +49,10 @@ export const Layout = (props) => {
                                                                                 width: 32
                                                                       }}
                                                             >
-                                                                      <Image src="/dar.ico" alt='DAR Apoteka' width='60' height='70' />
+                                                                      <Image src="/dar.ico"
+                                                                                alt='DAR Apoteka'
+                                                                                width='75'
+                                                                                height='70' />
                                                                       {/* <Logo /> */}
                                                             </Box>
                                                   </Box>
