@@ -13,6 +13,7 @@ export const AccountPopover = (props) => {
                     () => {
                               onClose?.();
                               auth.signOut();
+                              window.sessionStorage.setItem('authenticated', false)
                               router.push('/auth/login');
                     },
                     [onClose, auth, router]
