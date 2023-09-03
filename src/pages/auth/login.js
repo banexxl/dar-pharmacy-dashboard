@@ -17,8 +17,8 @@ const Page = () => {
           const mdDown = useMediaQuery((theme) => theme.breakpoints.down('md'));
           const formik = useFormik({
                     initialValues: {
-                              email: 'demo@devias.io',
-                              password: 'Password123!',
+                              email: '',
+                              password: '',
                               submit: null
                     },
                     validationSchema: Yup.object({
