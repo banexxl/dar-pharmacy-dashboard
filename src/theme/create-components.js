@@ -296,6 +296,15 @@ export function createComponents(config) {
                               defaultProps: {
                                         variant: 'filled'
                               }
+                    },
+                    MuiDialogPaper: {
+                              styleOverrides: {
+                                        root: {
+                                                  [`& .MuiDialog-container`]: {
+                                                            width: '800px'
+                                                  }
+                                        }
+                              }
                     }
           };
 }

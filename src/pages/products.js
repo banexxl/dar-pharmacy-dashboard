@@ -1,6 +1,12 @@
 import { useCallback, useMemo, useState } from 'react';
 import Head from 'next/head';
 import { subDays, subHours } from 'date-fns';
+import TextField from '@mui/material/TextField';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 import ArrowDownOnSquareIcon from '@heroicons/react/24/solid/ArrowDownOnSquareIcon';
 import ArrowUpOnSquareIcon from '@heroicons/react/24/solid/ArrowUpOnSquareIcon';
 import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
@@ -11,7 +17,7 @@ import { ProductsTable } from 'src/sections/products/products-table';
 import { ProductsSearch } from 'src/sections/products/products-search';
 import { applyPagination } from 'src/utils/apply-pagination';
 import { productsServices } from '../utils/product-services'
-
+import { AddProductForm } from '../sections/products/new-product-form'
 const useProducts = (data, page, rowsPerPage) => {
           return useMemo(
                     () => {
@@ -32,6 +38,7 @@ const useProductsIds = (products) => {
 
 const Page = (props) => {
           const [page, setPage] = useState(0);
+          const [open, setOpen] = useState(false)
           const [rowsPerPage, setRowsPerPage] = useState(5);
           const products = useProducts(props.products, page, rowsPerPage);
           const productsIds = useProductsIds(props.products);
@@ -50,9 +57,12 @@ const Page = (props) => {
                     },
                     []
           );
+          const handleClose = () => {
+                    console.log('closed');
+          }
 
           return (
-                    <>
+                    <Box>
                               <Head>
                                         <title>
                                                   Products
@@ -111,9 +121,13 @@ const Page = (props) => {
                                                                                                     </SvgIcon>
                                                                                           )}
                                                                                           variant="contained"
+                                                                                          onClick={() => {
+                                                                                                    setOpen(true)
+                                                                                          }}
                                                                                 >
                                                                                           Add
                                                                                 </Button>
+
                                                                       </div>
                                                             </Stack>
                                                             <ProductsSearch />
@@ -133,7 +147,20 @@ const Page = (props) => {
                                                   </Stack>
                                         </Container>
                               </Box>
-                    </>
+                              <Dialog open={open}
+                                        onClose={handleClose}
+                                        PaperProps={{
+                                                  sx: {
+                                                            width: '600px'
+                                                  }
+                                        }}
+                              >
+                                        <DialogTitle>Add product</DialogTitle>
+                                        <DialogContent >
+                                                  <AddProductForm />
+                                        </DialogContent>
+                              </Dialog>
+                    </Box >
           );
 };
 
