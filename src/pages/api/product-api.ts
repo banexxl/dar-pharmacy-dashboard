@@ -4,7 +4,7 @@ import type { NextApiRequest, NextApiResponse } from 'next/types'
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
 
           // const mongoClient = await clientPromise;
-          const mongoClient = await MongoClient.connect(process.env.MONGODB_PRODUCTS_URI!, {})
+          const mongoClient = await MongoClient.connect(process.env.MONGODB_URI!, {})
           const dbProducts = mongoClient.db('DAR_DB').collection('Products')
 
           try {
@@ -34,7 +34,10 @@ export default async function handler(request: NextApiRequest, response: NextApi
                               return response.status(200).json({ message: 'Product successfully added!' });
                     }
                     else if (request.method === 'DELETE') {
-                              await dbProducts.deleteOne({ _id: new ObjectId(`${request.body.selected}`) })
+                              const idsToDelete = request.body.selected.map((_id: any) => new ObjectId(_id))
+                              console.log(idsToDelete);
+
+                              await dbProducts.deleteMany({ _id: { $in: idsToDelete } })
                               return response.status(200).json({ message: 'Product successfully deleted!' });
                     }
                     else {
