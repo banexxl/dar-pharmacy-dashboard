@@ -26,9 +26,11 @@ const initialValues = {
           discountAmount: '',
 };
 
-export const AddProductForm = () => {
+export const AddProductForm = ({ onSubmitSuccess }) => {
 
           const router = useRouter();
+
+
 
           const handleSubmit = async (values, helpers) => {
 
@@ -46,6 +48,9 @@ export const AddProductForm = () => {
 
                               if (response.ok) {
                                         toast.success('Product added');
+                                        if (onSubmitSuccess) {
+                                                  onSubmitSuccess();
+                                        }
                                         router.push('/products');
                               } else {
                                         const errorData = await response.json(); // Parse the error response

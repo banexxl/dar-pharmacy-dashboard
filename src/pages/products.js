@@ -45,6 +45,11 @@ const Page = (props) => {
           const productsIds = useProductsIds(props.products);
           const productsSelection = useSelection(productsIds);
 
+          const handleSubmitSuccess = () => {
+                    // Called when the AddProductForm submission is successful
+                    setOpen(false); // Close the dialog
+          };
+
           const handlePageChange = useCallback(
                     (event, value) => {
                               setPage(value);
@@ -158,7 +163,7 @@ const Page = (props) => {
                               >
                                         <DialogTitle>Add product</DialogTitle>
                                         <DialogContent dividers >
-                                                  <AddProductForm />
+                                                  <AddProductForm onSubmitSuccess={handleSubmitSuccess} />
                                         </DialogContent>
                               </Dialog>
                     </Box >
