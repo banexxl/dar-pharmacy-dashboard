@@ -18,6 +18,7 @@ import { ProductsSearch } from 'src/sections/products/products-search';
 import { applyPagination } from 'src/utils/apply-pagination';
 import { productsServices } from '../utils/product-services'
 import { AddProductForm } from '../sections/products/new-product-form'
+
 const useProducts = (data, page, rowsPerPage) => {
           return useMemo(
                     () => {
@@ -156,7 +157,7 @@ const Page = (props) => {
                                         }}
                               >
                                         <DialogTitle>Add product</DialogTitle>
-                                        <DialogContent >
+                                        <DialogContent dividers >
                                                   <AddProductForm />
                                         </DialogContent>
                               </Dialog>

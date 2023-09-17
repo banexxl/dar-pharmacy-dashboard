@@ -1,8 +1,10 @@
 import React from 'react';
 import { useFormik } from 'formik';
-import { TextField, Button, Checkbox, FormControlLabel, Box } from '@mui/material';
+import { TextField, Button, Checkbox, FormControlLabel, Box, Typography } from '@mui/material';
 import { Form, Formik, FormikErrors, FormikTouched } from 'formik';
 import { newProductSchema } from './new-product-schema'
+import toast from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
 
 const initialValues = {
           name: '',
@@ -26,24 +28,61 @@ const initialValues = {
 
 export const AddProductForm = () => {
 
-          const handleSubmit = () => {
+          const router = useRouter();
 
+          const handleSubmit = async (values, helpers) => {
+
+                    try {
+                              //API CALL
+                              const response = await fetch('/api/product-api', {
+                                        method: 'POST',
+                                        headers: {
+                                                  'Content-Type': 'application/json',
+                                                  'Access-Control-Allow-Origin': '*',
+                                                  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS' // Set the content type to JSON
+                                        },
+                                        body: JSON.stringify(values), // Convert your data to JSON
+                              });
+
+                              if (response.ok) {
+                                        toast.success('Product added');
+                                        router.push('/products');
+                              } else {
+                                        const errorData = await response.json(); // Parse the error response
+                                        console.error(errorData);
+                                        toast.error('Something went wrong!');
+                              }
+
+                    } catch (err) {
+                              console.error(err);
+                              toast.error('Something went wrong!');
+                    }
           }
 
           return (
-
-                    <Formik initialValues={initialValues}
-                              onSubmit={(values) => handleSubmit(values)}
+                    <Formik
+                              initialValues={initialValues}
+                              onSubmit={(values) => {
+                                        handleSubmit(values)
+                              }}
                               validationSchema={newProductSchema()}>
                               {
                                         (formik) => (
-                                                  <Form>
+                                                  <Form style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+
+                                                            <Typography>
+                                                                      {
+                                                                                formik.dirty
+                                                                      }
+                                                            </Typography>
 
                                                             <TextField
                                                                       label="Name"
                                                                       name="name"
                                                                       value={formik.values.name}
                                                                       onChange={formik.handleChange}
+                                                                      error={formik.touched.name && !!formik.errors.name}
+                                                                      helperText={formik.touched.name && formik.errors.name}
                                                             />
                                                             <TextField
                                                                       label="Description"
@@ -52,6 +91,8 @@ export const AddProductForm = () => {
                                                                       rows={4}
                                                                       value={formik.values.description}
                                                                       onChange={formik.handleChange}
+                                                                      error={formik.touched.description && !!formik.errors.description}
+                                                                      helperText={formik.touched.description && formik.errors.description}
                                                             />
 
                                                             <TextField
@@ -59,6 +100,8 @@ export const AddProductForm = () => {
                                                                       name="mainCategory"
                                                                       value={formik.values.mainCategory}
                                                                       onChange={formik.handleChange}
+                                                                      error={formik.touched.mainCategory && !!formik.errors.mainCategory}
+                                                                      helperText={formik.touched.mainCategory && formik.errors.mainCategory}
                                                             />
 
                                                             <TextField
@@ -66,6 +109,8 @@ export const AddProductForm = () => {
                                                                       name="midCategory"
                                                                       value={formik.values.midCategory}
                                                                       onChange={formik.handleChange}
+                                                            // error={formik.touched.midCategory && !!formik.errors.midCategory}
+                                                            // helperText={formik.touched.midCategory && formik.errors.midCategory}
                                                             />
 
                                                             <TextField
@@ -73,6 +118,8 @@ export const AddProductForm = () => {
                                                                       name="subCategory"
                                                                       value={formik.values.subCategory}
                                                                       onChange={formik.handleChange}
+                                                            // error={formik.touched.subCategory && !!formik.errors.subCategory}
+                                                            // helperText={formik.touched.subCategory && formik.errors.subCategory}
                                                             />
 
                                                             <TextField
@@ -80,6 +127,8 @@ export const AddProductForm = () => {
                                                                       name="availableStock"
                                                                       value={formik.values.availableStock}
                                                                       onChange={formik.handleChange}
+                                                                      error={formik.touched.availableStock && !!formik.errors.availableStock}
+                                                                      helperText={formik.touched.availableStock && formik.errors.availableStock}
                                                             />
 
                                                             <TextField
@@ -87,6 +136,8 @@ export const AddProductForm = () => {
                                                                       name="ingredients"
                                                                       value={formik.values.ingredients}
                                                                       onChange={formik.handleChange}
+                                                                      error={formik.touched.ingredients && !!formik.errors.ingredients}
+                                                                      helperText={formik.touched.ingredients && formik.errors.ingredients}
                                                             />
 
                                                             <TextField
@@ -94,6 +145,8 @@ export const AddProductForm = () => {
                                                                       name="instructions"
                                                                       value={formik.values.instructions}
                                                                       onChange={formik.handleChange}
+                                                                      error={formik.touched.instructions && !!formik.errors.instructions}
+                                                                      helperText={formik.touched.instructions && formik.errors.instructions}
                                                             />
 
                                                             <TextField
@@ -101,6 +154,8 @@ export const AddProductForm = () => {
                                                                       name="quantity"
                                                                       value={formik.values.quantity}
                                                                       onChange={formik.handleChange}
+                                                                      error={formik.touched.quantity && !!formik.errors.quantity}
+                                                                      helperText={formik.touched.quantity && formik.errors.quantity}
                                                             />
 
                                                             <TextField
@@ -108,6 +163,8 @@ export const AddProductForm = () => {
                                                                       name="manufacturer"
                                                                       value={formik.values.manufacturer}
                                                                       onChange={formik.handleChange}
+                                                                      error={formik.touched.manufacturer && !!formik.errors.manufacturer}
+                                                                      helperText={formik.touched.manufacturer && formik.errors.manufacturer}
                                                             />
 
                                                             <TextField
@@ -115,6 +172,8 @@ export const AddProductForm = () => {
                                                                       name="warning"
                                                                       value={formik.values.warning}
                                                                       onChange={formik.handleChange}
+                                                                      error={formik.touched.warning && !!formik.errors.warning}
+                                                                      helperText={formik.touched.warning && formik.errors.warning}
                                                             />
 
                                                             <TextField
@@ -122,6 +181,8 @@ export const AddProductForm = () => {
                                                                       name="imageURL"
                                                                       value={formik.values.imageURL}
                                                                       onChange={formik.handleChange}
+                                                                      error={formik.touched.imageURL && !!formik.errors.imageURL}
+                                                                      helperText={formik.touched.imageURL && formik.errors.imageURL}
                                                             />
 
                                                             <TextField
@@ -129,6 +190,8 @@ export const AddProductForm = () => {
                                                                       name="price"
                                                                       value={formik.values.price}
                                                                       onChange={formik.handleChange}
+                                                                      error={formik.touched.price && !!formik.errors.price}
+                                                                      helperText={formik.touched.price && formik.errors.price}
                                                             />
 
                                                             <FormControlLabel
@@ -173,13 +236,13 @@ export const AddProductForm = () => {
 
                                                             <Button type="submit"
                                                                       variant="contained"
-                                                                      color="primary">
+                                                                      color="primary"
+                                                            >
                                                                       Add Product
                                                             </Button>
                                                   </Form>
                                         )
                               }
-                    </Formik>
-
+                    </Formik >
           );
 };

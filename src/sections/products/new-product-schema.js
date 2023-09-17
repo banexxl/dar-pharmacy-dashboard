@@ -8,7 +8,8 @@ export const newProductSchema = () => yup.object().shape({
                     .string()
                     .required('Product description is required'),
           mainCategory: yup
-                    .string(),
+                    .string()
+                    .required('Main category is required'),
           midCategory: yup
                     .string(),
           subCategory: yup
@@ -16,7 +17,7 @@ export const newProductSchema = () => yup.object().shape({
           availableStock: yup
                     .number()
                     .required('Available stock is required'),
-          ingedients: yup
+          ingredients: yup
                     .string()
                     .required('Product ingedients is required'),
           instructions: yup

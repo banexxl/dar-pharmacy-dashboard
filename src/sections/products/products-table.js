@@ -74,7 +74,7 @@ export const ProductsTable = (props) => {
                                                                       </TableRow>
                                                             </TableHead>
                                                             <TableBody>
-                                                                      {items.map((product) => {
+                                                                      {items.slice(page * rowsPerPage, (page * rowsPerPage) + rowsPerPage).map((product) => {
                                                                                 const isSelected = selected.includes(product._id);
 
                                                                                 return (
