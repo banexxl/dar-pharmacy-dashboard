@@ -34,6 +34,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
 
                     try {
                               //API CALL
+
                               const response = await fetch('/api/product-api', {
                                         method: 'POST',
                                         headers: {
