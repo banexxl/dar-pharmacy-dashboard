@@ -1,4 +1,4 @@
-import { MongoClient } from 'mongodb';
+import { MongoClient, ObjectId } from 'mongodb'
 import type { NextApiRequest, NextApiResponse } from 'next/types'
 
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
@@ -32,7 +32,12 @@ export default async function handler(request: NextApiRequest, response: NextApi
                               const newProduct = request.body
                               await dbProducts.insertOne(newProduct)
                               return response.status(200).json({ message: 'Product successfully added!' });
-                    } else {
+                    }
+                    else if (request.method === 'DELETE') {
+                              await dbProducts.deleteOne({ _id: new ObjectId(`${request.body.selected}`) })
+                              return response.status(200).json({ message: 'Product successfully deleted!' });
+                    }
+                    else {
                               return response.status(405).json({ error: 'Method not allowed!' });
                     }
           } catch (error) {

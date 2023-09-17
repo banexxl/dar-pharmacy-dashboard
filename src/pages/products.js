@@ -10,6 +10,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import ArrowDownOnSquareIcon from '@heroicons/react/24/solid/ArrowDownOnSquareIcon';
 import ArrowUpOnSquareIcon from '@heroicons/react/24/solid/ArrowUpOnSquareIcon';
 import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
+import ArchiveBoxIcon from '@heroicons/react/24/solid/ArchiveBoxIcon';
 import { Box, Button, Container, Stack, SvgIcon, Typography } from '@mui/material';
 import { useSelection } from 'src/hooks/use-selection';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
@@ -18,6 +19,8 @@ import { ProductsSearch } from 'src/sections/products/products-search';
 import { applyPagination } from 'src/utils/apply-pagination';
 import { productsServices } from '../utils/product-services'
 import { AddProductForm } from '../sections/products/new-product-form'
+import { useRouter } from 'next/navigation';
+import Swal from 'sweetalert2'
 
 const useProducts = (data, page, rowsPerPage) => {
           return useMemo(
@@ -44,11 +47,50 @@ const Page = (props) => {
           const products = useProducts(props.products, page, rowsPerPage);
           const productsIds = useProductsIds(props.products);
           const productsSelection = useSelection(productsIds);
+          const router = useRouter();
 
           const handleSubmitSuccess = () => {
-                    // Called when the AddProductForm submission is successful
+
                     setOpen(false); // Close the dialog
           };
+
+          const handleSubmitFail = () => {
+                    setOpen(false)
+
+          }
+
+          const handleDeleteProduct = async (product) => {
+
+                    try {
+                              //API CALL
+                              const response = await fetch('/api/product-api', {
+                                        method: 'DELETE',
+                                        headers: {
+                                                  'Content-Type': 'application/json',
+                                                  'Access-Control-Allow-Origin': '*',
+                                                  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS' // Set the content type to JSON
+                                        },
+                                        body: JSON.stringify(product), // Convert your data to JSON
+                              });
+
+                              if (response.ok) {
+                                        Swal.fire({
+                                                  icon: 'success',
+                                                  title: 'Success',
+                                                  text: 'Product deleted!',
+                                        })
+                                        router.push('/products')
+                              } else {
+                                        const errorData = await response.json(); // Parse the error response
+                                        console.error(errorData);
+
+                              }
+
+                    } catch (err) {
+                              console.error(err);
+
+                    }
+          }
 
           const handlePageChange = useCallback(
                     (event, value) => {
@@ -119,7 +161,7 @@ const Page = (props) => {
                                                                                           </Button>
                                                                                 </Stack>
                                                                       </Stack>
-                                                                      <div>
+                                                                      <Box sx={{ display: 'flex', justifyContent: 'space-between', height: '40px', width: '220px' }}>
                                                                                 <Button
                                                                                           startIcon={(
                                                                                                     <SvgIcon fontSize="small">
@@ -133,8 +175,19 @@ const Page = (props) => {
                                                                                 >
                                                                                           Add
                                                                                 </Button>
+                                                                                <Button
+                                                                                          startIcon={(
+                                                                                                    <SvgIcon fontSize="small">
+                                                                                                              <ArchiveBoxIcon />
+                                                                                                    </SvgIcon>
+                                                                                          )}
+                                                                                          variant="contained"
+                                                                                          onClick={() => handleDeleteProduct(productsSelection)}
+                                                                                >
+                                                                                          Delete
+                                                                                </Button>
 
-                                                                      </div>
+                                                                      </Box>
                                                             </Stack>
                                                             <ProductsSearch />
                                                             <ProductsTable
@@ -163,7 +216,9 @@ const Page = (props) => {
                               >
                                         <DialogTitle>Add product</DialogTitle>
                                         <DialogContent dividers >
-                                                  <AddProductForm onSubmitSuccess={handleSubmitSuccess} />
+                                                  <AddProductForm
+                                                            onSubmitSuccess={handleSubmitSuccess}
+                                                            onSubmitFail={handleSubmitFail} />
                                         </DialogContent>
                               </Dialog>
                     </Box >
