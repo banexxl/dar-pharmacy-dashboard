@@ -59,7 +59,23 @@ const Page = (props) => {
 
           }
 
-          const handleDeleteProduct = async (product) => {
+          const handleDeleteButtonClick = () => {
+                    Swal.fire({
+                              title: 'Are you sure?',
+                              text: "You won't be able to revert this!",
+                              icon: 'warning',
+                              showCancelButton: true,
+                              confirmButtonColor: '#3085d6',
+                              cancelButtonColor: '#d33',
+                              confirmButtonText: 'Yes, delete it!'
+                    }).then((result) => {
+                              if (result.isConfirmed) {
+                                        handleDeleteProduct(productsSelection)
+                              }
+                    })
+          }
+
+          const handleDeleteProduct = async (productsSelection) => {
 
                     try {
                               //API CALL
@@ -70,9 +86,9 @@ const Page = (props) => {
                                                   'Access-Control-Allow-Origin': '*',
                                                   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS' // Set the content type to JSON
                                         },
-                                        body: JSON.stringify(product), // Convert your data to JSON
+                                        body: JSON.stringify(productsSelection), // Convert your data to JSON
                               });
-
+                              console.log(response);
                               if (response.ok) {
                                         Swal.fire({
                                                   icon: 'success',
@@ -82,13 +98,11 @@ const Page = (props) => {
                                         router.push('/products')
                               } else {
                                         const errorData = await response.json(); // Parse the error response
-                                        console.error(errorData);
-
+                                        console.error('errorData', errorData);
                               }
 
                     } catch (err) {
                               console.error(err);
-
                     }
           }
 
@@ -182,7 +196,7 @@ const Page = (props) => {
                                                                                                     </SvgIcon>
                                                                                           )}
                                                                                           variant="contained"
-                                                                                          onClick={() => handleDeleteProduct(productsSelection)}
+                                                                                          onClick={() => handleDeleteButtonClick()}
                                                                                 >
                                                                                           Delete
                                                                                 </Button>
