@@ -83,7 +83,7 @@ const Page = (props) => {
                                         method: 'DELETE',
                                         headers: {
                                                   'Content-Type': 'application/json',
-                                                  'Access-Control-Allow-Origin': 'https://dar-pharmacy-dashboard.vercel.app, http://localhost',
+                                                  'Access-Control-Allow-Origin': 'https://dar-pharmacy-dashboard.vercel.app/api/product-api, http://localhost:3000/api/product-api',
                                                   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS' // Set the content type to JSON
                                         },
                                         body: JSON.stringify(productsSelection), // Convert your data to JSON
