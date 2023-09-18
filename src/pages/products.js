@@ -11,6 +11,7 @@ import ArrowDownOnSquareIcon from '@heroicons/react/24/solid/ArrowDownOnSquareIc
 import ArrowUpOnSquareIcon from '@heroicons/react/24/solid/ArrowUpOnSquareIcon';
 import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
 import ArchiveBoxIcon from '@heroicons/react/24/solid/ArchiveBoxIcon';
+import FolderOpenIcon from '@heroicons/react/24/solid/FolderOpenIcon';
 import { Box, Button, Container, Stack, SvgIcon, Typography } from '@mui/material';
 import { useSelection } from 'src/hooks/use-selection';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
@@ -19,6 +20,7 @@ import { ProductsSearch } from 'src/sections/products/products-search';
 import { applyPagination } from 'src/utils/apply-pagination';
 import { productsServices } from '../utils/product-services'
 import { AddProductForm } from '../sections/products/new-product-form'
+import { EditProductForm } from '../sections/products/edit-product-form'
 import { useRouter } from 'next/navigation';
 import Swal from 'sweetalert2'
 
@@ -27,7 +29,7 @@ const useProducts = (data, page, rowsPerPage) => {
                     () => {
                               return applyPagination(data, page, rowsPerPage);
                     },
-                    [page, rowsPerPage]
+                    [data, page, rowsPerPage]
           );
 };
 
@@ -43,6 +45,7 @@ const useProductsIds = (products) => {
 const Page = (props) => {
           const [page, setPage] = useState(0);
           const [open, setOpen] = useState(false)
+          const [openEdit, setOpenEdit] = useState(false)
           const [rowsPerPage, setRowsPerPage] = useState(5);
           const products = useProducts(props.products, page, rowsPerPage);
           const productsIds = useProductsIds(props.products);
@@ -50,13 +53,19 @@ const Page = (props) => {
           const router = useRouter();
 
           const handleSubmitSuccess = () => {
-
                     setOpen(false); // Close the dialog
           };
 
+          const handleSubmitEditSuccess = () => {
+                    setOpenEdit(false)
+          }
+
           const handleSubmitFail = () => {
                     setOpen(false)
+          }
 
+          const handleSubmitEditFail = () => {
+                    setOpenEdit(false)
           }
 
           const handleDeleteButtonClick = () => {
@@ -88,7 +97,7 @@ const Page = (props) => {
                                         },
                                         body: JSON.stringify(productsSelection), // Convert your data to JSON
                               });
-                              console.log(response);
+
                               if (response.ok) {
                                         Swal.fire({
                                                   icon: 'success',
@@ -119,7 +128,12 @@ const Page = (props) => {
                     },
                     []
           );
+
           const handleClose = () => {
+                    console.log('closed');
+          }
+
+          const handleEdit = () => {
                     console.log('closed');
           }
 
@@ -148,7 +162,7 @@ const Page = (props) => {
                                                                                 <Typography variant="h4">
                                                                                           Products
                                                                                 </Typography>
-                                                                                <Stack
+                                                                                {/* <Stack
                                                                                           alignItems="center"
                                                                                           direction="row"
                                                                                           spacing={1}
@@ -173,9 +187,9 @@ const Page = (props) => {
                                                                                           >
                                                                                                     Export
                                                                                           </Button>
-                                                                                </Stack>
+                                                                                </Stack> */}
                                                                       </Stack>
-                                                                      <Box sx={{ display: 'flex', justifyContent: 'space-between', height: '40px', width: '220px' }}>
+                                                                      <Box sx={{ display: 'flex', justifyContent: 'space-between', height: '40px', width: '320px' }}>
                                                                                 <Button
                                                                                           startIcon={(
                                                                                                     <SvgIcon fontSize="small">
@@ -200,7 +214,18 @@ const Page = (props) => {
                                                                                 >
                                                                                           Delete
                                                                                 </Button>
-
+                                                                                <Button
+                                                                                          startIcon={(
+                                                                                                    <SvgIcon fontSize="small">
+                                                                                                              <FolderOpenIcon />
+                                                                                                    </SvgIcon>
+                                                                                          )}
+                                                                                          variant="contained"
+                                                                                          onClick={() => setOpenEdit(true)}
+                                                                                          disabled={productsSelection.selected.length != 1}
+                                                                                >
+                                                                                          Edit
+                                                                                </Button>
                                                                       </Box>
                                                             </Stack>
                                                             <ProductsSearch />
@@ -233,6 +258,21 @@ const Page = (props) => {
                                                   <AddProductForm
                                                             onSubmitSuccess={handleSubmitSuccess}
                                                             onSubmitFail={handleSubmitFail} />
+                                        </DialogContent>
+                              </Dialog>
+                              <Dialog open={openEdit}
+                                        onClose={handleEdit}
+                                        PaperProps={{
+                                                  sx: {
+                                                            width: '600px'
+                                                  }
+                                        }}
+                              >
+                                        <DialogTitle>Edit product</DialogTitle>
+                                        <DialogContent dividers >
+                                                  <EditProductForm
+                                                            onSubmitSuccess={handleSubmitEditSuccess}
+                                                            onSubmitFail={handleSubmitEditFail} />
                                         </DialogContent>
                               </Dialog>
                     </Box >
