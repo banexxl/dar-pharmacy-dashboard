@@ -1,6 +1,6 @@
 import React from 'react';
 import { useFormik } from 'formik';
-import { TextField, Button, Checkbox, FormControlLabel, Box, Typography } from '@mui/material';
+import { TextField, Button, Checkbox, FormControlLabel, Box, Typography, Card, CardContent, Grid, MenuItem, Stack } from '@mui/material';
 import { Form, Formik, FormikErrors, FormikTouched } from 'formik';
 import { newProductSchema } from './new-product-schema'
 import { useRouter } from 'next/navigation';
@@ -25,6 +25,34 @@ const initialValues = {
           discount: false,
           discountAmount: '',
 };
+
+
+const categoryOptions = [
+          {
+                    label: 'Healthcare',
+                    value: 'healthcare',
+          },
+          {
+                    label: 'Makeup',
+                    value: 'makeup',
+          },
+          {
+                    label: 'Dress',
+                    value: 'dress',
+          },
+          {
+                    label: 'Skincare',
+                    value: 'skincare',
+          },
+          {
+                    label: 'Jewelry',
+                    value: 'jewelry',
+          },
+          {
+                    label: 'Blouse',
+                    value: 'blouse',
+          },
+];
 
 export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
 
@@ -87,11 +115,67 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                   (formik) => (
                                                             <Form style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
 
-                                                                      <Typography>
-                                                                                {
-                                                                                          formik.dirty
-                                                                                }
-                                                                      </Typography>
+                                                                      <Card>
+                                                                                <CardContent>
+                                                                                          <Grid
+                                                                                                    container
+                                                                                                    spacing={3}
+                                                                                          >
+                                                                                                    <Grid
+                                                                                                              xs={12}
+                                                                                                              md={4}
+                                                                                                    >
+                                                                                                              <Typography variant="h6">Category</Typography>
+                                                                                                    </Grid>
+                                                                                                    <Grid
+                                                                                                              xs={12}
+                                                                                                              md={8}
+                                                                                                    >
+                                                                                                              <Stack spacing={3}>
+                                                                                                                        <TextField
+                                                                                                                                  error={!!(formik.touched.category && formik.errors.category)}
+                                                                                                                                  fullWidth
+                                                                                                                                  label="Category"
+                                                                                                                                  name="category"
+                                                                                                                                  onBlur={formik.handleBlur}
+                                                                                                                                  onChange={formik.handleChange}
+                                                                                                                                  select
+                                                                                                                                  value={formik.values.category}
+                                                                                                                        >
+                                                                                                                                  {categoryOptions.map((option) => (
+                                                                                                                                            <MenuItem
+                                                                                                                                                      key={option.value}
+                                                                                                                                                      value={option.value}
+                                                                                                                                            >
+                                                                                                                                                      {option.label}
+                                                                                                                                            </MenuItem>
+                                                                                                                                  ))}
+                                                                                                                        </TextField>
+                                                                                                                        <TextField
+                                                                                                                                  disabled
+                                                                                                                                  error={!!(formik.touched.barcode && formik.errors.barcode)}
+                                                                                                                                  fullWidth
+                                                                                                                                  label="Barcode"
+                                                                                                                                  name="barcode"
+                                                                                                                                  onBlur={formik.handleBlur}
+                                                                                                                                  onChange={formik.handleChange}
+                                                                                                                                  value={formik.values.barcode}
+                                                                                                                        />
+                                                                                                                        <TextField
+                                                                                                                                  disabled
+                                                                                                                                  error={!!(formik.touched.sku && formik.errors.sku)}
+                                                                                                                                  fullWidth
+                                                                                                                                  label="SKU"
+                                                                                                                                  name="sku"
+                                                                                                                                  onBlur={formik.handleBlur}
+                                                                                                                                  onChange={formik.handleChange}
+                                                                                                                                  value={formik.values.sku}
+                                                                                                                        />
+                                                                                                              </Stack>
+                                                                                                    </Grid>
+                                                                                          </Grid>
+                                                                                </CardContent>
+                                                                      </Card>
 
                                                                       <TextField
                                                                                 label="Name"
