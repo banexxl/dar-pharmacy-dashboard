@@ -27,32 +27,296 @@ const initialValues = {
 };
 
 
-const categoryOptions = [
+const mainCategoryOptions = [
           {
-                    label: 'Healthcare',
-                    value: 'healthcare',
+                    label: 'Apoteka',
+                    value: 'apoteka',
           },
           {
-                    label: 'Makeup',
-                    value: 'makeup',
-          },
-          {
-                    label: 'Dress',
-                    value: 'dress',
-          },
-          {
-                    label: 'Skincare',
-                    value: 'skincare',
-          },
-          {
-                    label: 'Jewelry',
-                    value: 'jewelry',
-          },
-          {
-                    label: 'Blouse',
-                    value: 'blouse',
+                    label: 'Prirodna kozmetika',
+                    value: 'prirodna-kozmetika',
           },
 ];
+
+
+const midCategoryOptions = [
+          {
+                    label: 'Alergije',
+                    value: 'alergije',
+          },
+          {
+                    label: 'Anemija',
+                    value: 'anemija',
+          },
+          {
+                    label: 'Antioksidansi i detoksikacija',
+                    value: 'antioksidansi-i-detoksikacija',
+          },
+          {
+                    label: 'Bol',
+                    value: 'bol',
+          },
+          {
+                    label: 'Bubrezi i mokraćni putevi',
+                    value: 'bubrezi-i-mokracni-putevi',
+          },
+          {
+                    label: 'Energija i umor',
+                    value: 'energija-i-umor',
+          },
+          {
+                    label: 'Hemoroidi',
+                    value: 'hemoroidi',
+          },
+          {
+                    label: 'Kosa, koža i nokti',
+                    value: 'kosa-koza-i-nokti',
+          },
+          {
+                    label: 'Sokovi',
+                    value: 'sokovi',
+          },
+];
+
+
+const subCategoryOptions = [
+          {
+                    label: 'Biljni preparati',
+                    value: 'biljni-preparati',
+          },
+          {
+                    label: 'Bolovi u zglobovima i mišićima',
+                    value: 'bolovi-u-zglobovima-i-misicima',
+          },
+          {
+                    label: 'Irigacioni set',
+                    value: 'irigacioni-set',
+          },
+          {
+                    label: 'Kapsule i tablete',
+                    value: 'kapsule-i-tablete',
+          },
+];
+
+const manufacturerOptions = [
+          {
+                    label: 'ALPENKRAUTER',
+                    value: 'alpenkrauter',
+          },
+          {
+                    label: 'Abela Pharm',
+                    value: 'abela-pharm',
+          },
+          {
+                    label: 'Alpen Pharma doo',
+                    value: 'alpen-pharma-doo',
+          },
+          {
+                    label: 'Amer',
+                    value: 'amer',
+          },
+          {
+                    label: 'Bach Flower Remedies',
+                    value: 'bach-flower-remedies',
+          },
+          {
+                    label: 'Bajkal',
+                    value: 'bajkal',
+          },
+          {
+                    label: 'Beopanax d.o.o.',
+                    value: 'beopanax-doo',
+          },
+          {
+                    label: 'Bio Solutions',
+                    value: 'bio-solutions',
+          },
+          {
+                    label: 'Catalysis S.L.',
+                    value: 'catalysis-sl',
+          },
+          {
+                    label: 'Colloid',
+                    value: 'colloid',
+          },
+          {
+                    label: 'Cortex Labs',
+                    value: 'cortex-labs',
+          },
+          {
+                    label: 'DMG',
+                    value: 'dmg',
+          },
+          {
+                    label: 'Dimas',
+                    value: 'dimas',
+          },
+          {
+                    label: 'Dr. Werner Pharma',
+                    value: 'dr-werner-pharma',
+          },
+          {
+                    label: 'Fantastik fungi',
+                    value: 'fantastik-fungi',
+          },
+          {
+                    label: 'Farma Derma',
+                    value: 'farma-derma',
+          },
+          {
+                    label: 'Farmas MN',
+                    value: 'farmas-mn',
+          },
+          {
+                    label: 'GRANUM',
+                    value: 'granum',
+          },
+          {
+                    label: 'Galenika',
+                    value: 'galenika',
+          },
+          {
+                    label: 'Gana kozmetika',
+                    value: 'gana-kozmetika',
+          },
+          {
+                    label: 'Gavez',
+                    value: 'gavez',
+          },
+          {
+                    label: 'Herbalab',
+                    value: 'herbalab',
+          },
+          {
+                    label: 'Himalaya',
+                    value: 'himalaya',
+          },
+          {
+                    label: 'Innventa pharm',
+                    value: 'innventa-pharm',
+          },
+          {
+                    label: 'LAMA',
+                    value: 'lama',
+          },
+          {
+                    label: 'LV-Pharm',
+                    value: 'lv-pharm',
+          },
+          {
+                    label: 'Laboratorie ACM, France',
+                    value: 'laboratorie-acm-france',
+          },
+          {
+                    label: 'Laboratories NATIVE, France',
+                    value: 'laboratories-native-france',
+          },
+          {
+                    label: 'Lander',
+                    value: 'lander',
+          },
+          {
+                    label: 'Magni Food',
+                    value: 'magni-food',
+          },
+          {
+                    label: 'Majana',
+                    value: 'majana',
+          },
+          {
+                    label: 'MaxMedica',
+                    value: 'maxmedica',
+          },
+          {
+                    label: 'Medical Plants',
+                    value: 'medical-plants',
+          },
+          {
+                    label: 'Moj caj',
+                    value: 'moj-caj',
+          },
+          {
+                    label: 'NEMET PALIC',
+                    value: 'nemet-palic',
+          },
+          {
+                    label: 'NTC Pharma',
+                    value: 'ntc-pharma',
+          },
+          {
+                    label: 'Natural Way',
+                    value: 'natural-way',
+          },
+          {
+                    label: 'NaturalWealth',
+                    value: 'naturalwealth',
+          },
+          {
+                    label: 'Now Foods',
+                    value: 'now-foods',
+          },
+          {
+                    label: 'OKP',
+                    value: 'okp',
+          },
+          {
+                    label: 'OlimpSport',
+                    value: 'olimpsport',
+          },
+          {
+                    label: 'Pharma Medica',
+                    value: 'pharma-medica',
+          },
+          {
+                    label: 'PharmaDevelopment',
+                    value: 'pharmadevelopment',
+          },
+          {
+                    label: 'Plantacare',
+                    value: 'plantacare',
+          },
+          {
+                    label: 'Priroda na dar',
+                    value: 'priroda-na-dar',
+          },
+          {
+                    label: 'RHINOSAN',
+                    value: 'rhinosan',
+          },
+          {
+                    label: 'RabenHorst',
+                    value: 'rabenhorst',
+          },
+          {
+                    label: 'Rulek',
+                    value: 'rulek',
+          },
+          {
+                    label: 'Ruska Biljna Apoteka Organic',
+                    value: 'ruska-biljna-apoteka-organic',
+          },
+          {
+                    label: 'Shulke',
+                    value: 'shulke',
+          },
+          {
+                    label: 'Sofija',
+                    value: 'sofija',
+          },
+          {
+                    label: 'VitalGrana',
+                    value: 'vitalgrana',
+          },
+          {
+                    label: 'Weleda',
+                    value: 'weleda',
+          },
+          {
+                    label: 'Zodeks caj',
+                    value: 'zodeks-caj',
+          },
+];
+
 
 export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
 
@@ -114,69 +378,6 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                         {
                                                   (formik) => (
                                                             <Form style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-
-                                                                      <Card>
-                                                                                <CardContent>
-                                                                                          <Grid
-                                                                                                    container
-                                                                                                    spacing={3}
-                                                                                          >
-                                                                                                    <Grid
-                                                                                                              xs={12}
-                                                                                                              md={4}
-                                                                                                    >
-                                                                                                              <Typography variant="h6">Category</Typography>
-                                                                                                    </Grid>
-                                                                                                    <Grid
-                                                                                                              xs={12}
-                                                                                                              md={8}
-                                                                                                    >
-                                                                                                              <Stack spacing={3}>
-                                                                                                                        <TextField
-                                                                                                                                  error={!!(formik.touched.category && formik.errors.category)}
-                                                                                                                                  fullWidth
-                                                                                                                                  label="Category"
-                                                                                                                                  name="category"
-                                                                                                                                  onBlur={formik.handleBlur}
-                                                                                                                                  onChange={formik.handleChange}
-                                                                                                                                  select
-                                                                                                                                  value={formik.values.category}
-                                                                                                                        >
-                                                                                                                                  {categoryOptions.map((option) => (
-                                                                                                                                            <MenuItem
-                                                                                                                                                      key={option.value}
-                                                                                                                                                      value={option.value}
-                                                                                                                                            >
-                                                                                                                                                      {option.label}
-                                                                                                                                            </MenuItem>
-                                                                                                                                  ))}
-                                                                                                                        </TextField>
-                                                                                                                        <TextField
-                                                                                                                                  disabled
-                                                                                                                                  error={!!(formik.touched.barcode && formik.errors.barcode)}
-                                                                                                                                  fullWidth
-                                                                                                                                  label="Barcode"
-                                                                                                                                  name="barcode"
-                                                                                                                                  onBlur={formik.handleBlur}
-                                                                                                                                  onChange={formik.handleChange}
-                                                                                                                                  value={formik.values.barcode}
-                                                                                                                        />
-                                                                                                                        <TextField
-                                                                                                                                  disabled
-                                                                                                                                  error={!!(formik.touched.sku && formik.errors.sku)}
-                                                                                                                                  fullWidth
-                                                                                                                                  label="SKU"
-                                                                                                                                  name="sku"
-                                                                                                                                  onBlur={formik.handleBlur}
-                                                                                                                                  onChange={formik.handleChange}
-                                                                                                                                  value={formik.values.sku}
-                                                                                                                        />
-                                                                                                              </Stack>
-                                                                                                    </Grid>
-                                                                                          </Grid>
-                                                                                </CardContent>
-                                                                      </Card>
-
                                                                       <TextField
                                                                                 label="Name"
                                                                                 name="name"
@@ -197,31 +398,67 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                                       />
 
                                                                       <TextField
+                                                                                fullWidth
                                                                                 label="Main category"
                                                                                 name="mainCategory"
-                                                                                value={formik.values.mainCategory}
+                                                                                onBlur={formik.handleBlur}
                                                                                 onChange={formik.handleChange}
+                                                                                select
                                                                                 error={formik.touched.mainCategory && !!formik.errors.mainCategory}
                                                                                 helperText={formik.touched.mainCategory && formik.errors.mainCategory}
-                                                                      />
+                                                                                value={formik.values.mainCategory}
+                                                                      >
+                                                                                {mainCategoryOptions.map((option) => (
+                                                                                          <MenuItem
+                                                                                                    key={option.value}
+                                                                                                    value={option.value}
+                                                                                          >
+                                                                                                    {option.label}
+                                                                                          </MenuItem>
+                                                                                ))}
+                                                                      </TextField>
 
                                                                       <TextField
+                                                                                fullWidth
                                                                                 label="Mid category"
                                                                                 name="midCategory"
-                                                                                value={formik.values.midCategory}
+                                                                                onBlur={formik.handleBlur}
                                                                                 onChange={formik.handleChange}
-                                                                      // error={formik.touched.midCategory && !!formik.errors.midCategory}
-                                                                      // helperText={formik.touched.midCategory && formik.errors.midCategory}
-                                                                      />
+                                                                                select
+                                                                                error={formik.touched.midCategory && !!formik.errors.midCategory}
+                                                                                helperText={formik.touched.midCategory && formik.errors.midCategory}
+                                                                                value={formik.values.midCategory}
+                                                                      >
+                                                                                {midCategoryOptions.map((option) => (
+                                                                                          <MenuItem
+                                                                                                    key={option.value}
+                                                                                                    value={option.value}
+                                                                                          >
+                                                                                                    {option.label}
+                                                                                          </MenuItem>
+                                                                                ))}
+                                                                      </TextField>
 
                                                                       <TextField
+                                                                                fullWidth
                                                                                 label="Sub category"
                                                                                 name="subCategory"
-                                                                                value={formik.values.subCategory}
+                                                                                onBlur={formik.handleBlur}
                                                                                 onChange={formik.handleChange}
-                                                                      // error={formik.touched.subCategory && !!formik.errors.subCategory}
-                                                                      // helperText={formik.touched.subCategory && formik.errors.subCategory}
-                                                                      />
+                                                                                select
+                                                                                error={formik.touched.subCategory && !!formik.errors.subCategory}
+                                                                                helperText={formik.touched.subCategory && formik.errors.subCategory}
+                                                                                value={formik.values.subCategory}
+                                                                      >
+                                                                                {subCategoryOptions.map((option) => (
+                                                                                          <MenuItem
+                                                                                                    key={option.value}
+                                                                                                    value={option.value}
+                                                                                          >
+                                                                                                    {option.label}
+                                                                                          </MenuItem>
+                                                                                ))}
+                                                                      </TextField>
 
                                                                       <TextField
                                                                                 label="Available stock"
@@ -260,13 +497,25 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                                       />
 
                                                                       <TextField
+                                                                                fullWidth
                                                                                 label="Manufacturer"
                                                                                 name="manufacturer"
-                                                                                value={formik.values.manufacturer}
+                                                                                onBlur={formik.handleBlur}
                                                                                 onChange={formik.handleChange}
+                                                                                select
                                                                                 error={formik.touched.manufacturer && !!formik.errors.manufacturer}
                                                                                 helperText={formik.touched.manufacturer && formik.errors.manufacturer}
-                                                                      />
+                                                                                value={formik.values.manufacturer}
+                                                                      >
+                                                                                {manufacturerOptions.map((option) => (
+                                                                                          <MenuItem
+                                                                                                    key={option.value}
+                                                                                                    value={option.value}
+                                                                                          >
+                                                                                                    {option.label}
+                                                                                          </MenuItem>
+                                                                                ))}
+                                                                      </TextField>
 
                                                                       <TextField
                                                                                 label="Warning"
