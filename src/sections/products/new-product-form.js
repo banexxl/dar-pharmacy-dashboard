@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useFormik } from 'formik';
-import { TextField, Button, Checkbox, FormControlLabel, Box, Typography, Card, CardContent, Grid, MenuItem, Stack, Container, IconButton, CardActionArea } from '@mui/material';
+import { TextField, Button, Checkbox, FormControlLabel, Box, Input, Card, CardContent, Grid, MenuItem, Stack, Container, IconButton, CardActionArea } from '@mui/material';
 import { Form, Formik, FormikErrors, FormikTouched } from 'formik';
 import PhotoCamera from "@mui/icons-material/PhotoCamera";
 import { newProductSchema } from './new-product-schema'
@@ -329,12 +329,12 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
           };
 
           const handleSubmit = async (values) => {
-
+                    setUploadState(true)
                     const formData = new FormData();
                     formData.append('image', selectedFile);
-                    console.log(values);
+
                     try {
-                              const response = await fetch('/api/product-api', {
+                              const responseValues = await fetch('/api/product-api', {
                                         method: 'POST',
                                         headers: {
                                                   'Content-Type': 'application/json',
@@ -347,17 +347,17 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                               const responseImage = await fetch('/api/image-api/', {
                                         method: 'POST',
                                         body: formData
-                              })
-                                        .then((response) => response.json())
+                              }).then((response) => response.json())
                                         .then((data) => {
                                                   console.log('Image uploaded successfully:', data);
                                         })
                                         .catch((error) => {
                                                   console.error('Error uploading image:', error);
                                         });
-
-                              if (response.ok && responseImage.ok) {
+                              console.log(responseImage, responseValues);
+                              if (responseValues.ok && responseImage.ok) {
                                         onSubmitSuccess();
+
                                         Swal.fire({
                                                   icon: 'success',
                                                   title: 'Success',
@@ -384,6 +384,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                         footer: '<a href="">Why do I have this issue?</a>'
                               })
                     }
+                    setUploadState(true)
           }
 
           return (
@@ -562,17 +563,15 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                                       </Fab> */}
                                                                       <Container maxWidth="md"
                                                                                 sx={{ mt: 1, borderRadius: '5px', height: '300px', border: '1px solid red' }}>
-                                                                                <Stack direction="row"
-                                                                                          border='1px solid blue'
-                                                                                          alignItems="center"
-                                                                                          spacing={2}>
+                                                                                <Stack >
                                                                                           <IconButton
                                                                                                     color="primary"
                                                                                                     aria-label="upload picture"
                                                                                                     component="label"
+                                                                                                    display="flex"
 
                                                                                           >
-                                                                                                    <input hidden
+                                                                                                    <input hidden={true}
                                                                                                               accept="image/*"
                                                                                                               type="file"
                                                                                                               onChange={({ target }) => {
@@ -581,23 +580,24 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                                                                                         setSelectedFile(file)
                                                                                                               }}
                                                                                                     />
-                                                                                                    <PhotoCamera />
+                                                                                                    {
+                                                                                                              selectedImage ?
+                                                                                                                        <CardActionArea onClick={handleResetClick}
+                                                                                                                                  sx={{ border: '1px solid green', width: 'auto' }}>
+                                                                                                                                  <Image
+                                                                                                                                            src={selectedImage}
+                                                                                                                                            width={150}
+                                                                                                                                            height={200}
+                                                                                                                                            alt="LOGO" />
+                                                                                                                        </CardActionArea>
+                                                                                                                        :
+                                                                                                                        <PhotoCamera />
+                                                                                                    }
+
                                                                                           </IconButton>
 
                                                                                 </Stack>
-                                                                                {
-                                                                                          selectedImage ?
-                                                                                                    <CardActionArea onClick={handleResetClick}
-                                                                                                              sx={{ border: '1px solid green' }}>
-                                                                                                              <Image
-                                                                                                                        src={selectedImage}
-                                                                                                                        width={300}
-                                                                                                                        height={300}
-                                                                                                                        alt="LOGO" />
-                                                                                                    </CardActionArea>
-                                                                                                    :
-                                                                                                    <Stack>Select Image</Stack>
-                                                                                }
+
                                                                       </Container>
 
                                                                       <TextField
@@ -669,6 +669,6 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                   )
                                         }
                               </Formik >
-                    </Box>
+                    </Box >
           );
 };
