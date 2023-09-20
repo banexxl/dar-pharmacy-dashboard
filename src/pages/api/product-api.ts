@@ -35,7 +35,6 @@ export default async function handler(request: NextApiRequest, response: NextApi
                     }
                     else if (request.method === 'DELETE') {
                               const idsToDelete = request.body.selected.map((_id: any) => new ObjectId(_id))
-                              console.log(idsToDelete);
 
                               await dbProducts.deleteMany({ _id: { $in: idsToDelete } })
                               return response.status(200).json({ message: 'Product successfully deleted!' });

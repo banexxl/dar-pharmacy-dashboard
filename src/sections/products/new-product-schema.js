@@ -32,9 +32,9 @@ export const newProductSchema = () => yup.object().shape({
           warning: yup
                     .string()
                     .required('Product warning is required'),
-          imageURL: yup
-                    .string()
-                    .required('Product imageURL is required'),
+          // imageURL: yup
+          //           .string()
+          //           .required('Product imageURL is required'),
           price: yup
                     .number()
                     .required('Product price is required'),

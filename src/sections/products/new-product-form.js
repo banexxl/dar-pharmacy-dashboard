@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useFormik } from 'formik';
-import { TextField, Button, Checkbox, FormControlLabel, Box, Typography, Card, CardContent, Grid, MenuItem, Stack } from '@mui/material';
+import { TextField, Button, Checkbox, FormControlLabel, Box, Typography, Card, CardContent, Grid, MenuItem, Stack, Container, IconButton, CardActionArea } from '@mui/material';
 import { Form, Formik, FormikErrors, FormikTouched } from 'formik';
+import PhotoCamera from "@mui/icons-material/PhotoCamera";
 import { newProductSchema } from './new-product-schema'
 import { useRouter } from 'next/navigation';
 import Swal from 'sweetalert2'
+import Image from 'next/image';
 
 const initialValues = {
           name: '',
@@ -18,14 +20,13 @@ const initialValues = {
           quantity: '',
           manufacturer: '',
           warning: '',
-          imageURL: '',
+          //imageURL: '',
           price: '',
           newArrival: false,
           bestSeller: false,
           discount: false,
           discountAmount: '',
 };
-
 
 const mainCategoryOptions = [
           {
@@ -37,7 +38,6 @@ const mainCategoryOptions = [
                     value: 'prirodna-kozmetika',
           },
 ];
-
 
 const midCategoryOptions = [
           {
@@ -77,7 +77,6 @@ const midCategoryOptions = [
                     value: 'sokovi',
           },
 ];
-
 
 const subCategoryOptions = [
           {
@@ -317,16 +316,24 @@ const manufacturerOptions = [
           },
 ];
 
-
 export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
 
           const router = useRouter();
+          const [selectedFile, setSelectedFile] = useState(null);
+          const [selectedImage, setSelectedImage] = useState(null);
+          const [uploadState, setUploadState] = useState("initial");
 
-          const handleSubmit = async (values, helpers) => {
+          const handleResetClick = (event) => {
+                    setSelectedImage(null);
+                    setUploadState("initial");
+          };
 
+          const handleSubmit = async (values) => {
+
+                    const formData = new FormData();
+                    formData.append('image', selectedFile);
+                    console.log(values);
                     try {
-                              //API CALL
-
                               const response = await fetch('/api/product-api', {
                                         method: 'POST',
                                         headers: {
@@ -334,10 +341,22 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                   'Access-Control-Allow-Origin': '*',
                                                   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS' // Set the content type to JSON
                                         },
-                                        body: JSON.stringify(values), // Convert your data to JSON
+                                        body: JSON.stringify(values),
                               });
 
-                              if (response.ok) {
+                              const responseImage = await fetch('/api/image-api/', {
+                                        method: 'POST',
+                                        body: formData
+                              })
+                                        .then((response) => response.json())
+                                        .then((data) => {
+                                                  console.log('Image uploaded successfully:', data);
+                                        })
+                                        .catch((error) => {
+                                                  console.error('Error uploading image:', error);
+                                        });
+
+                              if (response.ok && responseImage.ok) {
                                         onSubmitSuccess();
                                         Swal.fire({
                                                   icon: 'success',
@@ -378,6 +397,9 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                         {
                                                   (formik) => (
                                                             <Form style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                                                                      {/* <Typography>
+                                                                                {`${ JSON.stringify(formik.errors) }`}
+                                                                      </Typography> */}
                                                                       <TextField
                                                                                 label="Name"
                                                                                 name="name"
@@ -534,6 +556,49 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                                                 error={formik.touched.imageURL && !!formik.errors.imageURL}
                                                                                 helperText={formik.touched.imageURL && formik.errors.imageURL}
                                                                       />
+                                                                      {/* <Fab component="span"
+                                                                      >
+                                                                                <PhotoCamera />
+                                                                      </Fab> */}
+                                                                      <Container maxWidth="md"
+                                                                                sx={{ mt: 1, borderRadius: '5px', height: '300px', border: '1px solid red' }}>
+                                                                                <Stack direction="row"
+                                                                                          border='1px solid blue'
+                                                                                          alignItems="center"
+                                                                                          spacing={2}>
+                                                                                          <IconButton
+                                                                                                    color="primary"
+                                                                                                    aria-label="upload picture"
+                                                                                                    component="label"
+
+                                                                                          >
+                                                                                                    <input hidden
+                                                                                                              accept="image/*"
+                                                                                                              type="file"
+                                                                                                              onChange={({ target }) => {
+                                                                                                                        const file = target.files[0]
+                                                                                                                        setSelectedImage(URL.createObjectURL(file))
+                                                                                                                        setSelectedFile(file)
+                                                                                                              }}
+                                                                                                    />
+                                                                                                    <PhotoCamera />
+                                                                                          </IconButton>
+
+                                                                                </Stack>
+                                                                                {
+                                                                                          selectedImage ?
+                                                                                                    <CardActionArea onClick={handleResetClick}
+                                                                                                              sx={{ border: '1px solid green' }}>
+                                                                                                              <Image
+                                                                                                                        src={selectedImage}
+                                                                                                                        width={300}
+                                                                                                                        height={300}
+                                                                                                                        alt="LOGO" />
+                                                                                                    </CardActionArea>
+                                                                                                    :
+                                                                                                    <Stack>Select Image</Stack>
+                                                                                }
+                                                                      </Container>
 
                                                                       <TextField
                                                                                 label="Price"
@@ -583,6 +648,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                                                 value={formik.values.discountAmount}
                                                                                 onChange={formik.handleChange}
                                                                       />
+
                                                                       <Box sx={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
                                                                                 <Button
                                                                                           variant="contained"
@@ -594,6 +660,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                                                 <Button type="submit"
                                                                                           variant="contained"
                                                                                           color="primary"
+                                                                                          disabled={Object.keys(formik.errors).length != 0}
                                                                                 >
                                                                                           Add Product
                                                                                 </Button>
