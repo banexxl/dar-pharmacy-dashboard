@@ -316,6 +316,29 @@ const manufacturerOptions = [
           },
 ];
 
+const handleFileUpload = async (file) => {
+          return new Promise(async (resolve, reject) => {
+                    try {
+                              const formData = new FormData();
+                              formData.append('file', file);
+
+                              const response = await fetch('/api/image-api', {
+                                        method: 'POST',
+                                        body: formData,
+                              });
+
+                              if (!response.ok) {
+                                        throw new Error('Failed to upload file');
+                              }
+
+                              const data = await response.json();
+                              resolve(data);
+                    } catch (error) {
+                              reject(error);
+                    }
+          });
+};
+
 export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
 
           const router = useRouter();
@@ -329,11 +352,21 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
           };
 
           const handleSubmit = async (values) => {
+
                     setUploadState(true)
-                    const formData = new FormData();
-                    formData.append('image', selectedFile);
 
                     try {
+
+                              if (selectedFile) {
+                                        handleFileUpload(selectedFile)
+                                                  .then((data) => {
+                                                            console.log('File uploaded successfully:', data);
+                                                  })
+                                                  .catch((error) => {
+                                                            console.error('Error uploading file:', error);
+                                                  });
+                              }
+
                               const responseValues = await fetch('/api/product-api', {
                                         method: 'POST',
                                         headers: {
@@ -344,18 +377,8 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                         body: JSON.stringify(values),
                               });
 
-                              const responseImage = await fetch('/api/image-api/', {
-                                        method: 'POST',
-                                        body: formData
-                              }).then((response) => response.json())
-                                        .then((data) => {
-                                                  console.log('Image uploaded successfully:', data);
-                                        })
-                                        .catch((error) => {
-                                                  console.error('Error uploading image:', error);
-                                        });
-                              console.log(responseImage, responseValues);
-                              if (responseValues.ok && responseImage.ok) {
+                              if (responseValues.ok && selectedFile) {
+
                                         onSubmitSuccess();
 
                                         Swal.fire({
@@ -565,6 +588,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                                                 sx={{ mt: 1, borderRadius: '5px', height: '300px', border: '1px solid red' }}>
                                                                                 <Stack >
                                                                                           <IconButton
+                                                                                                    onClick={handleResetClick}
                                                                                                     color="primary"
                                                                                                     aria-label="upload picture"
                                                                                                     component="label"
@@ -582,7 +606,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                                                                     />
                                                                                                     {
                                                                                                               selectedImage ?
-                                                                                                                        <CardActionArea onClick={handleResetClick}
+                                                                                                                        <CardActionArea
                                                                                                                                   sx={{ border: '1px solid green', width: 'auto' }}>
                                                                                                                                   <Image
                                                                                                                                             src={selectedImage}

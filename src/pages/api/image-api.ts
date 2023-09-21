@@ -1,36 +1,64 @@
-import { NextApiHandler, NextApiRequest, NextApiResponse } from "next";
-import formidable from "formidable";
-import path from "path";
-import fs from "fs/promises";
+import multer from 'multer';
+import fs from 'fs';
+import path from 'path';
 
+const publicFolderPath = path.join(process.cwd(), 'public/products/');
+const upload = multer({
+          dest: publicFolderPath,
+          fileFilter: (req, file, cb) => {
+                    if (file.mimetype.startsWith('image/')) {
+                              cb(null, true);
+                    } else {
+                              cb(new Error('Only images are allowed.'));
+                    }
+          },
+});
 
-const readFile = (req: NextApiRequest, saveLocally?: boolean): Promise<{ fields: formidable.Fields; files: formidable.Files }> => {
+const uploadMiddleware = upload.single('file');
 
-          const options: formidable.Options = {};
-          if (saveLocally) {
-                    options.uploadDir = path.join(process.cwd(), "/public/products");
-                    options.filename = (name, ext, path, form) => {
-                              return Date.now().toString() + "_" + path.originalFilename;
-                    };
-          }
-          options.maxFileSize = 4000 * 1024 * 1024;
-          const form = formidable(options);
-          return new Promise((resolve, reject) => {
-                    form.parse(req, (err, fields, files) => {
-                              if (err) reject(err);
-                              resolve({ fields, files });
-                    });
-          });
+export const config = {
+          api: {
+                    bodyParser: false,
+          },
 };
 
-const handler: NextApiHandler = async (req, res) => {
+export default async function handler(req, res) {
           try {
-                    await fs.readdir(path.join(process.cwd() + "/public", "/products"));
-          } catch (error) {
-                    await fs.mkdir(path.join(process.cwd() + "/public", "/products"));
-          }
-          await readFile(req, true);
-          res.json({ done: "ok" });
-};
+                    uploadMiddleware(req, res, async function (err) {
+                              if (err) {
+                                        console.error('Error uploading file:', err);
+                                        return res.status(500).json({ error: 'Error uploading file.' });
+                              }
 
-export default handler;
+                              const { file, body: { name } } = req;
+
+                              // Generate a unique filename using the current timestamp
+                              const timestamp = new Date().getTime();
+                              const fileName = `${timestamp}-${file.originalname}`;
+
+                              // Create a path to save the file in the public folder
+                              const filePath = path.join(publicFolderPath, fileName);
+
+                              // Read the file and write it to the desired location
+                              fs.readFile(file.path, (readErr, data) => {
+                                        if (readErr) {
+                                                  console.error('Error reading file:', readErr);
+                                                  return res.status(500).json({ error: 'Error reading file.' });
+                                        }
+
+                                        // Write the file buffer to the file
+                                        fs.writeFile(filePath, data, (writeErr) => {
+                                                  if (writeErr) {
+                                                            console.error('Error writing file:', writeErr);
+                                                            return res.status(500).json({ error: 'Error saving file.' });
+                                                  }
+
+                                                  res.status(200).json({ message: 'File uploaded successfully.', fileName });
+                                        });
+                              });
+                    });
+          } catch (error) {
+                    console.error('Error:', error);
+                    res.status(500).json({ error: 'Server error.' });
+          }
+}
