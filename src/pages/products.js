@@ -214,7 +214,7 @@ const Page = (props) => {
                                                                                 >
                                                                                           Delete
                                                                                 </Button>
-                                                                                <Button
+                                                                                {/* <Button
                                                                                           startIcon={(
                                                                                                     <SvgIcon fontSize="small">
                                                                                                               <FolderOpenIcon />
@@ -225,7 +225,7 @@ const Page = (props) => {
                                                                                           disabled={productsSelection.selected.length != 1}
                                                                                 >
                                                                                           Edit
-                                                                                </Button>
+                                                                                </Button> */}
                                                                       </Box>
                                                             </Stack>
                                                             <ProductsSearch />

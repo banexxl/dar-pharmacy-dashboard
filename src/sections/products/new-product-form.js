@@ -20,15 +20,15 @@ const initialValues = {
           quantity: '',
           manufacturer: '',
           warning: '',
-          //imageURL: '',
+          imageURL: '/',
           price: '',
           newArrival: false,
           bestSeller: false,
           discount: false,
-          discountAmount: '',
+          discountAmount: 0,
 };
 
-const mainCategoryOptions = [
+export const mainCategoryOptions = [
           {
                     label: 'Apoteka',
                     value: 'apoteka',
@@ -316,40 +316,40 @@ const manufacturerOptions = [
           },
 ];
 
-const handleFileUpload = async (file) => {
-          return new Promise(async (resolve, reject) => {
-                    try {
-                              const formData = new FormData();
-                              formData.append('file', file);
+// const handleFileUpload = async (file) => {
+//           return new Promise(async (resolve, reject) => {
+//                     try {
+//                               const formData = new FormData();
+//                               formData.append('file', file);
 
-                              const response = await fetch('/api/image-api', {
-                                        method: 'POST',
-                                        body: formData,
-                              });
+//                               const response = await fetch('/api/image-api', {
+//                                         method: 'POST',
+//                                         body: formData,
+//                               });
 
-                              if (!response.ok) {
-                                        throw new Error('Failed to upload file');
-                              }
+//                               if (!response.ok) {
+//                                         throw new Error('Failed to upload file');
+//                               }
 
-                              const data = await response.json();
-                              resolve(data);
-                    } catch (error) {
-                              reject(error);
-                    }
-          });
-};
+//                               const data = await response.json();
+//                               resolve(data);
+//                     } catch (error) {
+//                               reject(error);
+//                     }
+//           });
+// };
 
 export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
 
           const router = useRouter();
-          const [selectedFile, setSelectedFile] = useState(null);
-          const [selectedImage, setSelectedImage] = useState(null);
-          const [uploadState, setUploadState] = useState("initial");
+          // const [selectedFile, setSelectedFile] = useState(null);
+          // const [selectedImage, setSelectedImage] = useState(null);
+          // const [uploadState, setUploadState] = useState("initial");
 
-          const handleResetClick = (event) => {
-                    setSelectedImage(null);
-                    setUploadState("initial");
-          };
+          // const handleResetClick = (event) => {
+          //           setSelectedImage(null);
+          //           setUploadState("initial");
+          // };
 
           const handleSubmit = async (values) => {
 
@@ -357,15 +357,15 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
 
                     try {
 
-                              if (selectedFile) {
-                                        handleFileUpload(selectedFile)
-                                                  .then((data) => {
-                                                            console.log('File uploaded successfully:', data);
-                                                  })
-                                                  .catch((error) => {
-                                                            console.error('Error uploading file:', error);
-                                                  });
-                              }
+                              // if (selectedFile) {
+                              //           handleFileUpload(selectedFile)
+                              //                     .then((data) => {
+                              //                               console.log('File uploaded successfully:', data);
+                              //                     })
+                              //                     .catch((error) => {
+                              //                               console.error('Error uploading file:', error);
+                              //                     });
+                              // }
 
                               const responseValues = await fetch('/api/product-api', {
                                         method: 'POST',
@@ -377,7 +377,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                         body: JSON.stringify(values),
                               });
 
-                              if (responseValues.ok && selectedFile) {
+                              if (responseValues.ok) {
 
                                         onSubmitSuccess();
 
@@ -404,7 +404,6 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                         icon: 'error',
                                         title: 'Oops...',
                                         text: 'Something went wrong!',
-                                        footer: '<a href="">Why do I have this issue?</a>'
                               })
                     }
                     setUploadState(true)
@@ -584,7 +583,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                                       >
                                                                                 <PhotoCamera />
                                                                       </Fab> */}
-                                                                      <Container maxWidth="md"
+                                                                      {/* <Container maxWidth="md"
                                                                                 sx={{ mt: 1, borderRadius: '5px', height: '300px', border: '1px solid red' }}>
                                                                                 <Stack >
                                                                                           <IconButton
@@ -622,7 +621,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
 
                                                                                 </Stack>
 
-                                                                      </Container>
+                                                                      </Container> */}
 
                                                                       <TextField
                                                                                 label="Price"
