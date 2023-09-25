@@ -467,7 +467,7 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                               display: 'flex',
                                                                                                                                                                                     }}
                                                                                                                                                                           >
-                                                                                                                                                                                    <Switch value={product.discount} />
+                                                                                                                                                                                    <Switch value={product.discount} checked={product.discount} />
                                                                                                                                                                                     <Typography variant="subtitle2">
                                                                                                                                                                                               Discount
                                                                                                                                                                                     </Typography>
@@ -481,7 +481,7 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                               display: 'flex',
                                                                                                                                                                                     }}
                                                                                                                                                                           >
-                                                                                                                                                                                    <Switch value={product.newArrival} />
+                                                                                                                                                                                    <Switch value={product.newArrival} checked={product.newArrival} />
                                                                                                                                                                                     <Typography variant="subtitle2">
                                                                                                                                                                                               New arrival
                                                                                                                                                                                     </Typography>
@@ -495,7 +495,7 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                               display: 'flex',
                                                                                                                                                                                     }}
                                                                                                                                                                           >
-                                                                                                                                                                                    <Switch value={product.bestSeller} />
+                                                                                                                                                                                    <Switch value={product.bestSeller} checked={product.bestSeller} />
                                                                                                                                                                                     <Typography variant="subtitle2">
                                                                                                                                                                                               Best seller
                                                                                                                                                                                     </Typography>

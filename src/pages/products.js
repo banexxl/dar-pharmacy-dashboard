@@ -50,22 +50,13 @@ const Page = (props) => {
           const products = useProducts(props.products, page, rowsPerPage);
           const productsIds = useProductsIds(props.products);
           const productsSelection = useSelection(productsIds);
-          const router = useRouter();
-          console.log(props);
+
           const handleSubmitSuccess = () => {
                     setOpen(false); // Close the dialog
           };
 
-          const handleSubmitEditSuccess = () => {
-                    setOpenEdit(false)
-          }
-
           const handleSubmitFail = () => {
                     setOpen(false)
-          }
-
-          const handleSubmitEditFail = () => {
-                    setOpenEdit(false)
           }
 
           const handlePageChange = useCallback(
@@ -81,14 +72,6 @@ const Page = (props) => {
                     },
                     []
           );
-
-          const handleClose = () => {
-                    console.log('closed');
-          }
-
-          const handleEdit = () => {
-                    console.log('closed');
-          }
 
           return (
                     <Box>
@@ -199,7 +182,6 @@ const Page = (props) => {
                                         </Container>
                               </Box>
                               <Dialog open={open}
-                                        onClose={handleClose}
                                         PaperProps={{
                                                   sx: {
                                                             width: '600px'
@@ -211,21 +193,6 @@ const Page = (props) => {
                                                   <AddProductForm
                                                             onSubmitSuccess={handleSubmitSuccess}
                                                             onSubmitFail={handleSubmitFail} />
-                                        </DialogContent>
-                              </Dialog>
-                              <Dialog open={openEdit}
-                                        onClose={handleEdit}
-                                        PaperProps={{
-                                                  sx: {
-                                                            width: '600px'
-                                                  }
-                                        }}
-                              >
-                                        <DialogTitle>Edit product</DialogTitle>
-                                        <DialogContent dividers >
-                                                  <EditProductForm
-                                                            onSubmitSuccess={handleSubmitEditSuccess}
-                                                            onSubmitFail={handleSubmitEditFail} />
                                         </DialogContent>
                               </Dialog>
                     </Box >
