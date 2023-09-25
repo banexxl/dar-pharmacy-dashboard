@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useFormik } from 'formik';
-import { TextField, Button, Checkbox, FormControlLabel, Box, Input, Card, CardContent, Grid, MenuItem, Stack, Container, IconButton, CardActionArea } from '@mui/material';
+import { TextField, Typography, Button, Checkbox, FormControlLabel, Box, Input, Card, CardContent, Grid, MenuItem, Stack, Container, IconButton, CardActionArea } from '@mui/material';
 import { Form, Formik, FormikErrors, FormikTouched } from 'formik';
 import PhotoCamera from "@mui/icons-material/PhotoCamera";
 import { newProductSchema } from './new-product-schema'
@@ -39,7 +39,7 @@ export const mainCategoryOptions = [
           },
 ];
 
-const midCategoryOptions = [
+export const midCategoryOptions = [
           {
                     label: 'Alergije',
                     value: 'alergije',
@@ -353,8 +353,6 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
 
           const handleSubmit = async (values) => {
 
-                    setUploadState(true)
-
                     try {
 
                               // if (selectedFile) {
@@ -406,7 +404,6 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                         text: 'Something went wrong!',
                               })
                     }
-                    setUploadState(true)
           }
 
           return (
@@ -420,9 +417,9 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                         {
                                                   (formik) => (
                                                             <Form style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                                                                      {/* <Typography>
+                                                                      <Typography>
                                                                                 {`${ JSON.stringify(formik.errors) }`}
-                                                                      </Typography> */}
+                                                                      </Typography>
                                                                       <TextField
                                                                                 label="Name"
                                                                                 name="name"

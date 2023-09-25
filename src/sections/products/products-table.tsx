@@ -16,7 +16,9 @@ import numeral from 'numeral';
 import { Fragment, useCallback, useState } from 'react';
 import { Scrollbar } from 'src/components/scrollbar';
 import { SeverityPill } from '@/components/severity-pill';
-import { mainCategoryOptions } from './new-product-form';
+import { mainCategoryOptions, midCategoryOptions } from './new-product-form';
+import Swal from 'sweetalert2';
+import { useRouter } from 'next/navigation';
 
 export const ProductsTable = (props: any) => {
           const {
@@ -36,6 +38,7 @@ export const ProductsTable = (props: any) => {
           const selectedSome = (selected.length > 0) && (selected.length < items.length);
           const selectedAll = (items.length > 0) && (selected.length === items.length);
           const [currentProduct, setCurrentProduct] = useState(null);
+          const router = useRouter();
 
           const handleProductToggle = useCallback((productId: any) => {
                     setCurrentProduct((prevProductId: any) => {
@@ -56,9 +59,52 @@ export const ProductsTable = (props: any) => {
                     toast.success('Product updated');
           }, []);
 
-          const handleProductDelete = useCallback(() => {
-                    toast.error('Product cannot be deleted');
-          }, []);
+          const handleDeleteButtonClick = () => {
+                    Swal.fire({
+                              title: 'Are you sure?',
+                              text: "You won't be able to revert this!",
+                              icon: 'warning',
+                              showCancelButton: true,
+                              confirmButtonColor: '#3085d6',
+                              cancelButtonColor: '#d33',
+                              confirmButtonText: 'Yes, delete it!'
+                    }).then((result) => {
+                              if (result.isConfirmed) {
+                                        handleDeleteProduct(currentProduct)
+                              }
+                    })
+          }
+
+          const handleDeleteProduct = async (currentProduct: any) => {
+
+                    try {
+                              //API CALL
+                              const response = await fetch('/api/product-api', {
+                                        method: 'DELETE',
+                                        headers: {
+                                                  'Content-Type': 'application/json',
+                                                  'Access-Control-Allow-Origin': 'https://dar-pharmacy-dashboard.vercel.app/api/product-api, http://localhost:3000/api/product-api',
+                                                  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS' // Set the content type to JSON
+                                        },
+                                        body: JSON.stringify(currentProduct), // Convert your data to JSON
+                              });
+
+                              if (response.ok) {
+                                        Swal.fire({
+                                                  icon: 'success',
+                                                  title: 'Success',
+                                                  text: 'Product deleted!',
+                                        })
+                                        router.push('/products')
+                              } else {
+                                        const errorData = await response.json(); // Parse the error response
+                                        console.error('errorData', errorData);
+                              }
+
+                    } catch (err) {
+                              console.error(err);
+                    }
+          }
 
           return (
                     <Card>
@@ -92,7 +138,7 @@ export const ProductsTable = (props: any) => {
                                                             </TableHead>
                                                             <TableBody>
                                                                       {items.slice(page * rowsPerPage, (page * rowsPerPage) + rowsPerPage).map((product: any) => {
-                                                                                const isSelected = selected.includes(product._id);
+                                                                                //const isSelected = selected.includes(product._id);
                                                                                 const isCurrent = product._id === currentProduct;
                                                                                 console.log(isCurrent);
 
@@ -105,7 +151,7 @@ export const ProductsTable = (props: any) => {
                                                                                           <Fragment key={product.id}>
                                                                                                     <TableRow
                                                                                                               hover
-                                                                                                              key={product.id}
+                                                                                                              key={product._id}
                                                                                                     >
                                                                                                               <TableCell
                                                                                                                         padding="checkbox"
@@ -264,11 +310,11 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                     xs={12}
                                                                                                                                                                           >
                                                                                                                                                                                     <TextField
-                                                                                                                                                                                              defaultValue={product.sku}
+                                                                                                                                                                                              defaultValue={product._id.slice(-8)}
                                                                                                                                                                                               disabled
                                                                                                                                                                                               fullWidth
                                                                                                                                                                                               label="SKU"
-                                                                                                                                                                                              name="sku"
+                                                                                                                                                                                              name={product._id.slice(-8)}
                                                                                                                                                                                     />
                                                                                                                                                                           </Grid>
                                                                                                                                                                           <Grid
@@ -277,9 +323,9 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                     xs={12}
                                                                                                                                                                           >
                                                                                                                                                                                     <TextField
-                                                                                                                                                                                              defaultValue={product.category}
+                                                                                                                                                                                              defaultValue={product.mainCategory}
                                                                                                                                                                                               fullWidth
-                                                                                                                                                                                              label="Category"
+                                                                                                                                                                                              label="Main Category"
                                                                                                                                                                                               select
                                                                                                                                                                                     >
                                                                                                                                                                                               {mainCategoryOptions.map((option) => (
@@ -298,11 +344,67 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                     xs={12}
                                                                                                                                                                           >
                                                                                                                                                                                     <TextField
-                                                                                                                                                                                              defaultValue={product.id}
-                                                                                                                                                                                              disabled
+                                                                                                                                                                                              defaultValue={product.midCategory}
                                                                                                                                                                                               fullWidth
-                                                                                                                                                                                              label="Barcode"
-                                                                                                                                                                                              name="barcode"
+                                                                                                                                                                                              label="Mid Category"
+                                                                                                                                                                                              select
+                                                                                                                                                                                    >
+                                                                                                                                                                                              {midCategoryOptions.map((option) => (
+                                                                                                                                                                                                        <MenuItem
+                                                                                                                                                                                                                  key={option.value}
+                                                                                                                                                                                                                  value={option.value}
+                                                                                                                                                                                                        >
+                                                                                                                                                                                                                  {option.label}
+                                                                                                                                                                                                        </MenuItem>
+                                                                                                                                                                                              ))}
+                                                                                                                                                                                    </TextField>
+                                                                                                                                                                          </Grid>
+                                                                                                                                                                          <Grid
+                                                                                                                                                                                    item
+                                                                                                                                                                                    md={6}
+                                                                                                                                                                                    xs={12}
+                                                                                                                                                                          >
+                                                                                                                                                                                    <TextField
+                                                                                                                                                                                              defaultValue={product.quantity}
+                                                                                                                                                                                              fullWidth
+                                                                                                                                                                                              label="Quantity"
+                                                                                                                                                                                              name={product.quantity}
+                                                                                                                                                                                    />
+                                                                                                                                                                          </Grid>
+                                                                                                                                                                          <Grid
+                                                                                                                                                                                    item
+                                                                                                                                                                                    md={6}
+                                                                                                                                                                                    xs={12}
+                                                                                                                                                                          >
+                                                                                                                                                                                    <TextField
+                                                                                                                                                                                              defaultValue={product.description}
+                                                                                                                                                                                              fullWidth
+                                                                                                                                                                                              label="Description"
+                                                                                                                                                                                              name={product.description}
+                                                                                                                                                                                    />
+                                                                                                                                                                          </Grid>
+                                                                                                                                                                          <Grid
+                                                                                                                                                                                    item
+                                                                                                                                                                                    md={6}
+                                                                                                                                                                                    xs={12}
+                                                                                                                                                                          >
+                                                                                                                                                                                    <TextField
+                                                                                                                                                                                              defaultValue={product.instructions}
+                                                                                                                                                                                              fullWidth
+                                                                                                                                                                                              label="Instructions"
+                                                                                                                                                                                              name={product.instructions}
+                                                                                                                                                                                    />
+                                                                                                                                                                          </Grid>
+                                                                                                                                                                          <Grid
+                                                                                                                                                                                    item
+                                                                                                                                                                                    md={6}
+                                                                                                                                                                                    xs={12}
+                                                                                                                                                                          >
+                                                                                                                                                                                    <TextField
+                                                                                                                                                                                              defaultValue={product.warning}
+                                                                                                                                                                                              fullWidth
+                                                                                                                                                                                              label="Warning"
+                                                                                                                                                                                              name={product.warning}
                                                                                                                                                                                     />
                                                                                                                                                                           </Grid>
                                                                                                                                                                 </Grid>
@@ -365,9 +467,37 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                               display: 'flex',
                                                                                                                                                                                     }}
                                                                                                                                                                           >
-                                                                                                                                                                                    <Switch />
+                                                                                                                                                                                    <Switch value={product.discount} />
                                                                                                                                                                                     <Typography variant="subtitle2">
-                                                                                                                                                                                              Keep selling when stock is empty
+                                                                                                                                                                                              Discount
+                                                                                                                                                                                    </Typography>
+                                                                                                                                                                          </Grid>
+                                                                                                                                                                          <Grid
+                                                                                                                                                                                    item
+                                                                                                                                                                                    md={6}
+                                                                                                                                                                                    xs={12}
+                                                                                                                                                                                    sx={{
+                                                                                                                                                                                              alignItems: 'center',
+                                                                                                                                                                                              display: 'flex',
+                                                                                                                                                                                    }}
+                                                                                                                                                                          >
+                                                                                                                                                                                    <Switch value={product.newArrival} />
+                                                                                                                                                                                    <Typography variant="subtitle2">
+                                                                                                                                                                                              New arrival
+                                                                                                                                                                                    </Typography>
+                                                                                                                                                                          </Grid>
+                                                                                                                                                                          <Grid
+                                                                                                                                                                                    item
+                                                                                                                                                                                    md={6}
+                                                                                                                                                                                    xs={12}
+                                                                                                                                                                                    sx={{
+                                                                                                                                                                                              alignItems: 'center',
+                                                                                                                                                                                              display: 'flex',
+                                                                                                                                                                                    }}
+                                                                                                                                                                          >
+                                                                                                                                                                                    <Switch value={product.bestSeller} />
+                                                                                                                                                                                    <Typography variant="subtitle2">
+                                                                                                                                                                                              Best seller
                                                                                                                                                                                     </Typography>
                                                                                                                                                                           </Grid>
                                                                                                                                                                 </Grid>
@@ -402,7 +532,7 @@ export const ProductsTable = (props: any) => {
                                                                                                                                             </Stack>
                                                                                                                                             <div>
                                                                                                                                                       <Button
-                                                                                                                                                                onClick={handleProductDelete}
+                                                                                                                                                                onClick={handleDeleteButtonClick}
                                                                                                                                                                 color="error"
                                                                                                                                                       >
                                                                                                                                                                 Delete product

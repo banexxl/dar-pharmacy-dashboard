@@ -34,10 +34,14 @@ export default async function handler(request: NextApiRequest, response: NextApi
                               return response.status(200).json({ message: 'Product successfully added!' });
                     }
                     else if (request.method === 'DELETE') {
-                              const idsToDelete = request.body.selected.map((_id: any) => new ObjectId(_id))
-
-                              await dbProducts.deleteMany({ _id: { $in: idsToDelete } })
-                              return response.status(200).json({ message: 'Product successfully deleted!' });
+                              //const idsToDelete = request.body.selected.map((_id: any) => new ObjectId(_id))
+                              console.log(request.body);
+                              try {
+                                        await dbProducts.deleteOne({ _id: new ObjectId(request.body) })
+                                        return response.status(200).json({ message: 'Product successfully deleted!' });
+                              } catch (error) {
+                                        console.log(error);
+                              }
                     }
                     else {
                               return response.status(405).json({ error: 'Method not allowed!' });

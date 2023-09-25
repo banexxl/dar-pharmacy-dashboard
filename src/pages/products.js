@@ -68,53 +68,6 @@ const Page = (props) => {
                     setOpenEdit(false)
           }
 
-          const handleDeleteButtonClick = () => {
-                    Swal.fire({
-                              title: 'Are you sure?',
-                              text: "You won't be able to revert this!",
-                              icon: 'warning',
-                              showCancelButton: true,
-                              confirmButtonColor: '#3085d6',
-                              cancelButtonColor: '#d33',
-                              confirmButtonText: 'Yes, delete it!'
-                    }).then((result) => {
-                              if (result.isConfirmed) {
-                                        handleDeleteProduct(productsSelection)
-                              }
-                    })
-          }
-
-          const handleDeleteProduct = async (productsSelection) => {
-
-                    try {
-                              //API CALL
-                              const response = await fetch('/api/product-api', {
-                                        method: 'DELETE',
-                                        headers: {
-                                                  'Content-Type': 'application/json',
-                                                  'Access-Control-Allow-Origin': 'https://dar-pharmacy-dashboard.vercel.app/api/product-api, http://localhost:3000/api/product-api',
-                                                  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS' // Set the content type to JSON
-                                        },
-                                        body: JSON.stringify(productsSelection), // Convert your data to JSON
-                              });
-
-                              if (response.ok) {
-                                        Swal.fire({
-                                                  icon: 'success',
-                                                  title: 'Success',
-                                                  text: 'Product deleted!',
-                                        })
-                                        router.push('/products')
-                              } else {
-                                        const errorData = await response.json(); // Parse the error response
-                                        console.error('errorData', errorData);
-                              }
-
-                    } catch (err) {
-                              console.error(err);
-                    }
-          }
-
           const handlePageChange = useCallback(
                     (event, value) => {
                               setPage(value);
@@ -203,7 +156,7 @@ const Page = (props) => {
                                                                                 >
                                                                                           Add
                                                                                 </Button>
-                                                                                <Button
+                                                                                {/* <Button
                                                                                           startIcon={(
                                                                                                     <SvgIcon fontSize="small">
                                                                                                               <ArchiveBoxIcon />
@@ -213,7 +166,7 @@ const Page = (props) => {
                                                                                           onClick={() => handleDeleteButtonClick()}
                                                                                 >
                                                                                           Delete
-                                                                                </Button>
+                                                                                </Button> */}
                                                                                 {/* <Button
                                                                                           startIcon={(
                                                                                                     <SvgIcon fontSize="small">
