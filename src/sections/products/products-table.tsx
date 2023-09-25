@@ -37,25 +37,36 @@ export const ProductsTable = (props: any) => {
 
           const selectedSome = (selected.length > 0) && (selected.length < items.length);
           const selectedAll = (items.length > 0) && (selected.length === items.length);
-          const [currentProduct, setCurrentProduct] = useState(null);
+          const [currentProductID, setCurrentProductID] = useState(null);
+          const [currentProductObject, setCurrentProductObject] = useState(null);
           const router = useRouter();
 
+          const getObjectById = (_id: any, arrayToSearch: any) => {
+                    for (const obj of arrayToSearch) {
+                              if (obj._id === _id) {
+                                        return obj;  // Found the object with the desired ID
+                              }
+                    }
+                    return null;  // Object with the desired ID not found
+          }
+
           const handleProductToggle = useCallback((productId: any) => {
-                    setCurrentProduct((prevProductId: any) => {
+                    setCurrentProductID((prevProductId: any) => {
                               if (prevProductId === productId) {
+                                        setCurrentProductObject(null)
                                         return null;
                               }
-
+                              setCurrentProductObject(getObjectById(productId, items))
                               return productId;
                     });
           }, []);
 
           const handleProductClose = useCallback(() => {
-                    setCurrentProduct(null);
+                    setCurrentProductID(null);
           }, []);
 
           const handleProductUpdate = useCallback(() => {
-                    setCurrentProduct(null);
+                    setCurrentProductID(null);
                     toast.success('Product updated');
           }, []);
 
@@ -70,12 +81,12 @@ export const ProductsTable = (props: any) => {
                               confirmButtonText: 'Yes, delete it!'
                     }).then((result) => {
                               if (result.isConfirmed) {
-                                        handleDeleteProduct(currentProduct)
+                                        handleDeleteProduct(currentProductID)
                               }
                     })
           }
 
-          const handleDeleteProduct = async (currentProduct: any) => {
+          const handleDeleteProduct = async (currentProductID: any) => {
 
                     try {
                               //API CALL
@@ -86,7 +97,7 @@ export const ProductsTable = (props: any) => {
                                                   'Access-Control-Allow-Origin': 'https://dar-pharmacy-dashboard.vercel.app/api/product-api, http://localhost:3000/api/product-api',
                                                   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS' // Set the content type to JSON
                                         },
-                                        body: JSON.stringify(currentProduct), // Convert your data to JSON
+                                        body: JSON.stringify(currentProductID), // Convert your data to JSON
                               });
 
                               if (response.ok) {
@@ -139,8 +150,7 @@ export const ProductsTable = (props: any) => {
                                                             <TableBody>
                                                                       {items.slice(page * rowsPerPage, (page * rowsPerPage) + rowsPerPage).map((product: any) => {
                                                                                 //const isSelected = selected.includes(product._id);
-                                                                                const isCurrent = product._id === currentProduct;
-                                                                                console.log(isCurrent);
+                                                                                const isCurrent = product._id === currentProductID;
 
                                                                                 const price = numeral(product.price).format(`${product.currency}0,0.00`);
                                                                                 const quantityColor = product.quantity >= 10 ? 'success' : 'error';
