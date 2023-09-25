@@ -51,7 +51,7 @@ const Page = (props) => {
           const productsIds = useProductsIds(props.products);
           const productsSelection = useSelection(productsIds);
           const router = useRouter();
-
+          console.log(props);
           const handleSubmitSuccess = () => {
                     setOpen(false); // Close the dialog
           };

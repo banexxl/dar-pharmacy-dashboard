@@ -93,7 +93,9 @@ export const ProductsTable = (props: any) => {
                                                             <TableBody>
                                                                       {items.slice(page * rowsPerPage, (page * rowsPerPage) + rowsPerPage).map((product: any) => {
                                                                                 const isSelected = selected.includes(product._id);
-                                                                                const isCurrent = product.id === currentProduct;
+                                                                                const isCurrent = product._id === currentProduct;
+                                                                                console.log(isCurrent);
+
                                                                                 const price = numeral(product.price).format(`${product.currency}0,0.00`);
                                                                                 const quantityColor = product.quantity >= 10 ? 'success' : 'error';
                                                                                 const statusColor = product.status === 'published' ? 'success' : 'info';
@@ -123,7 +125,7 @@ export const ProductsTable = (props: any) => {
                                                                                                                         }}
                                                                                                                         width="25%"
                                                                                                               >
-                                                                                                                        <IconButton onClick={() => handleProductToggle(product.id)}>
+                                                                                                                        <IconButton onClick={() => handleProductToggle(product._id)}>
                                                                                                                                   <SvgIcon>{isCurrent ? <ChevronDownIcon /> : <ChevronRightIcon />}</SvgIcon>
                                                                                                                         </IconButton>
                                                                                                               </TableCell>
@@ -134,12 +136,12 @@ export const ProductsTable = (props: any) => {
                                                                                                                                             display: 'flex',
                                                                                                                                   }}
                                                                                                                         >
-                                                                                                                                  {product.image ? (
+                                                                                                                                  {product.imageURL ? (
                                                                                                                                             <Box
                                                                                                                                                       sx={{
                                                                                                                                                                 alignItems: 'center',
                                                                                                                                                                 backgroundColor: 'neutral.50',
-                                                                                                                                                                backgroundImage: `url(${product.image})`,
+                                                                                                                                                                backgroundImage: `url(${product.imageURL})`,
                                                                                                                                                                 backgroundPosition: 'center',
                                                                                                                                                                 backgroundSize: 'cover',
                                                                                                                                                                 borderRadius: 1,
@@ -178,33 +180,36 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                       color="text.secondary"
                                                                                                                                                       variant="body2"
                                                                                                                                             >
-                                                                                                                                                      in {product.category}
+                                                                                                                                                      in {product.mainCategory}
                                                                                                                                             </Typography>
                                                                                                                                   </Box>
                                                                                                                         </Box>
                                                                                                               </TableCell>
                                                                                                               <TableCell width="25%">
                                                                                                                         <LinearProgress
-                                                                                                                                  value={product.quantity}
+                                                                                                                                  value={product.availableStock}
                                                                                                                                   variant="determinate"
                                                                                                                                   color={quantityColor}
                                                                                                                                   sx={{
                                                                                                                                             height: 8,
-                                                                                                                                            width: 36,
+                                                                                                                                            width: 40,
                                                                                                                                   }}
                                                                                                                         />
                                                                                                                         <Typography
                                                                                                                                   color="text.secondary"
                                                                                                                                   variant="body2"
                                                                                                                         >
-                                                                                                                                  {product.quantity} in stock
+                                                                                                                                  {product.availableStock} in stock
                                                                                                                                   {hasManyVariants && ` in ${product.variants} variants`}
                                                                                                                         </Typography>
                                                                                                               </TableCell>
-                                                                                                              <TableCell>{price}</TableCell>
-                                                                                                              <TableCell>{product.sku}</TableCell>
+                                                                                                              <TableCell>{product.price}</TableCell>
+                                                                                                              <TableCell>{product._id.slice(-8)}</TableCell>
                                                                                                               <TableCell>
-                                                                                                                        <SeverityPill color={statusColor}>{product.status}</SeverityPill>
+                                                                                                                        <SeverityPill color={statusColor}>{product.discount.toString()}</SeverityPill>
+                                                                                                              </TableCell>
+                                                                                                              <TableCell>
+                                                                                                                        <SeverityPill color={statusColor}>{product.discountAmount}</SeverityPill>
                                                                                                               </TableCell>
                                                                                                     </TableRow>
                                                                                                     {isCurrent && (
