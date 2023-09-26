@@ -98,32 +98,6 @@ const Page = (props) => {
                                                                                 <Typography variant="h4">
                                                                                           Products
                                                                                 </Typography>
-                                                                                {/* <Stack
-                                                                                          alignItems="center"
-                                                                                          direction="row"
-                                                                                          spacing={1}
-                                                                                >
-                                                                                          <Button
-                                                                                                    color="inherit"
-                                                                                                    startIcon={(
-                                                                                                              <SvgIcon fontSize="small">
-                                                                                                                        <ArrowUpOnSquareIcon />
-                                                                                                              </SvgIcon>
-                                                                                                    )}
-                                                                                          >
-                                                                                                    Import
-                                                                                          </Button>
-                                                                                          <Button
-                                                                                                    color="inherit"
-                                                                                                    startIcon={(
-                                                                                                              <SvgIcon fontSize="small">
-                                                                                                                        <ArrowDownOnSquareIcon />
-                                                                                                              </SvgIcon>
-                                                                                                    )}
-                                                                                          >
-                                                                                                    Export
-                                                                                          </Button>
-                                                                                </Stack> */}
                                                                       </Stack>
                                                                       <Box sx={{ display: 'flex', justifyContent: 'space-between', height: '40px', width: '320px' }}>
                                                                                 <Button
@@ -139,29 +113,6 @@ const Page = (props) => {
                                                                                 >
                                                                                           Add
                                                                                 </Button>
-                                                                                {/* <Button
-                                                                                          startIcon={(
-                                                                                                    <SvgIcon fontSize="small">
-                                                                                                              <ArchiveBoxIcon />
-                                                                                                    </SvgIcon>
-                                                                                          )}
-                                                                                          variant="contained"
-                                                                                          onClick={() => handleDeleteButtonClick()}
-                                                                                >
-                                                                                          Delete
-                                                                                </Button> */}
-                                                                                {/* <Button
-                                                                                          startIcon={(
-                                                                                                    <SvgIcon fontSize="small">
-                                                                                                              <FolderOpenIcon />
-                                                                                                    </SvgIcon>
-                                                                                          )}
-                                                                                          variant="contained"
-                                                                                          onClick={() => setOpenEdit(true)}
-                                                                                          disabled={productsSelection.selected.length != 1}
-                                                                                >
-                                                                                          Edit
-                                                                                </Button> */}
                                                                       </Box>
                                                             </Stack>
                                                             <ProductsSearch />
