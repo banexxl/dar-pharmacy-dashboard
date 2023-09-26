@@ -43,6 +43,37 @@ export default async function handler(request: NextApiRequest, response: NextApi
                                         console.log(error);
                               }
                     }
+                    else if (request.method === 'PUT') {
+                              //const idsToDelete = request.body.selected.map((_id: any) => new ObjectId(_id))
+                              console.log(request.body);
+                              try {
+                                        await dbProducts.findOneAndUpdate({ _id: new ObjectId(request.body._id) },
+                                                  {
+                                                            $set: {
+                                                                      bestSeller: request.body.bestSeller,
+                                                                      description: request.body.description,
+                                                                      discount: request.body.discount,
+                                                                      discountAmount: request.body.discountAmount,
+                                                                      availableStock: request.body.availableStock,
+                                                                      imageURL: request.body.imageURL,
+                                                                      ingredients: request.body.ingredients,
+                                                                      instructions: request.body.instructions,
+                                                                      mainCategory: request.body.mainCategory,
+                                                                      manufacturer: request.body.manufacturer,
+                                                                      midCategory: request.body.midCategory,
+                                                                      name: request.body.name,
+                                                                      newArrival: request.body.newArrival,
+                                                                      price: request.body.price,
+                                                                      quantity: request.body.quantity,
+                                                                      subCategory: request.body.subCategory,
+                                                                      warning: request.body.warning
+                                                            }
+                                                  })
+                                        return response.status(200).json({ message: 'Product successfully updated!' });
+                              } catch (error) {
+                                        console.log(error);
+                              }
+                    }
                     else {
                               return response.status(405).json({ error: 'Method not allowed!' });
                     }

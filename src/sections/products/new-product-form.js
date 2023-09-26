@@ -78,7 +78,7 @@ export const midCategoryOptions = [
           },
 ];
 
-const subCategoryOptions = [
+export const subCategoryOptions = [
           {
                     label: 'Biljni preparati',
                     value: 'biljni-preparati',

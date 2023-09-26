@@ -16,9 +16,29 @@ import numeral from 'numeral';
 import { Fragment, useCallback, useState } from 'react';
 import { Scrollbar } from 'src/components/scrollbar';
 import { SeverityPill } from '@/components/severity-pill';
-import { mainCategoryOptions, midCategoryOptions } from './new-product-form';
+import { mainCategoryOptions, midCategoryOptions, subCategoryOptions } from './new-product-form';
 import Swal from 'sweetalert2';
 import { useRouter } from 'next/navigation';
+
+export interface IProduct {
+          bestSeller: boolean;
+          description: string;
+          discount: boolean;
+          discountAmount: number;
+          imageURL: string;
+          ingredients: string;
+          instructions: string;
+          mainCategory: string;
+          manufacturer: string;
+          midCategory: string;
+          name: string;
+          newArrival: boolean;
+          price: string;
+          quantity: string;
+          subCategory: string;
+          warning: string;
+          _id?: string;
+}
 
 export const ProductsTable = (props: any) => {
           const {
@@ -38,8 +58,10 @@ export const ProductsTable = (props: any) => {
           const selectedSome = (selected.length > 0) && (selected.length < items.length);
           const selectedAll = (items.length > 0) && (selected.length === items.length);
           const [currentProductID, setCurrentProductID] = useState(null);
-          const [currentProductObject, setCurrentProductObject] = useState(null);
+          const [currentProductObject, setCurrentProductObject] = useState<IProduct | null>();
           const router = useRouter();
+          console.log(currentProductObject);
+
 
           const getObjectById = (_id: any, arrayToSearch: any) => {
                     for (const obj of arrayToSearch) {
@@ -50,7 +72,7 @@ export const ProductsTable = (props: any) => {
                     return null;  // Object with the desired ID not found
           }
 
-          const handleProductToggle = useCallback((productId: any) => {
+          const handleProductToggle = (productId: any) => {
                     setCurrentProductID((prevProductId: any) => {
                               if (prevProductId === productId) {
                                         setCurrentProductObject(null)
@@ -59,16 +81,59 @@ export const ProductsTable = (props: any) => {
                               setCurrentProductObject(getObjectById(productId, items))
                               return productId;
                     });
-          }, []);
+          }
 
           const handleProductClose = useCallback(() => {
                     setCurrentProductID(null);
           }, []);
 
-          const handleProductUpdate = useCallback(() => {
-                    setCurrentProductID(null);
-                    toast.success('Product updated');
-          }, []);
+          const handleProductUpdateClick = () => {
+                    Swal.fire({
+                              title: 'Are you sure?',
+                              text: "You can edit this product at any time!",
+                              icon: 'warning',
+                              showCancelButton: true,
+                              confirmButtonColor: '#3085d6',
+                              cancelButtonColor: '#d33',
+                              confirmButtonText: 'Yes, update it!'
+                    }).then((result) => {
+                              if (result.isConfirmed) {
+                                        handleUpdateProduct(currentProductObject)
+                              }
+                    })
+          }
+
+          const handleUpdateProduct = async (currentProductObject: any) => {
+                    try {
+                              //API CALL
+                              const response = await fetch('/api/product-api', {
+                                        method: 'PUT',
+                                        headers: {
+                                                  'Content-Type': 'application/json',
+                                                  'Access-Control-Allow-Origin': 'https://dar-pharmacy-dashboard.vercel.app/api/product-api, http://localhost:3000/api/product-api',
+                                                  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS' // Set the content type to JSON
+                                        },
+                                        body: JSON.stringify(currentProductObject)
+                              });
+
+                              if (response.ok) {
+                                        handleProductClose()
+                                        setCurrentProductObject(null)
+                                        Swal.fire({
+                                                  icon: 'success',
+                                                  title: 'Success',
+                                                  text: 'Product updated!',
+                                        })
+                                        router.push('/products')
+                              } else {
+                                        const errorData = await response.json(); // Parse the error response
+                                        console.error('errorData', errorData);
+                              }
+
+                    } catch (err) {
+                              console.error(err);
+                    }
+          }
 
           const handleDeleteButtonClick = () => {
                     Swal.fire({
@@ -312,6 +377,13 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                               fullWidth
                                                                                                                                                                                               label="Product name"
                                                                                                                                                                                               name="name"
+                                                                                                                                                                                              onBlur={(e: any) =>
+                                                                                                                                                                                                        setCurrentProductObject((previousObject: any) => ({
+                                                                                                                                                                                                                  ...previousObject,
+                                                                                                                                                                                                                  name: e.target.value
+
+                                                                                                                                                                                                        }))
+                                                                                                                                                                                              }
                                                                                                                                                                                     />
                                                                                                                                                                           </Grid>
                                                                                                                                                                           <Grid
@@ -337,6 +409,13 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                               fullWidth
                                                                                                                                                                                               label="Main Category"
                                                                                                                                                                                               select
+                                                                                                                                                                                              onBlur={(e: any) =>
+                                                                                                                                                                                                        setCurrentProductObject((previousObject: any) => ({
+                                                                                                                                                                                                                  ...previousObject,
+                                                                                                                                                                                                                  mainCategory: e.target.value
+
+                                                                                                                                                                                                        }))
+                                                                                                                                                                                              }
                                                                                                                                                                                     >
                                                                                                                                                                                               {mainCategoryOptions.map((option) => (
                                                                                                                                                                                                         <MenuItem
@@ -358,8 +437,43 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                               fullWidth
                                                                                                                                                                                               label="Mid Category"
                                                                                                                                                                                               select
+                                                                                                                                                                                              onBlur={(e: any) =>
+                                                                                                                                                                                                        setCurrentProductObject((previousObject: any) => ({
+                                                                                                                                                                                                                  ...previousObject,
+                                                                                                                                                                                                                  midCategory: e.target.value
+
+                                                                                                                                                                                                        }))
+                                                                                                                                                                                              }
                                                                                                                                                                                     >
                                                                                                                                                                                               {midCategoryOptions.map((option) => (
+                                                                                                                                                                                                        <MenuItem
+                                                                                                                                                                                                                  key={option.value}
+                                                                                                                                                                                                                  value={option.value}
+                                                                                                                                                                                                        >
+                                                                                                                                                                                                                  {option.label}
+                                                                                                                                                                                                        </MenuItem>
+                                                                                                                                                                                              ))}
+                                                                                                                                                                                    </TextField>
+                                                                                                                                                                          </Grid>
+                                                                                                                                                                          <Grid
+                                                                                                                                                                                    item
+                                                                                                                                                                                    md={6}
+                                                                                                                                                                                    xs={12}
+                                                                                                                                                                          >
+                                                                                                                                                                                    <TextField
+                                                                                                                                                                                              defaultValue={product.subCategory}
+                                                                                                                                                                                              fullWidth
+                                                                                                                                                                                              label="Sub Category"
+                                                                                                                                                                                              select
+                                                                                                                                                                                              onBlur={(e: any) =>
+                                                                                                                                                                                                        setCurrentProductObject((previousObject: any) => ({
+                                                                                                                                                                                                                  ...previousObject,
+                                                                                                                                                                                                                  subCategory: e.target.value
+
+                                                                                                                                                                                                        }))
+                                                                                                                                                                                              }
+                                                                                                                                                                                    >
+                                                                                                                                                                                              {subCategoryOptions.map((option) => (
                                                                                                                                                                                                         <MenuItem
                                                                                                                                                                                                                   key={option.value}
                                                                                                                                                                                                                   value={option.value}
@@ -379,6 +493,13 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                               fullWidth
                                                                                                                                                                                               label="Quantity"
                                                                                                                                                                                               name={product.quantity}
+                                                                                                                                                                                              onBlur={(e: any) =>
+                                                                                                                                                                                                        setCurrentProductObject((previousObject: any) => ({
+                                                                                                                                                                                                                  ...previousObject,
+                                                                                                                                                                                                                  quantity: e.target.value
+
+                                                                                                                                                                                                        }))
+                                                                                                                                                                                              }
                                                                                                                                                                                     />
                                                                                                                                                                           </Grid>
                                                                                                                                                                           <Grid
@@ -391,6 +512,13 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                               fullWidth
                                                                                                                                                                                               label="Description"
                                                                                                                                                                                               name={product.description}
+                                                                                                                                                                                              onBlur={(e: any) =>
+                                                                                                                                                                                                        setCurrentProductObject((previousObject: any) => ({
+                                                                                                                                                                                                                  ...previousObject,
+                                                                                                                                                                                                                  description: e.target.value
+
+                                                                                                                                                                                                        }))
+                                                                                                                                                                                              }
                                                                                                                                                                                     />
                                                                                                                                                                           </Grid>
                                                                                                                                                                           <Grid
@@ -403,6 +531,13 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                               fullWidth
                                                                                                                                                                                               label="Instructions"
                                                                                                                                                                                               name={product.instructions}
+                                                                                                                                                                                              onBlur={(e: any) =>
+                                                                                                                                                                                                        setCurrentProductObject((previousObject: any) => ({
+                                                                                                                                                                                                                  ...previousObject,
+                                                                                                                                                                                                                  instructions: e.target.value
+
+                                                                                                                                                                                                        }))
+                                                                                                                                                                                              }
                                                                                                                                                                                     />
                                                                                                                                                                           </Grid>
                                                                                                                                                                           <Grid
@@ -415,6 +550,32 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                               fullWidth
                                                                                                                                                                                               label="Warning"
                                                                                                                                                                                               name={product.warning}
+                                                                                                                                                                                              onBlur={(e: any) =>
+                                                                                                                                                                                                        setCurrentProductObject((previousObject: any) => ({
+                                                                                                                                                                                                                  ...previousObject,
+                                                                                                                                                                                                                  warning: e.target.value
+
+                                                                                                                                                                                                        }))
+                                                                                                                                                                                              }
+                                                                                                                                                                                    />
+                                                                                                                                                                          </Grid>
+                                                                                                                                                                          <Grid
+                                                                                                                                                                                    item
+                                                                                                                                                                                    md={6}
+                                                                                                                                                                                    xs={12}
+                                                                                                                                                                          >
+                                                                                                                                                                                    <TextField
+                                                                                                                                                                                              defaultValue={product.ingredients}
+                                                                                                                                                                                              fullWidth
+                                                                                                                                                                                              label="Ingredients"
+                                                                                                                                                                                              name={product.ingredients}
+                                                                                                                                                                                              onBlur={(e: any) =>
+                                                                                                                                                                                                        setCurrentProductObject((previousObject: any) => ({
+                                                                                                                                                                                                                  ...previousObject,
+                                                                                                                                                                                                                  ingredients: e.target.value
+
+                                                                                                                                                                                                        }))
+                                                                                                                                                                                              }
                                                                                                                                                                                     />
                                                                                                                                                                           </Grid>
                                                                                                                                                                 </Grid>
@@ -440,6 +601,13 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                               fullWidth
                                                                                                                                                                                               label="Old price"
                                                                                                                                                                                               name="old-price"
+                                                                                                                                                                                              // onBlur={(e: any) =>
+                                                                                                                                                                                              //           setCurrentProductObject((previousObject: any) => ({
+                                                                                                                                                                                              //                     ...previousObject,
+                                                                                                                                                                                              //                     name: e.target.value
+
+                                                                                                                                                                                              //           }))
+                                                                                                                                                                                              // }
                                                                                                                                                                                               InputProps={{
                                                                                                                                                                                                         startAdornment: (
                                                                                                                                                                                                                   <InputAdornment position="start">
@@ -459,10 +627,17 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                               defaultValue={product.price}
                                                                                                                                                                                               fullWidth
                                                                                                                                                                                               label="New price"
-                                                                                                                                                                                              name="new-price"
+                                                                                                                                                                                              name="price"
+                                                                                                                                                                                              onBlur={(e: any) =>
+                                                                                                                                                                                                        setCurrentProductObject((previousObject: any) => ({
+                                                                                                                                                                                                                  ...previousObject,
+                                                                                                                                                                                                                  price: e.target.valueAsNumber
+
+                                                                                                                                                                                                        }))
+                                                                                                                                                                                              }
                                                                                                                                                                                               InputProps={{
                                                                                                                                                                                                         startAdornment: (
-                                                                                                                                                                                                                  <InputAdornment position="start">$</InputAdornment>
+                                                                                                                                                                                                                  <InputAdornment position="start">RSD</InputAdornment>
                                                                                                                                                                                                         ),
                                                                                                                                                                                               }}
                                                                                                                                                                                               type="number"
@@ -477,10 +652,35 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                               display: 'flex',
                                                                                                                                                                                     }}
                                                                                                                                                                           >
-                                                                                                                                                                                    <Switch value={product.discount} checked={product.discount} />
+                                                                                                                                                                                    <Switch checked={currentProductObject!.discount}
+                                                                                                                                                                                              onChange={() => setCurrentProductObject((previousObject: any) => ({
+                                                                                                                                                                                                        ...previousObject,
+                                                                                                                                                                                                        discount: !previousObject.discount
+                                                                                                                                                                                              }))}
+                                                                                                                                                                                    />
                                                                                                                                                                                     <Typography variant="subtitle2">
                                                                                                                                                                                               Discount
                                                                                                                                                                                     </Typography>
+                                                                                                                                                                          </Grid>
+                                                                                                                                                                          <Grid
+                                                                                                                                                                                    item
+                                                                                                                                                                                    md={6}
+                                                                                                                                                                                    xs={12}
+                                                                                                                                                                          >
+                                                                                                                                                                                    <TextField
+                                                                                                                                                                                              defaultValue={product.discountAmount}
+                                                                                                                                                                                              fullWidth
+                                                                                                                                                                                              label="Discount amount"
+                                                                                                                                                                                              name="discountAmount"
+                                                                                                                                                                                              onBlur={(e: any) =>
+                                                                                                                                                                                                        setCurrentProductObject((previousObject: any) => ({
+                                                                                                                                                                                                                  ...previousObject,
+                                                                                                                                                                                                                  discountAmount: e.target.valueAsNumber
+
+                                                                                                                                                                                                        }))
+                                                                                                                                                                                              }
+                                                                                                                                                                                              type="number"
+                                                                                                                                                                                    />
                                                                                                                                                                           </Grid>
                                                                                                                                                                           <Grid
                                                                                                                                                                                     item
@@ -491,7 +691,12 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                               display: 'flex',
                                                                                                                                                                                     }}
                                                                                                                                                                           >
-                                                                                                                                                                                    <Switch value={product.newArrival} checked={product.newArrival} />
+                                                                                                                                                                                    <Switch checked={currentProductObject!.newArrival}
+                                                                                                                                                                                              onChange={() => setCurrentProductObject((previousObject: any) => ({
+                                                                                                                                                                                                        ...previousObject,
+                                                                                                                                                                                                        newArrival: !previousObject.newArrival
+                                                                                                                                                                                              }))}
+                                                                                                                                                                                    />
                                                                                                                                                                                     <Typography variant="subtitle2">
                                                                                                                                                                                               New arrival
                                                                                                                                                                                     </Typography>
@@ -505,10 +710,37 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                               display: 'flex',
                                                                                                                                                                                     }}
                                                                                                                                                                           >
-                                                                                                                                                                                    <Switch value={product.bestSeller} checked={product.bestSeller} />
+                                                                                                                                                                                    <Switch
+                                                                                                                                                                                              checked={currentProductObject!.bestSeller}
+                                                                                                                                                                                              onChange={() => setCurrentProductObject((previousObject: any) => ({
+                                                                                                                                                                                                        ...previousObject,
+                                                                                                                                                                                                        bestSeller: !previousObject.bestSeller
+
+                                                                                                                                                                                              }))}
+                                                                                                                                                                                    />
                                                                                                                                                                                     <Typography variant="subtitle2">
                                                                                                                                                                                               Best seller
                                                                                                                                                                                     </Typography>
+                                                                                                                                                                          </Grid>
+                                                                                                                                                                          <Grid
+                                                                                                                                                                                    item
+                                                                                                                                                                                    md={6}
+                                                                                                                                                                                    xs={12}
+                                                                                                                                                                          >
+                                                                                                                                                                                    <TextField
+                                                                                                                                                                                              defaultValue={product.availableStock}
+                                                                                                                                                                                              fullWidth
+                                                                                                                                                                                              label="Available stock"
+                                                                                                                                                                                              name="availableStock"
+                                                                                                                                                                                              onBlur={(e: any) =>
+                                                                                                                                                                                                        setCurrentProductObject((previousObject: any) => ({
+                                                                                                                                                                                                                  ...previousObject,
+                                                                                                                                                                                                                  availableStock: e.target.valueAsNumber
+
+                                                                                                                                                                                                        }))
+                                                                                                                                                                                              }
+                                                                                                                                                                                              type="number"
+                                                                                                                                                                                    />
                                                                                                                                                                           </Grid>
                                                                                                                                                                 </Grid>
                                                                                                                                                       </Grid>
@@ -527,7 +759,7 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                       spacing={2}
                                                                                                                                             >
                                                                                                                                                       <Button
-                                                                                                                                                                onClick={handleProductUpdate}
+                                                                                                                                                                onClick={handleProductUpdateClick}
                                                                                                                                                                 type="submit"
                                                                                                                                                                 variant="contained"
                                                                                                                                                       >
