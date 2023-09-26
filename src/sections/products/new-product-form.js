@@ -417,9 +417,9 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                         {
                                                   (formik) => (
                                                             <Form style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                                                                      <Typography>
+                                                                      {/* <Typography>
                                                                                 {`${ JSON.stringify(formik.errors) }`}
-                                                                      </Typography>
+                                                                      </Typography> */}
                                                                       <TextField
                                                                                 label="Name"
                                                                                 name="name"
