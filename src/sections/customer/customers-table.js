@@ -16,6 +16,7 @@ import {
 } from '@mui/material';
 import { Scrollbar } from 'src/components/scrollbar';
 import { getInitials } from 'src/utils/get-initials';
+import Image from 'next/image';
 
 export const CustomersTable = (props) => {
           const {
@@ -62,13 +63,7 @@ export const CustomersTable = (props) => {
                                                                                           Email
                                                                                 </TableCell>
                                                                                 <TableCell>
-                                                                                          Location
-                                                                                </TableCell>
-                                                                                <TableCell>
-                                                                                          Phone
-                                                                                </TableCell>
-                                                                                <TableCell>
-                                                                                          Signed Up
+                                                                                          Image
                                                                                 </TableCell>
                                                                       </TableRow>
                                                             </TableHead>
@@ -112,7 +107,7 @@ export const CustomersTable = (props) => {
                                                                                                               {customer.email}
                                                                                                     </TableCell>
                                                                                                     <TableCell>
-                                                                                                              {customer.image}
+                                                                                                              <Image src={customer.image} width={80} height={80} alt='image' />
                                                                                                     </TableCell>
                                                                                           </TableRow>
                                                                                 );
