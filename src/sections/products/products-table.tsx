@@ -578,6 +578,25 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                               }
                                                                                                                                                                                     />
                                                                                                                                                                           </Grid>
+                                                                                                                                                                          <Grid
+                                                                                                                                                                                    item
+                                                                                                                                                                                    md={6}
+                                                                                                                                                                                    xs={12}
+                                                                                                                                                                          >
+                                                                                                                                                                                    <TextField
+                                                                                                                                                                                              defaultValue={product.imageURL}
+                                                                                                                                                                                              fullWidth
+                                                                                                                                                                                              label="Image URL"
+                                                                                                                                                                                              name={product.imageURL}
+                                                                                                                                                                                              onBlur={(e: any) =>
+                                                                                                                                                                                                        setCurrentProductObject((previousObject: any) => ({
+                                                                                                                                                                                                                  ...previousObject,
+                                                                                                                                                                                                                  imageURL: e.target.value
+
+                                                                                                                                                                                                        }))
+                                                                                                                                                                                              }
+                                                                                                                                                                                    />
+                                                                                                                                                                          </Grid>
                                                                                                                                                                 </Grid>
                                                                                                                                                       </Grid>
                                                                                                                                                       <Grid
