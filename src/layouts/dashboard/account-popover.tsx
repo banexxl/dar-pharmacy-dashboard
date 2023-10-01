@@ -7,7 +7,7 @@ import { useAuth } from 'src/hooks/use-auth';
 export const AccountPopover = (props: any) => {
           const { anchorEl, onClose, open } = props;
           const router = useRouter();
-          const auth = useAuth()
+          const auth: any = useAuth()
 
           const handleSignOut = useCallback(
                     () => {
@@ -43,7 +43,14 @@ export const AccountPopover = (props: any) => {
                                                   color="text.secondary"
                                                   variant="body2"
                                         >
-                                                  Anika Visser
+                                                  {auth.user?.name}
+
+                                        </Typography>
+                                        <Typography
+                                                  color="text.secondary"
+                                                  variant="body2"
+                                        >
+                                                  {auth.user?.email}
                                         </Typography>
                               </Box>
                               <Divider />
