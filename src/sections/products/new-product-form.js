@@ -20,7 +20,7 @@ const initialValues = {
           quantity: '',
           manufacturer: '',
           warning: '',
-          imageURL: '/',
+          imageURL: '',
           price: '',
           newArrival: false,
           bestSeller: false,
