@@ -1,17 +1,9 @@
 import { useCallback, useMemo, useState } from 'react';
 import Head from 'next/head';
-import { subDays, subHours } from 'date-fns';
-import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import ArrowDownOnSquareIcon from '@heroicons/react/24/solid/ArrowDownOnSquareIcon';
-import ArrowUpOnSquareIcon from '@heroicons/react/24/solid/ArrowUpOnSquareIcon';
 import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
-import ArchiveBoxIcon from '@heroicons/react/24/solid/ArchiveBoxIcon';
-import FolderOpenIcon from '@heroicons/react/24/solid/FolderOpenIcon';
 import { Box, Button, Container, Stack, SvgIcon, Typography } from '@mui/material';
 import { useSelection } from 'src/hooks/use-selection';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
@@ -20,9 +12,6 @@ import { ProductsSearch } from 'src/sections/products/products-search';
 import { applyPagination } from 'src/utils/apply-pagination';
 import { productsServices } from '../utils/product-services'
 import { AddProductForm } from '../sections/products/new-product-form'
-import { EditProductForm } from '../sections/products/edit-product-form'
-import { useRouter } from 'next/navigation';
-import Swal from 'sweetalert2'
 
 const useProducts = (data, page, rowsPerPage) => {
           return useMemo(
@@ -50,69 +39,13 @@ const Page = (props) => {
           const products = useProducts(props.products, page, rowsPerPage);
           const productsIds = useProductsIds(props.products);
           const productsSelection = useSelection(productsIds);
-          const router = useRouter();
 
           const handleSubmitSuccess = () => {
                     setOpen(false); // Close the dialog
           };
 
-          const handleSubmitEditSuccess = () => {
-                    setOpenEdit(false)
-          }
-
           const handleSubmitFail = () => {
                     setOpen(false)
-          }
-
-          const handleSubmitEditFail = () => {
-                    setOpenEdit(false)
-          }
-
-          const handleDeleteButtonClick = () => {
-                    Swal.fire({
-                              title: 'Are you sure?',
-                              text: "You won't be able to revert this!",
-                              icon: 'warning',
-                              showCancelButton: true,
-                              confirmButtonColor: '#3085d6',
-                              cancelButtonColor: '#d33',
-                              confirmButtonText: 'Yes, delete it!'
-                    }).then((result) => {
-                              if (result.isConfirmed) {
-                                        handleDeleteProduct(productsSelection)
-                              }
-                    })
-          }
-
-          const handleDeleteProduct = async (productsSelection) => {
-
-                    try {
-                              //API CALL
-                              const response = await fetch('/api/product-api', {
-                                        method: 'DELETE',
-                                        headers: {
-                                                  'Content-Type': 'application/json',
-                                                  'Access-Control-Allow-Origin': 'https://dar-pharmacy-dashboard.vercel.app/api/product-api, http://localhost:3000/api/product-api',
-                                                  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS' // Set the content type to JSON
-                                        },
-                                        body: JSON.stringify(productsSelection), // Convert your data to JSON
-                              });
-
-                              if (response.ok) {
-                                        Swal.fire({
-                                                  icon: 'success',
-                                                  title: 'Success',
-                                                  text: 'Product deleted!',
-                                        })
-                                        router.push('/products')
-                              } else {
-                                        const errorData = await response.json(); // Parse the error response
-                                        console.error('errorData', errorData);
-                              }
-
-                    } catch (err) {
-                              console.error(err);
-                    }
           }
 
           const handlePageChange = useCallback(
@@ -128,14 +61,6 @@ const Page = (props) => {
                     },
                     []
           );
-
-          const handleClose = () => {
-                    console.log('closed');
-          }
-
-          const handleEdit = () => {
-                    console.log('closed');
-          }
 
           return (
                     <Box>
@@ -162,32 +87,6 @@ const Page = (props) => {
                                                                                 <Typography variant="h4">
                                                                                           Products
                                                                                 </Typography>
-                                                                                {/* <Stack
-                                                                                          alignItems="center"
-                                                                                          direction="row"
-                                                                                          spacing={1}
-                                                                                >
-                                                                                          <Button
-                                                                                                    color="inherit"
-                                                                                                    startIcon={(
-                                                                                                              <SvgIcon fontSize="small">
-                                                                                                                        <ArrowUpOnSquareIcon />
-                                                                                                              </SvgIcon>
-                                                                                                    )}
-                                                                                          >
-                                                                                                    Import
-                                                                                          </Button>
-                                                                                          <Button
-                                                                                                    color="inherit"
-                                                                                                    startIcon={(
-                                                                                                              <SvgIcon fontSize="small">
-                                                                                                                        <ArrowDownOnSquareIcon />
-                                                                                                              </SvgIcon>
-                                                                                                    )}
-                                                                                          >
-                                                                                                    Export
-                                                                                          </Button>
-                                                                                </Stack> */}
                                                                       </Stack>
                                                                       <Box sx={{ display: 'flex', justifyContent: 'space-between', height: '40px', width: '320px' }}>
                                                                                 <Button
@@ -202,29 +101,6 @@ const Page = (props) => {
                                                                                           }}
                                                                                 >
                                                                                           Add
-                                                                                </Button>
-                                                                                <Button
-                                                                                          startIcon={(
-                                                                                                    <SvgIcon fontSize="small">
-                                                                                                              <ArchiveBoxIcon />
-                                                                                                    </SvgIcon>
-                                                                                          )}
-                                                                                          variant="contained"
-                                                                                          onClick={() => handleDeleteButtonClick()}
-                                                                                >
-                                                                                          Delete
-                                                                                </Button>
-                                                                                <Button
-                                                                                          startIcon={(
-                                                                                                    <SvgIcon fontSize="small">
-                                                                                                              <FolderOpenIcon />
-                                                                                                    </SvgIcon>
-                                                                                          )}
-                                                                                          variant="contained"
-                                                                                          onClick={() => setOpenEdit(true)}
-                                                                                          disabled={productsSelection.selected.length != 1}
-                                                                                >
-                                                                                          Edit
                                                                                 </Button>
                                                                       </Box>
                                                             </Stack>
@@ -246,7 +122,6 @@ const Page = (props) => {
                                         </Container>
                               </Box>
                               <Dialog open={open}
-                                        onClose={handleClose}
                                         PaperProps={{
                                                   sx: {
                                                             width: '600px'
@@ -258,21 +133,6 @@ const Page = (props) => {
                                                   <AddProductForm
                                                             onSubmitSuccess={handleSubmitSuccess}
                                                             onSubmitFail={handleSubmitFail} />
-                                        </DialogContent>
-                              </Dialog>
-                              <Dialog open={openEdit}
-                                        onClose={handleEdit}
-                                        PaperProps={{
-                                                  sx: {
-                                                            width: '600px'
-                                                  }
-                                        }}
-                              >
-                                        <DialogTitle>Edit product</DialogTitle>
-                                        <DialogContent dividers >
-                                                  <EditProductForm
-                                                            onSubmitSuccess={handleSubmitEditSuccess}
-                                                            onSubmitFail={handleSubmitEditFail} />
                                         </DialogContent>
                               </Dialog>
                     </Box >

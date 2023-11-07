@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useFormik } from 'formik';
-import { TextField, Button, Checkbox, FormControlLabel, Box, Input, Card, CardContent, Grid, MenuItem, Stack, Container, IconButton, CardActionArea } from '@mui/material';
+import { TextField, Typography, Button, Checkbox, FormControlLabel, Box, Input, Card, CardContent, Grid, MenuItem, Stack, Container, IconButton, CardActionArea } from '@mui/material';
 import { Form, Formik, FormikErrors, FormikTouched } from 'formik';
 import PhotoCamera from "@mui/icons-material/PhotoCamera";
 import { newProductSchema } from './new-product-schema'
@@ -23,15 +23,15 @@ const initialValues = {
           quantity: '',
           manufacturer: '',
           warning: '',
-          //imageURL: '',
+          imageURL: '',
           price: '',
           newArrival: false,
           bestSeller: false,
           discount: false,
-          discountAmount: '',
+          discountAmount: 0,
 };
 
-const mainCategoryOptions = [
+export const mainCategoryOptions = [
           {
                     label: 'Apoteka',
                     value: 'apoteka',
@@ -42,7 +42,7 @@ const mainCategoryOptions = [
           },
 ];
 
-const midCategoryOptions = [
+export const midCategoryOptions = [
           {
                     label: 'Alergije',
                     value: 'alergije',
@@ -81,7 +81,7 @@ const midCategoryOptions = [
           },
 ];
 
-const subCategoryOptions = [
+export const subCategoryOptions = [
           {
                     label: 'Biljni preparati',
                     value: 'biljni-preparati',
@@ -319,58 +319,56 @@ const manufacturerOptions = [
           },
 ];
 
-const handleFileUpload = async (file) => {
-          return new Promise(async (resolve, reject) => {
-                    try {
-                              const formData = new FormData();
-                              formData.append('file', file);
+// const handleFileUpload = async (file) => {
+//           return new Promise(async (resolve, reject) => {
+//                     try {
+//                               const formData = new FormData();
+//                               formData.append('file', file);
 
-                              const response = await fetch('/api/image-api', {
-                                        method: 'POST',
-                                        body: formData,
-                              });
+//                               const response = await fetch('/api/image-api', {
+//                                         method: 'POST',
+//                                         body: formData,
+//                               });
 
-                              if (!response.ok) {
-                                        throw new Error('Failed to upload file');
-                              }
+//                               if (!response.ok) {
+//                                         throw new Error('Failed to upload file');
+//                               }
 
-                              const data = await response.json();
-                              resolve(data);
-                    } catch (error) {
-                              reject(error);
-                    }
-          });
-};
+//                               const data = await response.json();
+//                               resolve(data);
+//                     } catch (error) {
+//                               reject(error);
+//                     }
+//           });
+// };
 
 export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
 
           const router = useRouter();
-          const [selectedFile, setSelectedFile] = useState(null);
-          const [selectedImage, setSelectedImage] = useState(null);
-          const [uploadState, setUploadState] = useState("initial");
+          // const [selectedFile, setSelectedFile] = useState(null);
+          // const [selectedImage, setSelectedImage] = useState(null);
+          // const [uploadState, setUploadState] = useState("initial");
 
 
 
-          const handleResetClick = (event) => {
-                    setSelectedImage(null);
-                    setUploadState("initial");
-          };
+          // const handleResetClick = (event) => {
+          //           setSelectedImage(null);
+          //           setUploadState("initial");
+          // };
 
           const handleSubmit = async (values) => {
 
-                    setUploadState(true)
-
                     try {
 
-                              if (selectedFile) {
-                                        handleFileUpload(selectedFile)
-                                                  .then((data) => {
-                                                            console.log('File uploaded successfully:', data);
-                                                  })
-                                                  .catch((error) => {
-                                                            console.error('Error uploading file:', error);
-                                                  });
-                              }
+                              // if (selectedFile) {
+                              //           handleFileUpload(selectedFile)
+                              //                     .then((data) => {
+                              //                               console.log('File uploaded successfully:', data);
+                              //                     })
+                              //                     .catch((error) => {
+                              //                               console.error('Error uploading file:', error);
+                              //                     });
+                              // }
 
                               const responseValues = await fetch('/api/product-api', {
                                         method: 'POST',
@@ -382,7 +380,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                         body: JSON.stringify(values),
                               });
 
-                              if (responseValues.ok && selectedFile) {
+                              if (responseValues.ok) {
 
                                         onSubmitSuccess();
 
@@ -409,10 +407,8 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                         icon: 'error',
                                         title: 'Oops...',
                                         text: 'Something went wrong!',
-                                        footer: '<a href="">Why do I have this issue?</a>'
                               })
                     }
-                    setUploadState(true)
           }
 
           const handleImageChange = (event) => {
@@ -601,80 +597,11 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                                                 onChange={formik.handleChange}
                                                                                 error={formik.touched.imageURL && !!formik.errors.imageURL}
                                                                                 helperText={formik.touched.imageURL && formik.errors.imageURL}
-                                                                      /> */}
-                                                                      <Card>
-                                                                                <CardContent>
-                                                                                          <Grid
-                                                                                                    container
-                                                                                                    spacing={3}
-                                                                                          >
-                                                                                                    <Box
-                                                                                                              sx={{
-                                                                                                                        display: 'flex',
-                                                                                                                        flexDirection: 'column',
-                                                                                                                        alignItems: 'center',
-                                                                                                                        gap: '10px',
-                                                                                                                        justifyContent: 'center'
-                                                                                                              }}
-                                                                                                    >
-
-                                                                                                              {
-                                                                                                                        selectedImage ?
-                                                                                                                                  <Image src={selectedImage}
-                                                                                                                                            alt='sds'
-                                                                                                                                            width={300}
-                                                                                                                                            height={300}
-                                                                                                                                            style={{
-                                                                                                                                                      borderRadius: '10px',
-                                                                                                                                                      cursor: 'pointer'
-                                                                                                                                            }}
-                                                                                                                                            onClick={() => handleFileRemove()}
-                                                                                                                                  />
-                                                                                                                                  :
-                                                                                                                                  <InsertPhotoIcon
-                                                                                                                                            color='primary'
-                                                                                                                                            sx={{ width: '300px', height: '300px' }}
-                                                                                                                                  />
-                                                                                                              }
-
-                                                                                                              <Button component="label"
-                                                                                                                        variant="contained"
-                                                                                                                        startIcon={<CloudUploadIcon />}
-                                                                                                                        sx={{
-                                                                                                                                  maxWidth: '150px'
-                                                                                                                        }}
-
-                                                                                                              >
-                                                                                                                        Upload file
-                                                                                                                        <Input
-                                                                                                                                  type="file"
-                                                                                                                                  inputProps={{ accept: 'image/*' }}
-                                                                                                                                  sx={{
-                                                                                                                                            clip: 'rect(0 0 0 0)',
-                                                                                                                                            clipPath: 'inset(50%)',
-                                                                                                                                            height: 1,
-                                                                                                                                            overflow: 'hidden',
-                                                                                                                                            position: 'absolute',
-                                                                                                                                            bottom: 0,
-                                                                                                                                            left: 0,
-                                                                                                                                            whiteSpace: 'nowrap',
-                                                                                                                                            width: 1,
-                                                                                                                                  }}
-                                                                                                                                  onInput={(e) => handleImageChange(e)}
-                                                                                                                        />
-                                                                                                              </Button>
-                                                                                                              {/* <FileDropzone
-                                                                                                    multiple={false}
-                                                                                                    accept={{ 'image/*': [] }}
-                                                                                                    caption="(SVG, JPG, PNG, or gif maximum 900x400)"
-                                                                                                    files={files}
-                                                                                                    onDrop={handleFilesDrop}
-                                                                                                    onRemove={handleFileRemove}
-                                                                                          /> */}
-                                                                                                    </Box>
-                                                                                          </Grid>
-                                                                                </CardContent>
-                                                                      </Card>
+                                                                      />
+                                                                      {/* <Fab component="span"
+                                                                      >
+                                                                                <PhotoCamera />
+                                                                      </Fab> */}
                                                                       <Container maxWidth="md"
                                                                                 sx={{ mt: 1, borderRadius: '5px', height: '300px', border: '1px solid red' }}>
                                                                                 <Stack >
@@ -713,7 +640,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
 
                                                                                 </Stack>
 
-                                                                      </Container>
+                                                                      </Container> */}
 
                                                                       <TextField
                                                                                 label="Price"

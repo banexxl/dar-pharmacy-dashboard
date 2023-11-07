@@ -14,7 +14,7 @@ const initialState = {
 };
 
 const handlers = {
-          [HANDLERS.INITIALIZE]: (state, action) => {
+          [HANDLERS.INITIALIZE]: (state: any, action: any) => {
                     const user = action.payload;
 
                     return {
@@ -33,7 +33,7 @@ const handlers = {
                               )
                     };
           },
-          [HANDLERS.SIGN_IN]: (state, action) => {
+          [HANDLERS.SIGN_IN]: (state: any, action: any) => {
                     const user = action.payload;
 
                     return {
@@ -42,7 +42,7 @@ const handlers = {
                               user
                     };
           },
-          [HANDLERS.SIGN_OUT]: (state) => {
+          [HANDLERS.SIGN_OUT]: (state: any) => {
                     return {
                               ...state,
                               isAuthenticated: false,
@@ -51,15 +51,18 @@ const handlers = {
           }
 };
 
-const reducer = (state, action) => (
+const reducer = (state: any, action: any) => (
           handlers[action.type] ? handlers[action.type](state, action) : state
 );
 
-// The role of this context is to propagate authentication state through the App tree.
+// The role of this context is to propagate authentication state through the App tree
+export const AuthContext = createContext({
+          user: null,
+          email: null,
+          signOut: () => { }
+})
 
-export const AuthContext = createContext({ undefined });
-
-export const AuthProvider = (props) => {
+export const AuthProvider = (props: any) => {
           const { children } = props;
           const [state, dispatch] = useReducer(reducer, initialState);
           const initialized = useRef(false);
@@ -84,8 +87,8 @@ export const AuthProvider = (props) => {
                               const user = {
                                         id: '5e86809283e28b96d2d38537',
                                         avatar: '/assets/avatars/avatar-anika-visser.png',
-                                        name: 'Anika Visser',
-                                        email: 'anika.visser@devias.io'
+                                        name: 'Maja',
+                                        email: 'maja@apoteka-dar.rs'
                               };
 
                               dispatch({
@@ -117,8 +120,8 @@ export const AuthProvider = (props) => {
                     const user = {
                               id: '5e86809283e28b96d2d38537',
                               avatar: '/assets/avatars/avatar-anika-visser.png',
-                              name: 'Anika Visser',
-                              email: 'anika.visser@devias.io'
+                              name: 'Maja',
+                              email: 'maja@apoteka-dar.rs'
                     };
 
                     dispatch({
@@ -127,7 +130,7 @@ export const AuthProvider = (props) => {
                     });
           };
 
-          const signIn = async (email, password) => {
+          const signIn = async (email: any, password: any) => {
                     if (email !== 'maja@apoteka-dar.rs' || password !== 'Majadar991') {
                               throw new Error('Please check your email and password');
                     }
@@ -141,8 +144,8 @@ export const AuthProvider = (props) => {
                     const user = {
                               id: '5e86809283e28b96d2d38537',
                               avatar: '/assets/avatars/avatar-anika-visser.png',
-                              name: 'Anika Visser',
-                              email: 'anika.visser@devias.io'
+                              name: 'Maja',
+                              email: 'maja@apoteka-dar.rs'
                     };
 
                     dispatch({
@@ -151,7 +154,7 @@ export const AuthProvider = (props) => {
                     });
           };
 
-          const signUp = async (email, name, password) => {
+          const signUp = async (email: any, name: any, password: any) => {
                     throw new Error('Sign up is not implemented');
           };
 
@@ -173,13 +176,13 @@ export const AuthProvider = (props) => {
                     >
                               {children}
                     </AuthContext.Provider>
-          );
-};
+          )
+}
 
 AuthProvider.propTypes = {
           children: PropTypes.node
-};
+}
 
 export const AuthConsumer = AuthContext.Consumer;
 
-export const useAuthContext = () => useContext(AuthContext);
+export const useAuthContext = () => useContext(AuthContext)

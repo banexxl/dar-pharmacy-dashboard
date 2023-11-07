@@ -4,16 +4,16 @@ import PropTypes from 'prop-types';
 import { Box, Divider, MenuItem, MenuList, Popover, Typography } from '@mui/material';
 import { useAuth } from 'src/hooks/use-auth';
 
-export const AccountPopover = (props) => {
+export const AccountPopover = (props: any) => {
           const { anchorEl, onClose, open } = props;
           const router = useRouter();
-          const auth = useAuth();
+          const auth: any = useAuth()
 
           const handleSignOut = useCallback(
                     () => {
                               onClose?.();
                               auth.signOut();
-                              window.sessionStorage.setItem('authenticated', false)
+                              window.sessionStorage.setItem('authenticated', 'false')
                               router.push('/auth/login');
                     },
                     [onClose, auth, router]
@@ -43,7 +43,14 @@ export const AccountPopover = (props) => {
                                                   color="text.secondary"
                                                   variant="body2"
                                         >
-                                                  Anika Visser
+                                                  {auth.user?.name}
+
+                                        </Typography>
+                                        <Typography
+                                                  color="text.secondary"
+                                                  variant="body2"
+                                        >
+                                                  {auth.user?.email}
                                         </Typography>
                               </Box>
                               <Divider />
