@@ -8,7 +8,6 @@ import { useRouter } from 'next/navigation';
 import Swal from 'sweetalert2'
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
-import Typography from '@mui/material/Typography';
 import Image from 'next/image';
 
 const initialValues = {
@@ -345,16 +344,16 @@ const manufacturerOptions = [
 export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
 
           const router = useRouter();
-          // const [selectedFile, setSelectedFile] = useState(null);
-          // const [selectedImage, setSelectedImage] = useState(null);
-          // const [uploadState, setUploadState] = useState("initial");
+          const [selectedFile, setSelectedFile] = useState(null);
+          const [selectedImage, setSelectedImage] = useState(null);
+          const [uploadState, setUploadState] = useState("initial");
 
 
 
-          // const handleResetClick = (event) => {
-          //           setSelectedImage(null);
-          //           setUploadState("initial");
-          // };
+          const handleResetClick = (event) => {
+                    setSelectedImage(null);
+                    setUploadState("initial");
+          };
 
           const handleSubmit = async (values) => {
 
@@ -412,16 +411,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
           }
 
           const handleImageChange = (event) => {
-                    const file = event.target.files[0]; // Get the first selected file
-                    if (file) {
-                              const reader = new FileReader();
-                              reader.onload = (e) => {
-                                        setSelectedImage(e.target.result);
-                                        formik.setFieldValue('image', e.target.result)
-                              };
 
-                              reader.readAsDataURL(file);
-                    }
           };
 
           const handleFileRemove = () => {
@@ -590,19 +580,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                                                 helperText={formik.touched.warning && formik.errors.warning}
                                                                       />
 
-                                                                      {/* <TextField
-                                                                                label="Image URL"
-                                                                                name="imageURL"
-                                                                                value={formik.values.imageURL}
-                                                                                onChange={formik.handleChange}
-                                                                                error={formik.touched.imageURL && !!formik.errors.imageURL}
-                                                                                helperText={formik.touched.imageURL && formik.errors.imageURL}
-                                                                      />
-                                                                      {/* <Fab component="span"
-                                                                      >
-                                                                                <PhotoCamera />
-                                                                      </Fab> */}
-                                                                      <Container maxWidth="md"
+                                                                      {/* <Container maxWidth="md"
                                                                                 sx={{ mt: 1, borderRadius: '5px', height: '300px', border: '1px solid red' }}>
                                                                                 <Stack >
                                                                                           <IconButton
@@ -641,7 +619,79 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                                                 </Stack>
 
                                                                       </Container> */}
+                                                                      <Card>
+                                                                                <CardContent>
 
+                                                                                          <Box
+                                                                                                    sx={{
+                                                                                                              display: 'flex',
+                                                                                                              flexDirection: 'column',
+                                                                                                              alignItems: 'center',
+                                                                                                              gap: '10px'
+                                                                                                    }}
+                                                                                          >
+
+                                                                                                    {
+                                                                                                              selectedImage ?
+                                                                                                                        <Image src={selectedImage}
+                                                                                                                                  alt='sds'
+                                                                                                                                  width={300}
+                                                                                                                                  height={300}
+                                                                                                                                  style={{
+                                                                                                                                            borderRadius: '10px',
+                                                                                                                                            cursor: 'pointer'
+                                                                                                                                  }}
+                                                                                                                                  onClick={() => handleFileRemove()}
+                                                                                                                        />
+                                                                                                                        :
+                                                                                                                        <InsertPhotoIcon
+                                                                                                                                  color='primary'
+                                                                                                                                  sx={{ width: '300px', height: '300px' }}
+                                                                                                                        />
+                                                                                                    }
+
+                                                                                                    <Button component="label"
+                                                                                                              variant="contained"
+                                                                                                              startIcon={<CloudUploadIcon />}
+                                                                                                              sx={{
+                                                                                                                        maxWidth: '150px'
+                                                                                                              }}
+
+                                                                                                    >
+                                                                                                              Upload file
+                                                                                                              <Input
+                                                                                                                        type="file"
+                                                                                                                        inputProps={{ accept: 'image/*' }}
+                                                                                                                        sx={{
+                                                                                                                                  clip: 'rect(0 0 0 0)',
+                                                                                                                                  clipPath: 'inset(50%)',
+                                                                                                                                  height: 1,
+                                                                                                                                  overflow: 'hidden',
+                                                                                                                                  position: 'absolute',
+                                                                                                                                  bottom: 0,
+                                                                                                                                  left: 0,
+                                                                                                                                  whiteSpace: 'nowrap',
+                                                                                                                                  width: 1,
+                                                                                                                        }}
+                                                                                                                        onInput={(e) => {
+                                                                                                                                  const file = e.target.files[0]; // Get the first selected file
+                                                                                                                                  if (file) {
+                                                                                                                                            const reader = new FileReader();
+                                                                                                                                            reader.onload = (e) => {
+                                                                                                                                                      setSelectedImage(e.target.result);
+                                                                                                                                                      formik.setFieldValue('imageURL', e.target.result)
+                                                                                                                                            };
+
+                                                                                                                                            reader.readAsDataURL(file);
+                                                                                                                                  }
+                                                                                                                        }
+                                                                                                                        }
+                                                                                                              />
+                                                                                                    </Button>
+
+                                                                                          </Box>
+                                                                                </CardContent>
+                                                                      </Card>
                                                                       <TextField
                                                                                 label="Price"
                                                                                 name="price"
