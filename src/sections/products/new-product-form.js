@@ -6,6 +6,9 @@ import PhotoCamera from "@mui/icons-material/PhotoCamera";
 import { newProductSchema } from './new-product-schema'
 import { useRouter } from 'next/navigation';
 import Swal from 'sweetalert2'
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
+import Typography from '@mui/material/Typography';
 import Image from 'next/image';
 
 const initialValues = {
@@ -346,6 +349,8 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
           const [selectedImage, setSelectedImage] = useState(null);
           const [uploadState, setUploadState] = useState("initial");
 
+
+
           const handleResetClick = (event) => {
                     setSelectedImage(null);
                     setUploadState("initial");
@@ -408,6 +413,23 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                               })
                     }
                     setUploadState(true)
+          }
+
+          const handleImageChange = (event) => {
+                    const file = event.target.files[0]; // Get the first selected file
+                    if (file) {
+                              const reader = new FileReader();
+                              reader.onload = (e) => {
+                                        setSelectedImage(e.target.result);
+                                        formik.setFieldValue('image', e.target.result)
+                              };
+
+                              reader.readAsDataURL(file);
+                    }
+          };
+
+          const handleFileRemove = () => {
+                    setSelectedImage(null);
           }
 
           return (
@@ -572,18 +594,87 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                                                 helperText={formik.touched.warning && formik.errors.warning}
                                                                       />
 
-                                                                      <TextField
+                                                                      {/* <TextField
                                                                                 label="Image URL"
                                                                                 name="imageURL"
                                                                                 value={formik.values.imageURL}
                                                                                 onChange={formik.handleChange}
                                                                                 error={formik.touched.imageURL && !!formik.errors.imageURL}
                                                                                 helperText={formik.touched.imageURL && formik.errors.imageURL}
-                                                                      />
-                                                                      {/* <Fab component="span"
-                                                                      >
-                                                                                <PhotoCamera />
-                                                                      </Fab> */}
+                                                                      /> */}
+                                                                      <Card>
+                                                                                <CardContent>
+                                                                                          <Grid
+                                                                                                    container
+                                                                                                    spacing={3}
+                                                                                          >
+                                                                                                    <Box
+                                                                                                              sx={{
+                                                                                                                        display: 'flex',
+                                                                                                                        flexDirection: 'column',
+                                                                                                                        alignItems: 'center',
+                                                                                                                        gap: '10px',
+                                                                                                                        justifyContent: 'center'
+                                                                                                              }}
+                                                                                                    >
+
+                                                                                                              {
+                                                                                                                        selectedImage ?
+                                                                                                                                  <Image src={selectedImage}
+                                                                                                                                            alt='sds'
+                                                                                                                                            width={300}
+                                                                                                                                            height={300}
+                                                                                                                                            style={{
+                                                                                                                                                      borderRadius: '10px',
+                                                                                                                                                      cursor: 'pointer'
+                                                                                                                                            }}
+                                                                                                                                            onClick={() => handleFileRemove()}
+                                                                                                                                  />
+                                                                                                                                  :
+                                                                                                                                  <InsertPhotoIcon
+                                                                                                                                            color='primary'
+                                                                                                                                            sx={{ width: '300px', height: '300px' }}
+                                                                                                                                  />
+                                                                                                              }
+
+                                                                                                              <Button component="label"
+                                                                                                                        variant="contained"
+                                                                                                                        startIcon={<CloudUploadIcon />}
+                                                                                                                        sx={{
+                                                                                                                                  maxWidth: '150px'
+                                                                                                                        }}
+
+                                                                                                              >
+                                                                                                                        Upload file
+                                                                                                                        <Input
+                                                                                                                                  type="file"
+                                                                                                                                  inputProps={{ accept: 'image/*' }}
+                                                                                                                                  sx={{
+                                                                                                                                            clip: 'rect(0 0 0 0)',
+                                                                                                                                            clipPath: 'inset(50%)',
+                                                                                                                                            height: 1,
+                                                                                                                                            overflow: 'hidden',
+                                                                                                                                            position: 'absolute',
+                                                                                                                                            bottom: 0,
+                                                                                                                                            left: 0,
+                                                                                                                                            whiteSpace: 'nowrap',
+                                                                                                                                            width: 1,
+                                                                                                                                  }}
+                                                                                                                                  onInput={(e) => handleImageChange(e)}
+                                                                                                                        />
+                                                                                                              </Button>
+                                                                                                              {/* <FileDropzone
+                                                                                                    multiple={false}
+                                                                                                    accept={{ 'image/*': [] }}
+                                                                                                    caption="(SVG, JPG, PNG, or gif maximum 900x400)"
+                                                                                                    files={files}
+                                                                                                    onDrop={handleFilesDrop}
+                                                                                                    onRemove={handleFileRemove}
+                                                                                          /> */}
+                                                                                                    </Box>
+                                                                                          </Grid>
+                                                                                </CardContent>
+                                                                      </Card>
                                                                       <Container maxWidth="md"
                                                                                 sx={{ mt: 1, borderRadius: '5px', height: '300px', border: '1px solid red' }}>
                                                                                 <Stack >
