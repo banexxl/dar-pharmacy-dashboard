@@ -39,6 +39,10 @@ export const mainCategoryOptions = [
                     label: 'Prirodna kozmetika',
                     value: 'prirodna-kozmetika',
           },
+          {
+                    label: 'Kolagen',
+                    value: 'kolagen',
+          },
 ];
 
 export const midCategoryOptions = [
