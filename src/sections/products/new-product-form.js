@@ -32,6 +32,10 @@ const initialValues = {
 
 export const mainCategoryOptions = [
           {
+                    label: 'Obrisi polje',
+                    value: '',
+          },
+          {
                     label: 'Apoteka',
                     value: 'apoteka',
           },
@@ -43,9 +47,29 @@ export const mainCategoryOptions = [
                     label: 'Kolagen',
                     value: 'kolagen',
           },
+          {
+                    label: 'Bebi prirodna kozmetika',
+                    value: 'bebi-prirodna-kozmetika',
+          },
+          {
+                    label: 'Suplementi',
+                    value: 'suplementi',
+          },
+          {
+                    label: 'Ledene Kocke za imunitet',
+                    value: 'ledene-kocke-za-imunitet',
+          },
+          {
+                    label: 'Prirodni imunitet',
+                    value: 'prirodni-imunitet',
+          },
 ];
 
 export const midCategoryOptions = [
+          {
+                    label: 'Obrisi polje',
+                    value: '',
+          },
           {
                     label: 'Alergije',
                     value: 'alergije',
@@ -85,6 +109,10 @@ export const midCategoryOptions = [
 ];
 
 export const subCategoryOptions = [
+          {
+                    label: 'Obrisi polje',
+                    value: '',
+          },
           {
                     label: 'Biljni preparati',
                     value: 'biljni-preparati',
