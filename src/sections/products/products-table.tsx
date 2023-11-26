@@ -41,26 +41,26 @@ export interface IProduct {
 }
 
 export const ProductsTable = (props: any) => {
+
           const {
                     count = 0,
                     items = [],
                     onDeselectAll,
                     onDeselectOne,
-                    onPageChange = () => { },
+                    onPageChange,
                     onRowsPerPageChange,
                     onSelectAll,
                     onSelectOne,
-                    page = 0,
                     rowsPerPage = 0,
                     selected = []
           } = props;
 
           const selectedSome = (selected.length > 0) && (selected.length < items.length);
           const selectedAll = (items.length > 0) && (selected.length === items.length);
+          const [page, setPage] = useState(0)
           const [currentProductID, setCurrentProductID] = useState(null);
           const [currentProductObject, setCurrentProductObject] = useState<IProduct | null>();
           const router = useRouter();
-
 
           const getObjectById = (_id: any, arrayToSearch: any) => {
                     for (const obj of arrayToSearch) {
@@ -212,7 +212,7 @@ export const ProductsTable = (props: any) => {
                                                                       </TableRow>
                                                             </TableHead>
                                                             <TableBody>
-                                                                      {items.slice(page * rowsPerPage, (page * rowsPerPage) + rowsPerPage).map((product: any) => {
+                                                                      {Array.isArray(items) && items.slice(page * rowsPerPage, (page * rowsPerPage) + rowsPerPage).map((product: any) => {
                                                                                 //const isSelected = selected.includes(product._id);
                                                                                 const isCurrent = product._id === currentProductID;
 
@@ -228,6 +228,7 @@ export const ProductsTable = (props: any) => {
                                                                                                               key={product._id}
                                                                                                     >
                                                                                                               <TableCell
+                                                                                                                        key={product.id}
                                                                                                                         padding="checkbox"
                                                                                                                         sx={{
                                                                                                                                   ...(isCurrent && {
@@ -245,12 +246,12 @@ export const ProductsTable = (props: any) => {
                                                                                                                         }}
                                                                                                                         width="25%"
                                                                                                               >
-                                                                                                                        <IconButton onClick={() => handleProductToggle(product._id)}>
-                                                                                                                                  <SvgIcon>{isCurrent ? <ChevronDownIcon /> : <ChevronRightIcon />}</SvgIcon>
+                                                                                                                        <IconButton key={product.id} onClick={() => handleProductToggle(product._id)}>
+                                                                                                                                  <SvgIcon key={product.id}>{isCurrent ? <ChevronDownIcon /> : <ChevronRightIcon />}</SvgIcon>
                                                                                                                         </IconButton>
                                                                                                               </TableCell>
-                                                                                                              <TableCell width="25%">
-                                                                                                                        <Box
+                                                                                                              <TableCell width="25%" key={product.id}>
+                                                                                                                        <Box key={product.id}
                                                                                                                                   sx={{
                                                                                                                                             alignItems: 'center',
                                                                                                                                             display: 'flex',
@@ -258,6 +259,7 @@ export const ProductsTable = (props: any) => {
                                                                                                                         >
                                                                                                                                   {product.imageURL ? (
                                                                                                                                             <Box
+                                                                                                                                                      key={product.id}
                                                                                                                                                       sx={{
                                                                                                                                                                 alignItems: 'center',
                                                                                                                                                                 backgroundColor: 'neutral.50',
@@ -274,6 +276,7 @@ export const ProductsTable = (props: any) => {
                                                                                                                                             />
                                                                                                                                   ) : (
                                                                                                                                             <Box
+                                                                                                                                                      key={product.id}
                                                                                                                                                       sx={{
                                                                                                                                                                 alignItems: 'center',
                                                                                                                                                                 backgroundColor: 'neutral.50',
@@ -290,13 +293,15 @@ export const ProductsTable = (props: any) => {
                                                                                                                                             </Box>
                                                                                                                                   )}
                                                                                                                                   <Box
+                                                                                                                                            key={product.id}
                                                                                                                                             sx={{
                                                                                                                                                       cursor: 'pointer',
                                                                                                                                                       ml: 2,
                                                                                                                                             }}
                                                                                                                                   >
-                                                                                                                                            <Typography variant="subtitle2">{product.name}</Typography>
+                                                                                                                                            <Typography key={product.id} variant="subtitle2">{product.name}</Typography>
                                                                                                                                             <Typography
+                                                                                                                                                      key={product.id}
                                                                                                                                                       color="text.secondary"
                                                                                                                                                       variant="body2"
                                                                                                                                             >
@@ -305,8 +310,9 @@ export const ProductsTable = (props: any) => {
                                                                                                                                   </Box>
                                                                                                                         </Box>
                                                                                                               </TableCell>
-                                                                                                              <TableCell width="25%">
+                                                                                                              <TableCell width="25%" key={product.id}>
                                                                                                                         <LinearProgress
+                                                                                                                                  key={product.id}
                                                                                                                                   value={product.availableStock}
                                                                                                                                   variant="determinate"
                                                                                                                                   color={quantityColor}
@@ -316,6 +322,7 @@ export const ProductsTable = (props: any) => {
                                                                                                                                   }}
                                                                                                                         />
                                                                                                                         <Typography
+                                                                                                                                  key={product.id}
                                                                                                                                   color="text.secondary"
                                                                                                                                   variant="body2"
                                                                                                                         >
@@ -323,18 +330,19 @@ export const ProductsTable = (props: any) => {
                                                                                                                                   {hasManyVariants && ` in ${product.variants} variants`}
                                                                                                                         </Typography>
                                                                                                               </TableCell>
-                                                                                                              <TableCell>{product.price}</TableCell>
-                                                                                                              <TableCell>{product._id.slice(-8)}</TableCell>
-                                                                                                              <TableCell>
-                                                                                                                        <SeverityPill color={statusColor}>{product.discount.toString()}</SeverityPill>
+                                                                                                              <TableCell key={product.id}>{product.price}</TableCell>
+                                                                                                              <TableCell key={product.id}>{product._id.slice(-8)}</TableCell>
+                                                                                                              <TableCell key={product.id}>
+                                                                                                                        <SeverityPill key={product.id} color={statusColor}>{product.discount.toString()}</SeverityPill>
                                                                                                               </TableCell>
-                                                                                                              <TableCell>
-                                                                                                                        <SeverityPill color={statusColor}>{product.discountAmount}</SeverityPill>
+                                                                                                              <TableCell key={product.id}>
+                                                                                                                        <SeverityPill key={product.id} color={statusColor}>{product.discountAmount}</SeverityPill>
                                                                                                               </TableCell>
                                                                                                     </TableRow>
                                                                                                     {isCurrent && (
-                                                                                                              <TableRow>
+                                                                                                              <TableRow key={product.id}>
                                                                                                                         <TableCell
+                                                                                                                                  key={product.id}
                                                                                                                                   colSpan={7}
                                                                                                                                   sx={{
                                                                                                                                             p: 0,
@@ -350,28 +358,28 @@ export const ProductsTable = (props: any) => {
                                                                                                                                             },
                                                                                                                                   }}
                                                                                                                         >
-                                                                                                                                  <CardContent>
-                                                                                                                                            <Grid
+                                                                                                                                  <CardContent key={product.id}>
+                                                                                                                                            <Grid key={product.id}
                                                                                                                                                       container
                                                                                                                                                       spacing={3}
                                                                                                                                             >
-                                                                                                                                                      <Grid
+                                                                                                                                                      <Grid key={product.id}
                                                                                                                                                                 item
                                                                                                                                                                 md={6}
                                                                                                                                                                 xs={12}
                                                                                                                                                       >
-                                                                                                                                                                <Typography variant="h6">Osnovni detalji</Typography>
-                                                                                                                                                                <Divider sx={{ my: 2 }} />
-                                                                                                                                                                <Grid
+                                                                                                                                                                <Typography key={product.id} variant="h6">Osnovni detalji</Typography>
+                                                                                                                                                                <Divider key={product.id} sx={{ my: 2 }} />
+                                                                                                                                                                <Grid key={product.id}
                                                                                                                                                                           container
                                                                                                                                                                           spacing={3}
                                                                                                                                                                 >
-                                                                                                                                                                          <Grid
+                                                                                                                                                                          <Grid key={product.id}
                                                                                                                                                                                     item
                                                                                                                                                                                     md={6}
                                                                                                                                                                                     xs={12}
                                                                                                                                                                           >
-                                                                                                                                                                                    <TextField
+                                                                                                                                                                                    <TextField key={product.id}
                                                                                                                                                                                               defaultValue={product.name}
                                                                                                                                                                                               fullWidth
                                                                                                                                                                                               label="Naziv"
@@ -385,12 +393,12 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                               }
                                                                                                                                                                                     />
                                                                                                                                                                           </Grid>
-                                                                                                                                                                          <Grid
+                                                                                                                                                                          <Grid key={product.id}
                                                                                                                                                                                     item
                                                                                                                                                                                     md={6}
                                                                                                                                                                                     xs={12}
                                                                                                                                                                           >
-                                                                                                                                                                                    <TextField
+                                                                                                                                                                                    <TextField key={product.id}
                                                                                                                                                                                               defaultValue={product._id.slice(-8)}
                                                                                                                                                                                               disabled
                                                                                                                                                                                               fullWidth
@@ -398,12 +406,12 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                               name={product._id.slice(-8)}
                                                                                                                                                                                     />
                                                                                                                                                                           </Grid>
-                                                                                                                                                                          <Grid
+                                                                                                                                                                          <Grid key={product.id}
                                                                                                                                                                                     item
                                                                                                                                                                                     md={6}
                                                                                                                                                                                     xs={12}
                                                                                                                                                                           >
-                                                                                                                                                                                    <TextField
+                                                                                                                                                                                    <TextField key={product.id}
                                                                                                                                                                                               defaultValue={product.mainCategory}
                                                                                                                                                                                               fullWidth
                                                                                                                                                                                               label="Glavna Kategorija"
@@ -418,7 +426,7 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                     >
                                                                                                                                                                                               {mainCategoryOptions.map((option) => (
                                                                                                                                                                                                         <MenuItem
-                                                                                                                                                                                                                  key={option.value}
+                                                                                                                                                                                                                  key={product.id}
                                                                                                                                                                                                                   value={option.value}
                                                                                                                                                                                                         >
                                                                                                                                                                                                                   {option.label}
@@ -426,12 +434,12 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                               ))}
                                                                                                                                                                                     </TextField>
                                                                                                                                                                           </Grid>
-                                                                                                                                                                          <Grid
+                                                                                                                                                                          <Grid key={product.id}
                                                                                                                                                                                     item
                                                                                                                                                                                     md={6}
                                                                                                                                                                                     xs={12}
                                                                                                                                                                           >
-                                                                                                                                                                                    <TextField
+                                                                                                                                                                                    <TextField key={product.id}
                                                                                                                                                                                               defaultValue={product.midCategory}
                                                                                                                                                                                               fullWidth
                                                                                                                                                                                               label="Mid Kategorija"
@@ -446,7 +454,7 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                     >
                                                                                                                                                                                               {midCategoryOptions.map((option) => (
                                                                                                                                                                                                         <MenuItem
-                                                                                                                                                                                                                  key={option.value}
+                                                                                                                                                                                                                  key={product.id}
                                                                                                                                                                                                                   value={option.value}
                                                                                                                                                                                                         >
                                                                                                                                                                                                                   {option.label}
@@ -454,12 +462,12 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                               ))}
                                                                                                                                                                                     </TextField>
                                                                                                                                                                           </Grid>
-                                                                                                                                                                          <Grid
+                                                                                                                                                                          <Grid key={product.id}
                                                                                                                                                                                     item
                                                                                                                                                                                     md={6}
                                                                                                                                                                                     xs={12}
                                                                                                                                                                           >
-                                                                                                                                                                                    <TextField
+                                                                                                                                                                                    <TextField key={product.id}
                                                                                                                                                                                               defaultValue={product.subCategory}
                                                                                                                                                                                               fullWidth
                                                                                                                                                                                               label="Sub Kategorija"
@@ -474,7 +482,7 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                     >
                                                                                                                                                                                               {subCategoryOptions.map((option) => (
                                                                                                                                                                                                         <MenuItem
-                                                                                                                                                                                                                  key={option.value}
+                                                                                                                                                                                                                  key={product.id}
                                                                                                                                                                                                                   value={option.value}
                                                                                                                                                                                                         >
                                                                                                                                                                                                                   {option.label}
@@ -487,7 +495,7 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                     md={6}
                                                                                                                                                                                     xs={12}
                                                                                                                                                                           >
-                                                                                                                                                                                    <TextField
+                                                                                                                                                                                    <TextField key={product.id}
                                                                                                                                                                                               defaultValue={product.quantity}
                                                                                                                                                                                               fullWidth
                                                                                                                                                                                               label="Kolicina"
@@ -506,7 +514,7 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                     md={6}
                                                                                                                                                                                     xs={12}
                                                                                                                                                                           >
-                                                                                                                                                                                    <TextField
+                                                                                                                                                                                    <TextField key={product.id}
                                                                                                                                                                                               defaultValue={product.description}
                                                                                                                                                                                               fullWidth
                                                                                                                                                                                               label="Opis"
@@ -520,12 +528,12 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                               }
                                                                                                                                                                                     />
                                                                                                                                                                           </Grid>
-                                                                                                                                                                          <Grid
+                                                                                                                                                                          <Grid key={product.id}
                                                                                                                                                                                     item
                                                                                                                                                                                     md={6}
                                                                                                                                                                                     xs={12}
                                                                                                                                                                           >
-                                                                                                                                                                                    <TextField
+                                                                                                                                                                                    <TextField key={product.id}
                                                                                                                                                                                               defaultValue={product.instructions}
                                                                                                                                                                                               fullWidth
                                                                                                                                                                                               label="Instrukcije"
@@ -539,12 +547,12 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                               }
                                                                                                                                                                                     />
                                                                                                                                                                           </Grid>
-                                                                                                                                                                          <Grid
+                                                                                                                                                                          <Grid key={product.id}
                                                                                                                                                                                     item
                                                                                                                                                                                     md={6}
                                                                                                                                                                                     xs={12}
                                                                                                                                                                           >
-                                                                                                                                                                                    <TextField
+                                                                                                                                                                                    <TextField key={product.id}
                                                                                                                                                                                               defaultValue={product.warning}
                                                                                                                                                                                               fullWidth
                                                                                                                                                                                               label="Upozorenje"
@@ -558,12 +566,12 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                               }
                                                                                                                                                                                     />
                                                                                                                                                                           </Grid>
-                                                                                                                                                                          <Grid
+                                                                                                                                                                          <Grid key={product.id}
                                                                                                                                                                                     item
                                                                                                                                                                                     md={6}
                                                                                                                                                                                     xs={12}
                                                                                                                                                                           >
-                                                                                                                                                                                    <TextField
+                                                                                                                                                                                    <TextField key={product.id}
                                                                                                                                                                                               defaultValue={product.ingredients}
                                                                                                                                                                                               fullWidth
                                                                                                                                                                                               label="Ingredients"
@@ -577,12 +585,12 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                               }
                                                                                                                                                                                     />
                                                                                                                                                                           </Grid>
-                                                                                                                                                                          <Grid
+                                                                                                                                                                          <Grid key={product.id}
                                                                                                                                                                                     item
                                                                                                                                                                                     md={6}
                                                                                                                                                                                     xs={12}
                                                                                                                                                                           >
-                                                                                                                                                                                    <TextField
+                                                                                                                                                                                    <TextField key={product.id}
                                                                                                                                                                                               defaultValue={product.imageURL}
                                                                                                                                                                                               fullWidth
                                                                                                                                                                                               label="Slika"
@@ -598,14 +606,14 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                           </Grid>
                                                                                                                                                                 </Grid>
                                                                                                                                                       </Grid>
-                                                                                                                                                      <Grid
+                                                                                                                                                      <Grid key={product.id}
                                                                                                                                                                 item
                                                                                                                                                                 md={6}
                                                                                                                                                                 xs={12}
                                                                                                                                                       >
-                                                                                                                                                                <Typography variant="h6">Pricing and stocks</Typography>
-                                                                                                                                                                <Divider sx={{ my: 2 }} />
-                                                                                                                                                                <Grid
+                                                                                                                                                                <Typography key={product.id} variant="h6">Pricing and stocks</Typography>
+                                                                                                                                                                <Divider key={product.id} sx={{ my: 2 }} />
+                                                                                                                                                                <Grid key={product.id}
                                                                                                                                                                           container
                                                                                                                                                                           spacing={3}
                                                                                                                                                                 >
@@ -636,12 +644,12 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                               type="number"
                                                                                                                                                                                     />
                                                                                                                                                                           </Grid> */}
-                                                                                                                                                                          <Grid
+                                                                                                                                                                          <Grid key={product.id}
                                                                                                                                                                                     item
                                                                                                                                                                                     md={6}
                                                                                                                                                                                     xs={12}
                                                                                                                                                                           >
-                                                                                                                                                                                    <TextField
+                                                                                                                                                                                    <TextField key={product.id}
                                                                                                                                                                                               defaultValue={product.price}
                                                                                                                                                                                               fullWidth
                                                                                                                                                                                               label="Nova cena"
@@ -655,13 +663,13 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                               }
                                                                                                                                                                                               InputProps={{
                                                                                                                                                                                                         startAdornment: (
-                                                                                                                                                                                                                  <InputAdornment position="start">RSD</InputAdornment>
+                                                                                                                                                                                                                  <InputAdornment key={product.id} position="start">RSD</InputAdornment>
                                                                                                                                                                                                         ),
                                                                                                                                                                                               }}
                                                                                                                                                                                               type="number"
                                                                                                                                                                                     />
                                                                                                                                                                           </Grid>
-                                                                                                                                                                          <Grid
+                                                                                                                                                                          <Grid key={product.id}
                                                                                                                                                                                     item
                                                                                                                                                                                     md={6}
                                                                                                                                                                                     xs={12}
@@ -670,22 +678,22 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                               display: 'flex',
                                                                                                                                                                                     }}
                                                                                                                                                                           >
-                                                                                                                                                                                    <Switch checked={currentProductObject!.discount}
+                                                                                                                                                                                    <Switch key={product.id} checked={currentProductObject!.discount}
                                                                                                                                                                                               onChange={() => setCurrentProductObject((previousObject: any) => ({
                                                                                                                                                                                                         ...previousObject,
                                                                                                                                                                                                         discount: !previousObject.discount
                                                                                                                                                                                               }))}
                                                                                                                                                                                     />
-                                                                                                                                                                                    <Typography variant="subtitle2">
+                                                                                                                                                                                    <Typography key={product.id} variant="subtitle2">
                                                                                                                                                                                               Popust
                                                                                                                                                                                     </Typography>
                                                                                                                                                                           </Grid>
-                                                                                                                                                                          <Grid
+                                                                                                                                                                          <Grid key={product.id}
                                                                                                                                                                                     item
                                                                                                                                                                                     md={6}
                                                                                                                                                                                     xs={12}
                                                                                                                                                                           >
-                                                                                                                                                                                    <TextField
+                                                                                                                                                                                    <TextField key={product.id}
                                                                                                                                                                                               defaultValue={product.discountAmount}
                                                                                                                                                                                               fullWidth
                                                                                                                                                                                               label="Iznos popusta"
@@ -700,7 +708,7 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                               type="number"
                                                                                                                                                                                     />
                                                                                                                                                                           </Grid>
-                                                                                                                                                                          <Grid
+                                                                                                                                                                          <Grid key={product.id}
                                                                                                                                                                                     item
                                                                                                                                                                                     md={6}
                                                                                                                                                                                     xs={12}
@@ -709,17 +717,17 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                               display: 'flex',
                                                                                                                                                                                     }}
                                                                                                                                                                           >
-                                                                                                                                                                                    <Switch checked={currentProductObject!.newArrival}
+                                                                                                                                                                                    <Switch key={product.id} checked={currentProductObject!.newArrival}
                                                                                                                                                                                               onChange={() => setCurrentProductObject((previousObject: any) => ({
                                                                                                                                                                                                         ...previousObject,
                                                                                                                                                                                                         newArrival: !previousObject.newArrival
                                                                                                                                                                                               }))}
                                                                                                                                                                                     />
-                                                                                                                                                                                    <Typography variant="subtitle2">
+                                                                                                                                                                                    <Typography key={product.id} variant="subtitle2">
                                                                                                                                                                                               Novi proizvod
                                                                                                                                                                                     </Typography>
                                                                                                                                                                           </Grid>
-                                                                                                                                                                          <Grid
+                                                                                                                                                                          <Grid key={product.id}
                                                                                                                                                                                     item
                                                                                                                                                                                     md={6}
                                                                                                                                                                                     xs={12}
@@ -728,7 +736,7 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                               display: 'flex',
                                                                                                                                                                                     }}
                                                                                                                                                                           >
-                                                                                                                                                                                    <Switch
+                                                                                                                                                                                    <Switch key={product.id}
                                                                                                                                                                                               checked={currentProductObject!.bestSeller}
                                                                                                                                                                                               onChange={() => setCurrentProductObject((previousObject: any) => ({
                                                                                                                                                                                                         ...previousObject,
@@ -736,16 +744,16 @@ export const ProductsTable = (props: any) => {
 
                                                                                                                                                                                               }))}
                                                                                                                                                                                     />
-                                                                                                                                                                                    <Typography variant="subtitle2">
+                                                                                                                                                                                    <Typography key={product.id} variant="subtitle2">
                                                                                                                                                                                               Najprodavaniji
                                                                                                                                                                                     </Typography>
                                                                                                                                                                           </Grid>
-                                                                                                                                                                          <Grid
+                                                                                                                                                                          <Grid key={product.id}
                                                                                                                                                                                     item
                                                                                                                                                                                     md={6}
                                                                                                                                                                                     xs={12}
                                                                                                                                                                           >
-                                                                                                                                                                                    <TextField
+                                                                                                                                                                                    <TextField key={product.id}
                                                                                                                                                                                               defaultValue={product.availableStock}
                                                                                                                                                                                               fullWidth
                                                                                                                                                                                               label="Na stanju"
@@ -765,25 +773,25 @@ export const ProductsTable = (props: any) => {
                                                                                                                                             </Grid>
                                                                                                                                   </CardContent>
                                                                                                                                   <Divider />
-                                                                                                                                  <Stack
+                                                                                                                                  <Stack key={product.id}
                                                                                                                                             alignItems="center"
                                                                                                                                             direction="row"
                                                                                                                                             justifyContent="space-between"
                                                                                                                                             sx={{ p: 2 }}
                                                                                                                                   >
-                                                                                                                                            <Stack
+                                                                                                                                            <Stack key={product.id}
                                                                                                                                                       alignItems="center"
                                                                                                                                                       direction="row"
                                                                                                                                                       spacing={2}
                                                                                                                                             >
-                                                                                                                                                      <Button
+                                                                                                                                                      <Button key={product.id}
                                                                                                                                                                 onClick={handleProductUpdateClick}
                                                                                                                                                                 type="submit"
                                                                                                                                                                 variant="contained"
                                                                                                                                                       >
                                                                                                                                                                 Izmeni
                                                                                                                                                       </Button>
-                                                                                                                                                      <Button
+                                                                                                                                                      <Button key={product.id}
                                                                                                                                                                 color="inherit"
                                                                                                                                                                 onClick={handleProductClose}
                                                                                                                                                       >
@@ -791,7 +799,7 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                       </Button>
                                                                                                                                             </Stack>
                                                                                                                                             <div>
-                                                                                                                                                      <Button
+                                                                                                                                                      <Button key={product.id}
                                                                                                                                                                 onClick={handleDeleteButtonClick}
                                                                                                                                                                 color="error"
                                                                                                                                                       >
@@ -811,12 +819,16 @@ export const ProductsTable = (props: any) => {
                               </Scrollbar>
                               <TablePagination
                                         component="div"
-                                        count={count}
-                                        onPageChange={onPageChange}
+                                        count={props.productsCount}
+                                        onPageChange={(event: any | null, page: number) => console.log(page)}
                                         onRowsPerPageChange={onRowsPerPageChange}
                                         page={page}
                                         rowsPerPage={rowsPerPage}
                                         rowsPerPageOptions={[5, 10, 25]}
+                                        showFirstButton
+                                        showLastButton
+                                        labelRowsPerPage={'Broj po stranici'}
+                                        labelDisplayedRows={({ from, to, count }) => { return `${from}–${to} od ${count !== -1 ? count : `više od ${to}`}`; }}
                               />
                     </Card>
           );

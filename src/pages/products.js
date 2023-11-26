@@ -12,6 +12,7 @@ import { ProductsSearch } from 'src/sections/products/products-search';
 import { applyPagination } from 'src/utils/apply-pagination';
 import { productsServices } from '../utils/product-services'
 import { AddProductForm } from '../sections/products/new-product-form'
+import { useRouter } from 'next/navigation';
 
 const useProducts = (data, page, rowsPerPage) => {
           return useMemo(
@@ -23,47 +24,24 @@ const useProducts = (data, page, rowsPerPage) => {
 };
 
 const useProductsIds = (products) => {
-          return useMemo(
-                    () => {
-                              return products.map((product) => product._id);
-                    },
-                    [products]
-          );
+          return useMemo(() => {
+                    if (!Array.isArray(products)) {
+                              return [];
+                    }
+
+                    return products.map((product) => product._id);
+          }, [products]);
 };
 
 const Page = (props) => {
+
           const [page, setPage] = useState(0);
           const [open, setOpen] = useState(false)
-          const [openEdit, setOpenEdit] = useState(false)
           const [rowsPerPage, setRowsPerPage] = useState(5);
           const products = useProducts(props.products, page, rowsPerPage);
           const productsIds = useProductsIds(props.products);
           const productsSelection = useSelection(productsIds);
-
-          // useEffect(() => {
-          //           try {
-          //                     fetch('/api/product-api', {
-          //                               method: 'GET',
-          //                               headers: {
-          //                                         'Content-Type': 'application/json',
-          //                                         'Access-Control-Allow-Origin': '*',
-          //                                         'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS' // Set the content type to JSON
-          //                               },
-          //                     }).then((response) => {
-
-          //                               if (response.ok) {
-
-
-          //                               } else {
-          //                                         const errorData = response.json(); // Parse the error response
-          //                                         console.error(errorData);
-          //                               }
-          //                     })
-          //           } catch (err) {
-          //                     console.error(err);
-          //           }
-          // }, [])
-
+          const router = useRouter();
 
           const handleSubmitSuccess = () => {
                     setOpen(false); // Close the dialog
@@ -73,19 +51,18 @@ const Page = (props) => {
                     setOpen(false)
           }
 
-          const handlePageChange = useCallback(
-                    (event, value) => {
-                              setPage(value);
-                    },
-                    []
-          );
+          const handleRowsPerPageChange = (event) => {
+                    setRowsPerPage(event.target.value);
+                    const currentPage = page || 1
+                    router.push(`products/?page=${ currentPage }&limit=${ event.target.value }`);
+          }
 
-          const handleRowsPerPageChange = useCallback(
-                    (event) => {
-                              setRowsPerPage(event.target.value);
-                    },
-                    []
-          );
+          const handlePageChange = (value) => {
+                    console.log('aaaaaaaaa', value);
+
+                    setPage(value)
+                    router.push(`/products?page=${ value }&limit=${ rowsPerPage }`);
+          }
 
           return (
                     <Box>
@@ -142,6 +119,7 @@ const Page = (props) => {
                                                                       page={page}
                                                                       rowsPerPage={rowsPerPage}
                                                                       selected={productsSelection.selected}
+                                                                      productsCount={props.productsCount}
                                                             />
                                                   </Stack>
                                         </Container>
@@ -165,25 +143,19 @@ const Page = (props) => {
 };
 
 
-export async function getServerSideProps() {
+export async function getServerSideProps(context) {
+          const page = context.query.page || 1; // Get page from query parameters or default to 1
+          const limit = context.query.limit || 5
 
-          const allProducts = await productsServices().getAllProducts()
-
-          const finalList = [
-                    ...allProducts
-          ]
-
-          redirect: {
-                    destination: "/404"
-          }
+          const products = await productsServices().getProductsByPage(page, limit);
+          const productsCount = await productsServices().getProductsCount();
 
           return {
                     props: {
-                              products: JSON.parse(JSON.stringify(finalList)),
-                              // ...(await serverSideTranslations('sr-RS'))
-                              // ...(await serverSideTranslations('sr-RS' ?? context.locale, ['common'], null, ['en-US', 'sr-RS'])),
+                              products: JSON.parse(JSON.stringify(products)),
+                              productsCount: JSON.parse(JSON.stringify(productsCount)),
                     },
-          }
+          };
 }
 
 

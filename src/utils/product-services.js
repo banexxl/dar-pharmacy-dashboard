@@ -3,17 +3,49 @@ import { ObjectId } from "mongodb"
 
 export const productsServices = () => {
 
-          const getAllProducts = async () => {
-                    const client = await MongoClient.connect(process.env.MONGODB_URI)
+          const getProductsByPage = async (page, limit) => {
+                    console.log(page, limit);
+                    const parsedLimit = parseInt(limit, 10); // Parse limit as an integer
+
+                    if (isNaN(parsedLimit) || parsedLimit <= 0) {
+                              // Handle the case when the parsed limit is not a valid positive integer
+                              return [];
+                    }
+                    const client = await MongoClient.connect(process.env.MONGODB_URI);
 
                     try {
-                              const db = client.db('DAR_DB')
-                              let data = await db.collection('Products').find({}).toArray()
-                              return data
+                              const db = client.db('DAR_DB');
+                              const skip = (page) * parsedLimit;
+                              const data = await db.collection('Products')
+                                        .find({})
+                                        .skip(skip)
+                                        .limit(parsedLimit)
+                                        .toArray();
+                              console.log(data.length);
+                              return data;
                     } catch (error) {
-                              return { message: error.message }
+                              return { message: error.message };
+                    } finally {
+                              await client.close();
                     }
-                    finally {
+          };
+
+          async function getProductsCount() {
+                    const client = new MongoClient(process.env.MONGODB_URI);
+
+                    try {
+                              await client.connect();
+                              const database = client.db('DAR_DB');
+                              const collection = database.collection('Products');
+
+                              // Use countDocuments to get the count of all documents in the collection
+                              const count = await collection.countDocuments();
+
+                              return count;
+                    } catch (error) {
+                              console.error('Error while fetching count:', error);
+                              return -1; // Return -1 or handle the error accordingly
+                    } finally {
                               await client.close();
                     }
           }
@@ -191,7 +223,8 @@ export const productsServices = () => {
 
 
           return {
-                    getAllProducts,
+                    getProductsByPage,
+                    getProductsCount,
                     getProductsForHomePage,
                     getProductById,
                     getProductsByNameAndOrManufacturer,
