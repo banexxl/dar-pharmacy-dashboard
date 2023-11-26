@@ -256,13 +256,13 @@ export const EditProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                                                           color="primary"
                                                                                           onClick={() => onSubmitFail()}
                                                                                 >
-                                                                                          Cancel
+                                                                                          Odustani
                                                                                 </Button>
                                                                                 <Button type="submit"
                                                                                           variant="contained"
                                                                                           color="primary"
                                                                                 >
-                                                                                          Add Product
+                                                                                          Izmeni proizvod
                                                                                 </Button>
                                                                       </Box>
                                                             </Form>

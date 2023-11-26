@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import Head from 'next/head';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
@@ -39,6 +39,31 @@ const Page = (props) => {
           const products = useProducts(props.products, page, rowsPerPage);
           const productsIds = useProductsIds(props.products);
           const productsSelection = useSelection(productsIds);
+
+          // useEffect(() => {
+          //           try {
+          //                     fetch('/api/product-api', {
+          //                               method: 'GET',
+          //                               headers: {
+          //                                         'Content-Type': 'application/json',
+          //                                         'Access-Control-Allow-Origin': '*',
+          //                                         'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS' // Set the content type to JSON
+          //                               },
+          //                     }).then((response) => {
+
+          //                               if (response.ok) {
+
+
+          //                               } else {
+          //                                         const errorData = response.json(); // Parse the error response
+          //                                         console.error(errorData);
+          //                               }
+          //                     })
+          //           } catch (err) {
+          //                     console.error(err);
+          //           }
+          // }, [])
+
 
           const handleSubmitSuccess = () => {
                     setOpen(false); // Close the dialog
@@ -85,7 +110,7 @@ const Page = (props) => {
                                                             >
                                                                       <Stack spacing={1}>
                                                                                 <Typography variant="h4">
-                                                                                          Products
+                                                                                          Proizvodi
                                                                                 </Typography>
                                                                       </Stack>
                                                                       <Box sx={{ display: 'flex', justifyContent: 'space-between', height: '40px', width: '320px' }}>
@@ -100,7 +125,7 @@ const Page = (props) => {
                                                                                                     setOpen(true)
                                                                                           }}
                                                                                 >
-                                                                                          Add
+                                                                                          Dodaj proizvod
                                                                                 </Button>
                                                                       </Box>
                                                             </Stack>
@@ -128,7 +153,7 @@ const Page = (props) => {
                                                   }
                                         }}
                               >
-                                        <DialogTitle>Add product</DialogTitle>
+                                        <DialogTitle>Dodaj proizvod</DialogTitle>
                                         <DialogContent dividers >
                                                   <AddProductForm
                                                             onSubmitSuccess={handleSubmitSuccess}

@@ -60,7 +60,6 @@ export const ProductsTable = (props: any) => {
           const [currentProductID, setCurrentProductID] = useState(null);
           const [currentProductObject, setCurrentProductObject] = useState<IProduct | null>();
           const router = useRouter();
-          console.log(currentProductObject);
 
 
           const getObjectById = (_id: any, arrayToSearch: any) => {
@@ -361,7 +360,7 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                 md={6}
                                                                                                                                                                 xs={12}
                                                                                                                                                       >
-                                                                                                                                                                <Typography variant="h6">Basic details</Typography>
+                                                                                                                                                                <Typography variant="h6">Osnovni detalji</Typography>
                                                                                                                                                                 <Divider sx={{ my: 2 }} />
                                                                                                                                                                 <Grid
                                                                                                                                                                           container
@@ -375,7 +374,7 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                     <TextField
                                                                                                                                                                                               defaultValue={product.name}
                                                                                                                                                                                               fullWidth
-                                                                                                                                                                                              label="Product name"
+                                                                                                                                                                                              label="Naziv"
                                                                                                                                                                                               name="name"
                                                                                                                                                                                               onBlur={(e: any) =>
                                                                                                                                                                                                         setCurrentProductObject((previousObject: any) => ({
@@ -395,7 +394,7 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                               defaultValue={product._id.slice(-8)}
                                                                                                                                                                                               disabled
                                                                                                                                                                                               fullWidth
-                                                                                                                                                                                              label="SKU"
+                                                                                                                                                                                              label="Sifra proizvoda"
                                                                                                                                                                                               name={product._id.slice(-8)}
                                                                                                                                                                                     />
                                                                                                                                                                           </Grid>
@@ -407,7 +406,7 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                     <TextField
                                                                                                                                                                                               defaultValue={product.mainCategory}
                                                                                                                                                                                               fullWidth
-                                                                                                                                                                                              label="Main Category"
+                                                                                                                                                                                              label="Glavna Kategorija"
                                                                                                                                                                                               select
                                                                                                                                                                                               onBlur={(e: any) =>
                                                                                                                                                                                                         setCurrentProductObject((previousObject: any) => ({
@@ -435,7 +434,7 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                     <TextField
                                                                                                                                                                                               defaultValue={product.midCategory}
                                                                                                                                                                                               fullWidth
-                                                                                                                                                                                              label="Mid Category"
+                                                                                                                                                                                              label="Mid Kategorija"
                                                                                                                                                                                               select
                                                                                                                                                                                               onBlur={(e: any) =>
                                                                                                                                                                                                         setCurrentProductObject((previousObject: any) => ({
@@ -463,7 +462,7 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                     <TextField
                                                                                                                                                                                               defaultValue={product.subCategory}
                                                                                                                                                                                               fullWidth
-                                                                                                                                                                                              label="Sub Category"
+                                                                                                                                                                                              label="Sub Kategorija"
                                                                                                                                                                                               select
                                                                                                                                                                                               onBlur={(e: any) =>
                                                                                                                                                                                                         setCurrentProductObject((previousObject: any) => ({
@@ -491,7 +490,7 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                     <TextField
                                                                                                                                                                                               defaultValue={product.quantity}
                                                                                                                                                                                               fullWidth
-                                                                                                                                                                                              label="Quantity"
+                                                                                                                                                                                              label="Kolicina"
                                                                                                                                                                                               name={product.quantity}
                                                                                                                                                                                               onBlur={(e: any) =>
                                                                                                                                                                                                         setCurrentProductObject((previousObject: any) => ({
@@ -510,7 +509,7 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                     <TextField
                                                                                                                                                                                               defaultValue={product.description}
                                                                                                                                                                                               fullWidth
-                                                                                                                                                                                              label="Description"
+                                                                                                                                                                                              label="Opis"
                                                                                                                                                                                               name={product.description}
                                                                                                                                                                                               onBlur={(e: any) =>
                                                                                                                                                                                                         setCurrentProductObject((previousObject: any) => ({
@@ -529,7 +528,7 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                     <TextField
                                                                                                                                                                                               defaultValue={product.instructions}
                                                                                                                                                                                               fullWidth
-                                                                                                                                                                                              label="Instructions"
+                                                                                                                                                                                              label="Instrukcije"
                                                                                                                                                                                               name={product.instructions}
                                                                                                                                                                                               onBlur={(e: any) =>
                                                                                                                                                                                                         setCurrentProductObject((previousObject: any) => ({
@@ -548,7 +547,7 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                     <TextField
                                                                                                                                                                                               defaultValue={product.warning}
                                                                                                                                                                                               fullWidth
-                                                                                                                                                                                              label="Warning"
+                                                                                                                                                                                              label="Upozorenje"
                                                                                                                                                                                               name={product.warning}
                                                                                                                                                                                               onBlur={(e: any) =>
                                                                                                                                                                                                         setCurrentProductObject((previousObject: any) => ({
@@ -586,7 +585,7 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                     <TextField
                                                                                                                                                                                               defaultValue={product.imageURL}
                                                                                                                                                                                               fullWidth
-                                                                                                                                                                                              label="Image URL"
+                                                                                                                                                                                              label="Slika"
                                                                                                                                                                                               name={product.imageURL}
                                                                                                                                                                                               onBlur={(e: any) =>
                                                                                                                                                                                                         setCurrentProductObject((previousObject: any) => ({
@@ -610,7 +609,7 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                           container
                                                                                                                                                                           spacing={3}
                                                                                                                                                                 >
-                                                                                                                                                                          <Grid
+                                                                                                                                                                          {/* <Grid
                                                                                                                                                                                     item
                                                                                                                                                                                     md={6}
                                                                                                                                                                                     xs={12}
@@ -636,7 +635,7 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                               }}
                                                                                                                                                                                               type="number"
                                                                                                                                                                                     />
-                                                                                                                                                                          </Grid>
+                                                                                                                                                                          </Grid> */}
                                                                                                                                                                           <Grid
                                                                                                                                                                                     item
                                                                                                                                                                                     md={6}
@@ -645,7 +644,7 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                     <TextField
                                                                                                                                                                                               defaultValue={product.price}
                                                                                                                                                                                               fullWidth
-                                                                                                                                                                                              label="New price"
+                                                                                                                                                                                              label="Nova cena"
                                                                                                                                                                                               name="price"
                                                                                                                                                                                               onBlur={(e: any) =>
                                                                                                                                                                                                         setCurrentProductObject((previousObject: any) => ({
@@ -678,7 +677,7 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                               }))}
                                                                                                                                                                                     />
                                                                                                                                                                                     <Typography variant="subtitle2">
-                                                                                                                                                                                              Discount
+                                                                                                                                                                                              Popust
                                                                                                                                                                                     </Typography>
                                                                                                                                                                           </Grid>
                                                                                                                                                                           <Grid
@@ -689,7 +688,7 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                     <TextField
                                                                                                                                                                                               defaultValue={product.discountAmount}
                                                                                                                                                                                               fullWidth
-                                                                                                                                                                                              label="Discount amount"
+                                                                                                                                                                                              label="Iznos popusta"
                                                                                                                                                                                               name="discountAmount"
                                                                                                                                                                                               onBlur={(e: any) =>
                                                                                                                                                                                                         setCurrentProductObject((previousObject: any) => ({
@@ -717,7 +716,7 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                               }))}
                                                                                                                                                                                     />
                                                                                                                                                                                     <Typography variant="subtitle2">
-                                                                                                                                                                                              New arrival
+                                                                                                                                                                                              Novi proizvod
                                                                                                                                                                                     </Typography>
                                                                                                                                                                           </Grid>
                                                                                                                                                                           <Grid
@@ -738,7 +737,7 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                               }))}
                                                                                                                                                                                     />
                                                                                                                                                                                     <Typography variant="subtitle2">
-                                                                                                                                                                                              Best seller
+                                                                                                                                                                                              Najprodavaniji
                                                                                                                                                                                     </Typography>
                                                                                                                                                                           </Grid>
                                                                                                                                                                           <Grid
@@ -749,7 +748,7 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                                     <TextField
                                                                                                                                                                                               defaultValue={product.availableStock}
                                                                                                                                                                                               fullWidth
-                                                                                                                                                                                              label="Available stock"
+                                                                                                                                                                                              label="Na stanju"
                                                                                                                                                                                               name="availableStock"
                                                                                                                                                                                               onBlur={(e: any) =>
                                                                                                                                                                                                         setCurrentProductObject((previousObject: any) => ({
@@ -782,13 +781,13 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                 type="submit"
                                                                                                                                                                 variant="contained"
                                                                                                                                                       >
-                                                                                                                                                                Update
+                                                                                                                                                                Izmeni
                                                                                                                                                       </Button>
                                                                                                                                                       <Button
                                                                                                                                                                 color="inherit"
                                                                                                                                                                 onClick={handleProductClose}
                                                                                                                                                       >
-                                                                                                                                                                Cancel
+                                                                                                                                                                Odustani
                                                                                                                                                       </Button>
                                                                                                                                             </Stack>
                                                                                                                                             <div>
@@ -796,7 +795,7 @@ export const ProductsTable = (props: any) => {
                                                                                                                                                                 onClick={handleDeleteButtonClick}
                                                                                                                                                                 color="error"
                                                                                                                                                       >
-                                                                                                                                                                Delete product
+                                                                                                                                                                Obrisi proizvod
                                                                                                                                                       </Button>
                                                                                                                                             </div>
                                                                                                                                   </Stack>

@@ -10,23 +10,8 @@ export default async function handler(request: NextApiRequest, response: NextApi
           try {
                     if (request.method === 'GET') {
 
-                              // const page = parseInt(request.query.page as string) // Explicit casting to string
-                              // const rowsPerPage = parseInt(request.query.rowsPerPage as string)
-                              // const sortBy = request.query.sortBy as string | undefined; // Explicit casting to string or undefined
-                              // const sortDir = request.query.sortDir as string | undefined; // Explicit casting to string or undefined
-                              // const skip = page * rowsPerPage
-                              // const sortOrder = sortDir === 'desc' ? -1 : 1; // Descending (-1) or Ascending (1)
-
-                              // const allTenants = await dbTenants
-                              //           .find({})
-                              //           .limit(rowsPerPage)
-                              //           .sort({ sortBy: sortOrder })
-                              //           .skip(skip)
-                              //           .toArray();
-
-                              // const totalCount = allTenants.length
-
-                              // return response.status(200).json({ message: 'Customers found!', data: allTenants, totalCount });
+                              const allProducts = await dbProducts.find({}).toArray()
+                              return response.status(200).json({ message: 'Products found!', data: allProducts });
 
                     } else if (request.method === 'POST') {
                               const newProduct = request.body

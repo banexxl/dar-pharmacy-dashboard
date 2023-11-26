@@ -348,6 +348,50 @@ const manufacturerOptions = [
                     label: 'Zodeks caj',
                     value: 'zodeks-caj',
           },
+          {
+                    label: 'Gloria',
+                    value: 'gloria',
+          },
+          {
+                    label: 'Azeta bio',
+                    value: 'azeta-bio',
+          },
+          {
+                    label: 'Gamarde',
+                    value: 'gamarde',
+          },
+          {
+                    label: 'Fitaky',
+                    value: 'fitaky',
+          },
+          {
+                    label: 'Mustela',
+                    value: 'mustela',
+          },
+          {
+                    label: 'Phyto',
+                    value: 'phyto',
+          },
+          {
+                    label: 'Priroda na dar',
+                    value: 'priroda-na-dar',
+          },
+          {
+                    label: 'Eco boom',
+                    value: 'eco-boom',
+          },
+          {
+                    label: 'Weleda',
+                    value: 'weleda',
+          },
+          {
+                    label: 'Herbs honey',
+                    value: 'herbs-honey',
+          },
+          {
+                    label: 'Vedra',
+                    value: 'vedra',
+          },
 ];
 
 // const handleFileUpload = async (file) => {
@@ -465,7 +509,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                                                 {`${ JSON.stringify(formik.errors) }`}
                                                                       </Typography> */}
                                                                       <TextField
-                                                                                label="Name"
+                                                                                label="Naziv"
                                                                                 name="name"
                                                                                 value={formik.values.name}
                                                                                 onChange={formik.handleChange}
@@ -473,7 +517,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                                                 helperText={formik.touched.name && formik.errors.name}
                                                                       />
                                                                       <TextField
-                                                                                label="Description"
+                                                                                label="Opis"
                                                                                 name="description"
                                                                                 multiline
                                                                                 rows={4}
@@ -485,7 +529,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
 
                                                                       <TextField
                                                                                 fullWidth
-                                                                                label="Main category"
+                                                                                label="Glavna kategorija"
                                                                                 name="mainCategory"
                                                                                 onBlur={formik.handleBlur}
                                                                                 onChange={formik.handleChange}
@@ -506,7 +550,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
 
                                                                       <TextField
                                                                                 fullWidth
-                                                                                label="Mid category"
+                                                                                label="Mid kategorija"
                                                                                 name="midCategory"
                                                                                 onBlur={formik.handleBlur}
                                                                                 onChange={formik.handleChange}
@@ -527,7 +571,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
 
                                                                       <TextField
                                                                                 fullWidth
-                                                                                label="Sub category"
+                                                                                label="Sub kategorija"
                                                                                 name="subCategory"
                                                                                 onBlur={formik.handleBlur}
                                                                                 onChange={formik.handleChange}
@@ -547,7 +591,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                                       </TextField>
 
                                                                       <TextField
-                                                                                label="Available stock"
+                                                                                label="Na stanju komada"
                                                                                 name="availableStock"
                                                                                 value={formik.values.availableStock}
                                                                                 onChange={formik.handleChange}
@@ -556,7 +600,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                                       />
 
                                                                       <TextField
-                                                                                label="Ingredients"
+                                                                                label="Sastojci"
                                                                                 name="ingredients"
                                                                                 value={formik.values.ingredients}
                                                                                 onChange={formik.handleChange}
@@ -565,7 +609,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                                       />
 
                                                                       <TextField
-                                                                                label="Instructions"
+                                                                                label="Instrukcije"
                                                                                 name="instructions"
                                                                                 value={formik.values.instructions}
                                                                                 onChange={formik.handleChange}
@@ -574,7 +618,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                                       />
 
                                                                       <TextField
-                                                                                label="Quantity"
+                                                                                label="Kolicina"
                                                                                 name="quantity"
                                                                                 value={formik.values.quantity}
                                                                                 onChange={formik.handleChange}
@@ -584,7 +628,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
 
                                                                       <TextField
                                                                                 fullWidth
-                                                                                label="Manufacturer"
+                                                                                label="Proizvodjac"
                                                                                 name="manufacturer"
                                                                                 onBlur={formik.handleBlur}
                                                                                 onChange={formik.handleChange}
@@ -604,7 +648,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                                       </TextField>
 
                                                                       <TextField
-                                                                                label="Warning"
+                                                                                label="Upozorenje"
                                                                                 name="warning"
                                                                                 value={formik.values.warning}
                                                                                 onChange={formik.handleChange}
@@ -661,6 +705,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                                                                               alignItems: 'center',
                                                                                                               gap: '10px'
                                                                                                     }}
+
                                                                                           >
 
                                                                                                     {
@@ -690,7 +735,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                                                                               }}
 
                                                                                                     >
-                                                                                                              Upload file
+                                                                                                              Ucitaj sliku
                                                                                                               <Input
                                                                                                                         type="file"
                                                                                                                         inputProps={{ accept: 'image/*' }}
@@ -725,7 +770,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                                                 </CardContent>
                                                                       </Card>
                                                                       <TextField
-                                                                                label="Price"
+                                                                                label="Cena"
                                                                                 name="price"
                                                                                 value={formik.values.price}
                                                                                 onChange={formik.handleChange}
@@ -741,7 +786,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                                                                     onChange={formik.handleChange}
                                                                                           />
                                                                                 }
-                                                                                label="New Arrival"
+                                                                                label="Novi proizvod"
                                                                       />
 
                                                                       <FormControlLabel
@@ -752,7 +797,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                                                                     onChange={formik.handleChange}
                                                                                           />
                                                                                 }
-                                                                                label="Best Seller"
+                                                                                label="Najprodavaniji"
                                                                       />
 
                                                                       <FormControlLabel
@@ -763,11 +808,11 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                                                                     onChange={formik.handleChange}
                                                                                           />
                                                                                 }
-                                                                                label="Discount"
+                                                                                label="Popust"
                                                                       />
 
                                                                       <TextField
-                                                                                label="Discount Amount"
+                                                                                label="Iznos popusta"
                                                                                 name="discountAmount"
                                                                                 value={formik.values.discountAmount}
                                                                                 onChange={formik.handleChange}
@@ -779,14 +824,14 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                                                           color="primary"
                                                                                           onClick={() => onSubmitFail()}
                                                                                 >
-                                                                                          Cancel
+                                                                                          Odustani
                                                                                 </Button>
                                                                                 <Button type="submit"
                                                                                           variant="contained"
                                                                                           color="primary"
                                                                                           disabled={Object.keys(formik.errors).length != 0}
                                                                                 >
-                                                                                          Add Product
+                                                                                          Dodaj proizvod
                                                                                 </Button>
                                                                       </Box>
                                                             </Form>
