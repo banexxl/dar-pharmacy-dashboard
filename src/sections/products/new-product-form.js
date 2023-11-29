@@ -480,33 +480,97 @@ export const subCategoryOptions = [
           value: 'problemi-sa-cirkulacijom',
      },
      {
-          label: 'aaaa',
-          value: 'aaaa',
+          label: 'Intimna nega',
+          value: 'intimna-nega',
      },
 
      {
-          label: 'aaaa',
-          value: 'aaaa',
+          label: 'Opekotine',
+          value: 'opekotine',
      },
      {
-          label: 'aaaa',
-          value: 'aaaa',
+          label: 'Sportske povrede',
+          value: 'sportske-povrede',
      },
      {
-          label: 'aaaa',
-          value: 'aaaa',
+          label: 'Reuma',
+          value: 'reuma',
      },
      {
-          label: 'aaaa',
-          value: 'aaaa',
+          label: 'Antiseptici',
+          value: 'antiseptici',
      },
      {
-          label: 'aaaa',
-          value: 'aaaa',
+          label: 'Gljivice',
+          value: 'gljivice',
      },
      {
-          label: 'aaaa',
-          value: 'aaaa',
+          label: 'Vitiligo',
+          value: 'vitiligo',
+     },
+     {
+          label: 'Boginje',
+          value: 'boginje',
+     },
+     {
+          label: 'Herpes',
+          value: 'herpes',
+     },
+     {
+          label: 'Seboreični dermatitis',
+          value: 'seboreicni-dermatitis',
+     },
+     {
+          label: 'Žuljevi, kurje oči, bradavice',
+          value: 'zuljevi-kurje-oci-bradavice',
+     },
+     {
+          label: ' Ekcem, psorijaza',
+          value: 'ekcem-psorijaza',
+     },
+     {
+          label: 'Suva, atopijska koža',
+          value: 'suva-atopijska-koza',
+     },
+     {
+          label: 'Lokalni anestetici',
+          value: 'lokalni-anestetici',
+     },
+     {
+          label: 'Površinske rane',
+          value: 'povrsinske-rane',
+     },
+     {
+          label: 'Tablete, kapsule, rastvori',
+          value: 'tablete-kapsule-rastvori',
+     },
+     {
+          label: ' Higijena, nega',
+          value: 'higijena-nega',
+     },
+     {
+          label: 'Kapi',
+          value: 'kapi',
+     },
+     {
+          label: 'Čepovi za uši',
+          value: 'cepovi-za-usi',
+     },
+     {
+          label: 'Sprejevi',
+          value: 'sprejevi',
+     },
+     {
+          label: 'Antiseptici',
+          value: 'antiseptici',
+     },
+     {
+          label: 'Flasteri',
+          value: 'flasteri',
+     },
+     {
+          label: 'Zavojni materijal',
+          value: 'zavojni-materijal',
      },
 ];
 
