@@ -57,11 +57,9 @@ const Page = (props) => {
                     router.push(`products/?page=${ currentPage }&limit=${ event.target.value }`);
           }
 
-          const handlePageChange = (value) => {
-                    console.log('aaaaaaaaa', value);
-
-                    setPage(value)
-                    router.push(`/products?page=${ value }&limit=${ rowsPerPage }`);
+          const handlePageChange = (page) => {
+                    useProducts(productsIds)
+                    router.push(`/products?page=${ page }&limit=${ rowsPerPage }`);
           }
 
           return (
@@ -144,8 +142,8 @@ const Page = (props) => {
 
 
 export async function getServerSideProps(context) {
-          const page = context.query.page || 1; // Get page from query parameters or default to 1
-          const limit = context.query.limit || 5
+          const page = context.query.page; // Get page from query parameters or default to 1
+          const limit = context.query.limit
 
           const products = await productsServices().getProductsByPage(page, limit);
           const productsCount = await productsServices().getProductsCount();

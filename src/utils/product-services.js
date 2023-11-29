@@ -11,6 +11,7 @@ export const productsServices = () => {
                               // Handle the case when the parsed limit is not a valid positive integer
                               return [];
                     }
+
                     const client = await MongoClient.connect(process.env.MONGODB_URI);
 
                     try {
@@ -21,7 +22,7 @@ export const productsServices = () => {
                                         .skip(skip)
                                         .limit(parsedLimit)
                                         .toArray();
-                              console.log(data.length);
+                              console.log('data length', data.length);
                               return data;
                     } catch (error) {
                               return { message: error.message };
