@@ -473,6 +473,166 @@ const manufacturerOptions = [
      },
 ];
 
+export const fetchSubCategoryOptions = async (selectedMidCategory) => {
+
+     switch (selectedMidCategory) {
+          case 'alergije':
+               return [
+                    { option: 'kapsule-i-tablete', label: 'Kapsule i tablete' },
+                    { option: 'sprejevi-za-nos', label: 'Sprejevi za nos' },
+                    { option: 'irigacioni-set', label: 'Irigacioni set' },
+                    { option: 'masti-gelovi', label: 'Masti i gelovi' }
+               ];
+          case 'anemija':
+               return [
+                    { value: 'folna-kiselina-i-vitamini', label: 'Folna kiselina i vitamini' },
+                    { value: 'biljni-preparati', label: 'Biljni preparati' },
+                    { value: 'preparati-gvozdja', label: 'Preparati gvožđa' }
+               ];
+          case 'bol':
+               return [
+                    { value: 'bol-u-grlu', label: 'Bol u grlu' },
+                    { value: 'menstrualni-bolovi', label: 'Menstrualni bolovi' },
+                    { value: 'bolovi-u-zglobovima-i-misicima', label: 'Bolovi u zglobovima i mišićima' }
+               ];
+          case 'hemoroidi':
+               return [
+                    { value: 'oralni-preparati', label: 'Oralni preparati' },
+                    { value: 'lokalna-primena', label: 'Lokalna primena' },
+                    { value: 'platforma', label: 'Platforma' }
+               ];
+          case 'holesterol-i-trigliceridi':
+               return [
+                    { value: 'omega-masne-kiseline', label: 'Omega masne kiseline' },
+                    { value: 'ostalo', label: 'Ostalo' }
+               ];
+          case 'imunitet-prehlada':
+               return [
+                    { value: 'deca', label: 'Deca' },
+                    { value: 'vitemini-i-minerali', label: 'Vitamini i minerali' },
+                    { value: 'sprejevi-za-nos', label: 'Sprejevi za nos' },
+                    { value: 'sprejevi-za-grlo', label: 'Sprejevi za grlo' },
+                    { value: 'irigacioni-set', label: 'Irigacioni set' },
+                    { value: 'masti-gelovi', label: 'Masti i gelovi' },
+                    { value: 'biljne-kapi', label: 'Biljne kapi' },
+                    { value: 'med-maticni-mlec-i-propolis', label: 'Med, matični mleč i propolis' },
+                    { value: 'pastile-za-grlo', label: 'Pastile za grlo' },
+                    { value: 'aloja-ehinacea-noni-aronija', label: 'Aloja, ehinacea, noni, aronija' },
+                    { value: 'probiotici', label: 'Probiotici' },
+                    { value: 'omega-masne-kiseline', label: 'Omega masne kiseline' },
+                    { value: 'ostalo', label: 'Ostalo' }
+               ];
+          case 'kosa-koza-i-nokti':
+               return [
+                    { value: 'oralni-preparati', label: 'Oralni preparati' },
+                    { value: 'lokalna-primena', label: 'Lokalna primena' }
+               ];
+          case 'kosti-i-zglobovi':
+               return [
+                    { value: 'oralni-preparati', label: 'Oralni preparati' },
+                    { value: 'primena-na-kozi', label: 'Primena na koži' }
+               ];
+          case 'mrsavljenje-celulit':
+               return [
+                    { value: 'oralni-preparati', label: 'Oralni preparati' },
+                    { value: 'primena-na-kozi', label: 'Primena na koži' }
+               ];
+          case 'posebna-ishrana':
+               return [
+                    { value: 'kase', label: 'Kase' },
+                    { value: 'sejkovi', label: 'Sejkovi' },
+                    { value: 'sportisti', label: 'Sportisti' },
+                    { value: 'zasladjivaci', label: 'Zaslađivači' },
+                    { value: 'bombone', label: 'Bombone' }
+               ];
+          case 'putna-apoteka':
+               return [
+                    { value: 'dehidratacija', label: 'Dehidratacija' },
+                    { value: 'dijareja', label: 'Dijareja' },
+                    { value: 'mucnina', label: 'Mučnina' },
+                    { value: 'auto-apoteka', label: 'Auto-apoteka' }
+               ];
+          case 'stomacne-tegobe':
+               return [
+                    { value: 'nadutost-i-gasovi', label: 'Nadutost i gasovi' },
+                    { value: 'zatvor', label: 'Zatvor' },
+                    { value: 'dijareja', label: 'Dijareja' },
+                    { value: 'iritabilni-kolon', label: 'Iritabilni kolon' },
+                    { value: 'otezano-varenje-i-gorusica', label: 'Otežano varenje i gorušica' }
+               ];
+          case 'zdravo-srce-i-cirkulacija':
+               return [
+                    { value: 'oralni-preparati', label: 'Oralni preparati' },
+                    { value: 'primena-na-kozi', label: 'Primena na koži' }
+               ];
+          case 'vitamini-i-minerali':
+               return [
+                    { value: 'vitamin-a', label: 'Vitamin A' },
+                    { value: 'vitamin-b', label: 'Vitamin B' },
+                    { value: 'vitamin-c', label: 'Vitamin C' },
+                    { value: 'vitamin-d', label: 'Vitamin D' },
+                    { value: 'vitamin-k', label: 'Vitamin K' },
+                    { value: 'cink', label: 'Cink' },
+                    { value: 'kalijum', label: 'Kalijum' },
+                    { value: 'kalcijum', label: 'Kalcijum' },
+                    { value: 'hrom', label: 'Hrom' },
+                    { value: 'magnezijum', label: 'Magnezijum' },
+                    { value: 'selen', label: 'Selen' },
+                    { value: 'gvozdje', label: 'Gvožđe' },
+                    { value: 'bakar', label: 'Bakar' },
+                    { value: 'bor', label: 'Bor' },
+                    { value: 'fluor', label: 'Fluor' },
+                    { value: 'fosfor', label: 'Fosfor' },
+                    { value: 'kompleksi-vitamina-i-minerala', label: 'Kompleksi vitamina i minerala' },
+                    { value: 'riblja-ulja', label: 'Riblja ulja' },
+                    { value: 'deca', label: 'Deca' },
+                    { value: 'sportisiti', label: 'Sportisti' },
+                    { value: 'trudnice', label: 'Trudnice' },
+                    { value: 'stariji', label: 'Stariji' }
+               ];
+          case 'preparati-za-primenu-na-kozi':
+               return [
+                    { value: 'iritacije', label: 'Iritacije' },
+                    { value: 'oziljci-i-strije', label: 'Ožiljci i strije' },
+                    { value: 'hemoroidi', label: 'Hemoroidi' },
+                    { value: 'problemi-sa-cirkulacijom', label: 'Problemi sa cirkulacijom' },
+                    { value: 'intimna-nega', label: 'Intimna nega' },
+                    { value: 'opekotine', label: 'Opekotine' },
+                    { value: 'sportske-povrede', label: 'Sportske povrede' },
+                    { value: 'reuma', label: 'Reuma' },
+                    { value: 'antiseptici', label: 'Antiseptici' },
+                    { value: 'gljivice', label: 'Gljivice' },
+                    { value: 'rozacea', label: 'Rozacea' },
+                    { value: 'vitiligo', label: 'Vitiligo' },
+                    { value: 'boginje', label: 'Boginje' },
+                    { value: 'herpes', label: 'Herpes' },
+                    { value: 'seboreicni-dermatitis', label: 'Seboreični dermatitis' },
+                    { value: 'zuljevi-kurje-oci-bradavice', label: 'Žuljevi, kurje oči, bradavice' },
+                    { value: 'ekcem-psorijaza', label: 'Ekcem, psorijaza' },
+                    { value: 'suva-atopijska-koza', label: 'Suva, atopijska koža' },
+                    { value: 'lokalni-anestetici', label: 'Lokalni anestetici' },
+                    { value: 'povrsinske-rane', label: 'Površinske rane' }
+               ];
+          case 'oci-i-usi':
+               return [
+                    { value: 'tablete-kapsule-rastvori', label: 'Tablete, kapsule, rastvori' },
+                    { value: 'higijena-nega', label: 'Higijena i nega' },
+                    { value: 'kapi', label: 'Kapi' },
+                    { value: 'masti', label: 'Masti' },
+                    { value: 'naocare', label: 'Naočare' },
+                    { value: 'tecnosti-i-kutije-za-sociva', label: 'Tečnosti i kutije za sočiva' },
+                    { value: 'cepovi-za-usi', label: 'Čepovi za uši' },
+                    { value: 'sprejevi', label: 'Sprejevi' }
+               ];
+          case 'prva-pomoc':
+               return [
+               ];
+          default:
+               return [];
+     }
+};
+
+
 // const handleFileUpload = async (file) => {
 //           return new Promise(async (resolve, reject) => {
 //                     try {
@@ -566,164 +726,6 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
           }
      }
 
-     const fetchSubCategoryOptions = async (selectedMidCategory) => {
-
-          switch (selectedMidCategory) {
-               case 'alergije':
-                    return [
-                         { option: 'kapsule-i-tablete', label: 'Kapsule i tablete' },
-                         { option: 'sprejevi-za-nos', label: 'Sprejevi za nos' },
-                         { option: 'irigacioni-set', label: 'Irigacioni set' },
-                         { option: 'masti-gelovi', label: 'Masti i gelovi' }
-                    ];
-               case 'anemija':
-                    return [
-                         { value: 'folna-kiselina-i-vitamini', label: 'Folna kiselina i vitamini' },
-                         { value: 'biljni-preparati', label: 'Biljni preparati' },
-                         { value: 'preparati-gvozdja', label: 'Preparati gvožđa' }
-                    ];
-               case 'bol':
-                    return [
-                         { value: 'bol-u-grlu', label: 'Bol u grlu' },
-                         { value: 'menstrualni-bolovi', label: 'Menstrualni bolovi' },
-                         { value: 'bolovi-u-zglobovima-i-misicima', label: 'Bolovi u zglobovima i mišićima' }
-                    ];
-               case 'hemoroidi':
-                    return [
-                         { value: 'oralni-preparati', label: 'Oralni preparati' },
-                         { value: 'lokalna-primena', label: 'Lokalna primena' },
-                         { value: 'platforma', label: 'Platforma' }
-                    ];
-               case 'holesterol-i-trigliceridi':
-                    return [
-                         { value: 'omega-masne-kiseline', label: 'Omega masne kiseline' },
-                         { value: 'ostalo', label: 'Ostalo' }
-                    ];
-               case 'imunitet-prehlada':
-                    return [
-                         { value: 'deca', label: 'Deca' },
-                         { value: 'vitemini-i-minerali', label: 'Vitamini i minerali' },
-                         { value: 'sprejevi-za-nos', label: 'Sprejevi za nos' },
-                         { value: 'sprejevi-za-grlo', label: 'Sprejevi za grlo' },
-                         { value: 'irigacioni-set', label: 'Irigacioni set' },
-                         { value: 'masti-gelovi', label: 'Masti i gelovi' },
-                         { value: 'biljne-kapi', label: 'Biljne kapi' },
-                         { value: 'med-maticni-mlec-i-propolis', label: 'Med, matični mleč i propolis' },
-                         { value: 'pastile-za-grlo', label: 'Pastile za grlo' },
-                         { value: 'aloja-ehinacea-noni-aronija', label: 'Aloja, ehinacea, noni, aronija' },
-                         { value: 'probiotici', label: 'Probiotici' },
-                         { value: 'omega-masne-kiseline', label: 'Omega masne kiseline' },
-                         { value: 'ostalo', label: 'Ostalo' }
-                    ];
-               case 'kosa-koza-i-nokti':
-                    return [
-                         { value: 'oralni-preparati', label: 'Oralni preparati' },
-                         { value: 'lokalna-primena', label: 'Lokalna primena' }
-                    ];
-               case 'kosti-i-zglobovi':
-                    return [
-                         { value: 'oralni-preparati', label: 'Oralni preparati' },
-                         { value: 'primena-na-kozi', label: 'Primena na koži' }
-                    ];
-               case 'mrsavljenje-celulit':
-                    return [
-                         { value: 'oralni-preparati', label: 'Oralni preparati' },
-                         { value: 'primena-na-kozi', label: 'Primena na koži' }
-                    ];
-               case 'posebna-ishrana':
-                    return [
-                         { value: 'kase', label: 'Kase' },
-                         { value: 'sejkovi', label: 'Sejkovi' },
-                         { value: 'sportisti', label: 'Sportisti' },
-                         { value: 'zasladjivaci', label: 'Zaslađivači' },
-                         { value: 'bombone', label: 'Bombone' }
-                    ];
-               case 'putna-apoteka':
-                    return [
-                         { value: 'dehidratacija', label: 'Dehidratacija' },
-                         { value: 'dijareja', label: 'Dijareja' },
-                         { value: 'mucnina', label: 'Mučnina' },
-                         { value: 'auto-apoteka', label: 'Auto-apoteka' }
-                    ];
-               case 'stomacne-tegobe':
-                    return [
-                         { value: 'nadutost-i-gasovi', label: 'Nadutost i gasovi' },
-                         { value: 'zatvor', label: 'Zatvor' },
-                         { value: 'dijareja', label: 'Dijareja' },
-                         { value: 'iritabilni-kolon', label: 'Iritabilni kolon' },
-                         { value: 'otezano-varenje-i-gorusica', label: 'Otežano varenje i gorušica' }
-                    ];
-               case 'zdravo-srce-i-cirkulacija':
-                    return [
-                         { value: 'oralni-preparati', label: 'Oralni preparati' },
-                         { value: 'primena-na-kozi', label: 'Primena na koži' }
-                    ];
-               case 'vitamini-i-minerali':
-                    return [
-                         { value: 'vitamin-a', label: 'Vitamin A' },
-                         { value: 'vitamin-b', label: 'Vitamin B' },
-                         { value: 'vitamin-c', label: 'Vitamin C' },
-                         { value: 'vitamin-d', label: 'Vitamin D' },
-                         { value: 'vitamin-k', label: 'Vitamin K' },
-                         { value: 'cink', label: 'Cink' },
-                         { value: 'kalijum', label: 'Kalijum' },
-                         { value: 'kalcijum', label: 'Kalcijum' },
-                         { value: 'hrom', label: 'Hrom' },
-                         { value: 'magnezijum', label: 'Magnezijum' },
-                         { value: 'selen', label: 'Selen' },
-                         { value: 'gvozdje', label: 'Gvožđe' },
-                         { value: 'bakar', label: 'Bakar' },
-                         { value: 'bor', label: 'Bor' },
-                         { value: 'fluor', label: 'Fluor' },
-                         { value: 'fosfor', label: 'Fosfor' },
-                         { value: 'kompleksi-vitamina-i-minerala', label: 'Kompleksi vitamina i minerala' },
-                         { value: 'riblja-ulja', label: 'Riblja ulja' },
-                         { value: 'deca', label: 'Deca' },
-                         { value: 'sportisiti', label: 'Sportisti' },
-                         { value: 'trudnice', label: 'Trudnice' },
-                         { value: 'stariji', label: 'Stariji' }
-                    ];
-               case 'preparati-za-primenu-na-kozi':
-                    return [
-                         { value: 'iritacije', label: 'Iritacije' },
-                         { value: 'oziljci-i-strije', label: 'Ožiljci i strije' },
-                         { value: 'hemoroidi', label: 'Hemoroidi' },
-                         { value: 'problemi-sa-cirkulacijom', label: 'Problemi sa cirkulacijom' },
-                         { value: 'intimna-nega', label: 'Intimna nega' },
-                         { value: 'opekotine', label: 'Opekotine' },
-                         { value: 'sportske-povrede', label: 'Sportske povrede' },
-                         { value: 'reuma', label: 'Reuma' },
-                         { value: 'antiseptici', label: 'Antiseptici' },
-                         { value: 'gljivice', label: 'Gljivice' },
-                         { value: 'rozacea', label: 'Rozacea' },
-                         { value: 'vitiligo', label: 'Vitiligo' },
-                         { value: 'boginje', label: 'Boginje' },
-                         { value: 'herpes', label: 'Herpes' },
-                         { value: 'seboreicni-dermatitis', label: 'Seboreični dermatitis' },
-                         { value: 'zuljevi-kurje-oci-bradavice', label: 'Žuljevi, kurje oči, bradavice' },
-                         { value: 'ekcem-psorijaza', label: 'Ekcem, psorijaza' },
-                         { value: 'suva-atopijska-koza', label: 'Suva, atopijska koža' },
-                         { value: 'lokalni-anestetici', label: 'Lokalni anestetici' },
-                         { value: 'povrsinske-rane', label: 'Površinske rane' }
-                    ];
-               case 'oci-i-usi':
-                    return [
-                         { value: 'tablete-kapsule-rastvori', label: 'Tablete, kapsule, rastvori' },
-                         { value: 'higijena-nega', label: 'Higijena i nega' },
-                         { value: 'kapi', label: 'Kapi' },
-                         { value: 'masti', label: 'Masti' },
-                         { value: 'naocare', label: 'Naočare' },
-                         { value: 'tecnosti-i-kutije-za-sociva', label: 'Tečnosti i kutije za sočiva' },
-                         { value: 'cepovi-za-usi', label: 'Čepovi za uši' },
-                         { value: 'sprejevi', label: 'Sprejevi' }
-                    ];
-               case 'prva-pomoc':
-                    return [
-                    ];
-               default:
-                    return [];
-          }
-     };
 
      const handleMidCategoryChange = async (event) => {
           const selectedMidCategory = event.target.value;
