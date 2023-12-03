@@ -17,10 +17,10 @@ import { TablePagination } from '@mui/material'
 
 
 const Page = (props) => {
-
      // const products = useMemo(() => {
      //      return applyPagination(props.products, props.page, props.limit);
      // }, [props.products, props.page, props.limit]);
+
 
      const productsIds = useMemo(() => {
           if (!Array.isArray(props.products)) {
@@ -96,12 +96,6 @@ const Page = (props) => {
                               <ProductsTable
                                    count={props.products.length || 0}
                                    items={props.products}
-                                   onDeselectAll={productsSelection.handleDeselectAll}
-                                   onDeselectOne={productsSelection.handleDeselectOne}
-                                   onPageChange={handlePageChange}
-                                   onRowsPerPageChange={handleRowsPerPageChange}
-                                   onSelectAll={productsSelection.handleSelectAll}
-                                   onSelectOne={productsSelection.handleSelectOne}
                                    page={props.page}
                                    rowsPerPage={props.limit}
                                    selected={productsSelection.selected}
@@ -118,7 +112,7 @@ const Page = (props) => {
                                    showFirstButton
                                    showLastButton
                                    labelRowsPerPage={'Broj po stranici'}
-                                   labelDisplayedRows={({ from, to, count }) => { return `${ from }–${ to } od ${ count !== -1 ? count : `više od ${ to }` }`; }}
+                              //labelDisplayedRows={({ from, to, count }) => { return `${ from }–${ to } od ${ count !== -1 ? count : `više od ${ to }` }`; }}
                               />
                          </Stack>
                     </Container>
@@ -145,7 +139,7 @@ const Page = (props) => {
 export async function getServerSideProps(context) {
 
      const page = context.query.page || 1
-     const limit = context.query.limit
+     const limit = context.query.limit || 5
 
      const products = await productsServices().getProductsByPage(page, limit);
      const productsCount = await productsServices().getProductsCount();
