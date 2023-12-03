@@ -5,7 +5,7 @@ import {
      Stack, SvgIcon, Switch, Table, TableBody, TableCell, TableHead, TablePagination, TableRow, TextField, Typography, useTheme
 } from '@mui/material';
 import numeral from 'numeral';
-import { Fragment, useCallback, useState } from 'react';
+import { Fragment, useCallback, useEffect, useState } from 'react';
 import { Scrollbar } from 'src/components/scrollbar';
 import { SeverityPill } from '@/components/severity-pill';
 import { fetchSubCategoryOptions, mainCategoryOptions, midCategoryOptions } from './new-product-form';
@@ -41,7 +41,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
      const [isSubCategoryEnabled, setIsSubCategoryEnabled] = useState(false);
      const [selectedMidCategory, setSelectedMidCategory] = useState('');
 
-     const [products, setProducts] = useState(items)
+
 
      const getObjectById = (_id: any, arrayToSearch: any) => {
           for (const obj of arrayToSearch) {
@@ -63,9 +63,9 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
           });
      }
 
-     const handleProductClose = useCallback(() => {
+     const handleProductClose = () => {
           setCurrentProductID(null);
-     }, []);
+     }
 
      const handleProductUpdateClick = () => {
           Swal.fire({
@@ -206,8 +206,8 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                               </TableHead>
                               <TableBody>
                                    {
-                                        products.length > 0 ?
-                                             products.slice(page * rowsPerPage, (page * rowsPerPage) + rowsPerPage).map((product: any) => {
+                                        items.length > 0 ?
+                                             items.map((product: any) => {
                                                   //const isSelected = selected.includes(product._id);
                                                   const isCurrent = product._id === currentProductID;
                                                   const price = numeral(product.price).format(`${product.currency}0,0.00`);

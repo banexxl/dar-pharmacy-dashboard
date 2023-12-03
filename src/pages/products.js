@@ -137,21 +137,33 @@ const Page = (props) => {
 
 
 export async function getServerSideProps(context) {
+     try {
+          const page = context.query.page || 1
+          const limit = context.query.limit || 5
 
-     const page = context.query.page || 1
-     const limit = context.query.limit || 5
+          const products = await productsServices().getProductsByPage(page, limit);
+          const productsCount = await productsServices().getProductsCount();
 
-     const products = await productsServices().getProductsByPage(page, limit);
-     const productsCount = await productsServices().getProductsCount();
-
-     return {
-          props: {
-               products: JSON.parse(JSON.stringify(products)),
-               productsCount: JSON.parse(JSON.stringify(productsCount)),
-               page: parseInt(context.query.page),
-               limit: parseInt(context.query.limit)
-          },
-     };
+          return {
+               props: {
+                    products: JSON.parse(JSON.stringify(products)),
+                    productsCount: JSON.parse(JSON.stringify(productsCount)),
+                    page: parseInt(context.query.page),
+                    limit: parseInt(context.query.limit)
+               },
+          };
+     } catch (error) {
+          console.error("Error fetching products:", error);
+          return {
+               props: {
+                    products: [],
+                    productsCount: 0,
+                    page: 1,
+                    limit: 5,
+                    error: "Failed to fetch products. Please try again later.",
+               },
+          };
+     }
 }
 
 Page.getLayout = (page) => (

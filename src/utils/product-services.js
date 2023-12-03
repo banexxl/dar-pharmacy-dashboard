@@ -4,7 +4,7 @@ import { ObjectId } from "mongodb"
 export const productsServices = () => {
 
      const getProductsByPage = async (page, limit) => {
-          console.log(page, limit);
+
           const parsedLimit = parseInt(limit, 10); // Parse limit as an integer
 
           if (isNaN(parsedLimit) || parsedLimit <= 0) {
@@ -16,13 +16,13 @@ export const productsServices = () => {
 
           try {
                const db = client.db('DAR_DB');
-               const skip = (page) * parsedLimit;
+               const skip = page * parsedLimit;
                const data = await db.collection('Products')
                     .find({})
                     .skip(skip)
                     .limit(parsedLimit)
                     .toArray();
-               console.log(data.length);
+               console.log(data);
                return data;
           } catch (error) {
                return { message: error.message };
