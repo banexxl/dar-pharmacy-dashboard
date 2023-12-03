@@ -1,27 +1,15 @@
 import ChevronRightIcon from '@untitled-ui/icons-react/build/esm/ChevronRight';
 import ChevronDownIcon from '@untitled-ui/icons-react/build/esm/ChevronDown';
 import {
-     Avatar, Box, Button, Card, CardContent, Checkbox,
-     Divider,
-     Grid,
-     IconButton,
-     InputAdornment,
-     LinearProgress,
-     MenuItem,
+     Avatar, Box, Button, Card, CardContent, Checkbox, Divider, Grid, IconButton, InputAdornment, LinearProgress, MenuItem,
      Stack, SvgIcon, Switch, Table, TableBody, TableCell, TableHead, TablePagination, TableRow, TextField, Typography, useTheme
 } from '@mui/material';
-import DotsHorizontalIcon from '@untitled-ui/icons-react/build/esm/DotsHorizontal';
-import { toast } from 'react-hot-toast';
 import numeral from 'numeral';
 import { Fragment, useCallback, useState } from 'react';
 import { Scrollbar } from 'src/components/scrollbar';
 import { SeverityPill } from '@/components/severity-pill';
 import { fetchSubCategoryOptions, mainCategoryOptions, midCategoryOptions } from './new-product-form';
 import Swal from 'sweetalert2';
-import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
-import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
-import FirstPageIcon from '@mui/icons-material/FirstPage';
-import LastPageIcon from '@mui/icons-material/LastPage';
 import { useRouter } from 'next/navigation';
 
 export interface IProduct {
@@ -44,65 +32,19 @@ export interface IProduct {
      _id?: string;
 }
 
-export const ProductsTable = (props: any) => {
+export const ProductsTable = ({ count,
+     items,
+     onDeselectAll,
+     onDeselectOne,
+     onPageChange,
+     onRowsPerPageChange,
+     onSelectAll,
+     onSelectOne,
+     page,
+     rowsPerPage,
+     selected,
+     productsCount }: any) => {
 
-     function TablePaginationActions(props: any) {
-
-          const theme = useTheme();
-          const { count, page, rowsPerPage, onPageChange } = props;
-
-          const handleFirstPageButtonClick = (event: any) => {
-               onPageChange(event, 1);
-          };
-
-          const handleBackButtonClick = (event: any) => {
-               onPageChange(event, page - 1);
-          };
-
-          const handleNextButtonClick = (event: any) => {
-               onPageChange(event, page + 1);
-          };
-
-          const handleLastPageButtonClick = (event: any) => {
-               onPageChange(event, Math.max(1, Math.ceil(count / rowsPerPage) - 1));
-          };
-
-          return (
-               <Box sx={{ flexShrink: 0, ml: 2.5 }}>
-                    <IconButton
-                         onClick={handleFirstPageButtonClick}
-                         disabled={page === 1}
-                         aria-label="first page"
-                    >
-                         {theme.direction === 'rtl' ? <LastPageIcon /> : <FirstPageIcon />}
-                    </IconButton>
-                    <IconButton
-                         onClick={handleBackButtonClick}
-                         disabled={page === 1}
-                         aria-label="previous page"
-                    >
-                         {theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
-                    </IconButton>
-                    <IconButton
-                         onClick={handleNextButtonClick}
-                         disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-                         aria-label="next page"
-                    >
-                         {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
-                    </IconButton>
-                    <IconButton
-                         onClick={handleLastPageButtonClick}
-                         disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-                         aria-label="last page"
-                    >
-                         {theme.direction === 'rtl' ? <FirstPageIcon /> : <LastPageIcon />}
-                    </IconButton>
-               </Box>
-          );
-     }
-
-     const selectedSome = (props.selected.length > 0) && (props.selected.length < props.items.length);
-     const selectedAll = (props.items.length > 0) && (props.selected.length === props.items.length);
      const [currentProductID, setCurrentProductID] = useState(null);
      const [currentProductObject, setCurrentProductObject] = useState<IProduct | null>();
      const router = useRouter();
@@ -126,7 +68,7 @@ export const ProductsTable = (props: any) => {
                     setCurrentProductObject(null)
                     return null;
                } ``
-               setCurrentProductObject(getObjectById(productId, props.items))
+               setCurrentProductObject(getObjectById(productId, items))
                return productId;
           });
      }
@@ -242,7 +184,6 @@ export const ProductsTable = (props: any) => {
           }
      }
 
-
      return (
           <Card>
                <Scrollbar>
@@ -274,7 +215,7 @@ export const ProductsTable = (props: any) => {
                                    </TableRow>
                               </TableHead>
                               <TableBody>
-                                   {Array.isArray(props.items) && props.items.slice(props.page * props.rowsPerPage, (props.page * props.rowsPerPage) + props.rowsPerPage).map((product: any) => {
+                                   {items.slice(page * rowsPerPage, (page * rowsPerPage) + rowsPerPage).map((product: any) => {
                                         //const isSelected = selected.includes(product._id);
                                         const isCurrent = product._id === currentProductID;
                                         const price = numeral(product.price).format(`${product.currency}0,0.00`);
@@ -308,7 +249,7 @@ export const ProductsTable = (props: any) => {
                                                             width="25%"
                                                        >
                                                             <IconButton key={product.id} onClick={() => handleProductToggle(product._id)}>
-                                                                 <SvgIcon key={product.id}>{isCurrent ? <ChevronDownIcon /> : <ChevronRightIcon />}</SvgIcon>
+                                                                 <SvgIcon key={product.id}>{isCurrent ? <ChevronDownIcon key={product.id} /> : <ChevronRightIcon key={product.id} />}</SvgIcon >
                                                             </IconButton>
                                                        </TableCell>
                                                        <TableCell width="25%" key={product.id}>
@@ -348,7 +289,7 @@ export const ProductsTable = (props: any) => {
                                                                                 width: 80,
                                                                            }}
                                                                       >
-                                                                           <SvgIcon>
+                                                                           <SvgIcon key={product.id} >
 
                                                                            </SvgIcon>
                                                                       </Box>
@@ -534,6 +475,7 @@ export const ProductsTable = (props: any) => {
                                                                                                fullWidth
                                                                                                label="Sub Kategorija"
                                                                                                select
+                                                                                               disabled={!isSubCategoryEnabled}
                                                                                                onBlur={(e: any) =>
                                                                                                     setCurrentProductObject((previousObject: any) => ({
                                                                                                          ...previousObject,
@@ -679,33 +621,6 @@ export const ProductsTable = (props: any) => {
                                                                                      container
                                                                                      spacing={3}
                                                                                 >
-                                                                                     {/* <Grid
-                                                                                                                                                                                    item
-                                                                                                                                                                                    md={6}
-                                                                                                                                                                                    xs={12}
-                                                                                                                                                                          >
-                                                                                                                                                                                    <TextField
-                                                                                                                                                                                              defaultValue={product.price}
-                                                                                                                                                                                              fullWidth
-                                                                                                                                                                                              label="Old price"
-                                                                                                                                                                                              name="old-price"
-                                                                                                                                                                                              // onBlur={(e: any) =>
-                                                                                                                                                                                              //           setCurrentProductObject((previousObject: any) => ({
-                                                                                                                                                                                              //                     ...previousObject,
-                                                                                                                                                                                              //                     name: e.target.value
-
-                                                                                                                                                                                              //           }))
-                                                                                                                                                                                              // }
-                                                                                                                                                                                              InputProps={{
-                                                                                                                                                                                                        startAdornment: (
-                                                                                                                                                                                                                  <InputAdornment position="start">
-                                                                                                                                                                                                                            {product.currency}
-                                                                                                                                                                                                                  </InputAdornment>
-                                                                                                                                                                                                        ),
-                                                                                                                                                                                              }}
-                                                                                                                                                                                              type="number"
-                                                                                                                                                                                    />
-                                                                                                                                                                          </Grid> */}
                                                                                      <Grid key={product.id}
                                                                                           item
                                                                                           md={6}
@@ -846,7 +761,7 @@ export const ProductsTable = (props: any) => {
                                                                            direction="row"
                                                                            spacing={2}
                                                                       >
-                                                                           <Button key={product.id}
+                                                                           <Button
                                                                                 onClick={handleProductUpdateClick}
                                                                                 type="submit"
                                                                                 variant="contained"
@@ -879,20 +794,6 @@ export const ProductsTable = (props: any) => {
                          </Table>
                     </Box>
                </Scrollbar>
-               <TablePagination
-                    component="div"
-                    count={props.productsCount}
-                    onPageChange={(e: any, page: number) => props.onPageChange(page)}
-                    onRowsPerPageChange={props.onRowsPerPageChange}
-                    page={props.page}
-                    rowsPerPage={props.rowsPerPage}
-                    rowsPerPageOptions={[5, 10, 25]}
-                    showFirstButton
-                    showLastButton
-                    labelRowsPerPage={'Broj po stranici'}
-                    labelDisplayedRows={({ from, to, count }) => { return `${from}–${to} od ${count !== -1 ? count : `više od ${to}`}`; }}
-                    ActionsComponent={TablePaginationActions}
-               />
           </Card>
      );
 };

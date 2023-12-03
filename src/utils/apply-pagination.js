@@ -5,7 +5,7 @@ export function applyPagination(documents, page, rowsPerPage) {
           return []; // Return an empty array or handle invalid input gracefully
      }
 
-     const startIndex = (page) * rowsPerPage;
+     const startIndex = (page - 1) * rowsPerPage;
      const endIndex = startIndex + rowsPerPage;
 
      return documents.slice(startIndex, endIndex);
