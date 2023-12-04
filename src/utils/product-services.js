@@ -22,7 +22,7 @@ export const productsServices = () => {
                     .skip(skip)
                     .limit(parsedLimit)
                     .toArray();
-               console.log(data);
+
                return data;
           } catch (error) {
                return { message: error.message };

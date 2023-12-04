@@ -1,9 +1,12 @@
 import ChevronRightIcon from '@untitled-ui/icons-react/build/esm/ChevronRight';
 import ChevronDownIcon from '@untitled-ui/icons-react/build/esm/ChevronDown';
 import {
-     Avatar, Box, Button, Card, CardContent, Checkbox, Divider, Grid, IconButton, InputAdornment, LinearProgress, MenuItem,
+     Avatar, Box, Button, Card, CardContent, Checkbox, Divider, Grid, IconButton, Input, InputAdornment, LinearProgress, MenuItem,
      Stack, SvgIcon, Switch, Table, TableBody, TableCell, TableHead, TablePagination, TableRow, TextField, Typography, useTheme
 } from '@mui/material';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
+import Image from 'next/image';
 import numeral from 'numeral';
 import { Fragment, useCallback, useEffect, useState } from 'react';
 import { Scrollbar } from 'src/components/scrollbar';
@@ -40,6 +43,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
      const [subCategoryOptions, setSubCategoryOptions] = useState<any>([]);
      const [isSubCategoryEnabled, setIsSubCategoryEnabled] = useState(false);
      const [selectedMidCategory, setSelectedMidCategory] = useState('');
+     const [selectedImage, setSelectedImage] = useState(null);
 
 
 
@@ -61,6 +65,10 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                setCurrentProductObject(getObjectById(productId, items))
                return productId;
           });
+     }
+
+     const handleFileRemove = () => {
+          setSelectedImage(null);
      }
 
      const handleProductClose = () => {
@@ -581,25 +589,6 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                          }
                                                                                                     />
                                                                                                </Grid>
-                                                                                               <Grid key={product.id}
-                                                                                                    item
-                                                                                                    md={6}
-                                                                                                    xs={12}
-                                                                                               >
-                                                                                                    <TextField key={product.id}
-                                                                                                         defaultValue={product.imageURL}
-                                                                                                         fullWidth
-                                                                                                         label="Slika"
-                                                                                                         name={product.imageURL}
-                                                                                                         onBlur={(e: any) =>
-                                                                                                              setCurrentProductObject((previousObject: any) => ({
-                                                                                                                   ...previousObject,
-                                                                                                                   imageURL: e.target.value
-
-                                                                                                              }))
-                                                                                                         }
-                                                                                                    />
-                                                                                               </Grid>
                                                                                           </Grid>
                                                                                      </Grid>
                                                                                      <Grid key={product.id}
@@ -740,6 +729,81 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                           </Grid>
                                                                                      </Grid>
                                                                                 </Grid>
+                                                                                <Card sx={{ width: '50%', marginTop: '20px' }}>
+                                                                                     <CardContent>
+                                                                                          <Box
+                                                                                               sx={{
+                                                                                                    display: 'flex',
+                                                                                                    flexDirection: 'column',
+                                                                                                    alignItems: 'center',
+                                                                                                    gap: '10px'
+                                                                                               }}
+                                                                                          >
+                                                                                               {/* {
+                                                                                                    currentProductObject?.imageURL ?
+                                                                                                         <Image src={currentProductObject.imageURL}
+                                                                                                              alt='sds'
+                                                                                                              width={300}
+                                                                                                              height={300}
+                                                                                                              style={{
+                                                                                                                   borderRadius: '10px',
+                                                                                                                   cursor: 'pointer'
+                                                                                                              }}
+                                                                                                              onClick={() => handleFileRemove()}
+                                                                                                         />
+                                                                                                         :
+                                                                                                         <InsertPhotoIcon
+                                                                                                              color='primary'
+                                                                                                              sx={{ width: '300px', height: '300px' }}
+                                                                                                         />
+                                                                                               } */}
+
+                                                                                               <Button component="label"
+                                                                                                    variant="contained"
+                                                                                                    startIcon={<CloudUploadIcon />}
+                                                                                                    sx={{
+                                                                                                         maxWidth: '150px'
+                                                                                                    }}
+
+                                                                                               >
+                                                                                                    Ucitaj sliku
+                                                                                                    <Input
+                                                                                                         type="file"
+                                                                                                         inputProps={{ accept: 'image/*' }}
+                                                                                                         sx={{
+                                                                                                              clip: 'rect(0 0 0 0)',
+                                                                                                              clipPath: 'inset(50%)',
+                                                                                                              height: 1,
+                                                                                                              overflow: 'hidden',
+                                                                                                              position: 'absolute',
+                                                                                                              bottom: 0,
+                                                                                                              left: 0,
+                                                                                                              whiteSpace: 'nowrap',
+                                                                                                              width: 1,
+                                                                                                         }}
+                                                                                                         onInput={(e: any) => {
+
+                                                                                                              const file = e.target.files[0]; // Get the first selected file
+                                                                                                              if (file) {
+                                                                                                                   const reader = new FileReader();
+                                                                                                                   reader.onload = (e: any) => {
+                                                                                                                        // setSelectedImage(e.target.result);
+                                                                                                                        setCurrentProductObject((previousObject: any) => ({
+                                                                                                                             ...previousObject,
+                                                                                                                             imageURL: e.target.result
+
+                                                                                                                        }))
+                                                                                                                   }
+                                                                                                                   reader.readAsDataURL(file);
+                                                                                                              }
+                                                                                                         }
+                                                                                                         }
+                                                                                                    />
+                                                                                               </Button>
+
+                                                                                          </Box>
+                                                                                     </CardContent>
+                                                                                </Card>
                                                                            </CardContent>
                                                                            <Divider />
                                                                            <Stack key={product.id}
