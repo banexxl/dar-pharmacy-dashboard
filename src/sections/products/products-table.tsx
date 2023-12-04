@@ -112,7 +112,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                          title: 'Success',
                          text: 'Product updated!',
                     })
-                    router.push('/products/?page=0&limit=1')
+                    router.push('/products/?page=0&limit=10')
                } else {
                     const errorData = await response.json(); // Parse the error response
                }
