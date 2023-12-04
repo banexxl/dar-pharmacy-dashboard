@@ -112,7 +112,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                          title: 'Success',
                          text: 'Product updated!',
                     })
-                    router.push('/products')
+                    router.push('/products/?page=0&limit=1')
                } else {
                     const errorData = await response.json(); // Parse the error response
                }
@@ -739,7 +739,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                     gap: '10px'
                                                                                                }}
                                                                                           >
-                                                                                               {/* {
+                                                                                               {
                                                                                                     currentProductObject?.imageURL ?
                                                                                                          <Image src={currentProductObject.imageURL}
                                                                                                               alt='sds'
@@ -756,7 +756,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                               color='primary'
                                                                                                               sx={{ width: '300px', height: '300px' }}
                                                                                                          />
-                                                                                               } */}
+                                                                                               }
 
                                                                                                <Button component="label"
                                                                                                     variant="contained"
