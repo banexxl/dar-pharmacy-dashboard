@@ -51,30 +51,6 @@ const Page = (props) => {
           router.push(`/products?page=${ newPage }&limit=${ props.limit }`);
      }
 
-     const createDummyCommit = async () => {
-          if (loading) {
-               return;
-          }
-
-          setLoading(true);
-
-          try {
-               const response = await fetch('/api/create-commit', {
-                    method: 'POST',
-               });
-
-               if (response.ok) {
-                    console.log('Dummy commit triggered successfully');
-               } else {
-                    console.error('Failed to trigger dummy commit');
-               }
-          } catch (error) {
-               console.error('Error triggering dummy commit:', error);
-          } finally {
-               setLoading(false);
-          }
-     };
-
      return (
           <Box>
                <Head>
@@ -123,7 +99,7 @@ const Page = (props) => {
                                                   </SvgIcon>
                                              )}
                                              variant="contained"
-                                             onClick={createDummyCommit}
+                                             onClick={() => alert('aaaa')}
                                              disabled={loading}
                                         >
                                              {loading ? 'Šaljem' : 'Pošalji proizvode na sajt'}
