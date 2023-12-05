@@ -32,6 +32,7 @@ const Page = (props) => {
      const [open, setOpen] = useState(false)
      const productsSelection = useSelection(productsIds);
      const router = useRouter();
+     const [loading, setLoading] = useState(false)
 
      const handleSubmitSuccess = () => {
           setOpen(false); // Close the dialog
@@ -49,6 +50,30 @@ const Page = (props) => {
      const handlePageChange = (event, newPage) => {
           router.push(`/products?page=${ newPage }&limit=${ props.limit }`);
      }
+
+     const createDummyCommit = async () => {
+          if (loading) {
+               return;
+          }
+
+          setLoading(true);
+
+          try {
+               const response = await fetch('/api/create-commit', {
+                    method: 'POST',
+               });
+
+               if (response.ok) {
+                    console.log('Dummy commit triggered successfully');
+               } else {
+                    console.error('Failed to trigger dummy commit');
+               }
+          } catch (error) {
+               console.error('Error triggering dummy commit:', error);
+          } finally {
+               setLoading(false);
+          }
+     };
 
      return (
           <Box>
@@ -76,7 +101,8 @@ const Page = (props) => {
                                              Proizvodi
                                         </Typography>
                                    </Stack>
-                                   <Box sx={{ display: 'flex', justifyContent: 'space-between', height: '40px', width: '320px' }}>
+
+                                   <Box sx={{ display: 'flex', justifyContent: 'space-between', height: '40px', width: '40%' }}>
                                         <Button
                                              startIcon={(
                                                   <SvgIcon fontSize="small">
@@ -89,6 +115,18 @@ const Page = (props) => {
                                              }}
                                         >
                                              Dodaj proizvod
+                                        </Button>
+                                        <Button
+                                             startIcon={(
+                                                  <SvgIcon fontSize="small">
+                                                       <PlusIcon />
+                                                  </SvgIcon>
+                                             )}
+                                             variant="contained"
+                                             onClick={createDummyCommit}
+                                             disabled={loading}
+                                        >
+                                             {loading ? 'Šaljem' : 'Pošalji proizvode na sajt'}
                                         </Button>
                                    </Box>
                               </Stack>
