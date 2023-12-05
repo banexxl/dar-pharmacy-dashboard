@@ -3,6 +3,7 @@ import Head from 'next/head';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
+import Swal from 'sweetalert2'
 import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
 import { Box, Button, Container, Stack, SvgIcon, Typography } from '@mui/material';
 import { useSelection } from 'src/hooks/use-selection';
@@ -49,6 +50,39 @@ const Page = (props) => {
 
      const handlePageChange = (event, newPage) => {
           router.push(`/products?page=${ newPage }&limit=${ props.limit }`);
+     }
+
+     const handleRebuild = async () => {
+
+          try {
+               const response = await fetch('https://api.vercel.com/v1/integrations/deploy/prj_8oTQMbXR6nd6jPsw1OWW2Ku6vXIi/bag2X5T5DK', {
+                    method: 'POST'
+               })
+
+               if (response.ok) {
+
+                    Swal.fire({
+                         icon: 'success',
+                         title: 'Success',
+                         text: 'Proizvodi uspešno poslati! Sačekajte par minuta i osvežite stranicu!',
+                    })
+                    router.push('/products/?page=0&limit=10')
+               } else {
+                    const errorData = await response.json(); // Parse the error response
+
+                    Swal.fire({
+                         icon: 'error',
+                         title: 'Oops...',
+                         text: 'Something went wrong! Error: ' + errorData,
+                    })
+               }
+          } catch (error) {
+               Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Something went wrong! Error: ' + error,
+               })
+          }
      }
 
      return (
@@ -99,7 +133,7 @@ const Page = (props) => {
                                                   </SvgIcon>
                                              )}
                                              variant="contained"
-                                             onClick={() => alert('aaaa')}
+                                             onClick={handleRebuild}
                                              disabled={loading}
                                         >
                                              {loading ? 'Šaljem' : 'Pošalji proizvode na sajt'}
