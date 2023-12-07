@@ -11,7 +11,7 @@ import numeral from 'numeral';
 import { Fragment, useCallback, useEffect, useState } from 'react';
 import { Scrollbar } from 'src/components/scrollbar';
 import { SeverityPill } from '@/components/severity-pill';
-import { fetchSubCategoryOptions, mainCategoryOptions, midCategoryOptions } from './new-product-form';
+import { fetchSubCategoryOptions, mainCategoryOptions, manufacturerOptions, midCategoryOptions } from './new-product-form';
 import Swal from 'sweetalert2';
 import { useRouter } from 'next/navigation';
 
@@ -631,20 +631,51 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                     item
                                                                                                     md={6}
                                                                                                     xs={12}
-                                                                                                    sx={{
-                                                                                                         alignItems: 'center',
-                                                                                                         display: 'flex',
-                                                                                                    }}
                                                                                                >
-                                                                                                    <Switch key={product.id} checked={currentProductObject!.discount}
-                                                                                                         onChange={() => setCurrentProductObject((previousObject: any) => ({
-                                                                                                              ...previousObject,
-                                                                                                              discount: !previousObject.discount
-                                                                                                         }))}
+                                                                                                    <TextField
+                                                                                                         fullWidth
+                                                                                                         label="Proizvodjac"
+                                                                                                         name="manufacturer"
+                                                                                                         onBlur={(e: any) =>
+                                                                                                              setCurrentProductObject((previousObject: any) => ({
+                                                                                                                   ...previousObject,
+                                                                                                                   manufacturer: e.target.value
+
+                                                                                                              }))
+                                                                                                         }
+                                                                                                         select
+                                                                                                         defaultValue={product.manufacturer}
+                                                                                                    >
+                                                                                                         {manufacturerOptions.map((option) => (
+                                                                                                              <MenuItem
+                                                                                                                   key={option.value}
+                                                                                                                   value={option.value}
+                                                                                                              >
+                                                                                                                   {option.label}
+                                                                                                              </MenuItem>
+                                                                                                         ))}
+                                                                                                    </TextField>
+                                                                                               </Grid>
+
+                                                                                               <Grid key={product.id}
+                                                                                                    item
+                                                                                                    md={6}
+                                                                                                    xs={12}
+                                                                                               >
+                                                                                                    <TextField key={product.id}
+                                                                                                         defaultValue={product.availableStock}
+                                                                                                         fullWidth
+                                                                                                         label="Na stanju"
+                                                                                                         name="availableStock"
+                                                                                                         onBlur={(e: any) =>
+                                                                                                              setCurrentProductObject((previousObject: any) => ({
+                                                                                                                   ...previousObject,
+                                                                                                                   availableStock: e.target.valueAsNumber
+
+                                                                                                              }))
+                                                                                                         }
+                                                                                                         type="number"
                                                                                                     />
-                                                                                                    <Typography key={product.id} variant="subtitle2">
-                                                                                                         Popust
-                                                                                                    </Typography>
                                                                                                </Grid>
                                                                                                <Grid key={product.id}
                                                                                                     item
@@ -710,21 +741,20 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                     item
                                                                                                     md={6}
                                                                                                     xs={12}
+                                                                                                    sx={{
+                                                                                                         alignItems: 'center',
+                                                                                                         display: 'flex',
+                                                                                                    }}
                                                                                                >
-                                                                                                    <TextField key={product.id}
-                                                                                                         defaultValue={product.availableStock}
-                                                                                                         fullWidth
-                                                                                                         label="Na stanju"
-                                                                                                         name="availableStock"
-                                                                                                         onBlur={(e: any) =>
-                                                                                                              setCurrentProductObject((previousObject: any) => ({
-                                                                                                                   ...previousObject,
-                                                                                                                   availableStock: e.target.valueAsNumber
-
-                                                                                                              }))
-                                                                                                         }
-                                                                                                         type="number"
+                                                                                                    <Switch key={product.id} checked={currentProductObject!.discount}
+                                                                                                         onChange={() => setCurrentProductObject((previousObject: any) => ({
+                                                                                                              ...previousObject,
+                                                                                                              discount: !previousObject.discount
+                                                                                                         }))}
                                                                                                     />
+                                                                                                    <Typography key={product.id} variant="subtitle2">
+                                                                                                         Popust
+                                                                                                    </Typography>
                                                                                                </Grid>
                                                                                           </Grid>
                                                                                      </Grid>
@@ -842,7 +872,8 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                            </Stack>
                                                                       </TableCell>
                                                                  </TableRow>
-                                                            )}
+                                                            )
+                                                            }
                                                        </Fragment>
                                                   );
                                              })
@@ -853,7 +884,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                          </Table>
                     </Box>
                </Scrollbar>
-          </Card>
+          </Card >
      );
 };
 

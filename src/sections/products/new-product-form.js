@@ -210,7 +210,7 @@ export const midCategoryOptions = [
      },
 ];
 
-const manufacturerOptions = [
+export const manufacturerOptions = [
      {
           label: 'ALPENKRAUTER',
           value: 'alpenkrauter',
