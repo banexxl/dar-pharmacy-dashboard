@@ -4,7 +4,7 @@ import { ObjectId } from "mongodb"
 export const productsServices = () => {
 
      const getProductsByPage = async (page, limit) => {
-
+          console.log('aaaaaaaaa', page, limit);
           const parsedLimit = parseInt(limit, 10); // Parse limit as an integer
 
           if (isNaN(parsedLimit) || parsedLimit <= 0) {

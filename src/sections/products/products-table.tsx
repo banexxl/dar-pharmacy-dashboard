@@ -315,7 +315,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                  <TableCell width="25%" key={product.id}>
                                                                       <LinearProgress
                                                                            key={product.id}
-                                                                           value={product.availableStock}
+                                                                           value={parseInt(product.availableStock, 10)}
                                                                            variant="determinate"
                                                                            color={quantityColor}
                                                                            sx={{
@@ -903,4 +903,3 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
 //           rowsPerPage: PropTypes.number,
 //           selected: PropTypes.array
 // };
-
