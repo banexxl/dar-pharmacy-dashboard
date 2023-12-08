@@ -3,22 +3,6 @@ import { ObjectId } from "mongodb"
 
 export const productsServices = () => {
 
-     const getAllProducts = async () => {
-
-          const client = await MongoClient.connect(process.env.MONGODB_URI)
-
-          try {
-               const db = client.db('DAR_DB')
-               let data = await db.collection('Products').find({}).toArray()
-               return data
-          } catch (error) {
-               return { message: error.message }
-          }
-          finally {
-               await client.close();
-          }
-     }
-
      const getProductsByPage = async (page, limit) => {
 
           const parsedLimit = parseInt(limit, 10); // Parse limit as an integer
@@ -240,7 +224,6 @@ export const productsServices = () => {
 
 
      return {
-          getAllProducts,
           getProductsByPage,
           getProductsCount,
           getProductsForHomePage,

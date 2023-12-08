@@ -35,7 +35,7 @@ export interface IProduct {
      _id?: string;
 }
 
-export const ProductsTable = ({ items }: any) => {
+export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
 
      const [currentProductID, setCurrentProductID] = useState(null);
      const [currentProductObject, setCurrentProductObject] = useState<IProduct | null>();
@@ -44,9 +44,7 @@ export const ProductsTable = ({ items }: any) => {
      const [isSubCategoryEnabled, setIsSubCategoryEnabled] = useState(false);
      const [selectedMidCategory, setSelectedMidCategory] = useState('');
      const [selectedImage, setSelectedImage] = useState(null);
-     const [products, setProducts] = useState(items)
-     const [page, setPage] = useState(1);
-     const [rowsPerPage, setRowsPerPage] = useState(5);
+
 
 
      const getObjectById = (_id: any, arrayToSearch: any) => {
@@ -114,16 +112,7 @@ export const ProductsTable = ({ items }: any) => {
                          title: 'Success',
                          text: 'Product updated!',
                     })
-                    setProducts((prevData: any) => {
-                         // Map through the previous state to find and update the item
-                         return prevData.map((item: any) => {
-                              if (item._id === currentProductID) {
-                                   // Update only the item that matches the given ID
-                                   return { ...item, ...currentProductObject }; // Merge updatedInfo into the existing item
-                              }
-                              return item; // Return unchanged item if ID doesn't match
-                         })
-                    })
+                    router.push('/products/?page=0&limit=10')
                } else {
                     const errorData = await response.json(); // Parse the error response
                }
@@ -183,10 +172,7 @@ export const ProductsTable = ({ items }: any) => {
                          title: 'Success',
                          text: 'Product deleted!',
                     })
-                    setProducts((prevData: any) => {
-                         // Filter out the item to be removed from the previous state
-                         return prevData.filter((item: any) => item._id !== currentProductID);
-                    });
+                    router.push('/products')
                } else {
                     const errorData = await response.json(); // Parse the error response
                }
@@ -195,15 +181,6 @@ export const ProductsTable = ({ items }: any) => {
                alert(err);
           }
      }
-
-     const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
-          setPage(newPage);
-     };
-
-     const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-          setRowsPerPage(parseInt(event.target.value, 10));
-          setPage(0);
-     };
 
      return (
           <Card>
@@ -237,8 +214,8 @@ export const ProductsTable = ({ items }: any) => {
                               </TableHead>
                               <TableBody>
                                    {
-                                        products.length > 0 ?
-                                             products.slice(page * rowsPerPage, (page * rowsPerPage) + rowsPerPage).map((product: any) => {
+                                        items.length > 0 ?
+                                             items.map((product: any) => {
                                                   //const isSelected = selected.includes(product._id);
                                                   const isCurrent = product._id === currentProductID;
                                                   const price = numeral(product.price).format(`${product.currency}0,0.00`);
@@ -906,20 +883,6 @@ export const ProductsTable = ({ items }: any) => {
                               </TableBody>
                          </Table>
                     </Box>
-                    <TablePagination
-                         sx={{ width: '100%' }}
-                         component="div"
-                         count={items.length}
-                         onPageChange={handleChangePage}
-                         onRowsPerPageChange={handleChangeRowsPerPage}
-                         page={page}
-                         rowsPerPage={rowsPerPage}
-                         rowsPerPageOptions={[5, 10, 25]}
-                         showFirstButton
-                         showLastButton
-                         labelRowsPerPage={'Broj po stranici'}
-                         labelDisplayedRows={({ from, to, count }) => { return `${from}–${to} od ${count !== -1 ? count : `više od ${to}`}`; }}
-                    />
                </Scrollbar>
           </Card >
      );

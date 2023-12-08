@@ -43,6 +43,15 @@ const Page = (props) => {
           setOpen(false)
      }
 
+     const handleRowsPerPageChange = (event) => {
+          router.push(`products/?page=${ props.page }&limit=${ event.target.value }`);
+          return (event.target.value)
+     }
+
+     const handlePageChange = (event, newPage) => {
+          router.push(`/products?page=${ newPage }&limit=${ props.limit }`);
+     }
+
      const handleRebuild = async () => {
 
           try {
@@ -140,6 +149,19 @@ const Page = (props) => {
                                    selected={productsSelection.selected}
                                    productsCount={props.productsCount}
                               />
+                              <TablePagination
+                                   component="div"
+                                   count={props.productsCount}
+                                   onPageChange={handlePageChange}
+                                   onRowsPerPageChange={handleRowsPerPageChange}
+                                   page={props.page}
+                                   rowsPerPage={props.limit}
+                                   rowsPerPageOptions={[5, 10, 25]}
+                                   showFirstButton
+                                   showLastButton
+                                   labelRowsPerPage={'Broj po stranici'}
+                              //labelDisplayedRows={({ from, to, count }) => { return `${ from }–${ to } od ${ count !== -1 ? count : `više od ${ to }` }`; }}
+                              />
                          </Stack>
                     </Container>
                </Box>
@@ -162,8 +184,12 @@ const Page = (props) => {
 };
 
 
-export async function getStaticProps(context) {
+export async function getServerSideProps(context) {
      try {
+          const page = context.query.page || 1
+          const limit = context.query.limit || 5
+
+          const products = await productsServices().getProductsByPage(page, limit);
           const productsCount = await productsServices().getProductsCount();
           const numberOfTenPages = Math.floor(productsCount / 10)
           const remainder = productsCount % 10
@@ -183,9 +209,8 @@ export async function getStaticProps(context) {
                     products: JSON.parse(JSON.stringify(products)),
                     productsCount: JSON.parse(JSON.stringify(productsCount)),
                     // page: parseInt(context.query.page),
-                    // limit: parseInt(context.query.limit)qa
+                    // limit: parseInt(context.query.limit)
                },
-               revalidate: 1
           };
      } catch (error) {
           console.error("Error fetching products:", error);
