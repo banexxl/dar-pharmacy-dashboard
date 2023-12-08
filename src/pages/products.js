@@ -174,7 +174,8 @@ export async function getStaticProps(context) {
           let products = []
 
           for (let page = 0; page < totalNumberOfTenPages; page++) {
-               products.concat(await productsServices().getProductsByPage(page, 10))
+               const fetchedProducts = await productsServices().getProductsByPage(page, 10);
+               products = products.concat(fetchedProducts); // Concatenate fetchedProducts to products
           }
 
           return {
