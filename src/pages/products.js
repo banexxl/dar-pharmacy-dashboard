@@ -173,7 +173,7 @@ export async function getStaticProps(context) {
 
           let products = []
 
-          for (let page = 0; index < totalNumberOfTenPages; page++) {
+          for (let page = 0; page < totalNumberOfTenPages; page++) {
                products.concat(await productsServices().getProductsByPage(page, 10))
           }
 
