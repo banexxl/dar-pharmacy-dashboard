@@ -164,18 +164,25 @@ const Page = (props) => {
 
 export async function getStaticProps(context) {
      try {
-          // const page = context.query.page || 1
-          // const limit = context.query.limit || 5
-
-          const products = await productsServices().getAllProducts();
           const productsCount = await productsServices().getProductsCount();
+          const numberOfTenPages = Math.floor(productsCount / 10)
+          const remainder = productsCount % 10
+          let totalNumberOfTenPages
+          remainder > 0 ?
+               totalNumberOfTenPages = numberOfTenPages + 1 : numberOfTenPages
+
+          let products = []
+
+          for (let page = 0; index < totalNumberOfTenPages; page++) {
+               products.concat(await productsServices().getProductsByPage(page, 10))
+          }
 
           return {
                props: {
                     products: JSON.parse(JSON.stringify(products)),
                     productsCount: JSON.parse(JSON.stringify(productsCount)),
                     // page: parseInt(context.query.page),
-                    // limit: parseInt(context.query.limit)
+                    // limit: parseInt(context.query.limit)qa
                },
                revalidate: 1
           };
