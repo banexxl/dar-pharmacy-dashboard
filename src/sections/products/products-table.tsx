@@ -45,8 +45,6 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
      const [selectedMidCategory, setSelectedMidCategory] = useState('');
      const [selectedImage, setSelectedImage] = useState(null);
 
-
-
      const getObjectById = (_id: any, arrayToSearch: any) => {
           for (const obj of arrayToSearch) {
                if (obj._id === _id) {
@@ -315,7 +313,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                  <TableCell width="25%" key={product.id}>
                                                                       <LinearProgress
                                                                            key={product.id}
-                                                                           value={parseInt(product.availableStock, 10)}
+                                                                           value={product.availableStock}
                                                                            variant="determinate"
                                                                            color={quantityColor}
                                                                            sx={{

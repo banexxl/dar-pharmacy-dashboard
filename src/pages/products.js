@@ -191,25 +191,13 @@ export async function getServerSideProps(context) {
 
           const products = await productsServices().getProductsByPage(page, limit);
           const productsCount = await productsServices().getProductsCount();
-          const numberOfTenPages = Math.floor(productsCount / 10)
-          const remainder = productsCount % 10
-          let totalNumberOfTenPages
-          remainder > 0 ?
-               totalNumberOfTenPages = numberOfTenPages + 1 : numberOfTenPages
-
-          let products = []
-
-          for (let page = 0; page < totalNumberOfTenPages; page++) {
-               const fetchedProducts = await productsServices().getProductsByPage(page, 10);
-               products = products.concat(fetchedProducts); // Concatenate fetchedProducts to products
-          }
 
           return {
                props: {
                     products: JSON.parse(JSON.stringify(products)),
                     productsCount: JSON.parse(JSON.stringify(productsCount)),
-                    // page: parseInt(context.query.page),
-                    // limit: parseInt(context.query.limit)
+                    page: parseInt(context.query.page),
+                    limit: parseInt(context.query.limit)
                },
           };
      } catch (error) {
