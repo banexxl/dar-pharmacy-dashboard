@@ -5,10 +5,14 @@ import { Form, Formik, FormikErrors, FormikTouched } from 'formik';
 import PhotoCamera from "@mui/icons-material/PhotoCamera";
 import { newProductSchema } from './new-product-schema'
 import { useRouter } from 'next/navigation';
+import CircularProgress from '@mui/material/CircularProgress';
 import Swal from 'sweetalert2'
+import AttachFileIcon from '@mui/icons-material/AttachFile';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
 import Image from 'next/image';
+import { LoadingButton } from '@mui/lab';
+import { status } from 'nprogress';
 
 const initialValues = {
      name: '',
@@ -632,46 +636,15 @@ export const fetchSubCategoryOptions = async (selectedMidCategory) => {
      }
 };
 
-
-const handleFileUpload = async (file) => {
-     return new Promise(async (resolve, reject) => {
-          try {
-               const buffer = Buffer.from(await file.arrayBuffer())
-
-               const response = await fetch('/api/image-api', {
-                    method: 'POST',
-                    body: JSON.stringify({ buffer: buffer, fileName: file.name }),
-               });
-
-               if (!response.ok) {
-                    throw new Error('Failed to upload file');
-               }
-
-               const data = await response.json();
-               resolve(data);
-          } catch (error) {
-               reject(error);
-          }
-     });
-};
-
 export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
 
      const router = useRouter();
-
-
-
      const [selectedFile, setSelectedFile] = useState(null);
-     const [uploadState, setUploadState] = useState("initial");
-
+     const [fileURL, setFileURL] = useState(null)
+     const [loading, setLoading] = useState(false)
+     const formData = new FormData();
      const [subCategoryOptions, setSubCategoryOptions] = useState([]);
      const [isSubCategoryEnabled, setIsSubCategoryEnabled] = useState(false);
-
-
-     const handleResetClick = (event) => {
-          setSelectedFile(null);
-          setUploadState("initial");
-     };
 
      const handleSubmit = async (values) => {
 
@@ -717,7 +690,6 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
           }
      }
 
-
      const handleMidCategoryChange = async (event) => {
           const selectedMidCategory = event.target.value;
 
@@ -731,9 +703,33 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
 
      };
 
+     const handleFileUpload = async (e) => {
+          e.preventDefault()
+          setLoading(true)
+
+          setTimeout(function () {
+               setLoading(false)
+          }, 2000);
+     };
+
      const handleFileRemove = () => {
-          setSelectedFile(null);
-     }
+          setSelectedFile(null); // Remove the selected file
+     };
+
+     const handleFileChange = (e) => {
+          const file = e.target.files[0]
+          setSelectedFile(file);
+
+          if (fileURL) {
+               const url = URL.revokeObjectURL(fileURL)
+          }
+
+          if (file) {
+               const url = URL.createObjectURL(file)
+               setFileURL(url)
+          }
+     };
+
 
      return (
           <Box>
@@ -902,48 +898,8 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                         helperText={formik.touched.warning && formik.errors.warning}
                                    />
 
-                                   {/* <Container maxWidth="md"
-                                        sx={{ mt: 1, borderRadius: '5px', height: '300px', border: '1px solid red' }}>
-                                        <Stack >
-                                             <IconButton
-                                                  onClick={handleResetClick}
-                                                  color="primary"
-                                                  aria-label="upload picture"
-                                                  component="label"
-                                                  display="flex"
-
-                                             >
-                                                  <input hidden={true}
-                                                       accept="image/*"
-                                                       type="file"
-                                                       onChange={({ target }) => {
-                                                            const file = target.files[0]
-                                                            setSelectedFile(URL.createObjectURL(file))
-                                                            setSelectedFile(file)
-                                                       }}
-                                                  />
-                                                  {
-                                                       selectedFile ?
-                                                            <CardActionArea
-                                                                 sx={{ border: '1px solid green', width: 'auto' }}>
-                                                                 <Image
-                                                                      src={selectedFile}
-                                                                      width={150}
-                                                                      height={200}
-                                                                      alt="LOGO" />
-                                                            </CardActionArea>
-                                                            :
-                                                            <PhotoCamera />
-                                                  }
-
-                                             </IconButton>
-
-                                        </Stack>
-
-                                   </Container> */}
                                    <Card>
                                         <CardContent>
-
                                              <Box
                                                   sx={{
                                                        display: 'flex',
@@ -952,34 +908,34 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                        gap: '10px'
                                                   }}
                                              >
-                                                  {
-                                                       selectedFile ?
-                                                            <Image src={selectedFile}
-                                                                 alt='sds'
-                                                                 width={300}
-                                                                 height={300}
-                                                                 style={{
-                                                                      borderRadius: '10px',
-                                                                      cursor: 'pointer'
-                                                                 }}
-                                                                 onClick={() => handleFileRemove()}
-                                                            />
-                                                            :
-                                                            <InsertPhotoIcon
-                                                                 color='primary'
-                                                                 sx={{ width: '300px', height: '300px' }}
-                                                            />
-                                                  }
-
-                                                  <Button component="label"
+                                                  {selectedFile ? (
+                                                       <Image
+                                                            src={fileURL}
+                                                            alt='Uploaded Image'
+                                                            width={300}
+                                                            height={300}
+                                                            style={{
+                                                                 borderRadius: '10px',
+                                                                 cursor: 'pointer'
+                                                            }}
+                                                            onClick={handleFileRemove}
+                                                       />
+                                                  ) : (
+                                                       <InsertPhotoIcon
+                                                            color='primary'
+                                                            sx={{ width: '300px', height: '300px' }}
+                                                       />
+                                                  )}
+                                                  <Button
+                                                       component="label"
                                                        variant="contained"
-                                                       startIcon={<CloudUploadIcon />}
+                                                       startIcon={<AttachFileIcon />}
                                                        sx={{
                                                             maxWidth: '150px'
                                                        }}
-
+                                                       disabled={selectedFile}
                                                   >
-                                                       Ucitaj sliku
+                                                       Izaberi sliku
                                                        <Input
                                                             type="file"
                                                             inputProps={{ accept: 'image/*' }}
@@ -994,25 +950,28 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                                  whiteSpace: 'nowrap',
                                                                  width: 1,
                                                             }}
-                                                            onInput={(e) => {
-                                                                 handleFileUpload(e.target.files[0])
-                                                                 // const file = e.target.files[0]; // Get the first selected file
-
-                                                                 // if (file) {
-                                                                 //      const reader = new FileReader();
-                                                                 //      reader.onload = (e) => {
-                                                                 //           setSelectedFile(e.target.result);
-                                                                 //           handleFileUpload(file)
-                                                                 //           //formik.setFieldValue('imageURL', e.target.result)
-                                                                 //      };
-
-                                                                 //      reader.readAsDataURL(file);
-                                                                 // }
-                                                            }
+                                                            onChange={handleFileChange
                                                             }
                                                        />
                                                   </Button>
-
+                                                  {
+                                                       selectedFile ?
+                                                            <LoadingButton
+                                                                 loading={loading}
+                                                                 loadingIndicator={<CircularProgress />}
+                                                                 component="label"
+                                                                 variant="contained"
+                                                                 startIcon={<CloudUploadIcon />}
+                                                                 sx={{
+                                                                      width: '250px',
+                                                                      height: '60px'
+                                                                 }}
+                                                                 onClick={handleFileUpload}
+                                                            >
+                                                                 Upload slike
+                                                            </LoadingButton>
+                                                            : null
+                                                  }
                                              </Box>
                                         </CardContent>
                                    </Card>

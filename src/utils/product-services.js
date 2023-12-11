@@ -31,9 +31,6 @@ export async function connectToDatabase() {
 
 export const productsServices = () => {
 
-     let cachedClient = null;
-     let cachedDb = null;
-
      const dbConnection = connectToDatabase()
 
      const getProductsByPage = async (page, limit) => {
