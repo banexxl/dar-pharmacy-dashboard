@@ -3,7 +3,6 @@ import type { NextApiRequest, NextApiResponse } from 'next/types'
 
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
 
-     // const mongoClient = await clientPromise;
      const mongoClient = await MongoClient.connect(process.env.MONGODB_URI!, {})
      const dbProducts = mongoClient.db('DAR_DB').collection('Products')
 

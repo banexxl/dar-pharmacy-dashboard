@@ -633,33 +633,35 @@ export const fetchSubCategoryOptions = async (selectedMidCategory) => {
 };
 
 
-// const handleFileUpload = async (file) => {
-//           return new Promise(async (resolve, reject) => {
-//                     try {
-//                               const formData = new FormData();
-//                               formData.append('file', file);
+const handleFileUpload = async (file) => {
+     return new Promise(async (resolve, reject) => {
+          try {
+               const buffer = Buffer.from(await file.arrayBuffer())
 
-//                               const response = await fetch('/api/image-api', {
-//                                         method: 'POST',
-//                                         body: formData,
-//                               });
+               const response = await fetch('/api/image-api', {
+                    method: 'POST',
+                    body: JSON.stringify({ buffer: buffer, fileName: file.name }),
+               });
 
-//                               if (!response.ok) {
-//                                         throw new Error('Failed to upload file');
-//                               }
+               if (!response.ok) {
+                    throw new Error('Failed to upload file');
+               }
 
-//                               const data = await response.json();
-//                               resolve(data);
-//                     } catch (error) {
-//                               reject(error);
-//                     }
-//           });
-// };
+               const data = await response.json();
+               resolve(data);
+          } catch (error) {
+               reject(error);
+          }
+     });
+};
 
 export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
 
      const router = useRouter();
-     const [selectedImage, setSelectedImage] = useState(null);
+
+
+
+     const [selectedFile, setSelectedFile] = useState(null);
      const [uploadState, setUploadState] = useState("initial");
 
      const [subCategoryOptions, setSubCategoryOptions] = useState([]);
@@ -667,7 +669,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
 
 
      const handleResetClick = (event) => {
-          setSelectedImage(null);
+          setSelectedFile(null);
           setUploadState("initial");
      };
 
@@ -730,7 +732,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
      };
 
      const handleFileRemove = () => {
-          setSelectedImage(null);
+          setSelectedFile(null);
      }
 
      return (
@@ -901,44 +903,44 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                    />
 
                                    {/* <Container maxWidth="md"
-                                                                                sx={{ mt: 1, borderRadius: '5px', height: '300px', border: '1px solid red' }}>
-                                                                                <Stack >
-                                                                                          <IconButton
-                                                                                                    onClick={handleResetClick}
-                                                                                                    color="primary"
-                                                                                                    aria-label="upload picture"
-                                                                                                    component="label"
-                                                                                                    display="flex"
+                                        sx={{ mt: 1, borderRadius: '5px', height: '300px', border: '1px solid red' }}>
+                                        <Stack >
+                                             <IconButton
+                                                  onClick={handleResetClick}
+                                                  color="primary"
+                                                  aria-label="upload picture"
+                                                  component="label"
+                                                  display="flex"
 
-                                                                                          >
-                                                                                                    <input hidden={true}
-                                                                                                              accept="image/*"
-                                                                                                              type="file"
-                                                                                                              onChange={({ target }) => {
-                                                                                                                        const file = target.files[0]
-                                                                                                                        setSelectedImage(URL.createObjectURL(file))
-                                                                                                                        setSelectedFile(file)
-                                                                                                              }}
-                                                                                                    />
-                                                                                                    {
-                                                                                                              selectedImage ?
-                                                                                                                        <CardActionArea
-                                                                                                                                  sx={{ border: '1px solid green', width: 'auto' }}>
-                                                                                                                                  <Image
-                                                                                                                                            src={selectedImage}
-                                                                                                                                            width={150}
-                                                                                                                                            height={200}
-                                                                                                                                            alt="LOGO" />
-                                                                                                                        </CardActionArea>
-                                                                                                                        :
-                                                                                                                        <PhotoCamera />
-                                                                                                    }
+                                             >
+                                                  <input hidden={true}
+                                                       accept="image/*"
+                                                       type="file"
+                                                       onChange={({ target }) => {
+                                                            const file = target.files[0]
+                                                            setSelectedFile(URL.createObjectURL(file))
+                                                            setSelectedFile(file)
+                                                       }}
+                                                  />
+                                                  {
+                                                       selectedFile ?
+                                                            <CardActionArea
+                                                                 sx={{ border: '1px solid green', width: 'auto' }}>
+                                                                 <Image
+                                                                      src={selectedFile}
+                                                                      width={150}
+                                                                      height={200}
+                                                                      alt="LOGO" />
+                                                            </CardActionArea>
+                                                            :
+                                                            <PhotoCamera />
+                                                  }
 
-                                                                                          </IconButton>
+                                             </IconButton>
 
-                                                                                </Stack>
+                                        </Stack>
 
-                                                                      </Container> */}
+                                   </Container> */}
                                    <Card>
                                         <CardContent>
 
@@ -949,12 +951,10 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                        alignItems: 'center',
                                                        gap: '10px'
                                                   }}
-
                                              >
-
                                                   {
-                                                       selectedImage ?
-                                                            <Image src={selectedImage}
+                                                       selectedFile ?
+                                                            <Image src={selectedFile}
                                                                  alt='sds'
                                                                  width={300}
                                                                  height={300}
@@ -995,16 +995,19 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                                  width: 1,
                                                             }}
                                                             onInput={(e) => {
-                                                                 const file = e.target.files[0]; // Get the first selected file
-                                                                 if (file) {
-                                                                      const reader = new FileReader();
-                                                                      reader.onload = (e) => {
-                                                                           setSelectedImage(e.target.result);
-                                                                           formik.setFieldValue('imageURL', e.target.result)
-                                                                      };
+                                                                 handleFileUpload(e.target.files[0])
+                                                                 // const file = e.target.files[0]; // Get the first selected file
 
-                                                                      reader.readAsDataURL(file);
-                                                                 }
+                                                                 // if (file) {
+                                                                 //      const reader = new FileReader();
+                                                                 //      reader.onload = (e) => {
+                                                                 //           setSelectedFile(e.target.result);
+                                                                 //           handleFileUpload(file)
+                                                                 //           //formik.setFieldValue('imageURL', e.target.result)
+                                                                 //      };
+
+                                                                 //      reader.readAsDataURL(file);
+                                                                 // }
                                                             }
                                                             }
                                                        />
