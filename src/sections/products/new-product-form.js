@@ -12,7 +12,7 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
 import Image from 'next/image';
 import { LoadingButton } from '@mui/lab';
-import { getSignedURL } from "../../pages/api/actions"
+
 
 const initialValues = {
      name: '',
@@ -645,59 +645,6 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
      const [subCategoryOptions, setSubCategoryOptions] = useState([]);
      const [isSubCategoryEnabled, setIsSubCategoryEnabled] = useState(false);
 
-     const computeSHA256 = async (file) => {
-          console.log(file);
-          const buffer = await file.arrayBuffer()
-          const hashBuffer = await crypto.subtle.digest("SHA-256", buffer)
-          const hashArray = Array.from(new Uint8Array(hashBuffer))
-          const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("")
-          return hashHex
-     }
-
-     const handleSubmit = async (values) => {
-
-          try {
-               const responseValues = await fetch('/api/product-api', {
-                    method: 'POST',
-                    headers: {
-                         'Content-Type': 'application/json',
-                         'Access-Control-Allow-Origin': '*',
-                         'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS' // Set the content type to JSON
-                    },
-                    body: JSON.stringify(values),
-               });
-
-               if (responseValues.ok) {
-
-                    onSubmitSuccess();
-
-                    Swal.fire({
-                         icon: 'success',
-                         title: 'Success',
-                         text: 'Product added!',
-                    })
-                    router.push('/products')
-               } else {
-                    onSubmitFail()
-                    const errorData = await response.json(); // Parse the error response
-                    console.error(errorData);
-                    Swal.fire({
-                         icon: 'error',
-                         title: 'Oops...',
-                         text: 'Something went wrong!',
-                    })
-               }
-
-          } catch (err) {
-               console.error(err);
-               Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: 'Something went wrong!',
-               })
-          }
-     }
-
      const handleMidCategoryChange = async (event) => {
           const selectedMidCategory = event.target.value;
 
@@ -710,32 +657,6 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
           setIsSubCategoryEnabled(!!selectedMidCategory);
 
      };
-
-     const handleFileUpload = async (file) => {
-          console.log(file);
-          const signedURLResult = await getSignedURL({
-               fileSize: file.size,
-               fileType: file.type,
-               checksum: await computeSHA256(file),
-          })
-          if (signedURLResult.failure !== undefined) {
-               throw new Error(signedURLResult.failure)
-          }
-          const { url } = signedURLResult.success
-          await fetch(url, {
-               method: "PUT",
-               headers: {
-                    "Content-Type": file.type,
-               },
-               body: file,
-          }).then((response) => {
-               console.log(response)
-               setLoading(false)
-          })
-
-          const fileUrl = url.split("?")[0]
-          return fileUrl
-     }
 
      const handleFileRemove = () => {
           setSelectedFile(null); // Remove the selected file
@@ -754,6 +675,8 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                setFileURL(null)
           }
      };
+
+
 
      return (
           <Box>

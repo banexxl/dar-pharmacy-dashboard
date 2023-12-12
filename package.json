@@ -27,6 +27,7 @@
     "@mui/system": "5.11.9",
     "@mui/x-date-pickers": "5.0.19",
     "@untitled-ui/icons-react": "^0.1.1",
+    "@uploadthing/react": "^6.0.2",
     "apexcharts": "3.37.0",
     "date-fns": "2.29.3",
     "formidable": "^3.5.1",
@@ -47,6 +48,7 @@
     "simplebar-react": "^3.2.1",
     "sweetalert2": "^11.7.28",
     "typescript": "^5.1.6",
+    "uploadthing": "^6.0.4",
     "yup": "^1.0.0"
   },
   "devDependencies": {
