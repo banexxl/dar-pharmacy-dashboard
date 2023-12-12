@@ -874,6 +874,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                        />
                                                   )}
                                                   <Button
+
                                                        component="label"
                                                        variant="contained"
                                                        startIcon={<AttachFileIcon />}
@@ -903,6 +904,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                   {
                                                        selectedFile ?
                                                             <LoadingButton
+
                                                                  loading={loading}
                                                                  loadingIndicator={<CircularProgress />}
                                                                  component="label"
