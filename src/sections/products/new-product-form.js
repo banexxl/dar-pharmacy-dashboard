@@ -1,3 +1,4 @@
+"use client"
 import React, { useState } from 'react';
 import { useFormik } from 'formik';
 import { TextField, Typography, Button, Checkbox, FormControlLabel, Box, Input, Card, CardContent, Grid, MenuItem, Stack, Container, IconButton, CardActionArea } from '@mui/material';
@@ -12,7 +13,9 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
 import Image from 'next/image';
 import { LoadingButton } from '@mui/lab';
-import { UploadButton } from "../../utils/image-upload-components";
+import "@uploadthing/react/styles.css";
+import { useTheme } from '@mui/material/styles';
+import { UploadButton, UploadDropzone } from "../../utils/image-upload-components";
 
 const initialValues = {
      name: '',
@@ -638,9 +641,10 @@ export const fetchSubCategoryOptions = async (selectedMidCategory) => {
 
 export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
 
+     const theme = useTheme()
      const router = useRouter();
-     const [selectedFile, setSelectedFile] = useState(null);
-     const [fileURL, setFileURL] = useState(null)
+     //const [selectedFile, setSelectedFile] = useState(null);
+     const [fileURL, setFileURL] = useState("")
      const [loading, setLoading] = useState(false)
      const [subCategoryOptions, setSubCategoryOptions] = useState([]);
      const [isSubCategoryEnabled, setIsSubCategoryEnabled] = useState(false);
@@ -659,22 +663,22 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
      };
 
      const handleFileRemove = () => {
-          setSelectedFile(null); // Remove the selected file
+          setFileURL(""); // Remove the selected file
      };
 
-     const handleFileChange = (e) => {
-          const file = e.target.files?.[0] ?? null
-          setSelectedFile(file)
-          if (fileURL) {
-               URL.revokeObjectURL(fileURL)
-          }
-          if (file) {
-               const url = URL.createObjectURL(file)
-               setFileURL(url)
-          } else {
-               setFileURL(null)
-          }
-     };
+     // const handleFileChange = (e) => {
+     //      const file = e.target.files?.[0] ?? null
+     //      setSelectedFile(file)
+     //      if (fileURL) {
+     //           URL.revokeObjectURL(fileURL)
+     //      }
+     //      if (file) {
+     //           const url = URL.createObjectURL(file)
+     //           setFileURL(url)
+     //      } else {
+     //           setFileURL(null)
+     //      }
+     // };
 
 
 
@@ -689,9 +693,9 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                     {
                          (formik) => (
                               <Form style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                                   {/* <Typography>
-                                                                                {`${ JSON.stringify(formik.errors) }`}
-                                                                      </Typography> */}
+                                   <Typography>
+                                        {`${ JSON.stringify(formik.errors) }`}
+                                   </Typography>
                                    <TextField
                                         label="Naziv"
                                         name="name"
@@ -846,8 +850,8 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                    />
 
                                    <Card>
-                                        <CardContent>
-                                             <Box
+                                        <CardContent sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+                                             {/* <Box
                                                   sx={{
                                                        display: 'flex',
                                                        flexDirection: 'column',
@@ -920,19 +924,68 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                             </LoadingButton>
                                                             : null
                                                   }
-                                             </Box>
+                                             </Box> */}
                                              <UploadButton
                                                   endpoint="imageUploader"
                                                   onClientUploadComplete={(res) => {
-                                                       // Do something with the response
-                                                       console.log("Files: ", res);
+                                                       setFileURL(res[0].url)
+                                                       formik.setFieldValue("imageURL", res[0].urll)
                                                        alert("Upload Completed");
                                                   }}
                                                   onUploadError={(error) => {
+                                                       console.log(error);
                                                        // Do something with the error.
                                                        alert(`ERROR! ${ error.message }`);
                                                   }}
+                                                  content={{
+                                                       Button({ ready }) {
+                                                            console.log(ready);
+                                                            if (ready) return <button>Upload stuff</button>;
+                                                            return "Getting ready...";
+                                                       },
+                                                       allowedContent({ ready, fileTypes }) {
+                                                            console.log(loading, ready, fileTypes);
+                                                            if (!ready) return "Checking what you allow";
+                                                            if (loading) return "Seems like stuff is uploading";
+                                                            return `Stuff you can upload: ${ fileTypes.join(", ") }`;
+                                                       },
+                                                  }}
+                                                  appearance={{
+                                                       Button({ ready }) {
+                                                            return {
+                                                                 fontSize: "1.6rem",
+                                                                 backgroundColor: theme.palette.primary.main,
+                                                                 color: "black",
+                                                                 ...(ready && { color: theme.palette.primary.main, }),
+                                                                 ...(loading && { color: theme.palette.primary.main, }),
+                                                                 borderRadius: "10px",
+                                                                 cursor: 'pointer'
+                                                            };
+                                                       },
+                                                       allowedContent: {
+                                                            color: theme.palette.primary.secondary,
+                                                       },
+                                                  }}
+
                                              />
+                                             {fileURL.length ? (
+                                                  <Image
+                                                       src={fileURL}
+                                                       alt='Uploaded Image'
+                                                       width={300}
+                                                       height={300}
+                                                       style={{
+                                                            borderRadius: '10px',
+                                                            cursor: 'pointer'
+                                                       }}
+                                                       onClick={handleFileRemove}
+                                                  />
+                                             ) : (
+                                                  <InsertPhotoIcon
+                                                       color='primary'
+                                                       sx={{ width: '300px', height: '300px' }}
+                                                  />
+                                             )}
                                         </CardContent>
                                    </Card>
                                    <TextField
