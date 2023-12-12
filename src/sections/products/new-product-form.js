@@ -12,7 +12,7 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
 import Image from 'next/image';
 import { LoadingButton } from '@mui/lab';
-import { status } from 'nprogress';
+import { getSignedURL } from "../../pages/api/actions"
 
 const initialValues = {
      name: '',
@@ -642,9 +642,17 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
      const [selectedFile, setSelectedFile] = useState(null);
      const [fileURL, setFileURL] = useState(null)
      const [loading, setLoading] = useState(false)
-     const formData = new FormData();
      const [subCategoryOptions, setSubCategoryOptions] = useState([]);
      const [isSubCategoryEnabled, setIsSubCategoryEnabled] = useState(false);
+
+     const computeSHA256 = async (file) => {
+          console.log(file);
+          const buffer = await file.arrayBuffer()
+          const hashBuffer = await crypto.subtle.digest("SHA-256", buffer)
+          const hashArray = Array.from(new Uint8Array(hashBuffer))
+          const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("")
+          return hashHex
+     }
 
      const handleSubmit = async (values) => {
 
@@ -703,33 +711,49 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
 
      };
 
-     const handleFileUpload = async (e) => {
-          e.preventDefault()
-          setLoading(true)
-
-          setTimeout(function () {
+     const handleFileUpload = async (file) => {
+          console.log(file);
+          const signedURLResult = await getSignedURL({
+               fileSize: file.size,
+               fileType: file.type,
+               checksum: await computeSHA256(file),
+          })
+          if (signedURLResult.failure !== undefined) {
+               throw new Error(signedURLResult.failure)
+          }
+          const { url } = signedURLResult.success
+          await fetch(url, {
+               method: "PUT",
+               headers: {
+                    "Content-Type": file.type,
+               },
+               body: file,
+          }).then((response) => {
+               console.log(response)
                setLoading(false)
-          }, 2000);
-     };
+          })
+
+          const fileUrl = url.split("?")[0]
+          return fileUrl
+     }
 
      const handleFileRemove = () => {
           setSelectedFile(null); // Remove the selected file
      };
 
      const handleFileChange = (e) => {
-          const file = e.target.files[0]
-          setSelectedFile(file);
-
+          const file = e.target.files?.[0] ?? null
+          setSelectedFile(file)
           if (fileURL) {
-               const url = URL.revokeObjectURL(fileURL)
+               URL.revokeObjectURL(fileURL)
           }
-
           if (file) {
                const url = URL.createObjectURL(file)
                setFileURL(url)
+          } else {
+               setFileURL(null)
           }
      };
-
 
      return (
           <Box>
@@ -950,8 +974,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                                  whiteSpace: 'nowrap',
                                                                  width: 1,
                                                             }}
-                                                            onChange={handleFileChange
-                                                            }
+                                                            onChange={handleFileChange}
                                                        />
                                                   </Button>
                                                   {
@@ -966,7 +989,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                                       width: '250px',
                                                                       height: '60px'
                                                                  }}
-                                                                 onClick={handleFileUpload}
+                                                                 onClick={() => handleFileUpload(selectedFile)}
                                                             >
                                                                  Upload slike
                                                             </LoadingButton>
