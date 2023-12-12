@@ -737,9 +737,9 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                     {
                          (formik) => (
                               <Form style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                                   <Typography>
+                                   {/* <Typography>
                                         {`${ JSON.stringify(formik.errors) }`}
-                                   </Typography>
+                                   </Typography> */}
                                    <TextField
                                         label="Naziv"
                                         name="name"
@@ -974,24 +974,29 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                   onClientUploadComplete={(res) => {
                                                        setFileURL(res[0].url)
                                                        formik.setFieldValue("imageURL", res[0].url)
-                                                       alert("Upload Completed");
+                                                       Swal.fire({
+                                                            icon: 'success',
+                                                            title: 'Jeeej',
+                                                            text: 'Slika je uspešno poslata na server!',
+                                                       })
                                                   }}
                                                   onUploadError={(error) => {
+                                                       Swal.fire({
+                                                            icon: 'success',
+                                                            title: 'Noooo',
+                                                            text: 'Nešto je pošlo po zlu :(',
+                                                       })
                                                        console.log(error);
-                                                       // Do something with the error.
-                                                       alert(`ERROR! ${ error.message }`);
                                                   }}
                                                   content={{
                                                        Button({ ready }) {
-                                                            console.log(ready);
-                                                            if (ready) return <button>Upload stuff</button>;
+                                                            if (ready) return <Button sx={{ color: theme.palette.divider }}>Pronadji sliku...</Button>;
                                                             return "Getting ready...";
                                                        },
                                                        allowedContent({ ready, fileTypes }) {
-                                                            console.log(loading, ready, fileTypes);
                                                             if (!ready) return "Checking what you allow";
                                                             if (loading) return "Seems like stuff is uploading";
-                                                            return `Stuff you can upload: ${ fileTypes.join(", ") }`;
+                                                            return `Tip datoteke: ${ fileTypes.join(", ") }`;
                                                        },
                                                   }}
                                                   appearance={{
@@ -1007,10 +1012,9 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                             };
                                                        },
                                                        allowedContent: {
-                                                            color: theme.palette.primary.secondary,
+                                                            color: theme.palette.primary,
                                                        },
                                                   }}
-
                                              />
                                              {fileURL.length ? (
                                                   <Image

@@ -14,6 +14,8 @@ import { SeverityPill } from '@/components/severity-pill';
 import { fetchSubCategoryOptions, mainCategoryOptions, manufacturerOptions, midCategoryOptions } from './new-product-form';
 import Swal from 'sweetalert2';
 import { useRouter } from 'next/navigation';
+import "@uploadthing/react/styles.css";
+import { UploadButton } from "../../utils/image-upload-components";
 
 export interface IProduct {
      bestSeller: boolean;
@@ -40,6 +42,9 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
      const [currentProductID, setCurrentProductID] = useState(null);
      const [currentProductObject, setCurrentProductObject] = useState<IProduct | null>();
      const router = useRouter();
+     const theme = useTheme()
+     const [fileURL, setFileURL] = useState("")
+     const [loading, setLoading] = useState(false)
      const [subCategoryOptions, setSubCategoryOptions] = useState<any>([]);
      const [isSubCategoryEnabled, setIsSubCategoryEnabled] = useState(false);
      const [selectedMidCategory, setSelectedMidCategory] = useState('');
@@ -66,7 +71,10 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
      }
 
      const handleFileRemove = () => {
-          setSelectedImage(null);
+          setCurrentProductObject((previousObject: any) => ({
+               ...previousObject,
+               imageURL: ""
+          }))
      }
 
      const handleProductClose = () => {
@@ -767,7 +775,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                     gap: '10px'
                                                                                                }}
                                                                                           >
-                                                                                               {
+                                                                                               {/* {
                                                                                                     currentProductObject?.imageURL ?
                                                                                                          <Image src={currentProductObject.imageURL}
                                                                                                               alt='sds'
@@ -827,7 +835,76 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                          }
                                                                                                          }
                                                                                                     />
-                                                                                               </Button>
+                                                                                               </Button> */}
+
+                                                                                               <UploadButton
+                                                                                                    endpoint="imageUploader"
+                                                                                                    onClientUploadComplete={(res) => {
+                                                                                                         setFileURL(res[0].url)
+                                                                                                         setCurrentProductObject((previousObject: any) => ({
+                                                                                                              ...previousObject,
+                                                                                                              imgURL: res[0].url
+                                                                                                         }))
+                                                                                                         Swal.fire({
+                                                                                                              icon: 'success',
+                                                                                                              title: 'Jeeej',
+                                                                                                              text: 'Slika je uspešno poslata na server!',
+                                                                                                         })
+                                                                                                    }}
+                                                                                                    onUploadError={(error) => {
+                                                                                                         Swal.fire({
+                                                                                                              icon: 'success',
+                                                                                                              title: 'Noooo',
+                                                                                                              text: 'Nešto je pošlo po zlu :(',
+                                                                                                         })
+                                                                                                         console.log(error);
+                                                                                                    }}
+                                                                                                    content={{
+                                                                                                         button({ ready }: any) {
+                                                                                                              if (ready) return <Button sx={{ color: theme.palette.divider }}>Pronadji sliku...</Button>;
+                                                                                                              return "Getting ready...";
+                                                                                                         },
+                                                                                                         allowedContent({ ready, fileTypes }) {
+                                                                                                              if (!ready) return "Checking what you allow";
+                                                                                                              if (loading) return "Seems like stuff is uploading";
+                                                                                                              return `Tip datoteke: ${fileTypes.join(", ")}`;
+                                                                                                         },
+                                                                                                    }}
+                                                                                                    appearance={{
+                                                                                                         button({ ready }: any) {
+                                                                                                              return {
+                                                                                                                   fontSize: "1.6rem",
+                                                                                                                   backgroundColor: theme.palette.primary.main,
+                                                                                                                   color: "black",
+                                                                                                                   ...(ready && { color: theme.palette.primary.main, }),
+                                                                                                                   ...(loading && { color: theme.palette.primary.main, }),
+                                                                                                                   borderRadius: "10px",
+                                                                                                                   cursor: 'pointer'
+                                                                                                              };
+                                                                                                         },
+                                                                                                         allowedContent: {
+                                                                                                              color: theme.palette.primary.main,
+                                                                                                         },
+                                                                                                    }}
+                                                                                               />
+                                                                                               {currentProductObject?.imageURL.length ? (
+                                                                                                    <Image
+                                                                                                         src={currentProductObject!.imageURL}
+                                                                                                         alt='Uploaded Image'
+                                                                                                         width={300}
+                                                                                                         height={300}
+                                                                                                         style={{
+                                                                                                              borderRadius: '10px',
+                                                                                                              cursor: 'pointer'
+                                                                                                         }}
+                                                                                                         onClick={handleFileRemove}
+                                                                                                    />
+                                                                                               ) : (
+                                                                                                    <InsertPhotoIcon
+                                                                                                         color='primary'
+                                                                                                         sx={{ width: '300px', height: '300px' }}
+                                                                                                    />
+                                                                                               )}
 
                                                                                           </Box>
                                                                                      </CardContent>
