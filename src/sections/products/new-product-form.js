@@ -12,7 +12,7 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
 import Image from 'next/image';
 import { LoadingButton } from '@mui/lab';
-
+import { UploadButton } from "../../utils/image-upload-components";
 
 const initialValues = {
      name: '',
@@ -919,6 +919,18 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                             : null
                                                   }
                                              </Box>
+                                             <UploadButton
+                                                  endpoint="imageUploader"
+                                                  onClientUploadComplete={(res) => {
+                                                       // Do something with the response
+                                                       console.log("Files: ", res);
+                                                       alert("Upload Completed");
+                                                  }}
+                                                  onUploadError={(error) => {
+                                                       // Do something with the error.
+                                                       alert(`ERROR! ${ error.message }`);
+                                                  }}
+                                             />
                                         </CardContent>
                                    </Card>
                                    <TextField
