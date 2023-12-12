@@ -666,6 +666,50 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
           setFileURL(""); // Remove the selected file
      };
 
+     const handleSubmit = async (values) => {
+
+          try {
+               const responseValues = await fetch('/api/product-api', {
+                    method: 'POST',
+                    headers: {
+                         'Content-Type': 'application/json',
+                         'Access-Control-Allow-Origin': '*',
+                         'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS' // Set the content type to JSON
+                    },
+                    body: JSON.stringify(values),
+               });
+
+               if (responseValues.ok) {
+
+                    onSubmitSuccess();
+
+                    Swal.fire({
+                         icon: 'success',
+                         title: 'Jeeej',
+                         text: 'Artikl ubačen uspešno',
+                    })
+                    router.push('/products')
+               } else {
+                    onSubmitFail()
+                    const errorData = await response.json(); // Parse the error response
+                    console.error(errorData);
+                    Swal.fire({
+                         icon: 'error',
+                         title: 'Oops...',
+                         text: 'Nešto ne valja :(',
+                    })
+               }
+
+          } catch (err) {
+               console.error(err);
+               Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Nešto ne valja :(',
+               })
+          }
+     }
+
      // const handleFileChange = (e) => {
      //      const file = e.target.files?.[0] ?? null
      //      setSelectedFile(file)
@@ -929,7 +973,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                   endpoint="imageUploader"
                                                   onClientUploadComplete={(res) => {
                                                        setFileURL(res[0].url)
-                                                       formik.setFieldValue("imageURL", res[0].urll)
+                                                       formik.setFieldValue("imageURL", res[0].url)
                                                        alert("Upload Completed");
                                                   }}
                                                   onUploadError={(error) => {
