@@ -119,7 +119,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                          title: 'Sve OK!',
                          text: 'Artikl izmenjen :)',
                     })
-                    router.push('/products/?page=3&limit=25')
+                    router.refresh()
                } else {
                     const errorData = await response.json(); // Parse the error response
                }
@@ -393,6 +393,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                          fullWidth
                                                                                                          label="Naziv"
                                                                                                          name="name"
+                                                                                                         disabled={loading}
                                                                                                          onBlur={(e: any) =>
                                                                                                               setCurrentProductObject((previousObject: any) => ({
                                                                                                                    ...previousObject,
@@ -425,11 +426,11 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                          fullWidth
                                                                                                          label="Glavna Kategorija"
                                                                                                          select
+                                                                                                         disabled={loading}
                                                                                                          onBlur={(e: any) =>
                                                                                                               setCurrentProductObject((previousObject: any) => ({
                                                                                                                    ...previousObject,
                                                                                                                    mainCategory: e.target.value
-
                                                                                                               }))
                                                                                                          }
                                                                                                     >
@@ -453,6 +454,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                          fullWidth
                                                                                                          label="Mid Kategorija"
                                                                                                          select
+                                                                                                         disabled={loading}
                                                                                                          onChange={(e) => handleMidCategoryChange(e)}
                                                                                                          onBlur={(e: any) =>
                                                                                                               setCurrentProductObject((previousObject: any) => ({
@@ -482,7 +484,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                          fullWidth
                                                                                                          label="Sub Kategorija"
                                                                                                          select
-                                                                                                         disabled={!isSubCategoryEnabled}
+                                                                                                         disabled={!isSubCategoryEnabled || loading}
                                                                                                          onBlur={(e: any) =>
                                                                                                               setCurrentProductObject((previousObject: any) => ({
                                                                                                                    ...previousObject,
@@ -510,6 +512,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                          defaultValue={product.quantity}
                                                                                                          fullWidth
                                                                                                          label="Kolicina"
+                                                                                                         disabled={loading}
                                                                                                          name={product.quantity}
                                                                                                          onBlur={(e: any) =>
                                                                                                               setCurrentProductObject((previousObject: any) => ({
@@ -529,6 +532,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                          defaultValue={product.description}
                                                                                                          fullWidth
                                                                                                          label="Opis"
+                                                                                                         disabled={loading}
                                                                                                          name={product.description}
                                                                                                          onBlur={(e: any) =>
                                                                                                               setCurrentProductObject((previousObject: any) => ({
@@ -548,6 +552,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                          defaultValue={product.instructions}
                                                                                                          fullWidth
                                                                                                          label="Instrukcije"
+                                                                                                         disabled={loading}
                                                                                                          name={product.instructions}
                                                                                                          onBlur={(e: any) =>
                                                                                                               setCurrentProductObject((previousObject: any) => ({
@@ -567,6 +572,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                          defaultValue={product.warning}
                                                                                                          fullWidth
                                                                                                          label="Upozorenje"
+                                                                                                         disabled={loading}
                                                                                                          name={product.warning}
                                                                                                          onBlur={(e: any) =>
                                                                                                               setCurrentProductObject((previousObject: any) => ({
@@ -585,6 +591,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                     <TextField key={product.id}
                                                                                                          defaultValue={product.ingredients}
                                                                                                          fullWidth
+                                                                                                         disabled={loading}
                                                                                                          label="Ingredients"
                                                                                                          name={product.ingredients}
                                                                                                          onBlur={(e: any) =>
@@ -617,6 +624,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                     <TextField key={product.id}
                                                                                                          defaultValue={product.price}
                                                                                                          fullWidth
+                                                                                                         disabled={loading}
                                                                                                          label="Nova cena"
                                                                                                          name="price"
                                                                                                          onBlur={(e: any) =>
@@ -643,6 +651,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                          fullWidth
                                                                                                          label="Proizvodjac"
                                                                                                          name="manufacturer"
+                                                                                                         disabled={loading}
                                                                                                          onBlur={(e: any) =>
                                                                                                               setCurrentProductObject((previousObject: any) => ({
                                                                                                                    ...previousObject,
@@ -651,7 +660,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                               }))
                                                                                                          }
                                                                                                          select
-                                                                                                         defaultValue={product.manufacturer}
+                                                                                                         value={product.manufacturer}
                                                                                                     >
                                                                                                          {manufacturerOptions.map((option) => (
                                                                                                               <MenuItem
@@ -672,6 +681,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                     <TextField key={product.id}
                                                                                                          defaultValue={product.availableStock}
                                                                                                          fullWidth
+                                                                                                         disabled={loading}
                                                                                                          label="Na stanju"
                                                                                                          name="availableStock"
                                                                                                          onBlur={(e: any) =>
@@ -692,6 +702,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                     <TextField key={product.id}
                                                                                                          defaultValue={product.discountAmount}
                                                                                                          fullWidth
+                                                                                                         disabled={loading}
                                                                                                          label="Iznos popusta"
                                                                                                          name="discountAmount"
                                                                                                          onBlur={(e: any) =>
@@ -713,7 +724,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                          display: 'flex',
                                                                                                     }}
                                                                                                >
-                                                                                                    <Switch key={product.id} checked={currentProductObject!.newArrival}
+                                                                                                    <Switch key={product.id} disabled={loading} checked={currentProductObject!.newArrival}
                                                                                                          onChange={() => setCurrentProductObject((previousObject: any) => ({
                                                                                                               ...previousObject,
                                                                                                               newArrival: !previousObject.newArrival
@@ -732,7 +743,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                          display: 'flex',
                                                                                                     }}
                                                                                                >
-                                                                                                    <Switch key={product.id}
+                                                                                                    <Switch key={product.id} disabled={loading}
                                                                                                          checked={currentProductObject!.bestSeller}
                                                                                                          onChange={() => setCurrentProductObject((previousObject: any) => ({
                                                                                                               ...previousObject,
@@ -753,7 +764,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                          display: 'flex',
                                                                                                     }}
                                                                                                >
-                                                                                                    <Switch key={product.id} checked={currentProductObject!.discount}
+                                                                                                    <Switch key={product.id} disabled={loading} checked={currentProductObject!.discount}
                                                                                                          onChange={() => setCurrentProductObject((previousObject: any) => ({
                                                                                                               ...previousObject,
                                                                                                               discount: !previousObject.discount
@@ -858,13 +869,13 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                          Swal.fire({
                                                                                                               icon: 'success',
                                                                                                               title: 'Noooo',
-                                                                                                              text: 'Nešto je pošlo po zlu :(',
+                                                                                                              text: 'Nešto je pošlo po zlu! Proveri format fajla koji upload-uješ!',
                                                                                                          })
                                                                                                          console.log(error);
                                                                                                     }}
                                                                                                     content={{
-                                                                                                         Button({ ready }: any) {
-                                                                                                              if (ready) return <Button sx={{ color: theme.palette.divider }}>Pronadji sliku...</Button>;
+                                                                                                         button({ ready }: any) {
+                                                                                                              if (ready) return <Typography sx={{ color: theme.palette.divider }}>Pronadji sliku...</Typography>;
                                                                                                               return "Getting ready...";
                                                                                                          },
                                                                                                          allowedContent({ ready, fileTypes }) {
@@ -874,7 +885,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                          },
                                                                                                     }}
                                                                                                     appearance={{
-                                                                                                         Button({ ready }: any) {
+                                                                                                         button({ ready }: any) {
                                                                                                               return {
                                                                                                                    fontSize: "1.6rem",
                                                                                                                    backgroundColor: theme.palette.primary.main,
