@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import { createUploadthing, type FileRouter } from "uploadthing/next-legacy";
+import { UTApi } from "uploadthing/server";
 
 const f = createUploadthing();
 
@@ -31,5 +32,18 @@ export const ourFileRouter = {
                return { uploadedBy: metadata.userId };
           }),
 } satisfies FileRouter;
+
+
+export async function DELETE(request: Request) {
+     console.log('usao u delete ', request);
+
+     console.log(request);
+
+     const newUrl = request.url.substring(request.url.lastIndexOf("/") + 1);
+     const utapi = new UTApi()
+     await utapi.deleteFiles(newUrl);
+
+     return Response.json({ message: "ok" });
+}
 
 export type OurFileRouter = typeof ourFileRouter;

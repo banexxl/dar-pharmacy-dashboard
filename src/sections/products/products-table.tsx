@@ -16,6 +16,7 @@ import Swal from 'sweetalert2';
 import { useRouter } from 'next/navigation';
 import "@uploadthing/react/styles.css";
 import { UploadButton } from "../../utils/image-upload-components";
+import { DELETE } from '@/server/uploadthing';
 
 export interface IProduct {
      bestSeller: boolean;
@@ -161,8 +162,14 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
 
      const handleDeleteProduct = async (currentProductID: any) => {
 
+          const currentProductObject = getObjectById(currentProductID, items)
+
           try {
-               //API CALL
+
+               DELETE(currentProductObject.imageURL)
+
+
+
                const response = await fetch('/api/product-api', {
                     method: 'DELETE',
                     headers: {
@@ -171,7 +178,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS' // Set the content type to JSON
                     },
                     body: JSON.stringify(currentProductID), // Convert your data to JSON
-               });
+               })
 
                if (response.ok) {
                     Swal.fire({
@@ -179,7 +186,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                          title: 'Sve OK!',
                          text: 'Artikl obrisan!',
                     })
-                    router.push('/products')
+                    router.refresh()
                } else {
                     const errorData = await response.json(); // Parse the error response
                }

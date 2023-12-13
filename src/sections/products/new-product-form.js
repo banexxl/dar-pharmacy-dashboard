@@ -678,7 +678,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                     },
                     body: JSON.stringify(values),
                });
-
+               console.log(responseValues);
                if (responseValues.ok) {
 
                     onSubmitSuccess();
@@ -688,7 +688,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                          title: 'Jeeej',
                          text: 'Artikl ubačen uspešno',
                     })
-                    router.push('/products')
+                    router.reload()
                } else {
                     onSubmitFail()
                     const errorData = await response.json(); // Parse the error response
@@ -736,14 +736,15 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                     validationSchema={newProductSchema()}>
                     {
                          (formik) => (
-                              <Form style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                                   {/* <Typography>
+                              <Form style={{ display: 'flex', flexDirection: 'column', gap: '15px', opacity: loading ? .5 : 1, }}>
+                                   <Typography>
                                         {`${ JSON.stringify(formik.errors) }`}
-                                   </Typography> */}
+                                   </Typography>
                                    <TextField
                                         label="Naziv"
                                         name="name"
                                         value={formik.values.name}
+                                        disabled={loading}
                                         onChange={formik.handleChange}
                                         error={formik.touched.name && !!formik.errors.name}
                                         helperText={formik.touched.name && formik.errors.name}
@@ -752,6 +753,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                         label="Opis"
                                         name="description"
                                         multiline
+                                        disabled={loading}
                                         rows={4}
                                         value={formik.values.description}
                                         onChange={formik.handleChange}
@@ -764,6 +766,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                         label="Glavna kategorija"
                                         name="mainCategory"
                                         onBlur={formik.handleBlur}
+                                        disabled={loading}
                                         onChange={formik.handleChange}
                                         select
                                         error={formik.touched.mainCategory && !!formik.errors.mainCategory}
@@ -785,6 +788,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                         label="Mid kategorija"
                                         name="midCategory"
                                         onBlur={formik.handleBlur}
+                                        disabled={loading}
                                         onChange={(event) => {
                                              formik.handleChange(event); // Update formik values
                                              handleMidCategoryChange(event); // Call custom function to handle midCategory change
@@ -811,7 +815,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                         error={formik.touched.subCategory && !!formik.errors.subCategory}
                                         helperText={formik.touched.subCategory && formik.errors.subCategory}
                                         value={formik.values.subCategory}
-                                        disabled={!isSubCategoryEnabled}
+                                        disabled={!isSubCategoryEnabled || loading}
                                    >
                                         {subCategoryOptions ?
                                              subCategoryOptions.map((option) =>
@@ -831,6 +835,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                         label="Na stanju komada"
                                         name="availableStock"
                                         value={formik.values.availableStock}
+                                        disabled={loading}
                                         onChange={formik.handleChange}
                                         error={formik.touched.availableStock && !!formik.errors.availableStock}
                                         helperText={formik.touched.availableStock && formik.errors.availableStock}
@@ -841,6 +846,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                         name="ingredients"
                                         value={formik.values.ingredients}
                                         onChange={formik.handleChange}
+                                        disabled={loading}
                                         error={formik.touched.ingredients && !!formik.errors.ingredients}
                                         helperText={formik.touched.ingredients && formik.errors.ingredients}
                                    />
@@ -848,6 +854,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                    <TextField
                                         label="Instrukcije"
                                         name="instructions"
+                                        disabled={loading}
                                         value={formik.values.instructions}
                                         onChange={formik.handleChange}
                                         error={formik.touched.instructions && !!formik.errors.instructions}
@@ -857,6 +864,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                    <TextField
                                         label="Kolicina"
                                         name="quantity"
+                                        disabled={loading}
                                         value={formik.values.quantity}
                                         onChange={formik.handleChange}
                                         error={formik.touched.quantity && !!formik.errors.quantity}
@@ -865,6 +873,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
 
                                    <TextField
                                         fullWidth
+                                        disabled={loading}
                                         label="Proizvodjac"
                                         name="manufacturer"
                                         onBlur={formik.handleBlur}
@@ -887,6 +896,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                    <TextField
                                         label="Upozorenje"
                                         name="warning"
+                                        disabled={loading}
                                         value={formik.values.warning}
                                         onChange={formik.handleChange}
                                         error={formik.touched.warning && !!formik.errors.warning}
@@ -894,7 +904,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                    />
 
                                    <Card>
-                                        <CardContent sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+                                        <CardContent disabled={loading} sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
                                              {/* <Box
                                                   sx={{
                                                        display: 'flex',
@@ -970,14 +980,17 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                              </Box> */}
                                              <UploadButton
                                                   endpoint="imageUploader"
+                                                  onUploadBegin={() => setLoading(true)}
                                                   onClientUploadComplete={(res) => {
                                                        setFileURL(res[0].url)
                                                        formik.setFieldValue("imageURL", res[0].url)
-                                                       Swal.fire({
-                                                            icon: 'success',
-                                                            title: 'Jeeej',
-                                                            text: 'Slika je uspešno poslata na server!',
-                                                       })
+                                                       alert('Slika je uspešno poslata na server!')
+                                                       // Swal.fire({
+                                                       //      icon: 'success',
+                                                       //      title: 'Jeeej',
+                                                       //      text: 'Slika je uspešno poslata na server!',
+                                                       // })
+                                                       setLoading(false)
                                                   }}
                                                   onUploadError={(error) => {
                                                        Swal.fire({
@@ -1052,6 +1065,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                   onChange={formik.handleChange}
                                              />
                                         }
+                                        disabled={loading}
                                         label="Novi proizvod"
                                    />
 
@@ -1063,6 +1077,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                   onChange={formik.handleChange}
                                              />
                                         }
+                                        disabled={loading}
                                         label="Najprodavaniji"
                                    />
 
@@ -1074,6 +1089,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                   onChange={formik.handleChange}
                                              />
                                         }
+                                        disabled={loading}
                                         label="Popust"
                                    />
 
@@ -1082,6 +1098,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                         name="discountAmount"
                                         value={formik.values.discountAmount}
                                         onChange={formik.handleChange}
+                                        disabled={loading}
                                    />
 
                                    <Box sx={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
@@ -1089,13 +1106,14 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                              variant="contained"
                                              color="primary"
                                              onClick={() => onSubmitFail()}
+                                             disabled={loading}
                                         >
                                              Odustani
                                         </Button>
                                         <Button type="submit"
                                              variant="contained"
                                              color="primary"
-                                             disabled={Object.keys(formik.errors).length != 0}
+                                             disabled={Object.keys(formik.errors).length != 0 && loading}
                                         >
                                              Dodaj proizvod
                                         </Button>
