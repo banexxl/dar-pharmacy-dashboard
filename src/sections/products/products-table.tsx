@@ -83,13 +83,14 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
 
      const handleProductUpdateClick = () => {
           Swal.fire({
-               title: 'Are you sure?',
-               text: "You can edit this product at any time!",
+               title: 'Da li ste sigurni?',
+               text: "Možete izmeniti artikl u svakom momentu...",
                icon: 'warning',
                showCancelButton: true,
                confirmButtonColor: '#3085d6',
                cancelButtonColor: '#d33',
-               confirmButtonText: 'Yes, update it!'
+               confirmButtonText: 'Da, izmeni!',
+               cancelButtonText: 'Odustani!'
           }).then((result) => {
                if (result.isConfirmed) {
                     handleUpdateProduct(currentProductObject)
@@ -115,10 +116,10 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                     setCurrentProductObject(null)
                     Swal.fire({
                          icon: 'success',
-                         title: 'Success',
-                         text: 'Product updated!',
+                         title: 'Sve OK!',
+                         text: 'Artikl izmenjen :)',
                     })
-                    router.push('/products/?page=0&limit=10')
+                    router.push('/products/?page=3&limit=25')
                } else {
                     const errorData = await response.json(); // Parse the error response
                }
@@ -175,8 +176,8 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                if (response.ok) {
                     Swal.fire({
                          icon: 'success',
-                         title: 'Success',
-                         text: 'Product deleted!',
+                         title: 'Sve OK!',
+                         text: 'Artikl obrisan!',
                     })
                     router.push('/products')
                } else {
@@ -839,16 +840,18 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
 
                                                                                                <UploadButton
                                                                                                     endpoint="imageUploader"
+                                                                                                    onUploadProgress={() => setLoading(true)}
                                                                                                     onClientUploadComplete={(res) => {
                                                                                                          setFileURL(res[0].url)
+                                                                                                         setLoading(false)
                                                                                                          setCurrentProductObject((previousObject: any) => ({
                                                                                                               ...previousObject,
-                                                                                                              imgURL: res[0].url
+                                                                                                              imageURL: res[0].url
                                                                                                          }))
                                                                                                          Swal.fire({
                                                                                                               icon: 'success',
                                                                                                               title: 'Jeeej',
-                                                                                                              text: 'Slika je uspešno poslata na server!',
+                                                                                                              text: 'Slika je uspešno sačuvana! Nastavi sa izmenama i sačuvaj proizvod...',
                                                                                                          })
                                                                                                     }}
                                                                                                     onUploadError={(error) => {
@@ -860,18 +863,18 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                          console.log(error);
                                                                                                     }}
                                                                                                     content={{
-                                                                                                         button({ ready }: any) {
+                                                                                                         Button({ ready }: any) {
                                                                                                               if (ready) return <Button sx={{ color: theme.palette.divider }}>Pronadji sliku...</Button>;
                                                                                                               return "Getting ready...";
                                                                                                          },
                                                                                                          allowedContent({ ready, fileTypes }) {
                                                                                                               if (!ready) return "Checking what you allow";
-                                                                                                              if (loading) return "Seems like stuff is uploading";
+                                                                                                              if (loading) return "Upload slike u toku!";
                                                                                                               return `Tip datoteke: ${fileTypes.join(", ")}`;
                                                                                                          },
                                                                                                     }}
                                                                                                     appearance={{
-                                                                                                         button({ ready }: any) {
+                                                                                                         Button({ ready }: any) {
                                                                                                               return {
                                                                                                                    fontSize: "1.6rem",
                                                                                                                    backgroundColor: theme.palette.primary.main,
@@ -889,6 +892,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                />
                                                                                                {currentProductObject?.imageURL.length ? (
                                                                                                     <Image
+
                                                                                                          src={currentProductObject!.imageURL}
                                                                                                          alt='Uploaded Image'
                                                                                                          width={300}
@@ -926,12 +930,14 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                           onClick={handleProductUpdateClick}
                                                                                           type="submit"
                                                                                           variant="contained"
+                                                                                          disabled={loading}
                                                                                      >
                                                                                           Izmeni
                                                                                      </Button>
                                                                                      <Button key={product.id}
                                                                                           color="inherit"
                                                                                           onClick={handleProductClose}
+                                                                                          disabled={loading}
                                                                                      >
                                                                                           Odustani
                                                                                      </Button>
@@ -940,6 +946,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                      <Button key={product.id}
                                                                                           onClick={handleDeleteButtonClick}
                                                                                           color="error"
+                                                                                          disabled={loading}
                                                                                      >
                                                                                           Obrisi proizvod
                                                                                      </Button>

@@ -922,7 +922,6 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                        />
                                                   )}
                                                   <Button
-
                                                        component="label"
                                                        variant="contained"
                                                        startIcon={<AttachFileIcon />}
