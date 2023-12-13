@@ -16,7 +16,6 @@ import Swal from 'sweetalert2';
 import { useRouter } from 'next/navigation';
 import "@uploadthing/react/styles.css";
 import { UploadButton } from "../../utils/image-upload-components";
-import { DELETE } from '@/server/uploadthing';
 
 export interface IProduct {
      bestSeller: boolean;
@@ -166,10 +165,6 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
 
           try {
 
-               DELETE(currentProductObject.imageURL)
-
-
-
                const response = await fetch('/api/product-api', {
                     method: 'DELETE',
                     headers: {
@@ -177,7 +172,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                          'Access-Control-Allow-Origin': 'https://dar-pharmacy-dashboard.vercel.app/api/product-api, http://localhost:3000/api/product-api',
                          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS' // Set the content type to JSON
                     },
-                    body: JSON.stringify(currentProductID), // Convert your data to JSON
+                    body: JSON.stringify({ currentProductID: currentProductID, imageID: currentProductObject.imageURL }), // Convert your data to JSON
                })
 
                if (response.ok) {

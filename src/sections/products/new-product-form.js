@@ -688,7 +688,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                          title: 'Jeeej',
                          text: 'Artikl ubačen uspešno',
                     })
-                    router.reload()
+                    router.refresh()
                } else {
                     onSubmitFail()
                     const errorData = await response.json(); // Parse the error response
@@ -737,9 +737,9 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                     {
                          (formik) => (
                               <Form style={{ display: 'flex', flexDirection: 'column', gap: '15px', opacity: loading ? .5 : 1, }}>
-                                   <Typography>
+                                   {/* <Typography>
                                         {`${ JSON.stringify(formik.errors) }`}
-                                   </Typography>
+                                   </Typography> */}
                                    <TextField
                                         label="Naziv"
                                         name="name"

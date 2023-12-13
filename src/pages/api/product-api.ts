@@ -1,5 +1,6 @@
 import { MongoClient, ObjectId } from 'mongodb'
 import type { NextApiRequest, NextApiResponse } from 'next/types'
+import { UTApi } from 'uploadthing/server';
 
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
 
@@ -19,9 +20,14 @@ export default async function handler(request: NextApiRequest, response: NextApi
           }
           else if (request.method === 'DELETE') {
                //const idsToDelete = request.body.selected.map((_id: any) => new ObjectId(_id))
+               console.log(request.body);
 
                try {
-                    await dbProducts.deleteOne({ _id: new ObjectId(request.body) })
+                    const newUrl = request.body.imageID.substring(request.body.imageID.lastIndexOf("/") + 1);
+                    const utapi = new UTApi()
+                    await utapi.deleteFiles(newUrl);
+
+                    await dbProducts.deleteOne({ _id: new ObjectId(request.body.currentProductID) })
                     return response.status(200).json({ message: 'Product successfully deleted!' });
                } catch (error) {
                     alert(error);
