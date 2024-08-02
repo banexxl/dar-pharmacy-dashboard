@@ -15,7 +15,7 @@ import Image from 'next/image';
 import { LoadingButton } from '@mui/lab';
 import "@uploadthing/react/styles.css";
 import { useTheme } from '@mui/material/styles';
-import { UploadButton, UploadDropzone } from "../../utils/image-upload-components";
+import { UploadButton } from "../../utils/image-upload-components";
 
 const initialValues = {
      name: '',
@@ -28,6 +28,7 @@ const initialValues = {
      instructions: '',
      quantity: '',
      manufacturer: '',
+     manufacturerURL: '',
      warning: '',
      imageURL: '',
      price: '',
@@ -219,7 +220,7 @@ export const midCategoryOptions = [
 
 export const manufacturerOptions = [
      {
-          label: 'ALPENKRAUTER',
+          label: 'Alpenkrauter',
           value: 'alpenkrauter',
      },
      {
@@ -355,7 +356,7 @@ export const manufacturerOptions = [
           value: 'moj-caj',
      },
      {
-          label: 'NEMET PALIC',
+          label: 'Nemet Palic',
           value: 'nemet-palic',
      },
      {
@@ -399,7 +400,7 @@ export const manufacturerOptions = [
           value: 'priroda-na-dar',
      },
      {
-          label: 'RHINOSAN',
+          label: 'Rhinosan',
           value: 'rhinosan',
      },
      {
@@ -667,7 +668,6 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
      };
 
      const handleSubmit = async (values) => {
-
           try {
                const responseValues = await fetch('/api/product-api', {
                     method: 'POST',
@@ -876,8 +876,16 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                         disabled={loading}
                                         label="Proizvodjac"
                                         name="manufacturer"
-                                        onBlur={formik.handleBlur}
-                                        onChange={formik.handleChange}
+                                        onChange={(event) => {
+                                             const selectedLabel = event.target.value;
+                                             const selectedOption = manufacturerOptions.find(option => option.label === selectedLabel);
+
+                                             if (selectedOption) {
+                                                  formik.setFieldValue('manufacturer', selectedLabel);
+                                                  formik.setFieldValue('manufacturerURL', selectedOption.value);
+                                             }
+                                        }
+                                        }
                                         select
                                         error={formik.touched.manufacturer && !!formik.errors.manufacturer}
                                         helperText={formik.touched.manufacturer && formik.errors.manufacturer}
@@ -886,7 +894,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                         {manufacturerOptions.map((option) => (
                                              <MenuItem
                                                   key={option.value}
-                                                  value={option.value}
+                                                  value={option.label}
                                              >
                                                   {option.label}
                                              </MenuItem>

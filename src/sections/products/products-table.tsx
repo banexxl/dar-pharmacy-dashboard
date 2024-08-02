@@ -82,6 +82,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
      }
 
      const handleProductUpdateClick = () => {
+
           Swal.fire({
                title: 'Da li ste sigurni?',
                text: "Možete izmeniti artikl u svakom momentu...",
@@ -233,13 +234,13 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                   const hasManyVariants = product.variants > 1;
 
                                                   return (
-                                                       <Fragment key={product.id}>
+                                                       <Fragment key={product._id}>
                                                             <TableRow
                                                                  hover
                                                                  key={product._id}
                                                             >
                                                                  <TableCell
-                                                                      key={product.id}
+                                                                      key={product._id}
                                                                       padding="checkbox"
                                                                       sx={{
                                                                            ...(isCurrent && {
@@ -257,12 +258,12 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                       }}
                                                                       width="25%"
                                                                  >
-                                                                      <IconButton key={product.id} onClick={() => handleProductToggle(product._id)}>
-                                                                           <SvgIcon key={product.id}>{isCurrent ? <ChevronDownIcon key={product.id} /> : <ChevronRightIcon key={product.id} />}</SvgIcon >
+                                                                      <IconButton key={product._id} onClick={() => handleProductToggle(product._id)}>
+                                                                           <SvgIcon key={product._id}>{isCurrent ? <ChevronDownIcon key={product._id} /> : <ChevronRightIcon key={product._id} />}</SvgIcon >
                                                                       </IconButton>
                                                                  </TableCell>
-                                                                 <TableCell width="25%" key={product.id}>
-                                                                      <Box key={product.id}
+                                                                 <TableCell width="25%" key={product._id}>
+                                                                      <Box key={product._id}
                                                                            sx={{
                                                                                 alignItems: 'center',
                                                                                 display: 'flex',
@@ -270,7 +271,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                       >
                                                                            {product.imageURL ? (
                                                                                 <Box
-                                                                                     key={product.id}
+                                                                                     key={product._id}
                                                                                      sx={{
                                                                                           alignItems: 'center',
                                                                                           backgroundColor: 'neutral.50',
@@ -287,7 +288,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                 />
                                                                            ) : (
                                                                                 <Box
-                                                                                     key={product.id}
+                                                                                     key={product._id}
                                                                                      sx={{
                                                                                           alignItems: 'center',
                                                                                           backgroundColor: 'neutral.50',
@@ -298,21 +299,21 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                           width: 80,
                                                                                      }}
                                                                                 >
-                                                                                     <SvgIcon key={product.id} >
+                                                                                     <SvgIcon key={product._id} >
 
                                                                                      </SvgIcon>
                                                                                 </Box>
                                                                            )}
                                                                            <Box
-                                                                                key={product.id}
+                                                                                key={product._id}
                                                                                 sx={{
                                                                                      cursor: 'pointer',
                                                                                      ml: 2,
                                                                                 }}
                                                                            >
-                                                                                <Typography key={product.id} variant="subtitle2">{product.name}</Typography>
+                                                                                <Typography key={product._id} variant="subtitle2">{product.name}</Typography>
                                                                                 <Typography
-                                                                                     key={product.id}
+                                                                                     key={product._id}
                                                                                      color="text.secondary"
                                                                                      variant="body2"
                                                                                 >
@@ -321,9 +322,9 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                            </Box>
                                                                       </Box>
                                                                  </TableCell>
-                                                                 <TableCell width="25%" key={product.id}>
+                                                                 <TableCell width="25%" key={product._id}>
                                                                       <LinearProgress
-                                                                           key={product.id}
+                                                                           key={product._id}
                                                                            value={product.availableStock}
                                                                            variant="determinate"
                                                                            color={quantityColor}
@@ -333,7 +334,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                            }}
                                                                       />
                                                                       <Typography
-                                                                           key={product.id}
+                                                                           key={product._id}
                                                                            color="text.secondary"
                                                                            variant="body2"
                                                                       >
@@ -341,19 +342,19 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                            {hasManyVariants && ` in ${product.variants} variants`}
                                                                       </Typography>
                                                                  </TableCell>
-                                                                 <TableCell key={product.id}>{product.price}</TableCell>
-                                                                 <TableCell key={product.id}>{product._id.slice(-8)}</TableCell>
-                                                                 <TableCell key={product.id}>
-                                                                      <SeverityPill key={product.id} color={statusColor}>{product.discount.toString()}</SeverityPill>
+                                                                 <TableCell key={product._id}>{product.price}</TableCell>
+                                                                 <TableCell key={product._id}>{product._id.slice(-8)}</TableCell>
+                                                                 <TableCell key={product._id}>
+                                                                      <SeverityPill key={product._id} color={statusColor}>{product.discount.toString()}</SeverityPill>
                                                                  </TableCell>
-                                                                 <TableCell key={product.id}>
-                                                                      <SeverityPill key={product.id} color={statusColor}>{product.discountAmount}</SeverityPill>
+                                                                 <TableCell key={product._id}>
+                                                                      <SeverityPill key={product._id} color={statusColor}>{product.discountAmount}</SeverityPill>
                                                                  </TableCell>
                                                             </TableRow>
                                                             {isCurrent && (
-                                                                 <TableRow key={product.id}>
+                                                                 <TableRow key={product._id}>
                                                                       <TableCell
-                                                                           key={product.id}
+                                                                           key={product._id}
                                                                            colSpan={7}
                                                                            sx={{
                                                                                 p: 0,
@@ -369,28 +370,28 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                 },
                                                                            }}
                                                                       >
-                                                                           <CardContent key={product.id}>
-                                                                                <Grid key={product.id}
+                                                                           <CardContent key={product._id}>
+                                                                                <Grid key={product._id}
                                                                                      container
                                                                                      spacing={3}
                                                                                 >
-                                                                                     <Grid key={product.id}
+                                                                                     <Grid key={product._id}
                                                                                           item
                                                                                           md={6}
                                                                                           xs={12}
                                                                                      >
-                                                                                          <Typography key={product.id} variant="h6">Osnovni detalji</Typography>
-                                                                                          <Divider key={product.id} sx={{ my: 2 }} />
-                                                                                          <Grid key={product.id}
+                                                                                          <Typography key={product._id} variant="h6">Osnovni detalji</Typography>
+                                                                                          <Divider key={product._id} sx={{ my: 2 }} />
+                                                                                          <Grid key={product._id}
                                                                                                container
                                                                                                spacing={3}
                                                                                           >
-                                                                                               <Grid key={product.id}
+                                                                                               <Grid key={product._id}
                                                                                                     item
                                                                                                     md={6}
                                                                                                     xs={12}
                                                                                                >
-                                                                                                    <TextField key={product.id}
+                                                                                                    <TextField key={product._id}
                                                                                                          defaultValue={product.name}
                                                                                                          fullWidth
                                                                                                          label="Naziv"
@@ -405,12 +406,12 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                          }
                                                                                                     />
                                                                                                </Grid>
-                                                                                               <Grid key={product.id}
+                                                                                               <Grid key={product._id}
                                                                                                     item
                                                                                                     md={6}
                                                                                                     xs={12}
                                                                                                >
-                                                                                                    <TextField key={product.id}
+                                                                                                    <TextField key={product._id}
                                                                                                          defaultValue={product._id.slice(-8)}
                                                                                                          disabled
                                                                                                          fullWidth
@@ -418,12 +419,12 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                          name={product._id.slice(-8)}
                                                                                                     />
                                                                                                </Grid>
-                                                                                               <Grid key={product.id}
+                                                                                               <Grid key={product._id}
                                                                                                     item
                                                                                                     md={6}
                                                                                                     xs={12}
                                                                                                >
-                                                                                                    <TextField key={product.id}
+                                                                                                    <TextField key={product._id}
                                                                                                          defaultValue={product.mainCategory}
                                                                                                          fullWidth
                                                                                                          label="Glavna Kategorija"
@@ -438,7 +439,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                     >
                                                                                                          {mainCategoryOptions.map((option) => (
                                                                                                               <MenuItem
-                                                                                                                   key={product.id}
+                                                                                                                   key={product._id}
                                                                                                                    value={option.value}
                                                                                                               >
                                                                                                                    {option.label}
@@ -446,12 +447,12 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                          ))}
                                                                                                     </TextField>
                                                                                                </Grid>
-                                                                                               <Grid key={product.id}
+                                                                                               <Grid key={product._id}
                                                                                                     item
                                                                                                     md={6}
                                                                                                     xs={12}
                                                                                                >
-                                                                                                    <TextField key={product.id}
+                                                                                                    <TextField key={product._id}
                                                                                                          defaultValue={product.midCategory}
                                                                                                          fullWidth
                                                                                                          label="Mid Kategorija"
@@ -468,7 +469,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                     >
                                                                                                          {midCategoryOptions.map((option) => (
                                                                                                               <MenuItem
-                                                                                                                   key={product.id}
+                                                                                                                   key={product._id}
                                                                                                                    value={option.value}
                                                                                                               >
                                                                                                                    {option.label}
@@ -476,12 +477,12 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                          ))}
                                                                                                     </TextField>
                                                                                                </Grid>
-                                                                                               <Grid key={product.id}
+                                                                                               <Grid key={product._id}
                                                                                                     item
                                                                                                     md={6}
                                                                                                     xs={12}
                                                                                                >
-                                                                                                    <TextField key={product.id}
+                                                                                                    <TextField key={product._id}
                                                                                                          defaultValue={product.subCategory}
                                                                                                          fullWidth
                                                                                                          label="Sub Kategorija"
@@ -497,7 +498,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                     >
                                                                                                          {subCategoryOptions.map((option: any) => (
                                                                                                               <MenuItem
-                                                                                                                   key={product.id}
+                                                                                                                   key={product._id}
                                                                                                                    value={option.value}
                                                                                                               >
                                                                                                                    {option.label}
@@ -510,7 +511,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                     md={6}
                                                                                                     xs={12}
                                                                                                >
-                                                                                                    <TextField key={product.id}
+                                                                                                    <TextField key={product._id}
                                                                                                          defaultValue={product.quantity}
                                                                                                          fullWidth
                                                                                                          label="Kolicina"
@@ -530,7 +531,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                     md={6}
                                                                                                     xs={12}
                                                                                                >
-                                                                                                    <TextField key={product.id}
+                                                                                                    <TextField key={product._id}
                                                                                                          defaultValue={product.description}
                                                                                                          fullWidth
                                                                                                          label="Opis"
@@ -545,12 +546,12 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                          }
                                                                                                     />
                                                                                                </Grid>
-                                                                                               <Grid key={product.id}
+                                                                                               <Grid key={product._id}
                                                                                                     item
                                                                                                     md={6}
                                                                                                     xs={12}
                                                                                                >
-                                                                                                    <TextField key={product.id}
+                                                                                                    <TextField key={product._id}
                                                                                                          defaultValue={product.instructions}
                                                                                                          fullWidth
                                                                                                          label="Instrukcije"
@@ -565,12 +566,12 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                          }
                                                                                                     />
                                                                                                </Grid>
-                                                                                               <Grid key={product.id}
+                                                                                               <Grid key={product._id}
                                                                                                     item
                                                                                                     md={6}
                                                                                                     xs={12}
                                                                                                >
-                                                                                                    <TextField key={product.id}
+                                                                                                    <TextField key={product._id}
                                                                                                          defaultValue={product.warning}
                                                                                                          fullWidth
                                                                                                          label="Upozorenje"
@@ -585,12 +586,12 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                          }
                                                                                                     />
                                                                                                </Grid>
-                                                                                               <Grid key={product.id}
+                                                                                               <Grid key={product._id}
                                                                                                     item
                                                                                                     md={6}
                                                                                                     xs={12}
                                                                                                >
-                                                                                                    <TextField key={product.id}
+                                                                                                    <TextField key={product._id}
                                                                                                          defaultValue={product.ingredients}
                                                                                                          fullWidth
                                                                                                          disabled={loading}
@@ -607,23 +608,23 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                </Grid>
                                                                                           </Grid>
                                                                                      </Grid>
-                                                                                     <Grid key={product.id}
+                                                                                     <Grid key={product._id}
                                                                                           item
                                                                                           md={6}
                                                                                           xs={12}
                                                                                      >
-                                                                                          <Typography key={product.id} variant="h6">Pricing and stocks</Typography>
-                                                                                          <Divider key={product.id} sx={{ my: 2 }} />
-                                                                                          <Grid key={product.id}
+                                                                                          <Typography key={product._id} variant="h6">Pricing and stocks</Typography>
+                                                                                          <Divider key={product._id} sx={{ my: 2 }} />
+                                                                                          <Grid key={product._id}
                                                                                                container
                                                                                                spacing={3}
                                                                                           >
-                                                                                               <Grid key={product.id}
+                                                                                               <Grid key={product._id}
                                                                                                     item
                                                                                                     md={6}
                                                                                                     xs={12}
                                                                                                >
-                                                                                                    <TextField key={product.id}
+                                                                                                    <TextField key={product._id}
                                                                                                          defaultValue={product.price}
                                                                                                          fullWidth
                                                                                                          disabled={loading}
@@ -638,13 +639,14 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                          }
                                                                                                          InputProps={{
                                                                                                               startAdornment: (
-                                                                                                                   <InputAdornment key={product.id} position="start">RSD</InputAdornment>
+                                                                                                                   <InputAdornment key={product._id} position="start">RSD</InputAdornment>
                                                                                                               ),
                                                                                                          }}
                                                                                                          type="number"
                                                                                                     />
                                                                                                </Grid>
-                                                                                               <Grid key={product.id}
+
+                                                                                               <Grid key={product._id}
                                                                                                     item
                                                                                                     md={6}
                                                                                                     xs={12}
@@ -657,17 +659,17 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                          onBlur={(e: any) =>
                                                                                                               setCurrentProductObject((previousObject: any) => ({
                                                                                                                    ...previousObject,
-                                                                                                                   manufacturer: e.target.value
-
+                                                                                                                   manufacturer: e.target.value,
+                                                                                                                   manufacturerURL: manufacturerOptions.find((option) => option.label === e.target.value)?.value
                                                                                                               }))
                                                                                                          }
                                                                                                          select
-                                                                                                         value={product.manufacturer}
+                                                                                                         defaultValue={product.manufacturer}
                                                                                                     >
                                                                                                          {manufacturerOptions.map((option) => (
                                                                                                               <MenuItem
                                                                                                                    key={option.value}
-                                                                                                                   value={option.value}
+                                                                                                                   value={option.label}
                                                                                                               >
                                                                                                                    {option.label}
                                                                                                               </MenuItem>
@@ -675,12 +677,12 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                     </TextField>
                                                                                                </Grid>
 
-                                                                                               <Grid key={product.id}
+                                                                                               <Grid key={product._id}
                                                                                                     item
                                                                                                     md={6}
                                                                                                     xs={12}
                                                                                                >
-                                                                                                    <TextField key={product.id}
+                                                                                                    <TextField key={product._id}
                                                                                                          defaultValue={product.availableStock}
                                                                                                          fullWidth
                                                                                                          disabled={loading}
@@ -696,12 +698,12 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                          type="number"
                                                                                                     />
                                                                                                </Grid>
-                                                                                               <Grid key={product.id}
+                                                                                               <Grid key={product._id}
                                                                                                     item
                                                                                                     md={6}
                                                                                                     xs={12}
                                                                                                >
-                                                                                                    <TextField key={product.id}
+                                                                                                    <TextField key={product._id}
                                                                                                          defaultValue={product.discountAmount}
                                                                                                          fullWidth
                                                                                                          disabled={loading}
@@ -717,7 +719,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                          type="number"
                                                                                                     />
                                                                                                </Grid>
-                                                                                               <Grid key={product.id}
+                                                                                               <Grid key={product._id}
                                                                                                     item
                                                                                                     md={6}
                                                                                                     xs={12}
@@ -726,17 +728,17 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                          display: 'flex',
                                                                                                     }}
                                                                                                >
-                                                                                                    <Switch key={product.id} disabled={loading} checked={currentProductObject!.newArrival}
+                                                                                                    <Switch key={product._id} disabled={loading} checked={currentProductObject!.newArrival}
                                                                                                          onChange={() => setCurrentProductObject((previousObject: any) => ({
                                                                                                               ...previousObject,
                                                                                                               newArrival: !previousObject.newArrival
                                                                                                          }))}
                                                                                                     />
-                                                                                                    <Typography key={product.id} variant="subtitle2">
+                                                                                                    <Typography key={product._id} variant="subtitle2">
                                                                                                          Novi proizvod
                                                                                                     </Typography>
                                                                                                </Grid>
-                                                                                               <Grid key={product.id}
+                                                                                               <Grid key={product._id}
                                                                                                     item
                                                                                                     md={6}
                                                                                                     xs={12}
@@ -745,7 +747,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                          display: 'flex',
                                                                                                     }}
                                                                                                >
-                                                                                                    <Switch key={product.id} disabled={loading}
+                                                                                                    <Switch key={product._id} disabled={loading}
                                                                                                          checked={currentProductObject!.bestSeller}
                                                                                                          onChange={() => setCurrentProductObject((previousObject: any) => ({
                                                                                                               ...previousObject,
@@ -753,11 +755,11 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
 
                                                                                                          }))}
                                                                                                     />
-                                                                                                    <Typography key={product.id} variant="subtitle2">
+                                                                                                    <Typography key={product._id} variant="subtitle2">
                                                                                                          Najprodavaniji
                                                                                                     </Typography>
                                                                                                </Grid>
-                                                                                               <Grid key={product.id}
+                                                                                               <Grid key={product._id}
                                                                                                     item
                                                                                                     md={6}
                                                                                                     xs={12}
@@ -766,13 +768,13 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                          display: 'flex',
                                                                                                     }}
                                                                                                >
-                                                                                                    <Switch key={product.id} disabled={loading} checked={currentProductObject!.discount}
+                                                                                                    <Switch key={product._id} disabled={loading} checked={currentProductObject!.discount}
                                                                                                          onChange={() => setCurrentProductObject((previousObject: any) => ({
                                                                                                               ...previousObject,
                                                                                                               discount: !previousObject.discount
                                                                                                          }))}
                                                                                                     />
-                                                                                                    <Typography key={product.id} variant="subtitle2">
+                                                                                                    <Typography key={product._id} variant="subtitle2">
                                                                                                          Popust
                                                                                                     </Typography>
                                                                                                </Grid>
@@ -928,13 +930,13 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                 </Card>
                                                                            </CardContent>
                                                                            <Divider />
-                                                                           <Stack key={product.id}
+                                                                           <Stack key={product._id}
                                                                                 alignItems="center"
                                                                                 direction="row"
                                                                                 justifyContent="space-between"
                                                                                 sx={{ p: 2 }}
                                                                            >
-                                                                                <Stack key={product.id}
+                                                                                <Stack key={product._id}
                                                                                      alignItems="center"
                                                                                      direction="row"
                                                                                      spacing={2}
@@ -947,7 +949,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                      >
                                                                                           Izmeni
                                                                                      </Button>
-                                                                                     <Button key={product.id}
+                                                                                     <Button key={product._id}
                                                                                           color="inherit"
                                                                                           onClick={handleProductClose}
                                                                                           disabled={loading}
@@ -956,7 +958,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                      </Button>
                                                                                 </Stack>
                                                                                 <div>
-                                                                                     <Button key={product.id}
+                                                                                     <Button key={product._id}
                                                                                           onClick={handleDeleteButtonClick}
                                                                                           color="error"
                                                                                           disabled={loading}

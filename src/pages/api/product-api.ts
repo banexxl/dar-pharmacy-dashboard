@@ -50,6 +50,7 @@ export default async function handler(request: NextApiRequest, response: NextApi
                                    instructions: request.body.instructions,
                                    mainCategory: request.body.mainCategory,
                                    manufacturer: request.body.manufacturer,
+                                   manufacturerURL: request.body.manufacturerURL,
                                    midCategory: request.body.midCategory,
                                    name: request.body.name,
                                    newArrival: request.body.newArrival,

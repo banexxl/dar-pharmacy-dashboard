@@ -1,40 +1,13 @@
 import { MongoClient } from "mongodb"
 import { ObjectId } from "mongodb"
 
-let cachedClient = null;
-let cachedDb = null;
-
-export async function connectToDatabase() {
-     // check the cached.
-     if (cachedClient && cachedDb) {
-          // load from cache
-          return {
-               client: cachedClient,
-               db: cachedDb,
-          };
-     }
-
-     // Connect to cluster
-     let client = new MongoClient(process.env.MONGODB_URI);
-     await client.connect();
-     let db = client.db('DAR_DB');
-
-     // set cache
-     cachedClient = client;
-     cachedDb = db;
-
-     return {
-          client: cachedClient,
-          db: cachedDb,
-     };
-}
-
 export const productsServices = () => {
-
-     const dbConnection = connectToDatabase()
 
      const getProductsByPage = async (page, limit) => {
 
+          const client = new MongoClient(process.env.MONGODB_URI);
+          const clientresponse = await client.connect();
+          const db = client.db('DAR_DB');
           const parsedLimit = parseInt(limit, 10); // Parse limit as an integer
 
           if (isNaN(parsedLimit) || parsedLimit <= 0) {
@@ -43,9 +16,8 @@ export const productsServices = () => {
           }
 
           try {
-
                const skip = page * parsedLimit;
-               const data = (await dbConnection).db.collection('Products')
+               const data = await db.collection('Products')
                     .find({})
                     .skip(skip)
                     .limit(parsedLimit)
@@ -53,6 +25,8 @@ export const productsServices = () => {
                return data;
           } catch (error) {
                return { message: error.message };
+          } finally {
+               await client.close();
           }
      };
 
