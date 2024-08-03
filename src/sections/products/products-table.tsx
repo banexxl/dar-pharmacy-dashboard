@@ -2,6 +2,7 @@ import ChevronRightIcon from '@untitled-ui/icons-react/build/esm/ChevronRight';
 import ChevronDownIcon from '@untitled-ui/icons-react/build/esm/ChevronDown';
 import {
      Avatar, Box, Button, Card, CardContent, Checkbox, Divider, Grid, IconButton, Input, InputAdornment, LinearProgress, MenuItem,
+     OutlinedInput,
      Stack, SvgIcon, Switch, Table, TableBody, TableCell, TableHead, TablePagination, TableRow, TextField, Typography, useTheme
 } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
@@ -17,6 +18,8 @@ import { useRouter } from 'next/navigation';
 import "@uploadthing/react/styles.css";
 import { UploadButton } from "../../utils/image-upload-components";
 import { mainCategoryOptions, manufacturerOptions, midCategoryOptions, quantityUnitOptions } from './new-product-schema';
+import MagnifyingGlassIcon from '@heroicons/react/24/solid/MagnifyingGlassIcon';
+import ClearIcon from '@mui/icons-material/Clear';
 
 export interface IProduct {
      bestSeller: boolean;
@@ -42,7 +45,7 @@ export interface IProduct {
      _id?: string;
 }
 
-export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
+export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
 
      const [currentProductID, setCurrentProductID] = useState(null);
      const [currentProductObject, setCurrentProductObject] = useState<IProduct | null>();
@@ -55,6 +58,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
      const [selectedMidCategory, setSelectedMidCategory] = useState('');
      const [selectedImage, setSelectedImage] = useState(null);
      const [discountValue, setDiscountValue] = useState<number>(0);
+     const [productsForDisplay, setProductsForDisplay] = useState<IProduct[]>(items);
 
      const getObjectById = (_id: any, arrayToSearch: any) => {
           for (const obj of arrayToSearch) {
@@ -198,8 +202,55 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
           }
      }
 
+     const [searchQuery, setSearchQuery] = useState('');
+
+     const handleClearSearch = () => {
+          setSearchQuery('');
+     };
+     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+          setSearchQuery(event.target.value);
+     };
+
+     const filteredItems = items.filter((product: IProduct) =>
+          product.name.toLowerCase().includes(searchQuery.toLowerCase())
+     );
+
+
      return (
           <Card>
+               <Card sx={{ p: 2 }}>
+                    <OutlinedInput
+                         value={searchQuery}
+                         onChange={handleSearchChange}
+                         fullWidth
+                         placeholder="Pronađi proizvod po nazivu..."
+                         startAdornment={(
+                              <InputAdornment position="start">
+                                   <SvgIcon
+                                        color="action"
+                                        fontSize="small"
+                                   >
+                                        <MagnifyingGlassIcon />
+                                   </SvgIcon>
+                              </InputAdornment>
+                         )}
+                         endAdornment={(
+                              <InputAdornment position="end">
+                                   <IconButton
+                                        onClick={handleClearSearch}
+                                   >
+                                        <SvgIcon
+                                             color="action"
+                                             fontSize="small"
+                                        >
+                                             <ClearIcon />
+                                        </SvgIcon>
+                                   </IconButton>
+                              </InputAdornment>
+                         )}
+                         sx={{ maxWidth: 500 }}
+                    />
+               </Card>
                <Scrollbar>
                     <Box sx={{ minWidth: 800 }}>
                          <Table>
@@ -230,8 +281,8 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                               </TableHead>
                               <TableBody>
                                    {
-                                        items.length > 0 ?
-                                             items.map((product: IProduct) => {
+                                        filteredItems.length > 0 ?
+                                             filteredItems.map((product: IProduct) => {
                                                   //const isSelected = selected.includes(product._id);
                                                   const isCurrent = product._id === currentProductID;
                                                   // const price = numeral(product.price).format(`${product.currency}0,0.00`);
@@ -1039,7 +1090,11 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                   );
                                              })
                                              :
-                                             null
+                                             <TableRow>
+                                                  <TableCell colSpan={7} align="center">
+                                                       Nije pronađen nijedan proizvod...
+                                                  </TableCell>
+                                             </TableRow>
                                    }
                               </TableBody>
                          </Table>

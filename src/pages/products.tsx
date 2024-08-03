@@ -9,7 +9,6 @@ import { Box, Button, Container, Stack, SvgIcon, Typography } from '@mui/materia
 import { useSelection } from 'src/hooks/use-selection';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { ProductsTable } from 'src/sections/products/products-table';
-import { ProductsSearch } from 'src/sections/products/products-search';
 import { applyPagination } from 'src/utils/apply-pagination';
 import { productsServices } from '../utils/product-services'
 import { useRouter } from 'next/navigation';
@@ -140,7 +139,6 @@ const Page = (props: any) => {
                                         </Button>
                                    </Box>
                               </Stack>
-                              <ProductsSearch />
                               <ProductsTable
                                    count={props.products.length || 0}
                                    items={props.products}
@@ -156,7 +154,7 @@ const Page = (props: any) => {
                                    onRowsPerPageChange={handleRowsPerPageChange}
                                    page={props.page}
                                    rowsPerPage={props.limit}
-                                   rowsPerPageOptions={[5, 10, 25]}
+                                   rowsPerPageOptions={[5, 10, 25, 50, 100, 200]}
                                    showFirstButton
                                    showLastButton
                                    labelRowsPerPage={'Broj po stranici'}

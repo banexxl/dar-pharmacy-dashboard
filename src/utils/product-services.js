@@ -221,8 +221,24 @@ export const productsServices = () => {
           }
      }
 
+     const getAllProducts = async () => {
+          const client = await MongoClient.connect(process.env.MONGODB_URI)
+
+          try {
+               const db = client.db('DAR_DB')
+               let products = await db.collection('Products').find().toArray()
+               return products
+          } catch (error) {
+               return { message: error.message }
+          }
+          finally {
+               await client.close();
+          }
+     }
+
 
      return {
+          getAllProducts,
           getProductsByPage,
           getProductsCount,
           getProductsForHomePage,
