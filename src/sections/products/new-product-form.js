@@ -288,7 +288,7 @@ export const manufacturerOptions = [
           value: 'farmas-mn',
      },
      {
-          label: 'GRANUM',
+          label: 'Granum',
           value: 'granum',
      },
      {
@@ -426,10 +426,6 @@ export const manufacturerOptions = [
      {
           label: 'VitalGrana',
           value: 'vitalgrana',
-     },
-     {
-          label: 'Weleda',
-          value: 'weleda',
      },
      {
           label: 'Zodeks caj',
