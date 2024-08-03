@@ -12,12 +12,12 @@ import { ProductsTable } from 'src/sections/products/products-table';
 import { ProductsSearch } from 'src/sections/products/products-search';
 import { applyPagination } from 'src/utils/apply-pagination';
 import { productsServices } from '../utils/product-services'
-import { AddProductForm } from '../sections/products/new-product-form'
 import { useRouter } from 'next/navigation';
 import { TablePagination } from '@mui/material'
+import { AddProductForm } from '@/sections/products/new-product-form';
 
 
-const Page = (props) => {
+const Page = (props: any) => {
      // const products = useMemo(() => {
      //      return applyPagination(props.products, props.page, props.limit);
      // }, [props.products, props.page, props.limit]);
@@ -27,7 +27,7 @@ const Page = (props) => {
           if (!Array.isArray(props.products)) {
                return [];
           }
-          return props.products.map((product) => product._id);
+          return props.products.map((product: any) => product._id);
      }, [props.products]);
 
      const [open, setOpen] = useState(false)
@@ -43,13 +43,13 @@ const Page = (props) => {
           setOpen(false)
      }
 
-     const handleRowsPerPageChange = (event) => {
-          router.push(`products/?page=${ props.page }&limit=${ event.target.value }`);
+     const handleRowsPerPageChange = (event: any) => {
+          router.push(`products/?page=${props.page}&limit=${event.target.value}`);
           return (event.target.value)
      }
 
-     const handlePageChange = (event, newPage) => {
-          router.push(`/products?page=${ newPage }&limit=${ props.limit }`);
+     const handlePageChange = (event: any, newPage: any) => {
+          router.push(`/products?page=${newPage}&limit=${props.limit}`);
      }
 
      const handleRebuild = async () => {
@@ -184,7 +184,7 @@ const Page = (props) => {
 };
 
 
-export async function getServerSideProps(context) {
+export async function getServerSideProps(context: any) {
      try {
           const page = context.query.page || 1
           const limit = context.query.limit || 5
@@ -214,7 +214,7 @@ export async function getServerSideProps(context) {
      }
 }
 
-Page.getLayout = (page) => (
+Page.getLayout = (page: any) => (
      <DashboardLayout>
           {page}
      </DashboardLayout>

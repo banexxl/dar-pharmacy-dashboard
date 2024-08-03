@@ -54,8 +54,10 @@ export default async function handler(request: NextApiRequest, response: NextApi
                                    midCategory: request.body.midCategory,
                                    name: request.body.name,
                                    newArrival: request.body.newArrival,
+                                   isActive: request.body.isActive,
                                    price: request.body.price,
                                    quantity: request.body.quantity,
+                                   quantityUnit: request.body.quantityUnit,
                                    subCategory: request.body.subCategory,
                                    warning: request.body.warning
                               }

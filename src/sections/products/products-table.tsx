@@ -11,27 +11,32 @@ import numeral from 'numeral';
 import { Fragment, useCallback, useEffect, useState } from 'react';
 import { Scrollbar } from 'src/components/scrollbar';
 import { SeverityPill } from '@/components/severity-pill';
-import { fetchSubCategoryOptions, mainCategoryOptions, manufacturerOptions, midCategoryOptions } from './new-product-form';
+import { fetchSubCategoryOptions } from './new-product-form';
 import Swal from 'sweetalert2';
 import { useRouter } from 'next/navigation';
 import "@uploadthing/react/styles.css";
 import { UploadButton } from "../../utils/image-upload-components";
+import { mainCategoryOptions, manufacturerOptions, midCategoryOptions, quantityUnitOptions } from './new-product-schema';
 
 export interface IProduct {
      bestSeller: boolean;
      description: string;
      discount: boolean;
      discountAmount: number;
+     availableStock: number;
      imageURL: string;
      ingredients: string;
      instructions: string;
      mainCategory: string;
      manufacturer: string;
+     manufacturerURL: string;
      midCategory: string;
      name: string;
      newArrival: boolean;
+     isActive: boolean;
      price: string;
-     quantity: string;
+     quantity: number;
+     quantityUnit: string;
      subCategory: string;
      warning: string;
      _id?: string;
@@ -49,6 +54,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
      const [isSubCategoryEnabled, setIsSubCategoryEnabled] = useState(false);
      const [selectedMidCategory, setSelectedMidCategory] = useState('');
      const [selectedImage, setSelectedImage] = useState(null);
+     const [discountValue, setDiscountValue] = useState<number>(0);
 
      const getObjectById = (_id: any, arrayToSearch: any) => {
           for (const obj of arrayToSearch) {
@@ -212,7 +218,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                              Cena
                                         </TableCell>
                                         <TableCell>
-                                             Sifra
+                                             Šifra
                                         </TableCell>
                                         <TableCell>
                                              Na popustu
@@ -225,13 +231,13 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                               <TableBody>
                                    {
                                         items.length > 0 ?
-                                             items.map((product: any) => {
+                                             items.map((product: IProduct) => {
                                                   //const isSelected = selected.includes(product._id);
                                                   const isCurrent = product._id === currentProductID;
-                                                  const price = numeral(product.price).format(`${product.currency}0,0.00`);
+                                                  // const price = numeral(product.price).format(`${product.currency}0,0.00`);
                                                   const quantityColor = product.quantity >= 10 ? 'success' : 'error';
-                                                  const statusColor = product.status === 'published' ? 'success' : 'info';
-                                                  const hasManyVariants = product.variants > 1;
+                                                  const statusColor = product.isActive === true ? 'success' : 'info';
+                                                  // const hasManyVariants = product.variants > 1;
 
                                                   return (
                                                        <Fragment key={product._id}>
@@ -325,7 +331,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                  <TableCell width="25%" key={product._id}>
                                                                       <LinearProgress
                                                                            key={product._id}
-                                                                           value={product.availableStock}
+                                                                           value={product.quantity}
                                                                            variant="determinate"
                                                                            color={quantityColor}
                                                                            sx={{
@@ -339,11 +345,11 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                            variant="body2"
                                                                       >
                                                                            {product.availableStock} in stock
-                                                                           {hasManyVariants && ` in ${product.variants} variants`}
+                                                                           {/* {hasManyVariants && ` in ${product.variants} variants`} */}
                                                                       </Typography>
                                                                  </TableCell>
                                                                  <TableCell key={product._id}>{product.price}</TableCell>
-                                                                 <TableCell key={product._id}>{product._id.slice(-8)}</TableCell>
+                                                                 <TableCell key={product._id}>{product._id!.slice(-8)}</TableCell>
                                                                  <TableCell key={product._id}>
                                                                       <SeverityPill key={product._id} color={statusColor}>{product.discount.toString()}</SeverityPill>
                                                                  </TableCell>
@@ -412,11 +418,11 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                     xs={12}
                                                                                                >
                                                                                                     <TextField key={product._id}
-                                                                                                         defaultValue={product._id.slice(-8)}
+                                                                                                         defaultValue={product._id!.slice(-8)}
                                                                                                          disabled
                                                                                                          fullWidth
-                                                                                                         label="Sifra proizvoda"
-                                                                                                         name={product._id.slice(-8)}
+                                                                                                         label="Šifra proizvoda"
+                                                                                                         name={product._id!.slice(-8)}
                                                                                                     />
                                                                                                </Grid>
                                                                                                <Grid key={product._id}
@@ -437,7 +443,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                               }))
                                                                                                          }
                                                                                                     >
-                                                                                                         {mainCategoryOptions.map((option) => (
+                                                                                                         {mainCategoryOptions.map((option: any) => (
                                                                                                               <MenuItem
                                                                                                                    key={product._id}
                                                                                                                    value={option.value}
@@ -467,7 +473,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                               }))
                                                                                                          }
                                                                                                     >
-                                                                                                         {midCategoryOptions.map((option) => (
+                                                                                                         {midCategoryOptions.map((option: any) => (
                                                                                                               <MenuItem
                                                                                                                    key={product._id}
                                                                                                                    value={option.value}
@@ -506,26 +512,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                          ))}
                                                                                                     </TextField>
                                                                                                </Grid>
-                                                                                               <Grid
-                                                                                                    item
-                                                                                                    md={6}
-                                                                                                    xs={12}
-                                                                                               >
-                                                                                                    <TextField key={product._id}
-                                                                                                         defaultValue={product.quantity}
-                                                                                                         fullWidth
-                                                                                                         label="Kolicina"
-                                                                                                         disabled={loading}
-                                                                                                         name={product.quantity}
-                                                                                                         onBlur={(e: any) =>
-                                                                                                              setCurrentProductObject((previousObject: any) => ({
-                                                                                                                   ...previousObject,
-                                                                                                                   quantity: e.target.value
 
-                                                                                                              }))
-                                                                                                         }
-                                                                                                    />
-                                                                                               </Grid>
                                                                                                <Grid
                                                                                                     item
                                                                                                     md={6}
@@ -595,7 +582,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                          defaultValue={product.ingredients}
                                                                                                          fullWidth
                                                                                                          disabled={loading}
-                                                                                                         label="Ingredients"
+                                                                                                         label="Sastav"
                                                                                                          name={product.ingredients}
                                                                                                          onBlur={(e: any) =>
                                                                                                               setCurrentProductObject((previousObject: any) => ({
@@ -613,7 +600,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                           md={6}
                                                                                           xs={12}
                                                                                      >
-                                                                                          <Typography key={product._id} variant="h6">Pricing and stocks</Typography>
+                                                                                          <Typography key={product._id} variant="h6">Napredni podaci</Typography>
                                                                                           <Divider key={product._id} sx={{ my: 2 }} />
                                                                                           <Grid key={product._id}
                                                                                                container
@@ -653,7 +640,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                >
                                                                                                     <TextField
                                                                                                          fullWidth
-                                                                                                         label="Proizvodjac"
+                                                                                                         label="Proizvođač"
                                                                                                          name="manufacturer"
                                                                                                          disabled={loading}
                                                                                                          onBlur={(e: any) =>
@@ -666,7 +653,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                          select
                                                                                                          defaultValue={product.manufacturer}
                                                                                                     >
-                                                                                                         {manufacturerOptions.map((option) => (
+                                                                                                         {manufacturerOptions.map((option: any) => (
                                                                                                               <MenuItem
                                                                                                                    key={option.value}
                                                                                                                    value={option.label}
@@ -709,15 +696,92 @@ export const ProductsTable = ({ items, page, rowsPerPage, }: any) => {
                                                                                                          disabled={loading}
                                                                                                          label="Iznos popusta"
                                                                                                          name="discountAmount"
+                                                                                                         onChange={(e) => {
+                                                                                                              const min = 0;
+                                                                                                              const max = 100;
+                                                                                                              var value = parseInt(e.target.value, 10);
+
+                                                                                                              if (value > max) value = max;
+                                                                                                              if (value < min) value = min;
+
+                                                                                                              setDiscountValue(value);
+
+                                                                                                              setCurrentProductObject((previousObject: any) => ({
+                                                                                                                   ...previousObject,
+                                                                                                                   discountAmount: value
+                                                                                                              }))
+
+                                                                                                         }}
+                                                                                                         type="number"
+                                                                                                    />
+                                                                                               </Grid>
+                                                                                               <Grid
+                                                                                                    item
+                                                                                                    md={6}
+                                                                                                    xs={12}
+                                                                                               >
+                                                                                                    <TextField key={product._id}
+                                                                                                         defaultValue={product.quantity}
+                                                                                                         type="number"
+                                                                                                         fullWidth
+                                                                                                         label="Količina"
+                                                                                                         disabled={loading}
                                                                                                          onBlur={(e: any) =>
                                                                                                               setCurrentProductObject((previousObject: any) => ({
                                                                                                                    ...previousObject,
-                                                                                                                   discountAmount: e.target.valueAsNumber
+                                                                                                                   quantity: e.target.value
 
                                                                                                               }))
                                                                                                          }
-                                                                                                         type="number"
                                                                                                     />
+                                                                                               </Grid>
+                                                                                               <Grid
+                                                                                                    item
+                                                                                                    md={6}
+                                                                                                    xs={12}
+                                                                                               >
+                                                                                                    <TextField key={product._id}
+                                                                                                         defaultValue={product.quantityUnit}
+                                                                                                         select
+                                                                                                         fullWidth
+                                                                                                         label="Jedinica mere"
+                                                                                                         disabled={loading}
+                                                                                                         onBlur={(e: any) =>
+                                                                                                              setCurrentProductObject((previousObject: any) => ({
+                                                                                                                   ...previousObject,
+                                                                                                                   quantityUnit: e.target.value
+
+                                                                                                              }))
+                                                                                                         }
+                                                                                                    >
+                                                                                                         {quantityUnitOptions.map((option: any) => (
+                                                                                                              <MenuItem
+                                                                                                                   key={option.value}
+                                                                                                                   value={option.value}
+                                                                                                              >
+                                                                                                                   {option.label}
+                                                                                                              </MenuItem>
+                                                                                                         ))}
+                                                                                                    </TextField>
+                                                                                               </Grid>
+                                                                                               <Grid key={product._id}
+                                                                                                    item
+                                                                                                    md={6}
+                                                                                                    xs={12}
+                                                                                                    sx={{
+                                                                                                         alignItems: 'center',
+                                                                                                         display: 'flex',
+                                                                                                    }}
+                                                                                               >
+                                                                                                    <Switch key={product._id} disabled={loading} checked={currentProductObject!.isActive}
+                                                                                                         onChange={() => setCurrentProductObject((previousObject: any) => ({
+                                                                                                              ...previousObject,
+                                                                                                              isActive: !previousObject.isActive
+                                                                                                         }))}
+                                                                                                    />
+                                                                                                    <Typography key={product._id} variant="subtitle2">
+                                                                                                         Aktivan
+                                                                                                    </Typography>
                                                                                                </Grid>
                                                                                                <Grid key={product._id}
                                                                                                     item

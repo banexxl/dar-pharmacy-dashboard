@@ -1,10 +1,10 @@
 "use client"
 import React, { useState } from 'react';
 import { useFormik } from 'formik';
-import { TextField, Typography, Button, Checkbox, FormControlLabel, Box, Input, Card, CardContent, Grid, MenuItem, Stack, Container, IconButton, CardActionArea } from '@mui/material';
+import { TextField, Typography, Button, Checkbox, FormControlLabel, Box, Input, Card, CardContent, Grid, MenuItem, Stack, Container, IconButton, CardActionArea, colors } from '@mui/material';
 import { Form, Formik, FormikErrors, FormikTouched } from 'formik';
 import PhotoCamera from "@mui/icons-material/PhotoCamera";
-import { newProductSchema } from './new-product-schema'
+import { initialValues, mainCategoryOptions, manufacturerOptions, midCategoryOptions, newProductSchema, quantityUnitOptions } from './new-product-schema'
 import { useRouter } from 'next/navigation';
 import CircularProgress from '@mui/material/CircularProgress';
 import Swal from 'sweetalert2'
@@ -16,468 +16,9 @@ import { LoadingButton } from '@mui/lab';
 import "@uploadthing/react/styles.css";
 import { useTheme } from '@mui/material/styles';
 import { UploadButton } from "../../utils/image-upload-components";
+import { IProduct } from './products-table';
 
-const initialValues = {
-     name: '',
-     description: '',
-     mainCategory: '',
-     midCategory: '',
-     subCategory: '',
-     availableStock: '',
-     ingredients: '',
-     instructions: '',
-     quantity: '',
-     manufacturer: '',
-     manufacturerURL: '',
-     warning: '',
-     imageURL: '',
-     price: '',
-     newArrival: false,
-     bestSeller: false,
-     discount: false,
-     discountAmount: 0,
-};
-
-export const mainCategoryOptions = [
-     {
-          label: 'Obrisi polje',
-          value: '',
-     },
-     {
-          label: 'Apoteka',
-          value: 'apoteka',
-     },
-     {
-          label: 'Prirodna kozmetika',
-          value: 'prirodna-kozmetika',
-     },
-     {
-          label: 'Bebi prirodna kozmetika',
-          value: 'bebi-prirodna-kozmetika',
-     },
-     {
-          label: 'Kolagen',
-          value: 'kolagen',
-     },
-     {
-          label: 'Suplementi',
-          value: 'suplementi',
-     },
-     {
-          label: 'Ledene Kocke za imunitet',
-          value: 'ledene-kocke-za-imunitet',
-     },
-     {
-          label: 'Prirodni imunitet',
-          value: 'prirodni-imunitet',
-     },
-
-];
-
-export const midCategoryOptions = [
-     {
-          label: 'Obrisi polje',
-          value: '',
-     },
-     {
-          label: 'Alergije',
-          value: 'alergije',
-     },
-     {
-          label: 'Anemija',
-          value: 'anemija',
-     },
-     {
-          label: 'Bol',
-          value: 'bol',
-     },
-     {
-          label: 'Hemoroidi',
-          value: 'hemoroidi',
-     },
-     {
-          label: 'Holesterol i trigliceridi',
-          value: 'holesterol-i-trigliceridi',
-     },
-     {
-          label: 'Imunitet, prehlada',
-          value: 'imunitet-prehlada',
-     },
-     {
-          label: 'Kosa, koža i nokti',
-          value: 'kosa-koza-i-nokti',
-     },
-     {
-          label: 'Kosti i zglobovi',
-          value: 'kosti-i-zglobovi',
-     },
-     {
-          label: 'Mršavljenje, celulit',
-          value: 'mrsavljenje-celulit',
-     },
-     {
-          label: 'Posebna ishrana',
-          value: 'posebna-ishrana',
-     },
-     {
-          label: 'Putna apoteka',
-          value: 'putna-apoteka',
-     },
-     {
-          label: 'Stomačne tekobe',
-          value: 'stomacne-tekobe',
-     },
-     {
-          label: 'Zdravo srce i cirkulacija',
-          value: 'zdravo-srce-i-cirkulacija',
-     },
-     {
-          label: 'Vitamini i mineralni',
-          value: 'vitamini-i-minerali',
-     },
-     {
-          label: 'Preparati za primenu na koži',
-          value: 'preparati-za-primenu-na-kozi',
-     },
-     {
-          label: 'Oči i uši',
-          value: 'oci-i-usi',
-     },
-     {
-          label: 'Prva pomoć',
-          value: 'prva-pomoc',
-     },
-     {
-          label: 'Energija i umor',
-          value: 'energija-i-umor',
-     },
-     {
-          label: 'Sokovi',
-          value: 'sokovi',
-     },
-     {
-          label: 'Antioksidansi i detoksikacija',
-          value: 'antioksidansi-i-detoksikacija',
-     },
-     {
-          label: 'Biljne kapi, biljna i eterična ulja',
-          value: 'biljne-kapi-biljna-i-etericna-ulja',
-     },
-     {
-          label: 'Bubrezi i mokraćni putevi',
-          value: 'bubrezi-i-mokracni-putevi',
-     },
-
-     {
-          label: 'Čajevi',
-          value: 'cajevi',
-     },
-     {
-          label: 'Dijabetes i insulinska resistencija',
-          value: 'dijabetes-i-insulinska-resistencija',
-     },
-     {
-          label: 'Jetra i žuč',
-          value: 'jetra-i-zuc',
-     },
-     {
-          label: 'Kašalj',
-          value: 'kasalj',
-     },
-     {
-          label: 'PMS',
-          value: 'pms',
-     },
-     {
-          label: 'Menopauza',
-          value: 'menopauza',
-     },
-     {
-          label: 'Odvikavanje od alkohola',
-          value: 'odvikavanje-od-alkohola',
-     },
-     {
-          label: 'Pamćenje i koncentracija',
-          value: 'pamcenje-i-koncentracija',
-     },
-     {
-          label: 'Poremećaj fertiliteta',
-          value: 'poremecaj-fertiliteta',
-     },
-     {
-          label: 'Prostata i potencija',
-          value: 'prostata-i-potencija',
-     },
-     {
-          label: 'Stres, depresija, nesanica',
-          value: 'stres-depresija-nesanica',
-     },
-     {
-          label: 'Dozatori i sekači za lekove',
-          value: 'dozatori-i-sekaci-za-lekove',
-     },
-];
-
-export const manufacturerOptions = [
-     {
-          label: 'Alpenkrauter',
-          value: 'alpenkrauter',
-     },
-     {
-          label: 'Abela Pharm',
-          value: 'abela-pharm',
-     },
-     {
-          label: 'Alpen Pharma doo',
-          value: 'alpen-pharma-doo',
-     },
-     {
-          label: 'Amer',
-          value: 'amer',
-     },
-     {
-          label: 'Bach Flower Remedies',
-          value: 'bach-flower-remedies',
-     },
-     {
-          label: 'Bajkal',
-          value: 'bajkal',
-     },
-     {
-          label: 'Beopanax d.o.o.',
-          value: 'beopanax-doo',
-     },
-     {
-          label: 'Bio Solutions',
-          value: 'bio-solutions',
-     },
-     {
-          label: 'Catalysis S.L.',
-          value: 'catalysis-sl',
-     },
-     {
-          label: 'Colloid',
-          value: 'colloid',
-     },
-     {
-          label: 'Cortex Labs',
-          value: 'cortex-labs',
-     },
-     {
-          label: 'DMG',
-          value: 'dmg',
-     },
-     {
-          label: 'Dimas',
-          value: 'dimas',
-     },
-     {
-          label: 'Dr. Werner Pharma',
-          value: 'dr-werner-pharma',
-     },
-     {
-          label: 'Fantastik fungi',
-          value: 'fantastik-fungi',
-     },
-     {
-          label: 'Farma Derma',
-          value: 'farma-derma',
-     },
-     {
-          label: 'Farmas MN',
-          value: 'farmas-mn',
-     },
-     {
-          label: 'Granum',
-          value: 'granum',
-     },
-     {
-          label: 'Galenika',
-          value: 'galenika',
-     },
-     {
-          label: 'Gana kozmetika',
-          value: 'gana-kozmetika',
-     },
-     {
-          label: 'Gavez',
-          value: 'gavez',
-     },
-     {
-          label: 'Herbalab',
-          value: 'herbalab',
-     },
-     {
-          label: 'Himalaya',
-          value: 'himalaya',
-     },
-     {
-          label: 'Innventa pharm',
-          value: 'innventa-pharm',
-     },
-     {
-          label: 'LAMA',
-          value: 'lama',
-     },
-     {
-          label: 'LV-Pharm',
-          value: 'lv-pharm',
-     },
-     {
-          label: 'Laboratorie ACM, France',
-          value: 'laboratorie-acm-france',
-     },
-     {
-          label: 'Laboratories NATIVE, France',
-          value: 'laboratories-native-france',
-     },
-     {
-          label: 'Lander',
-          value: 'lander',
-     },
-     {
-          label: 'Magni Food',
-          value: 'magni-food',
-     },
-     {
-          label: 'Majana',
-          value: 'majana',
-     },
-     {
-          label: 'MaxMedica',
-          value: 'maxmedica',
-     },
-     {
-          label: 'Medical Plants',
-          value: 'medical-plants',
-     },
-     {
-          label: 'Moj caj',
-          value: 'moj-caj',
-     },
-     {
-          label: 'Nemet Palic',
-          value: 'nemet-palic',
-     },
-     {
-          label: 'NTC Pharma',
-          value: 'ntc-pharma',
-     },
-     {
-          label: 'Natural Way',
-          value: 'natural-way',
-     },
-     {
-          label: 'NaturalWealth',
-          value: 'naturalwealth',
-     },
-     {
-          label: 'Now Foods',
-          value: 'now-foods',
-     },
-     {
-          label: 'OKP',
-          value: 'okp',
-     },
-     {
-          label: 'OlimpSport',
-          value: 'olimpsport',
-     },
-     {
-          label: 'Pharma Medica',
-          value: 'pharma-medica',
-     },
-     {
-          label: 'PharmaDevelopment',
-          value: 'pharmadevelopment',
-     },
-     {
-          label: 'Plantacare',
-          value: 'plantacare',
-     },
-     {
-          label: 'Priroda na dar',
-          value: 'priroda-na-dar',
-     },
-     {
-          label: 'Rhinosan',
-          value: 'rhinosan',
-     },
-     {
-          label: 'RabenHorst',
-          value: 'rabenhorst',
-     },
-     {
-          label: 'Rulek',
-          value: 'rulek',
-     },
-     {
-          label: 'Ruska Biljna Apoteka Organic',
-          value: 'ruska-biljna-apoteka-organic',
-     },
-     {
-          label: 'Shulke',
-          value: 'shulke',
-     },
-     {
-          label: 'Sofija',
-          value: 'sofija',
-     },
-     {
-          label: 'VitalGrana',
-          value: 'vitalgrana',
-     },
-     {
-          label: 'Zodeks caj',
-          value: 'zodeks-caj',
-     },
-     {
-          label: 'Gloria',
-          value: 'gloria',
-     },
-     {
-          label: 'Azeta bio',
-          value: 'azeta-bio',
-     },
-     {
-          label: 'Gamarde',
-          value: 'gamarde',
-     },
-     {
-          label: 'Fitaky',
-          value: 'fitaky',
-     },
-     {
-          label: 'Mustela',
-          value: 'mustela',
-     },
-     {
-          label: 'Phyto',
-          value: 'phyto',
-     },
-     {
-          label: 'Priroda na dar',
-          value: 'priroda-na-dar',
-     },
-     {
-          label: 'Eco boom',
-          value: 'eco-boom',
-     },
-     {
-          label: 'Weleda',
-          value: 'weleda',
-     },
-     {
-          label: 'Herbs honey',
-          value: 'herbs-honey',
-     },
-     {
-          label: 'Vedra',
-          value: 'vedra',
-     },
-];
-
-export const fetchSubCategoryOptions = async (selectedMidCategory) => {
+export const fetchSubCategoryOptions = async (selectedMidCategory: any) => {
 
      switch (selectedMidCategory) {
           case 'alergije':
@@ -636,17 +177,18 @@ export const fetchSubCategoryOptions = async (selectedMidCategory) => {
      }
 };
 
-export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
+export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }: any) => {
 
      const theme = useTheme()
      const router = useRouter();
      //const [selectedFile, setSelectedFile] = useState(null);
      const [fileURL, setFileURL] = useState("")
      const [loading, setLoading] = useState(false)
-     const [subCategoryOptions, setSubCategoryOptions] = useState([]);
+     const [subCategoryOptions, setSubCategoryOptions] = useState<any>([]);
      const [isSubCategoryEnabled, setIsSubCategoryEnabled] = useState(false);
+     const [discountValue, setDiscountValue] = useState<number>(0);
 
-     const handleMidCategoryChange = async (event) => {
+     const handleMidCategoryChange = async (event: any) => {
           const selectedMidCategory = event.target.value;
 
           // Fetch subcategory options based on the selected midCategory
@@ -663,7 +205,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
           setFileURL(""); // Remove the selected file
      };
 
-     const handleSubmit = async (values) => {
+     const handleSubmit = async (values: IProduct) => {
           try {
                const responseValues = await fetch('/api/product-api', {
                     method: 'POST',
@@ -687,8 +229,8 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                     router.refresh()
                } else {
                     onSubmitFail()
-                    const errorData = await response.json(); // Parse the error response
-                    console.error(errorData);
+                    // const errorData = await response.json(); // Parse the error response
+                    // console.error(errorData);
                     Swal.fire({
                          icon: 'error',
                          title: 'Oops...',
@@ -769,7 +311,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                         helperText={formik.touched.mainCategory && formik.errors.mainCategory}
                                         value={formik.values.mainCategory}
                                    >
-                                        {mainCategoryOptions.map((option) => (
+                                        {mainCategoryOptions.map((option: any) => (
                                              <MenuItem
                                                   key={option.value}
                                                   value={option.value}
@@ -814,7 +356,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                         disabled={!isSubCategoryEnabled || loading}
                                    >
                                         {subCategoryOptions ?
-                                             subCategoryOptions.map((option) =>
+                                             subCategoryOptions.map((option: any) =>
                                              (
                                                   <MenuItem key={option.value} value={option.value}>
                                                        {option.label}
@@ -835,6 +377,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                         onChange={formik.handleChange}
                                         error={formik.touched.availableStock && !!formik.errors.availableStock}
                                         helperText={formik.touched.availableStock && formik.errors.availableStock}
+                                        type='number'
                                    />
 
                                    <TextField
@@ -858,14 +401,39 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                    />
 
                                    <TextField
-                                        label="Kolicina"
+                                        label="Količina"
                                         name="quantity"
                                         disabled={loading}
                                         value={formik.values.quantity}
                                         onChange={formik.handleChange}
                                         error={formik.touched.quantity && !!formik.errors.quantity}
                                         helperText={formik.touched.quantity && formik.errors.quantity}
+                                        type='number'
                                    />
+
+                                   <TextField
+                                        fullWidth
+                                        label="Jedinica mere"
+                                        name="quantityUnit"
+                                        onBlur={formik.handleBlur}
+                                        disabled={loading}
+                                        onChange={formik.handleChange}
+                                        select
+                                        error={formik.touched.quantityUnit && !!formik.errors.quantityUnit}
+                                        helperText={formik.touched.quantityUnit && formik.errors.quantityUnit}
+                                        value={formik.values.quantityUnit}
+                                   >
+                                        {quantityUnitOptions.map((option: any) => (
+                                             <MenuItem
+                                                  key={option.value}
+                                                  value={option.value}
+                                             >
+                                                  {option.label}
+                                             </MenuItem>
+                                        ))}
+                                   </TextField>
+
+
 
                                    <TextField
                                         fullWidth
@@ -908,80 +476,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                    />
 
                                    <Card>
-                                        <CardContent disabled={loading} sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-                                             {/* <Box
-                                                  sx={{
-                                                       display: 'flex',
-                                                       flexDirection: 'column',
-                                                       alignItems: 'center',
-                                                       gap: '10px'
-                                                  }}
-                                             >
-                                                  {selectedFile ? (
-                                                       <Image
-                                                            src={fileURL}
-                                                            alt='Uploaded Image'
-                                                            width={300}
-                                                            height={300}
-                                                            style={{
-                                                                 borderRadius: '10px',
-                                                                 cursor: 'pointer'
-                                                            }}
-                                                            onClick={handleFileRemove}
-                                                       />
-                                                  ) : (
-                                                       <InsertPhotoIcon
-                                                            color='primary'
-                                                            sx={{ width: '300px', height: '300px' }}
-                                                       />
-                                                  )}
-                                                  <Button
-                                                       component="label"
-                                                       variant="contained"
-                                                       startIcon={<AttachFileIcon />}
-                                                       sx={{
-                                                            maxWidth: '150px'
-                                                       }}
-                                                       disabled={selectedFile}
-                                                  >
-                                                       Izaberi sliku
-                                                       <Input
-                                                            type="file"
-                                                            inputProps={{ accept: 'image/*' }}
-                                                            sx={{
-                                                                 clip: 'rect(0 0 0 0)',
-                                                                 clipPath: 'inset(50%)',
-                                                                 height: 1,
-                                                                 overflow: 'hidden',
-                                                                 position: 'absolute',
-                                                                 bottom: 0,
-                                                                 left: 0,
-                                                                 whiteSpace: 'nowrap',
-                                                                 width: 1,
-                                                            }}
-                                                            onChange={handleFileChange}
-                                                       />
-                                                  </Button>
-                                                  {
-                                                       selectedFile ?
-                                                            <LoadingButton
-
-                                                                 loading={loading}
-                                                                 loadingIndicator={<CircularProgress />}
-                                                                 component="label"
-                                                                 variant="contained"
-                                                                 startIcon={<CloudUploadIcon />}
-                                                                 sx={{
-                                                                      width: '250px',
-                                                                      height: '60px'
-                                                                 }}
-                                                                 onClick={() => handleFileUpload(selectedFile)}
-                                                            >
-                                                                 Upload slike
-                                                            </LoadingButton>
-                                                            : null
-                                                  }
-                                             </Box> */}
+                                        <CardContent sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', disabled: `${loading}` }}>
                                              <UploadButton
                                                   endpoint="imageUploader"
                                                   onUploadBegin={() => setLoading(true)}
@@ -1005,18 +500,18 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                        console.log(error);
                                                   }}
                                                   content={{
-                                                       Button({ ready }) {
+                                                       button({ ready }: any) {
                                                             if (ready) return <Button sx={{ color: theme.palette.divider }}>Pronadji sliku...</Button>;
                                                             return "Getting ready...";
                                                        },
                                                        allowedContent({ ready, fileTypes }) {
                                                             if (!ready) return "Checking what you allow";
                                                             if (loading) return "Seems like stuff is uploading";
-                                                            return `Tip datoteke: ${ fileTypes.join(", ") }`;
+                                                            return `Tip datoteke: ${fileTypes.join(", ")}`;
                                                        },
                                                   }}
                                                   appearance={{
-                                                       Button({ ready }) {
+                                                       button({ ready }: any) {
                                                             return {
                                                                  fontSize: "1.6rem",
                                                                  backgroundColor: theme.palette.primary.main,
@@ -1028,7 +523,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                                             };
                                                        },
                                                        allowedContent: {
-                                                            color: theme.palette.primary,
+                                                            color: theme.palette.primary.main,
                                                        },
                                                   }}
                                              />
@@ -1052,13 +547,27 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
                                              )}
                                         </CardContent>
                                    </Card>
+
                                    <TextField
                                         label="Cena"
                                         name="price"
+                                        type='number'
                                         value={formik.values.price}
                                         onChange={formik.handleChange}
                                         error={formik.touched.price && !!formik.errors.price}
                                         helperText={formik.touched.price && formik.errors.price}
+                                   />
+
+                                   <FormControlLabel
+                                        control={
+                                             <Checkbox
+                                                  name="isActive"
+                                                  checked={formik.values.isActive}
+                                                  onChange={formik.handleChange}
+                                             />
+                                        }
+                                        disabled={loading}
+                                        label="Aktivan"
                                    />
 
                                    <FormControlLabel
@@ -1099,10 +608,23 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }) => {
 
                                    <TextField
                                         label="Iznos popusta"
+                                        type='number'
                                         name="discountAmount"
                                         value={formik.values.discountAmount}
-                                        onChange={formik.handleChange}
+                                        onChange={(e) => {
+                                             const min = 0;
+                                             const max = 100;
+                                             var value = parseInt(e.target.value, 10);
+
+                                             if (value > max) value = max;
+                                             if (value < min) value = min;
+
+                                             setDiscountValue(value);
+
+                                             formik.setFieldValue('discountAmount', value);
+                                        }}
                                         disabled={loading}
+                                        InputProps={{ inputProps: { min: 0, max: 100 } }}
                                    />
 
                                    <Box sx={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
