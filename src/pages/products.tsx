@@ -135,7 +135,7 @@ const Page = (props: any) => {
                                              onClick={handleRebuild}
                                              disabled={loading}
                                         >
-                                             {loading ? 'Šaljem' : 'Pošalji proizvode na sajt'}
+                                             {loading ? 'Šaljem' : 'Pošalji izmene na sajt'}
                                         </Button>
                                    </Box>
                               </Stack>
