@@ -186,7 +186,6 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }: any) => {
      const [loading, setLoading] = useState(false)
      const [subCategoryOptions, setSubCategoryOptions] = useState<any>([]);
      const [isSubCategoryEnabled, setIsSubCategoryEnabled] = useState(false);
-     const [discountValue, setDiscountValue] = useState<number>(0);
 
      const handleMidCategoryChange = async (event: any) => {
           const selectedMidCategory = event.target.value;
@@ -618,8 +617,6 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }: any) => {
 
                                              if (value > max) value = max;
                                              if (value < min) value = min;
-
-                                             setDiscountValue(value);
 
                                              formik.setFieldValue('discountAmount', value);
                                         }}

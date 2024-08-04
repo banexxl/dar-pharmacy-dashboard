@@ -291,13 +291,13 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                   // const hasManyVariants = product.variants > 1;
 
                                                   return (
-                                                       <Fragment key={product._id}>
+                                                       <Fragment key={Math.random()}>
                                                             <TableRow
                                                                  hover
-                                                                 key={product._id}
+                                                                 key={Math.random()}
                                                             >
                                                                  <TableCell
-                                                                      key={product._id}
+                                                                      key={Math.random()}
                                                                       padding="checkbox"
                                                                       sx={{
                                                                            ...(isCurrent && {
@@ -315,12 +315,12 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                       }}
                                                                       width="25%"
                                                                  >
-                                                                      <IconButton key={product._id} onClick={() => handleProductToggle(product._id)}>
-                                                                           <SvgIcon key={product._id}>{isCurrent ? <ChevronDownIcon key={product._id} /> : <ChevronRightIcon key={product._id} />}</SvgIcon >
+                                                                      <IconButton key={Math.random()} onClick={() => handleProductToggle(product._id)}>
+                                                                           <SvgIcon key={Math.random()}>{isCurrent ? <ChevronDownIcon key={Math.random()} /> : <ChevronRightIcon key={Math.random()} />}</SvgIcon >
                                                                       </IconButton>
                                                                  </TableCell>
-                                                                 <TableCell width="25%" key={product._id}>
-                                                                      <Box key={product._id}
+                                                                 <TableCell width="25%" key={Math.random()}>
+                                                                      <Box key={Math.random()}
                                                                            sx={{
                                                                                 alignItems: 'center',
                                                                                 display: 'flex',
@@ -328,7 +328,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                       >
                                                                            {product.imageURL ? (
                                                                                 <Box
-                                                                                     key={product._id}
+                                                                                     key={Math.random()}
                                                                                      sx={{
                                                                                           alignItems: 'center',
                                                                                           backgroundColor: 'neutral.50',
@@ -345,7 +345,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                                 />
                                                                            ) : (
                                                                                 <Box
-                                                                                     key={product._id}
+                                                                                     key={Math.random()}
                                                                                      sx={{
                                                                                           alignItems: 'center',
                                                                                           backgroundColor: 'neutral.50',
@@ -356,21 +356,21 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                                           width: 80,
                                                                                      }}
                                                                                 >
-                                                                                     <SvgIcon key={product._id} >
+                                                                                     <SvgIcon key={Math.random()} >
 
                                                                                      </SvgIcon>
                                                                                 </Box>
                                                                            )}
                                                                            <Box
-                                                                                key={product._id}
+                                                                                key={Math.random()}
                                                                                 sx={{
                                                                                      cursor: 'pointer',
                                                                                      ml: 2,
                                                                                 }}
                                                                            >
-                                                                                <Typography key={product._id} variant="subtitle2">{product.name}</Typography>
+                                                                                <Typography key={Math.random()} variant="subtitle2">{product.name}</Typography>
                                                                                 <Typography
-                                                                                     key={product._id}
+                                                                                     key={Math.random()}
                                                                                      color="text.secondary"
                                                                                      variant="body2"
                                                                                 >
@@ -379,9 +379,9 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                            </Box>
                                                                       </Box>
                                                                  </TableCell>
-                                                                 <TableCell width="25%" key={product._id}>
+                                                                 <TableCell width="25%" key={Math.random()}>
                                                                       <LinearProgress
-                                                                           key={product._id}
+                                                                           key={Math.random()}
                                                                            value={product.quantity}
                                                                            variant="determinate"
                                                                            color={quantityColor}
@@ -391,7 +391,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                            }}
                                                                       />
                                                                       <Typography
-                                                                           key={product._id}
+                                                                           key={Math.random()}
                                                                            color="text.secondary"
                                                                            variant="body2"
                                                                       >
@@ -399,19 +399,19 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                            {/* {hasManyVariants && ` in ${product.variants} variants`} */}
                                                                       </Typography>
                                                                  </TableCell>
-                                                                 <TableCell key={product._id}>{product.price}</TableCell>
-                                                                 <TableCell key={product._id}>{product._id!.slice(-8)}</TableCell>
-                                                                 <TableCell key={product._id}>
-                                                                      <SeverityPill key={product._id} color={statusColor}>{product.discount.toString()}</SeverityPill>
+                                                                 <TableCell key={Math.random()}>{product.price}</TableCell>
+                                                                 <TableCell key={Math.random()}>{product._id!.slice(-8)}</TableCell>
+                                                                 <TableCell key={Math.random()}>
+                                                                      <SeverityPill key={Math.random()} color={statusColor}>{product.discount.toString()}</SeverityPill>
                                                                  </TableCell>
-                                                                 <TableCell key={product._id}>
-                                                                      <SeverityPill key={product._id} color={statusColor}>{product.discountAmount}</SeverityPill>
+                                                                 <TableCell key={Math.random()}>
+                                                                      <SeverityPill key={Math.random()} color={statusColor}>{product.discountAmount}</SeverityPill>
                                                                  </TableCell>
                                                             </TableRow>
                                                             {isCurrent && (
-                                                                 <TableRow key={product._id}>
+                                                                 <TableRow key={Math.random()}>
                                                                       <TableCell
-                                                                           key={product._id}
+                                                                           key={Math.random()}
                                                                            colSpan={7}
                                                                            sx={{
                                                                                 p: 0,
@@ -427,28 +427,28 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                                 },
                                                                            }}
                                                                       >
-                                                                           <CardContent key={product._id}>
-                                                                                <Grid key={product._id}
+                                                                           <CardContent key={Math.random()}>
+                                                                                <Grid key={Math.random()}
                                                                                      container
                                                                                      spacing={3}
                                                                                 >
-                                                                                     <Grid key={product._id}
+                                                                                     <Grid key={Math.random()}
                                                                                           item
                                                                                           md={6}
                                                                                           xs={12}
                                                                                      >
-                                                                                          <Typography key={product._id} variant="h6">Osnovni detalji</Typography>
-                                                                                          <Divider key={product._id} sx={{ my: 2 }} />
-                                                                                          <Grid key={product._id}
+                                                                                          <Typography key={Math.random()} variant="h6">Osnovni detalji</Typography>
+                                                                                          <Divider key={Math.random()} sx={{ my: 2 }} />
+                                                                                          <Grid key={Math.random()}
                                                                                                container
                                                                                                spacing={3}
                                                                                           >
-                                                                                               <Grid key={product._id}
+                                                                                               <Grid key={Math.random()}
                                                                                                     item
                                                                                                     md={6}
                                                                                                     xs={12}
                                                                                                >
-                                                                                                    <TextField key={product._id}
+                                                                                                    <TextField key={Math.random()}
                                                                                                          defaultValue={product.name}
                                                                                                          fullWidth
                                                                                                          label="Naziv"
@@ -463,12 +463,12 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                                                          }
                                                                                                     />
                                                                                                </Grid>
-                                                                                               <Grid key={product._id}
+                                                                                               <Grid key={Math.random()}
                                                                                                     item
                                                                                                     md={6}
                                                                                                     xs={12}
                                                                                                >
-                                                                                                    <TextField key={product._id}
+                                                                                                    <TextField key={Math.random()}
                                                                                                          defaultValue={product._id!.slice(-8)}
                                                                                                          disabled
                                                                                                          fullWidth
@@ -476,12 +476,12 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                                                          name={product._id!.slice(-8)}
                                                                                                     />
                                                                                                </Grid>
-                                                                                               <Grid key={product._id}
+                                                                                               <Grid key={Math.random()}
                                                                                                     item
                                                                                                     md={6}
                                                                                                     xs={12}
                                                                                                >
-                                                                                                    <TextField key={product._id}
+                                                                                                    <TextField key={Math.random()}
                                                                                                          defaultValue={product.mainCategory}
                                                                                                          fullWidth
                                                                                                          label="Glavna Kategorija"
@@ -496,7 +496,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                                                     >
                                                                                                          {mainCategoryOptions.map((option: any) => (
                                                                                                               <MenuItem
-                                                                                                                   key={product._id}
+                                                                                                                   key={Math.random()}
                                                                                                                    value={option.value}
                                                                                                               >
                                                                                                                    {option.label}
@@ -504,12 +504,12 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                                                          ))}
                                                                                                     </TextField>
                                                                                                </Grid>
-                                                                                               <Grid key={product._id}
+                                                                                               <Grid key={Math.random()}
                                                                                                     item
                                                                                                     md={6}
                                                                                                     xs={12}
                                                                                                >
-                                                                                                    <TextField key={product._id}
+                                                                                                    <TextField key={Math.random()}
                                                                                                          defaultValue={product.midCategory}
                                                                                                          fullWidth
                                                                                                          label="Mid Kategorija"
@@ -526,7 +526,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                                                     >
                                                                                                          {midCategoryOptions.map((option: any) => (
                                                                                                               <MenuItem
-                                                                                                                   key={product._id}
+                                                                                                                   key={Math.random()}
                                                                                                                    value={option.value}
                                                                                                               >
                                                                                                                    {option.label}
@@ -534,12 +534,12 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                                                          ))}
                                                                                                     </TextField>
                                                                                                </Grid>
-                                                                                               <Grid key={product._id}
+                                                                                               <Grid key={Math.random()}
                                                                                                     item
                                                                                                     md={6}
                                                                                                     xs={12}
                                                                                                >
-                                                                                                    <TextField key={product._id}
+                                                                                                    <TextField key={Math.random()}
                                                                                                          defaultValue={product.subCategory}
                                                                                                          fullWidth
                                                                                                          label="Sub Kategorija"
@@ -555,7 +555,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                                                     >
                                                                                                          {subCategoryOptions.map((option: any) => (
                                                                                                               <MenuItem
-                                                                                                                   key={product._id}
+                                                                                                                   key={Math.random()}
                                                                                                                    value={option.value}
                                                                                                               >
                                                                                                                    {option.label}
@@ -569,7 +569,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                                                     md={6}
                                                                                                     xs={12}
                                                                                                >
-                                                                                                    <TextField key={product._id}
+                                                                                                    <TextField key={Math.random()}
                                                                                                          defaultValue={product.description}
                                                                                                          fullWidth
                                                                                                          label="Opis"
@@ -584,12 +584,12 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                                                          }
                                                                                                     />
                                                                                                </Grid>
-                                                                                               <Grid key={product._id}
+                                                                                               <Grid key={Math.random()}
                                                                                                     item
                                                                                                     md={6}
                                                                                                     xs={12}
                                                                                                >
-                                                                                                    <TextField key={product._id}
+                                                                                                    <TextField key={Math.random()}
                                                                                                          defaultValue={product.instructions}
                                                                                                          fullWidth
                                                                                                          label="Instrukcije"
@@ -604,12 +604,12 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                                                          }
                                                                                                     />
                                                                                                </Grid>
-                                                                                               <Grid key={product._id}
+                                                                                               <Grid key={Math.random()}
                                                                                                     item
                                                                                                     md={6}
                                                                                                     xs={12}
                                                                                                >
-                                                                                                    <TextField key={product._id}
+                                                                                                    <TextField key={Math.random()}
                                                                                                          defaultValue={product.warning}
                                                                                                          fullWidth
                                                                                                          label="Upozorenje"
@@ -624,12 +624,12 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                                                          }
                                                                                                     />
                                                                                                </Grid>
-                                                                                               <Grid key={product._id}
+                                                                                               <Grid key={Math.random()}
                                                                                                     item
                                                                                                     md={6}
                                                                                                     xs={12}
                                                                                                >
-                                                                                                    <TextField key={product._id}
+                                                                                                    <TextField key={Math.random()}
                                                                                                          defaultValue={product.ingredients}
                                                                                                          fullWidth
                                                                                                          disabled={loading}
@@ -646,23 +646,23 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                                                </Grid>
                                                                                           </Grid>
                                                                                      </Grid>
-                                                                                     <Grid key={product._id}
+                                                                                     <Grid key={Math.random()}
                                                                                           item
                                                                                           md={6}
                                                                                           xs={12}
                                                                                      >
-                                                                                          <Typography key={product._id} variant="h6">Napredni podaci</Typography>
-                                                                                          <Divider key={product._id} sx={{ my: 2 }} />
-                                                                                          <Grid key={product._id}
+                                                                                          <Typography key={Math.random()} variant="h6">Napredni podaci</Typography>
+                                                                                          <Divider key={Math.random()} sx={{ my: 2 }} />
+                                                                                          <Grid key={Math.random()}
                                                                                                container
                                                                                                spacing={3}
                                                                                           >
-                                                                                               <Grid key={product._id}
+                                                                                               <Grid key={Math.random()}
                                                                                                     item
                                                                                                     md={6}
                                                                                                     xs={12}
                                                                                                >
-                                                                                                    <TextField key={product._id}
+                                                                                                    <TextField key={Math.random()}
                                                                                                          defaultValue={product.price}
                                                                                                          fullWidth
                                                                                                          disabled={loading}
@@ -677,14 +677,14 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                                                          }
                                                                                                          InputProps={{
                                                                                                               startAdornment: (
-                                                                                                                   <InputAdornment key={product._id} position="start">RSD</InputAdornment>
+                                                                                                                   <InputAdornment key={Math.random()} position="start">RSD</InputAdornment>
                                                                                                               ),
                                                                                                          }}
                                                                                                          type="number"
                                                                                                     />
                                                                                                </Grid>
 
-                                                                                               <Grid key={product._id}
+                                                                                               <Grid key={Math.random()}
                                                                                                     item
                                                                                                     md={6}
                                                                                                     xs={12}
@@ -715,12 +715,12 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                                                     </TextField>
                                                                                                </Grid>
 
-                                                                                               <Grid key={product._id}
+                                                                                               <Grid key={Math.random()}
                                                                                                     item
                                                                                                     md={6}
                                                                                                     xs={12}
                                                                                                >
-                                                                                                    <TextField key={product._id}
+                                                                                                    <TextField key={Math.random()}
                                                                                                          defaultValue={product.availableStock}
                                                                                                          fullWidth
                                                                                                          disabled={loading}
@@ -736,26 +736,25 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                                                          type="number"
                                                                                                     />
                                                                                                </Grid>
-                                                                                               <Grid key={product._id}
+                                                                                               <Grid key={Math.random()}
                                                                                                     item
                                                                                                     md={6}
                                                                                                     xs={12}
                                                                                                >
-                                                                                                    <TextField key={product._id}
-                                                                                                         defaultValue={product.discountAmount}
+                                                                                                    <TextField key={Math.random()}
+                                                                                                         defaultValue={currentProductObject?.discountAmount}
                                                                                                          fullWidth
                                                                                                          disabled={loading}
                                                                                                          label="Iznos popusta"
                                                                                                          name="discountAmount"
-                                                                                                         onChange={(e) => {
+                                                                                                         onBlur={(e) => {
                                                                                                               const min = 0;
                                                                                                               const max = 100;
                                                                                                               var value = parseInt(e.target.value, 10);
 
                                                                                                               if (value > max) value = max;
                                                                                                               if (value < min) value = min;
-
-                                                                                                              setDiscountValue(value);
+                                                                                                              console.log(currentProductObject?.discountAmount);
 
                                                                                                               setCurrentProductObject((previousObject: any) => ({
                                                                                                                    ...previousObject,
@@ -771,7 +770,8 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                                                     md={6}
                                                                                                     xs={12}
                                                                                                >
-                                                                                                    <TextField key={product._id}
+                                                                                                    <TextField
+                                                                                                         key={Math.random()}
                                                                                                          defaultValue={product.quantity}
                                                                                                          type="number"
                                                                                                          fullWidth
@@ -791,7 +791,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                                                     md={6}
                                                                                                     xs={12}
                                                                                                >
-                                                                                                    <TextField key={product._id}
+                                                                                                    <TextField key={Math.random()}
                                                                                                          defaultValue={product.quantityUnit}
                                                                                                          select
                                                                                                          fullWidth
@@ -815,7 +815,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                                                          ))}
                                                                                                     </TextField>
                                                                                                </Grid>
-                                                                                               <Grid key={product._id}
+                                                                                               <Grid key={Math.random()}
                                                                                                     item
                                                                                                     md={6}
                                                                                                     xs={12}
@@ -824,17 +824,17 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                                                          display: 'flex',
                                                                                                     }}
                                                                                                >
-                                                                                                    <Switch key={product._id} disabled={loading} checked={currentProductObject!.isActive}
+                                                                                                    <Switch key={Math.random()} disabled={loading} checked={currentProductObject!.isActive}
                                                                                                          onChange={() => setCurrentProductObject((previousObject: any) => ({
                                                                                                               ...previousObject,
                                                                                                               isActive: !previousObject.isActive
                                                                                                          }))}
                                                                                                     />
-                                                                                                    <Typography key={product._id} variant="subtitle2">
+                                                                                                    <Typography key={Math.random()} variant="subtitle2">
                                                                                                          Aktivan
                                                                                                     </Typography>
                                                                                                </Grid>
-                                                                                               <Grid key={product._id}
+                                                                                               <Grid key={Math.random()}
                                                                                                     item
                                                                                                     md={6}
                                                                                                     xs={12}
@@ -843,17 +843,17 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                                                          display: 'flex',
                                                                                                     }}
                                                                                                >
-                                                                                                    <Switch key={product._id} disabled={loading} checked={currentProductObject!.newArrival}
+                                                                                                    <Switch key={Math.random()} disabled={loading} checked={currentProductObject!.newArrival}
                                                                                                          onChange={() => setCurrentProductObject((previousObject: any) => ({
                                                                                                               ...previousObject,
                                                                                                               newArrival: !previousObject.newArrival
                                                                                                          }))}
                                                                                                     />
-                                                                                                    <Typography key={product._id} variant="subtitle2">
+                                                                                                    <Typography key={Math.random()} variant="subtitle2">
                                                                                                          Novi proizvod
                                                                                                     </Typography>
                                                                                                </Grid>
-                                                                                               <Grid key={product._id}
+                                                                                               <Grid key={Math.random()}
                                                                                                     item
                                                                                                     md={6}
                                                                                                     xs={12}
@@ -862,7 +862,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                                                          display: 'flex',
                                                                                                     }}
                                                                                                >
-                                                                                                    <Switch key={product._id} disabled={loading}
+                                                                                                    <Switch key={Math.random()} disabled={loading}
                                                                                                          checked={currentProductObject!.bestSeller}
                                                                                                          onChange={() => setCurrentProductObject((previousObject: any) => ({
                                                                                                               ...previousObject,
@@ -870,11 +870,11 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
 
                                                                                                          }))}
                                                                                                     />
-                                                                                                    <Typography key={product._id} variant="subtitle2">
+                                                                                                    <Typography key={Math.random()} variant="subtitle2">
                                                                                                          Najprodavaniji
                                                                                                     </Typography>
                                                                                                </Grid>
-                                                                                               <Grid key={product._id}
+                                                                                               <Grid key={Math.random()}
                                                                                                     item
                                                                                                     md={6}
                                                                                                     xs={12}
@@ -883,13 +883,13 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                                                          display: 'flex',
                                                                                                     }}
                                                                                                >
-                                                                                                    <Switch key={product._id} disabled={loading} checked={currentProductObject!.discount}
+                                                                                                    <Switch key={Math.random()} disabled={loading} checked={currentProductObject!.discount}
                                                                                                          onChange={() => setCurrentProductObject((previousObject: any) => ({
                                                                                                               ...previousObject,
                                                                                                               discount: !previousObject.discount
                                                                                                          }))}
                                                                                                     />
-                                                                                                    <Typography key={product._id} variant="subtitle2">
+                                                                                                    <Typography key={Math.random()} variant="subtitle2">
                                                                                                          Popust
                                                                                                     </Typography>
                                                                                                </Grid>
@@ -1010,7 +1010,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                                                                    backgroundColor: theme.palette.primary.main,
                                                                                                                    color: "black",
                                                                                                                    ...(ready && { color: theme.palette.primary.main, }),
-                                                                                                                   ...(loading && { color: theme.palette.primary.main, }),
+                                                                                                                   ...(loading && { color: theme.palette.primary.main, disabled: loading }),
                                                                                                                    borderRadius: "10px",
                                                                                                                    cursor: 'pointer'
                                                                                                               };
@@ -1045,13 +1045,13 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                                 </Card>
                                                                            </CardContent>
                                                                            <Divider />
-                                                                           <Stack key={product._id}
+                                                                           <Stack key={Math.random()}
                                                                                 alignItems="center"
                                                                                 direction="row"
                                                                                 justifyContent="space-between"
                                                                                 sx={{ p: 2 }}
                                                                            >
-                                                                                <Stack key={product._id}
+                                                                                <Stack key={Math.random()}
                                                                                      alignItems="center"
                                                                                      direction="row"
                                                                                      spacing={2}
@@ -1064,7 +1064,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                                      >
                                                                                           Izmeni
                                                                                      </Button>
-                                                                                     <Button key={product._id}
+                                                                                     <Button key={Math.random()}
                                                                                           color="inherit"
                                                                                           onClick={handleProductClose}
                                                                                           disabled={loading}
@@ -1073,7 +1073,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                                      </Button>
                                                                                 </Stack>
                                                                                 <div>
-                                                                                     <Button key={product._id}
+                                                                                     <Button key={Math.random()}
                                                                                           onClick={handleDeleteButtonClick}
                                                                                           color="error"
                                                                                           disabled={loading}
