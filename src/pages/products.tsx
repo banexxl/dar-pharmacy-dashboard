@@ -43,7 +43,7 @@ const Page = (props: any) => {
      }
 
      const handleRowsPerPageChange = (event: any) => {
-          router.push(`products/?page=${props.page}&limit=${event.target.value}`);
+          router.push(`products/?page=0&limit=${event.target.value}`);
           return (event.target.value)
      }
 
