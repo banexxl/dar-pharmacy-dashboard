@@ -79,7 +79,7 @@ export const initialValues: IProduct = {
 
 export const mainCategoryOptions = [
      {
-          label: 'Obrisi polje',
+          label: 'Obriši polje',
           value: '',
      },
      {
@@ -110,12 +110,39 @@ export const mainCategoryOptions = [
           label: 'Prirodni imunitet',
           value: 'prirodni-imunitet',
      },
-
+     {
+          label: 'Ruska apoteka',
+          value: 'ruska-apoteka',
+     },
+     {
+          label: 'Domaci prirodni melemi',
+          value: 'domaci-prirodni-melemi',
+     },
+     {
+          label: 'Mast od Jazavca',
+          value: 'mast-od-jazavca',
+     },
+     {
+          label: 'Ulja za masažu',
+          value: 'ulja-za-masazu',
+     },
+     {
+          label: 'Biljne tinkture',
+          value: 'biljne-tinkture',
+     },
+     {
+          label: 'Imunitet za decu',
+          value: 'imunitet-za-decu',
+     },
+     {
+          label: 'Todoxin',
+          value: 'todoxin',
+     }
 ];
 
 export const midCategoryOptions = [
      {
-          label: 'Obrisi polje',
+          label: 'Obriši polje',
           value: '',
      },
      {
@@ -514,6 +541,10 @@ export const manufacturerOptions = [
           label: 'Vedra',
           value: 'vedra',
      },
+     {
+          label: 'Zao make up',
+          value: 'zao-make-up',
+     },
 ];
 
 export type QuantityUnit =
@@ -526,7 +557,7 @@ export type QuantityUnit =
 
 export const quantityUnitOptions = [
      {
-          label: 'Obrisi polje',
+          label: 'Obriši polje',
           value: '',
      },
      {
