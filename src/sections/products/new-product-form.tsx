@@ -482,12 +482,11 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }: any) => {
                                                   onClientUploadComplete={(res) => {
                                                        setFileURL(res[0].url)
                                                        formik.setFieldValue("imageURL", res[0].url)
-                                                       alert('Slika je uspešno poslata na server!')
-                                                       // Swal.fire({
-                                                       //      icon: 'success',
-                                                       //      title: 'Jeeej',
-                                                       //      text: 'Slika je uspešno poslata na server!',
-                                                       // })
+                                                       Swal.fire({
+                                                            icon: 'success',
+                                                            title: 'Jeeej',
+                                                            text: 'Slika je uspešno poslata na server!',
+                                                       })
                                                        setLoading(false)
                                                   }}
                                                   onUploadError={(error) => {
@@ -500,7 +499,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }: any) => {
                                                   }}
                                                   content={{
                                                        button({ ready }: any) {
-                                                            if (ready) return <Button sx={{ color: theme.palette.divider }}>Pronadji sliku...</Button>;
+                                                            if (ready) return <Typography sx={{ color: theme.palette.divider }}>Pronadji sliku...</Typography>;
                                                             return "Getting ready...";
                                                        },
                                                        allowedContent({ ready, fileTypes }) {
