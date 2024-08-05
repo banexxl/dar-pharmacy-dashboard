@@ -492,7 +492,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }: any) => {
                                                   }}
                                                   onUploadError={(error) => {
                                                        Swal.fire({
-                                                            icon: 'success',
+                                                            icon: 'error',
                                                             title: 'Noooo',
                                                             text: 'Nešto je pošlo po zlu :(',
                                                        })
