@@ -492,7 +492,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }: any) => {
                                                   onUploadError={(error) => {
                                                        Swal.fire({
                                                             icon: 'error',
-                                                            title: 'Noooo',
+                                                            title: 'Neee',
                                                             text: 'Nešto je pošlo po zlu :(',
                                                        })
                                                        console.log(error);
@@ -500,11 +500,11 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }: any) => {
                                                   content={{
                                                        button({ ready }: any) {
                                                             if (ready) return <Typography sx={{ color: theme.palette.divider }}>Pronadji sliku...</Typography>;
-                                                            return "Getting ready...";
+                                                            return "Pronadji sliku...";
                                                        },
                                                        allowedContent({ ready, fileTypes }) {
-                                                            if (!ready) return "Checking what you allow";
-                                                            if (loading) return "Seems like stuff is uploading";
+                                                            if (!ready) return "Proveravam tip datoteke...";
+                                                            if (loading) return "Slika se uploaduje...";
                                                             return `Tip datoteke: ${fileTypes.join(", ")}`;
                                                        },
                                                   }}

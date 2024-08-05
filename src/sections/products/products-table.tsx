@@ -987,7 +987,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                                                     onUploadError={(error) => {
                                                                                                          Swal.fire({
                                                                                                               icon: 'error',
-                                                                                                              title: 'Noooo',
+                                                                                                              title: 'Neeee',
                                                                                                               text: 'Nešto je pošlo po zlu! Proveri format fajla koji upload-uješ!',
                                                                                                          })
                                                                                                          console.log(error);
@@ -995,10 +995,10 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                                                     content={{
                                                                                                          button({ ready }: any) {
                                                                                                               if (ready) return <Typography sx={{ color: theme.palette.divider }}>Pronadji sliku...</Typography>;
-                                                                                                              return "Getting ready...";
+                                                                                                              return "Priprema za upload...";
                                                                                                          },
                                                                                                          allowedContent({ ready, fileTypes }) {
-                                                                                                              if (!ready) return "Checking what you allow";
+                                                                                                              if (!ready) return "Proveravam tip datoteke...";
                                                                                                               if (loading) return "Upload slike u toku!";
                                                                                                               return `Tip datoteke: ${fileTypes.join(", ")}`;
                                                                                                          },
