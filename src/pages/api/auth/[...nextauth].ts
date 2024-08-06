@@ -1,4 +1,4 @@
-import NextAuth from "next-auth";
+import NextAuth, { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import { userServices } from "@/utils/user-services";
 
@@ -9,7 +9,7 @@ type User = {
      // other user properties
 }
 
-export const authOptions = {
+export const authOptions: NextAuthOptions = {
      secret: process.env.NEXTAUTH_SECRET,
      providers: [
           GoogleProvider({
@@ -20,8 +20,6 @@ export const authOptions = {
      ],
      callbacks: {
           async signIn({ account, profile }: any) {
-               console.log(process.env.NEXTAUTH_SECRET);
-
                if (account.provider === "google") {
                     const user = await userServices().getUserByEmail(profile.email);
 
