@@ -10,11 +10,12 @@ import { OverviewTasksProgress } from 'src/sections/overview/overview-tasks-prog
 import { OverviewTotalCustomers } from 'src/sections/overview/overview-total-customers';
 import { OverviewTotalProfit } from 'src/sections/overview/overview-total-profit';
 import { OverviewTraffic } from 'src/sections/overview/overview-traffic';
+import { SessionProvider } from 'next-auth/react';
 
 const now = new Date();
 
 const Page = () => (
-     <>
+     <SessionProvider>
           <Head>
                <title>
                     Overview
@@ -151,7 +152,7 @@ const Page = () => (
                               md={12}
                               lg={8}
                          >
-                              <OverviewLatestOrders
+                              {/* <OverviewLatestOrders
                                    orders={[
                                         {
                                              id: 'f69f88012978187a6c12897f',
@@ -215,15 +216,15 @@ const Page = () => (
                                         }
                                    ]}
                                    sx={{ height: '100%' }}
-                              />
+                              /> */}
                          </Grid>
                     </Grid>
                </Container>
           </Box>
-     </>
+     </SessionProvider>
 );
 
-Page.getLayout = (page) => (
+Page.getLayout = (page: any) => (
      <DashboardLayout>
           {page}
      </DashboardLayout>

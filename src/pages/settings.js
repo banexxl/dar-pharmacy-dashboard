@@ -5,10 +5,10 @@ import { SettingsPassword } from 'src/sections/settings/settings-password';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 
 const Page = () => (
-  <>
+  <SessionProvider>
     <Head>
       <title>
-        Settings 
+        Settings
       </title>
     </Head>
     <Box
@@ -28,7 +28,7 @@ const Page = () => (
         </Stack>
       </Container>
     </Box>
-  </>
+  </SessionProvider>
 );
 
 Page.getLayout = (page) => (

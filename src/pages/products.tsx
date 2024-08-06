@@ -14,12 +14,15 @@ import { productsServices } from '../utils/product-services'
 import { useRouter } from 'next/navigation';
 import { TablePagination } from '@mui/material'
 import { AddProductForm } from '@/sections/products/new-product-form';
+import { SessionProvider, useSession } from 'next-auth/react';
 
 
 const Page = (props: any) => {
      // const products = useMemo(() => {
      //      return applyPagination(props.products, props.page, props.limit);
      // }, [props.products, props.page, props.limit]);
+     const session = useSession()
+     console.log('session', session);
 
 
      const productsIds = useMemo(() => {
@@ -85,99 +88,101 @@ const Page = (props: any) => {
      }
 
      return (
-          <Box>
-               <Head>
-                    <title>
-                         Proizvodi
-                    </title>
-               </Head>
-               <Box
-                    component="main"
-                    sx={{
-                         flexGrow: 1,
-                         py: 8
-                    }}
-               >
-                    <Container maxWidth="xl">
-                         <Stack spacing={3}>
-                              <Stack
-                                   direction="row"
-                                   justifyContent="space-between"
-                                   spacing={4}
-                              >
-                                   <Stack spacing={1}>
-                                        <Typography variant="h4">
-                                             Proizvodi
-                                        </Typography>
-                                   </Stack>
+          <SessionProvider>
+               <Box>
+                    <Head>
+                         <title>
+                              Proizvodi
+                         </title>
+                    </Head>
+                    <Box
+                         component="main"
+                         sx={{
+                              flexGrow: 1,
+                              py: 8
+                         }}
+                    >
+                         <Container maxWidth="xl">
+                              <Stack spacing={3}>
+                                   <Stack
+                                        direction="row"
+                                        justifyContent="space-between"
+                                        spacing={4}
+                                   >
+                                        <Stack spacing={1}>
+                                             <Typography variant="h4">
+                                                  Proizvodi
+                                             </Typography>
+                                        </Stack>
 
-                                   <Box sx={{ display: 'flex', justifyContent: 'space-between', height: '40px', width: '40%' }}>
-                                        <Button
-                                             startIcon={(
-                                                  <SvgIcon fontSize="small">
-                                                       <PlusIcon />
-                                                  </SvgIcon>
-                                             )}
-                                             variant="contained"
-                                             onClick={() => {
-                                                  setOpen(true)
-                                             }}
-                                        >
-                                             Dodaj proizvod
-                                        </Button>
-                                        <Button
-                                             startIcon={(
-                                                  <SvgIcon fontSize="small">
-                                                       <PlusIcon />
-                                                  </SvgIcon>
-                                             )}
-                                             variant="contained"
-                                             onClick={handleRebuild}
-                                             disabled={loading}
-                                        >
-                                             {loading ? 'Šaljem' : 'Pošalji izmene na sajt'}
-                                        </Button>
-                                   </Box>
+                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', height: '40px', width: '40%' }}>
+                                             <Button
+                                                  startIcon={(
+                                                       <SvgIcon fontSize="small">
+                                                            <PlusIcon />
+                                                       </SvgIcon>
+                                                  )}
+                                                  variant="contained"
+                                                  onClick={() => {
+                                                       setOpen(true)
+                                                  }}
+                                             >
+                                                  Dodaj proizvod
+                                             </Button>
+                                             <Button
+                                                  startIcon={(
+                                                       <SvgIcon fontSize="small">
+                                                            <PlusIcon />
+                                                       </SvgIcon>
+                                                  )}
+                                                  variant="contained"
+                                                  onClick={handleRebuild}
+                                                  disabled={loading}
+                                             >
+                                                  {loading ? 'Šaljem' : 'Pošalji izmene na sajt'}
+                                             </Button>
+                                        </Box>
+                                   </Stack>
+                                   <ProductsTable
+                                        count={props.products.length || 0}
+                                        items={props.products}
+                                        page={props.page}
+                                        rowsPerPage={props.limit}
+                                        selected={productsSelection.selected}
+                                        productsCount={props.productsCount}
+                                   />
+                                   <TablePagination
+                                        component="div"
+                                        count={props.productsCount}
+                                        onPageChange={handlePageChange}
+                                        onRowsPerPageChange={handleRowsPerPageChange}
+                                        page={props.page}
+                                        rowsPerPage={props.limit}
+                                        rowsPerPageOptions={[5, 10, 25, 50, 100, 200]}
+                                        showFirstButton
+                                        showLastButton
+                                        labelRowsPerPage={'Broj po stranici'}
+                                   //labelDisplayedRows={({ from, to, count }) => { return `${ from }–${ to } od ${ count !== -1 ? count : `više od ${ to }` }`; }}
+                                   />
                               </Stack>
-                              <ProductsTable
-                                   count={props.products.length || 0}
-                                   items={props.products}
-                                   page={props.page}
-                                   rowsPerPage={props.limit}
-                                   selected={productsSelection.selected}
-                                   productsCount={props.productsCount}
-                              />
-                              <TablePagination
-                                   component="div"
-                                   count={props.productsCount}
-                                   onPageChange={handlePageChange}
-                                   onRowsPerPageChange={handleRowsPerPageChange}
-                                   page={props.page}
-                                   rowsPerPage={props.limit}
-                                   rowsPerPageOptions={[5, 10, 25, 50, 100, 200]}
-                                   showFirstButton
-                                   showLastButton
-                                   labelRowsPerPage={'Broj po stranici'}
-                              //labelDisplayedRows={({ from, to, count }) => { return `${ from }–${ to } od ${ count !== -1 ? count : `više od ${ to }` }`; }}
-                              />
-                         </Stack>
-                    </Container>
-               </Box>
-               <Dialog open={open}
-                    PaperProps={{
-                         sx: {
-                              width: '600px'
-                         }
-                    }}
-               >
-                    <DialogTitle>Dodaj proizvod</DialogTitle>
-                    <DialogContent dividers >
-                         <AddProductForm
-                              onSubmitSuccess={handleSubmitSuccess}
-                              onSubmitFail={handleSubmitFail} />
-                    </DialogContent>
-               </Dialog>
-          </Box >
+                         </Container>
+                    </Box>
+                    <Dialog open={open}
+                         PaperProps={{
+                              sx: {
+                                   width: '600px'
+                              }
+                         }}
+                    >
+                         <DialogTitle>Dodaj proizvod</DialogTitle>
+                         <DialogContent dividers >
+                              <AddProductForm
+                                   onSubmitSuccess={handleSubmitSuccess}
+                                   onSubmitFail={handleSubmitFail} />
+                         </DialogContent>
+                    </Dialog>
+               </Box >
+          </SessionProvider>
      );
 };
 

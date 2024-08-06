@@ -53,7 +53,7 @@ const Page = (props) => {
      );
 
      return (
-          <>
+          <SessionProvider>
                <Head>
                     <title>
                          Customers
@@ -134,7 +134,7 @@ const Page = (props) => {
                          </Stack>
                     </Container>
                </Box>
-          </>
+          </SessionProvider>
      );
 };
 

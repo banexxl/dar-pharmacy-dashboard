@@ -68,10 +68,11 @@ const companies = [
 ];
 
 const Page = () => (
-  <>
+
+  <SessionProvider>
     <Head>
       <title>
-        Companies 
+        Companies
       </title>
     </Head>
     <Box
@@ -162,7 +163,8 @@ const Page = () => (
         </Stack>
       </Container>
     </Box>
-  </>
+  </SessionProvider>
+
 );
 
 Page.getLayout = (page) => (
