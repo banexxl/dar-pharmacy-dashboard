@@ -542,8 +542,8 @@ export const manufacturerOptions = [
           value: 'vedra',
      },
      {
-          label: 'Zao make up',
-          value: 'zao-make-up',
+          label: 'Zao prirodna kozmetika',
+          value: 'zao-prirodna-kozmetika',
      },
 ];
 
