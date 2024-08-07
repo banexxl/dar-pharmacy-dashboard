@@ -133,7 +133,11 @@ export const mainCategoryOptions = [
      {
           label: 'Imunitet za decu',
           value: 'imunitet-za-decu',
-     }
+     },
+     {
+          label: 'Zao prirodna šminka',
+          value: 'zao-prirodna-sminka',
+     },
 ];
 
 export const midCategoryOptions = [
