@@ -138,6 +138,10 @@ export const mainCategoryOptions = [
           label: 'Zao prirodna šminka',
           value: 'zao-prirodna-sminka',
      },
+     {
+          label: 'Todoxin',
+          value: 'todoxin',
+     },
 ];
 
 export const midCategoryOptions = [
@@ -233,7 +237,6 @@ export const midCategoryOptions = [
           label: 'Bubrezi i mokraćni putevi',
           value: 'bubrezi-i-mokracni-putevi',
      },
-
      {
           label: 'Čajevi',
           value: 'cajevi',
