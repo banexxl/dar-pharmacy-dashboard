@@ -408,6 +408,16 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }: any) => {
                                         error={formik.touched.quantity && !!formik.errors.quantity}
                                         helperText={formik.touched.quantity && formik.errors.quantity}
                                         type='number'
+                                        inputProps={{ min: 1 }}
+                                        onBlur={(e) => {
+                                             const min = 1;
+                                             const value = Number(e.target.value);
+                                             if (value < min) {
+                                                  formik.setFieldValue('quantity', min);
+                                             } else {
+                                                  formik.handleBlur(e);
+                                             }
+                                        }}
                                    />
 
                                    <TextField
@@ -554,6 +564,16 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }: any) => {
                                         onChange={formik.handleChange}
                                         error={formik.touched.price && !!formik.errors.price}
                                         helperText={formik.touched.price && formik.errors.price}
+                                        inputProps={{ min: 1 }}
+                                        onBlur={(e) => {
+                                             const min = 1;
+                                             const value = Number(e.target.value);
+                                             if (value < min) {
+                                                  formik.setFieldValue('price', min);
+                                             } else {
+                                                  formik.handleBlur(e);
+                                             }
+                                        }}
                                    />
 
                                    <FormControlLabel

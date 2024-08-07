@@ -490,6 +490,10 @@ export const manufacturerOptions = [
           value: 'sofija',
      },
      {
+          label: 'Todoxin',
+          value: 'todoxin',
+     },
+     {
           label: 'VitalGrana',
           value: 'vitalgrana',
      },
