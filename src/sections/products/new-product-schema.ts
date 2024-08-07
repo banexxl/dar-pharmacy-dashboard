@@ -133,10 +133,6 @@ export const mainCategoryOptions = [
      {
           label: 'Imunitet za decu',
           value: 'imunitet-za-decu',
-     },
-     {
-          label: 'Todoxin',
-          value: 'todoxin',
      }
 ];
 
