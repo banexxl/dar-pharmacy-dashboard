@@ -133,10 +133,6 @@ export const mainCategoryOptions = [
      {
           label: 'Imunitet za decu',
           value: 'imunitet-za-decu',
-     },
-     {
-          label: 'Todoxin',
-          value: 'todoxin',
      }
 ];
 
@@ -488,6 +484,10 @@ export const manufacturerOptions = [
      {
           label: 'Sofija',
           value: 'sofija',
+     },
+     {
+          label: 'Todoxin',
+          value: 'todoxin',
      },
      {
           label: 'VitalGrana',
