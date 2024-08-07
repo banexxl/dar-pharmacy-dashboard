@@ -138,10 +138,6 @@ export const mainCategoryOptions = [
           label: 'Zao prirodna šminka',
           value: 'zao-prirodna-sminka',
      },
-     {
-          label: 'Todoxin',
-          value: 'todoxin',
-     },
 ];
 
 export const midCategoryOptions = [
