@@ -321,6 +321,10 @@ export const manufacturerOptions = [
           value: 'bio-solutions',
      },
      {
+          label: 'Bioguard',
+          value: 'bioguard',
+     },
+     {
           label: 'Catalysis S.L.',
           value: 'catalysis-sl',
      },
