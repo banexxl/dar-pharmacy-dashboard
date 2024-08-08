@@ -305,6 +305,10 @@ export const manufacturerOptions = [
           value: 'amer',
      },
      {
+          label: 'Aronica',
+          value: 'aronica',
+     },
+     {
           label: 'Bach Flower Remedies',
           value: 'bach-flower-remedies',
      },
