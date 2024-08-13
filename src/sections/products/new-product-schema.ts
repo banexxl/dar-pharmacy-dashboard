@@ -305,6 +305,10 @@ export const manufacturerOptions = [
           value: 'amer',
      },
      {
+          label: 'Aronica',
+          value: 'aronica',
+     },
+     {
           label: 'Bach Flower Remedies',
           value: 'bach-flower-remedies',
      },
@@ -319,6 +323,10 @@ export const manufacturerOptions = [
      {
           label: 'Bio Solutions',
           value: 'bio-solutions',
+     },
+     {
+          label: 'Bioguard',
+          value: 'bioguard',
      },
      {
           label: 'Catalysis S.L.',
