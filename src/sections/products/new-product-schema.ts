@@ -139,6 +139,10 @@ export const mainCategoryOptions = [
           value: 'imunitet-za-decu',
      },
      {
+          label: 'Suplemania',
+          value: 'suplemania',
+     },
+     {
           label: 'Zao prirodna šminka',
           value: 'zao-prirodna-sminka',
      },
@@ -353,6 +357,10 @@ export const manufacturerOptions = [
           value: 'dr-werner-pharma',
      },
      {
+          label: 'Eco boom',
+          value: 'eco-boom',
+     },
+     {
           label: 'Fantastik fungi',
           value: 'fantastik-fungi',
      },
@@ -549,12 +557,12 @@ export const manufacturerOptions = [
           value: 'phyto',
      },
      {
-          label: 'Priroda na dar',
-          value: 'priroda-na-dar',
+          label: 'Suplemania',
+          value: 'suplemania',
      },
      {
-          label: 'Eco boom',
-          value: 'eco-boom',
+          label: 'Priroda na dar',
+          value: 'priroda-na-dar',
      },
      {
           label: 'Weleda',
