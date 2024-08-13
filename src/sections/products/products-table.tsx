@@ -449,7 +449,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                                                     xs={12}
                                                                                                >
                                                                                                     <TextField key={Math.random()}
-                                                                                                         defaultValue={product.name}
+                                                                                                         defaultValue={currentProductObject?.name}
                                                                                                          fullWidth
                                                                                                          label="Naziv"
                                                                                                          name="name"
@@ -772,7 +772,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                                                >
                                                                                                     <TextField
                                                                                                          key={Math.random()}
-                                                                                                         defaultValue={product.quantity}
+                                                                                                         defaultValue={currentProductObject?.quantity}
                                                                                                          type="number"
                                                                                                          fullWidth
                                                                                                          label="Količina"
@@ -792,7 +792,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                                                     xs={12}
                                                                                                >
                                                                                                     <TextField key={Math.random()}
-                                                                                                         defaultValue={product.quantityUnit}
+                                                                                                         defaultValue={currentProductObject?.quantityUnit}
                                                                                                          select
                                                                                                          fullWidth
                                                                                                          label="Jedinica mere"
