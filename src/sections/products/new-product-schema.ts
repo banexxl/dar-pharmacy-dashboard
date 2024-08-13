@@ -123,6 +123,10 @@ export const mainCategoryOptions = [
           value: 'mast-od-jazavca',
      },
      {
+          label: 'Guščija mast',
+          value: 'guscija-mast',
+     },
+     {
           label: 'Ulja za masažu',
           value: 'ulja-za-masazu',
      },
@@ -371,6 +375,10 @@ export const manufacturerOptions = [
      {
           label: 'Herbalab',
           value: 'herbalab',
+     },
+     {
+          label: 'Health & more',
+          value: 'health-and-more',
      },
      {
           label: 'Himalaya',
