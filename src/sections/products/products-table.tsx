@@ -469,7 +469,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                                                     xs={12}
                                                                                                >
                                                                                                     <TextField key={Math.random()}
-                                                                                                         defaultValue={product._id!.slice(-8)}
+                                                                                                         defaultValue={currentProductObject?._id!.slice(-8)}
                                                                                                          disabled
                                                                                                          fullWidth
                                                                                                          label="Šifra proizvoda"
@@ -482,7 +482,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                                                     xs={12}
                                                                                                >
                                                                                                     <TextField key={Math.random()}
-                                                                                                         defaultValue={product.mainCategory}
+                                                                                                         defaultValue={currentProductObject?.mainCategory}
                                                                                                          fullWidth
                                                                                                          label="Glavna Kategorija"
                                                                                                          select
@@ -510,7 +510,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                                                     xs={12}
                                                                                                >
                                                                                                     <TextField key={Math.random()}
-                                                                                                         defaultValue={product.midCategory}
+                                                                                                         defaultValue={currentProductObject?.midCategory}
                                                                                                          fullWidth
                                                                                                          label="Mid Kategorija"
                                                                                                          select
@@ -540,7 +540,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                                                     xs={12}
                                                                                                >
                                                                                                     <TextField key={Math.random()}
-                                                                                                         defaultValue={product.subCategory}
+                                                                                                         defaultValue={currentProductObject?.subCategory}
                                                                                                          fullWidth
                                                                                                          label="Sub Kategorija"
                                                                                                          select
@@ -570,7 +570,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                                                     xs={12}
                                                                                                >
                                                                                                     <TextField key={Math.random()}
-                                                                                                         defaultValue={product.description}
+                                                                                                         defaultValue={currentProductObject?.description}
                                                                                                          fullWidth
                                                                                                          label="Opis"
                                                                                                          disabled={loading}
@@ -590,7 +590,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                                                     xs={12}
                                                                                                >
                                                                                                     <TextField key={Math.random()}
-                                                                                                         defaultValue={product.instructions}
+                                                                                                         defaultValue={currentProductObject?.instructions}
                                                                                                          fullWidth
                                                                                                          label="Instrukcije"
                                                                                                          disabled={loading}
@@ -610,7 +610,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                                                     xs={12}
                                                                                                >
                                                                                                     <TextField key={Math.random()}
-                                                                                                         defaultValue={product.warning}
+                                                                                                         defaultValue={currentProductObject?.warning}
                                                                                                          fullWidth
                                                                                                          label="Upozorenje"
                                                                                                          disabled={loading}
@@ -630,7 +630,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                                                     xs={12}
                                                                                                >
                                                                                                     <TextField key={Math.random()}
-                                                                                                         defaultValue={product.ingredients}
+                                                                                                         defaultValue={currentProductObject?.ingredients}
                                                                                                          fullWidth
                                                                                                          disabled={loading}
                                                                                                          label="Sastav"
@@ -663,7 +663,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                                                     xs={12}
                                                                                                >
                                                                                                     <TextField key={Math.random()}
-                                                                                                         defaultValue={product.price}
+                                                                                                         defaultValue={currentProductObject?.price}
                                                                                                          fullWidth
                                                                                                          disabled={loading}
                                                                                                          label="Nova cena"
@@ -702,7 +702,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                                                               }))
                                                                                                          }
                                                                                                          select
-                                                                                                         defaultValue={product.manufacturer}
+                                                                                                         defaultValue={currentProductObject?.manufacturer}
                                                                                                     >
                                                                                                          {manufacturerOptions.map((option: any) => (
                                                                                                               <MenuItem
@@ -721,7 +721,7 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                                                     xs={12}
                                                                                                >
                                                                                                     <TextField key={Math.random()}
-                                                                                                         defaultValue={product.availableStock}
+                                                                                                         defaultValue={currentProductObject?.availableStock}
                                                                                                          fullWidth
                                                                                                          disabled={loading}
                                                                                                          label="Na stanju"
