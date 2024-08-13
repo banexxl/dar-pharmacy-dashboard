@@ -385,6 +385,10 @@ export const manufacturerOptions = [
           value: 'herbalab',
      },
      {
+          label: 'Hedera Vita',
+          value: 'hedera-vita',
+     },
+     {
           label: 'Health & more',
           value: 'health-and-more',
      },
