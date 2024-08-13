@@ -517,6 +517,10 @@ export const manufacturerOptions = [
           value: 'vitalgrana',
      },
      {
+          label: 'Viviscal',
+          value: 'viviscal',
+     },
+     {
           label: 'Zodeks caj',
           value: 'zodeks-caj',
      },
