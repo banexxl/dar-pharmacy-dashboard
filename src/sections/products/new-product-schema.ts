@@ -373,6 +373,10 @@ export const manufacturerOptions = [
           value: 'farmas-mn',
      },
      {
+          label: 'For Natural',
+          value: 'for-natural',
+     },
+     {
           label: 'Granum',
           value: 'granum',
      },
@@ -445,6 +449,10 @@ export const manufacturerOptions = [
           value: 'medical-plants',
      },
      {
+          label: 'Meli Plants',
+          value: 'meli-plants',
+     },
+     {
           label: 'Moj caj',
           value: 'moj-caj',
      },
@@ -485,6 +493,10 @@ export const manufacturerOptions = [
           value: 'pharmadevelopment',
      },
      {
+          label: 'Pharmaceuticals',
+          value: 'pharmaceuticals',
+     },
+     {
           label: 'Plantacare',
           value: 'plantacare',
      },
@@ -507,6 +519,10 @@ export const manufacturerOptions = [
      {
           label: 'Ruska Biljna Apoteka Organic',
           value: 'ruska-biljna-apoteka-organic',
+     },
+     {
+          label: 'Salus',
+          value: 'salus',
      },
      {
           label: 'Shulke',
