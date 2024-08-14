@@ -489,8 +489,8 @@ export const manufacturerOptions = [
           value: 'now-foods',
      },
      {
-          label: 'OKP paket za čišćenje',
-          value: 'okp-paket-za-ciscenje',
+          label: 'OKP',
+          value: 'okp',
      },
      {
           label: 'OlimpSport',
