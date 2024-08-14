@@ -139,6 +139,10 @@ export const mainCategoryOptions = [
           value: 'imunitet-za-decu',
      },
      {
+          label: 'Homeopatija',
+          value: 'homeopatija',
+     },
+     {
           label: 'Suplemania',
           value: 'suplemania',
      },
@@ -481,8 +485,8 @@ export const manufacturerOptions = [
           value: 'now-foods',
      },
      {
-          label: 'OKP',
-          value: 'okp',
+          label: 'OKP paket za čišćenje',
+          value: 'okp-paket-za-ciscenje',
      },
      {
           label: 'OlimpSport',
