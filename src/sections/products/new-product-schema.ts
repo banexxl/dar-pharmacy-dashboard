@@ -143,6 +143,10 @@ export const mainCategoryOptions = [
           value: 'suplemania',
      },
      {
+          label: 'Proizvodi za žene',
+          value: 'proizvodi-za-zene',
+     },
+     {
           label: 'Zao prirodna šminka',
           value: 'zao-prirodna-sminka',
      },
