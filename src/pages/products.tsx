@@ -143,6 +143,19 @@ const Page = (props: any) => {
                                              </Button>
                                         </Box>
                                    </Stack>
+                                   <TablePagination
+                                        component="div"
+                                        count={props.productsCount}
+                                        onPageChange={handlePageChange}
+                                        onRowsPerPageChange={handleRowsPerPageChange}
+                                        page={props.page}
+                                        rowsPerPage={props.limit}
+                                        rowsPerPageOptions={[5, 10, 25, 50, 100, 200]}
+                                        showFirstButton
+                                        showLastButton
+                                        labelRowsPerPage={'Broj po stranici'}
+                                   //labelDisplayedRows={({ from, to, count }) => { return `${ from }–${ to } od ${ count !== -1 ? count : `više od ${ to }` }`; }}
+                                   />
                                    <ProductsTable
                                         count={props.products.length || 0}
                                         items={props.products}
