@@ -151,6 +151,10 @@ export const mainCategoryOptions = [
           value: 'proizvodi-za-zene',
      },
      {
+          label: 'Čišćenje organizma',
+          value: 'ciscenje-organizma',
+     },
+     {
           label: 'Zao prirodna šminka',
           value: 'zao-prirodna-sminka',
      },
