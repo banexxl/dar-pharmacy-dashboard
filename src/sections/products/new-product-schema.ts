@@ -95,6 +95,10 @@ export const mainCategoryOptions = [
           value: 'bebi-prirodna-kozmetika',
      },
      {
+          label: 'Bebi pelene',
+          value: 'bebi-pelene',
+     },
+     {
           label: 'Kolagen',
           value: 'kolagen',
      },
