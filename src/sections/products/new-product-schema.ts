@@ -87,76 +87,72 @@ export const mainCategoryOptions = [
           value: 'apoteka',
      },
      {
-          label: 'Prirodna kozmetika',
-          value: 'prirodna-kozmetika',
+          label: 'Bebi pelene',
+          value: 'bebi-pelene',
      },
      {
           label: 'Bebi prirodna kozmetika',
           value: 'bebi-prirodna-kozmetika',
      },
      {
-          label: 'Bebi pelene',
-          value: 'bebi-pelene',
+          label: 'Biljne tinkture',
+          value: 'biljne-tinkture',
      },
      {
-          label: 'Kolagen',
-          value: 'kolagen',
-     },
-     {
-          label: 'Suplementi',
-          value: 'suplementi',
-     },
-     {
-          label: 'Ledene Kocke za imunitet',
-          value: 'ledene-kocke-za-imunitet',
-     },
-     {
-          label: 'Prirodni imunitet',
-          value: 'prirodni-imunitet',
-     },
-     {
-          label: 'Ruska apoteka',
-          value: 'ruska-apoteka',
+          label: 'Čišćenje organizma',
+          value: 'ciscenje-organizma',
      },
      {
           label: 'Domaci prirodni melemi',
           value: 'domaci-prirodni-melemi',
      },
      {
-          label: 'Mast od Jazavca',
-          value: 'mast-od-jazavca',
-     },
-     {
           label: 'Guščija mast',
           value: 'guscija-mast',
-     },
-     {
-          label: 'Ulja za masažu',
-          value: 'ulja-za-masazu',
-     },
-     {
-          label: 'Biljne tinkture',
-          value: 'biljne-tinkture',
-     },
-     {
-          label: 'Imunitet za decu',
-          value: 'imunitet-za-decu',
      },
      {
           label: 'Homeopatija',
           value: 'homeopatija',
      },
      {
-          label: 'Suplemania',
-          value: 'suplemania',
+          label: 'Imunitet za decu',
+          value: 'imunitet-za-decu',
+     },
+     {
+          label: 'Kolagen',
+          value: 'kolagen',
+     },
+     {
+          label: 'Ledene Kocke za imunitet',
+          value: 'ledene-kocke-za-imunitet',
+     },
+     {
+          label: 'Mast od Jazavca',
+          value: 'mast-od-jazavca',
+     },
+     {
+          label: 'Prirodna kozmetika',
+          value: 'prirodna-kozmetika',
+     },
+     {
+          label: 'Prirodni imunitet',
+          value: 'prirodni-imunitet',
      },
      {
           label: 'Proizvodi za žene',
           value: 'proizvodi-za-zene',
      },
      {
-          label: 'Čišćenje organizma',
-          value: 'ciscenje-organizma',
+          label: 'Ruska apoteka',
+          value: 'ruska-apoteka',
+     },
+     {
+          label: 'Suplemania',
+          value: 'suplemania',
+     },
+     {
+          label: 'Ulja za masažu',
+          value: 'ulja-za-masazu',
      },
      {
           label: 'Zao prirodna šminka',
