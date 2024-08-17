@@ -309,10 +309,6 @@ export const midCategoryOptions = [
 
 export const manufacturerOptions = [
      {
-          label: 'Alpenkrauter',
-          value: 'alpenkrauter',
-     },
-     {
           label: 'Abela Pharm',
           value: 'abela-pharm',
      },
@@ -321,12 +317,20 @@ export const manufacturerOptions = [
           value: 'alpen-pharma-doo',
      },
      {
+          label: 'Alpenkrauter',
+          value: 'alpenkrauter',
+     },
+     {
           label: 'Amer',
           value: 'amer',
      },
      {
           label: 'Aronica',
           value: 'aronica',
+     },
+     {
+          label: 'Azeta bio',
+          value: 'azeta-bio',
      },
      {
           label: 'Bach Flower Remedies',
@@ -365,12 +369,12 @@ export const manufacturerOptions = [
           value: 'cortex-labs',
      },
      {
-          label: 'DMG',
-          value: 'dmg',
-     },
-     {
           label: 'Dimas',
           value: 'dimas',
+     },
+     {
+          label: 'DMG',
+          value: 'dmg',
      },
      {
           label: 'Dr. Werner Pharma',
@@ -393,16 +397,20 @@ export const manufacturerOptions = [
           value: 'farmas-mn',
      },
      {
+          label: 'Fitaky',
+          value: 'fitaky',
+     },
+     {
           label: 'For Natural',
           value: 'for-natural',
      },
      {
-          label: 'Granum',
-          value: 'granum',
-     },
-     {
           label: 'Galenika',
           value: 'galenika',
+     },
+     {
+          label: 'Gamarde',
+          value: 'gamarde',
      },
      {
           label: 'Gana kozmetika',
@@ -413,8 +421,12 @@ export const manufacturerOptions = [
           value: 'gavez',
      },
      {
-          label: 'Herbalab',
-          value: 'herbalab',
+          label: 'Gloria',
+          value: 'gloria',
+     },
+     {
+          label: 'Granum',
+          value: 'granum',
      },
      {
           label: 'Hedera Vita',
@@ -423,6 +435,14 @@ export const manufacturerOptions = [
      {
           label: 'Health & more',
           value: 'health-and-more',
+     },
+     {
+          label: 'Herbalab',
+          value: 'herbalab',
+     },
+     {
+          label: 'Herbs honey',
+          value: 'herbs-honey',
      },
      {
           label: 'Himalaya',
@@ -437,10 +457,6 @@ export const manufacturerOptions = [
           value: 'lama',
      },
      {
-          label: 'LV-Pharm',
-          value: 'lv-pharm',
-     },
-     {
           label: 'Laboratorie ACM, France',
           value: 'laboratorie-acm-france',
      },
@@ -451,6 +467,10 @@ export const manufacturerOptions = [
      {
           label: 'Lander',
           value: 'lander',
+     },
+     {
+          label: 'LV-Pharm',
+          value: 'lv-pharm',
      },
      {
           label: 'Magni Food',
@@ -477,12 +497,8 @@ export const manufacturerOptions = [
           value: 'moj-caj',
      },
      {
-          label: 'Nemet Palic',
-          value: 'nemet-palic',
-     },
-     {
-          label: 'NTC Pharma',
-          value: 'ntc-pharma',
+          label: 'Mustela',
+          value: 'mustela',
      },
      {
           label: 'Natural Way',
@@ -493,8 +509,16 @@ export const manufacturerOptions = [
           value: 'naturalwealth',
      },
      {
+          label: 'Nemet Palic',
+          value: 'nemet-palic',
+     },
+     {
           label: 'Now Foods',
           value: 'now-foods',
+     },
+     {
+          label: 'NTC Pharma',
+          value: 'ntc-pharma',
      },
      {
           label: 'OKP',
@@ -517,6 +541,10 @@ export const manufacturerOptions = [
           value: 'pharmaceuticals',
      },
      {
+          label: 'Phyto',
+          value: 'phyto',
+     },
+     {
           label: 'Plantacare',
           value: 'plantacare',
      },
@@ -525,12 +553,12 @@ export const manufacturerOptions = [
           value: 'priroda-na-dar',
      },
      {
-          label: 'Rhinosan',
-          value: 'rhinosan',
-     },
-     {
           label: 'RabenHorst',
           value: 'rabenhorst',
+     },
+     {
+          label: 'Rhinosan',
+          value: 'rhinosan',
      },
      {
           label: 'Rulek',
@@ -553,8 +581,16 @@ export const manufacturerOptions = [
           value: 'sofija',
      },
      {
+          label: 'Suplemania',
+          value: 'suplemania',
+     },
+     {
           label: 'Todoxin',
           value: 'todoxin',
+     },
+     {
+          label: 'Vedra',
+          value: 'vedra',
      },
      {
           label: 'VitalGrana',
@@ -565,58 +601,19 @@ export const manufacturerOptions = [
           value: 'viviscal',
      },
      {
-          label: 'Zodeks caj',
-          value: 'zodeks-caj',
-     },
-     {
-          label: 'Gloria',
-          value: 'gloria',
-     },
-     {
-          label: 'Azeta bio',
-          value: 'azeta-bio',
-     },
-     {
-          label: 'Gamarde',
-          value: 'gamarde',
-     },
-     {
-          label: 'Fitaky',
-          value: 'fitaky',
-     },
-     {
-          label: 'Mustela',
-          value: 'mustela',
-     },
-     {
-          label: 'Phyto',
-          value: 'phyto',
-     },
-     {
-          label: 'Suplemania',
-          value: 'suplemania',
-     },
-     {
-          label: 'Priroda na dar',
-          value: 'priroda-na-dar',
-     },
-     {
           label: 'Weleda',
           value: 'weleda',
-     },
-     {
-          label: 'Herbs honey',
-          value: 'herbs-honey',
-     },
-     {
-          label: 'Vedra',
-          value: 'vedra',
      },
      {
           label: 'Zao prirodna šminka',
           value: 'zao-prirodna-sminka',
      },
+     {
+          label: 'Zodeks caj',
+          value: 'zodeks-caj',
+     },
 ];
+
 
 export type QuantityUnit =
      'briketa' | 'flastera' |
