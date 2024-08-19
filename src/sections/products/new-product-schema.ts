@@ -153,11 +153,7 @@ export const mainCategoryOptions = [
      {
           label: 'Ulja za masažu',
           value: 'ulja-za-masazu',
-     },
-     {
-          label: 'Zao prirodna šminka',
-          value: 'zao-prirodna-sminka',
-     },
+     }
 ];
 
 export const midCategoryOptions = [

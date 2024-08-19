@@ -1,12 +1,10 @@
 "use client"
 import React, { useState } from 'react';
-import { useFormik } from 'formik';
 import { TextField, Typography, Button, Checkbox, FormControlLabel, Box, Input, Card, CardContent, Grid, MenuItem, Stack, Container, IconButton, CardActionArea, colors } from '@mui/material';
 import { Form, Formik, FormikErrors, FormikTouched } from 'formik';
 import PhotoCamera from "@mui/icons-material/PhotoCamera";
 import { initialValues, mainCategoryOptions, manufacturerOptions, midCategoryOptions, newProductSchema, quantityUnitOptions } from './new-product-schema'
 import { useRouter } from 'next/navigation';
-import CircularProgress from '@mui/material/CircularProgress';
 import Swal from 'sweetalert2'
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
