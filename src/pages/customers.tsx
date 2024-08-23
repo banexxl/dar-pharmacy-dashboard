@@ -1,56 +1,39 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import Head from 'next/head';
-import { subDays, subHours } from 'date-fns';
 import ArrowDownOnSquareIcon from '@heroicons/react/24/solid/ArrowDownOnSquareIcon';
 import ArrowUpOnSquareIcon from '@heroicons/react/24/solid/ArrowUpOnSquareIcon';
 import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
-import { Box, Button, Container, Stack, SvgIcon, Typography } from '@mui/material';
+import { Box, Button, Container, Stack, SvgIcon, TablePagination, Typography } from '@mui/material';
 import { useSelection } from 'src/hooks/use-selection';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
-import { CustomersTable } from 'src/sections/customer/customers-table';
 import { CustomersSearch } from 'src/sections/customer/customers-search';
-import { applyPagination } from 'src/utils/apply-pagination';
 import { userServices } from '../utils/user-services'
+import { SessionProvider } from 'next-auth/react';
+import { useRouter } from 'next/router';
+import { CustomersTable } from '@/sections/customer/customers-table';
 
-const useCustomers = (data, page, rowsPerPage) => {
-     return useMemo(
-          () => {
-               return applyPagination(data, page, rowsPerPage);
-          },
-          [page, rowsPerPage]
-     );
-};
 
-const useCustomerIds = (customers) => {
-     return useMemo(
-          () => {
-               return customers.map((customer) => customer.id);
-          },
-          [customers]
-     );
-};
+const CustomersPage = (props: any) => {
+     console.log('pageprops', props);
 
-const Page = (props) => {
+     const customerIDs = useMemo(() => {
+          if (!Array.isArray(props.customers)) {
+               return [];
+          }
+          return props.customers.map((customer: any) => customer._id);
+     }, [props.customers]);
 
-     const [page, setPage] = useState(0);
-     const [rowsPerPage, setRowsPerPage] = useState(5);
-     const customers = useCustomers(props.users, page, rowsPerPage);
-     const customersIds = useCustomerIds(customers);
-     const customersSelection = useSelection(customersIds);
+     const customersSelection = useSelection(customerIDs);
+     const router = useRouter();
 
-     const handlePageChange = useCallback(
-          (event, value) => {
-               setPage(value);
-          },
-          []
-     );
+     const handleRowsPerPageChange = (event: any) => {
+          router.push(`customers/?page=0&limit=${event.target.value}`);
+          return (event.target.value)
+     }
 
-     const handleRowsPerPageChange = useCallback(
-          (event) => {
-               setRowsPerPage(event.target.value);
-          },
-          []
-     );
+     const handlePageChange = (event: any, newPage: any) => {
+          router.push(`/customers?page=${newPage}&limit=${props.limit}`);
+     }
 
      return (
           <SessionProvider>
@@ -118,18 +101,37 @@ const Page = (props) => {
                                    </div>
                               </Stack>
                               <CustomersSearch />
-                              <CustomersTable
-                                   count={props.users.length}
-                                   items={customers}
-                                   onDeselectAll={customersSelection.handleDeselectAll}
-                                   onDeselectOne={customersSelection.handleDeselectOne}
+                              < TablePagination
+                                   component="div"
+                                   count={props.customersCount}
                                    onPageChange={handlePageChange}
                                    onRowsPerPageChange={handleRowsPerPageChange}
-                                   onSelectAll={customersSelection.handleSelectAll}
-                                   onSelectOne={customersSelection.handleSelectOne}
-                                   page={page}
-                                   rowsPerPage={rowsPerPage}
+                                   page={props.page}
+                                   rowsPerPage={props.limit}
+                                   rowsPerPageOptions={[5, 10, 25, 50, 100, 200]}
+                                   showFirstButton
+                                   showLastButton
+                                   labelRowsPerPage={'Broj po stranici'}
+                              //labelDisplayedRows={({ from, to, count }) => { return `${ from }–${ to } od ${ count !== -1 ? count : `više od ${ to }` }`; }}
+                              />
+                              <CustomersTable
+                                   count={props.customers.length || 0}
+                                   items={props.customers}
+                                   page={props.page}
+                                   rowsPerPage={props.limit}
                                    selected={customersSelection.selected}
+                              />
+                              < TablePagination
+                                   count={props.customersCount}
+                                   onPageChange={handlePageChange}
+                                   onRowsPerPageChange={handleRowsPerPageChange}
+                                   page={props.page}
+                                   rowsPerPage={props.limit}
+                                   rowsPerPageOptions={[5, 10, 25, 50, 100, 200]}
+                                   showFirstButton
+                                   showLastButton
+                                   labelRowsPerPage={'Broj po stranici'}
+                              //labelDisplayedRows={({ from, to, count }) => { return `${ from }–${ to } od ${ count !== -1 ? count : `više od ${ to }` }`; }}
                               />
                          </Stack>
                     </Container>
@@ -138,52 +140,40 @@ const Page = (props) => {
      );
 };
 
+export async function getServerSideProps(context: any) {
+     try {
+          const page = context.query.page || 1
+          const limit = context.query.limit || 5
 
-export async function getServerSideProps() {
+          const customers = await userServices().getUsersByPage(page, limit);
+          const customersCount = await userServices().getUsersCount();
 
-     const allUsers = await userServices().getAllUsers()
-
-     redirect: {
-          destination: "/404"
-     }
-
-     return {
-          props: {
-               users: JSON.parse(JSON.stringify(allUsers)),
-               // ...(await serverSideTranslations('sr-RS'))
-               // ...(await serverSideTranslations('sr-RS' ?? context.locale, ['common'], null, ['en-US', 'sr-RS'])),
-          },
+          return {
+               props: {
+                    customers: JSON.parse(JSON.stringify(customers)),
+                    customersCount: JSON.parse(JSON.stringify(customersCount)),
+                    page: parseInt(context.query.page),
+                    limit: parseInt(context.query.limit)
+               },
+          };
+     } catch (error) {
+          console.error("Error fetching customers:", error);
+          return {
+               props: {
+                    customers: [],
+                    customersCount: 0,
+                    page: 1,
+                    limit: 5,
+                    error: "Failed to fetch customers. Please try again later.",
+               },
+          };
      }
 }
 
-
-// export const getStaticPaths = async (context) => {
-
-//           const allProducts = await productsServices().getAllProducts()
-
-//           const finalList = [
-//                     ...allProducts
-//           ]
-
-//           const paths = finalList.flatMap((product) =>
-//                     context.locales.map((locale) => ({
-//                               params: {
-//                                         proizvodjac: product.manufacturer.toString()
-//                               },
-//                               locale,
-//                     }))
-//           );
-
-//           return {
-//                     paths,
-//                     fallback: false, // false or "blocking"
-//           };
-// }
-
-Page.getLayout = (page) => (
+CustomersPage.getLayout = (page: any) => (
      <DashboardLayout>
           {page}
      </DashboardLayout>
 );
 
-export default Page;
+export default CustomersPage;

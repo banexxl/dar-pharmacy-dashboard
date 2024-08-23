@@ -1,15 +1,13 @@
 import ChevronRightIcon from '@untitled-ui/icons-react/build/esm/ChevronRight';
 import ChevronDownIcon from '@untitled-ui/icons-react/build/esm/ChevronDown';
 import {
-     Avatar, Box, Button, Card, CardContent, Checkbox, Divider, Grid, IconButton, Input, InputAdornment, LinearProgress, MenuItem,
+     Box, Button, Card, CardContent, Checkbox, Divider, Grid, IconButton, Input, InputAdornment, LinearProgress, MenuItem,
      OutlinedInput,
-     Stack, SvgIcon, Switch, Table, TableBody, TableCell, TableHead, TablePagination, TableRow, TextField, Typography, useTheme
+     Stack, SvgIcon, Switch, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography, useTheme
 } from '@mui/material';
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
 import Image from 'next/image';
-import numeral from 'numeral';
-import { Fragment, useCallback, useEffect, useState } from 'react';
+import { Fragment, useState } from 'react';
 import { Scrollbar } from 'src/components/scrollbar';
 import { SeverityPill } from '@/components/severity-pill';
 import { fetchSubCategoryOptions } from './new-product-form';
@@ -45,7 +43,7 @@ export interface IProduct {
      _id?: string;
 }
 
-export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
+export const ProductsTable = ({ items }: any) => {
 
      const [currentProductID, setCurrentProductID] = useState(null);
      const [currentProductObject, setCurrentProductObject] = useState<IProduct | null>();
@@ -56,9 +54,6 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
      const [subCategoryOptions, setSubCategoryOptions] = useState<any>([]);
      const [isSubCategoryEnabled, setIsSubCategoryEnabled] = useState(false);
      const [selectedMidCategory, setSelectedMidCategory] = useState('');
-     const [selectedImage, setSelectedImage] = useState(null);
-     const [discountValue, setDiscountValue] = useState<number>(0);
-     const [productsForDisplay, setProductsForDisplay] = useState<IProduct[]>(items);
 
      const getObjectById = (_id: any, arrayToSearch: any) => {
           for (const obj of arrayToSearch) {
@@ -754,7 +749,6 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
 
                                                                                                               if (value > max) value = max;
                                                                                                               if (value < min) value = min;
-                                                                                                              console.log(currentProductObject?.discountAmount);
 
                                                                                                               setCurrentProductObject((previousObject: any) => ({
                                                                                                                    ...previousObject,
@@ -990,7 +984,6 @@ export const ProductsTable = ({ items, page, rowsPerPage, allItems }: any) => {
                                                                                                               title: 'Neeee',
                                                                                                               text: 'Nešto je pošlo po zlu! Proveri format fajla koji upload-uješ!',
                                                                                                          })
-                                                                                                         console.log(error);
                                                                                                     }}
                                                                                                     content={{
                                                                                                          button({ ready }: any) {

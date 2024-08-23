@@ -17,7 +17,7 @@ export const SettingsPassword = () => {
   });
 
   const handleChange = useCallback(
-    (event) => {
+    (event: any) => {
       setValues((prevState) => ({
         ...prevState,
         [event.target.name]: event.target.value
@@ -27,7 +27,7 @@ export const SettingsPassword = () => {
   );
 
   const handleSubmit = useCallback(
-    (event) => {
+    (event: any) => {
       event.preventDefault();
     },
     []

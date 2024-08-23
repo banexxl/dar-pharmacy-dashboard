@@ -3,10 +3,9 @@ import { ObjectId } from "mongodb"
 
 export const productsServices = () => {
 
-     const getProductsByPage = async (page, limit) => {
+     const getProductsByPage = async (page: any, limit: any) => {
 
-          const client = new MongoClient(process.env.MONGODB_URI);
-          const clientresponse = await client.connect();
+          const client = new MongoClient(process.env.MONGODB_URI!)
           const db = client.db('DAR_DB');
           const parsedLimit = parseInt(limit, 10); // Parse limit as an integer
 
@@ -24,14 +23,14 @@ export const productsServices = () => {
                     .toArray();
                return data;
           } catch (error) {
-               return { message: error.message };
+               return { message: error };
           } finally {
                await client.close();
           }
      };
 
-     async function getProductsCount() {
-          const client = new MongoClient(process.env.MONGODB_URI);
+     const getProductsCount = async () => {
+          const client = new MongoClient(process.env.MONGODB_URI!);
 
           try {
                await client.connect();
@@ -52,14 +51,14 @@ export const productsServices = () => {
 
      const getProductsForHomePage = async () => {
 
-          const client = await MongoClient.connect(process.env.MONGODB_URI)
+          const client = await MongoClient.connect(process.env.MONGODB_URI!)
 
           try {
                const db = client.db('DAR_DB')
                let data = await db.collection('Products').find().toArray()
                return data
           } catch (error) {
-               return { message: error.message }
+               return { message: error }
           }
           finally {
                await client.close();
@@ -68,69 +67,69 @@ export const productsServices = () => {
 
      const getAllLogos = async () => {
 
-          const client = await MongoClient.connect(process.env.MONGODB_URI)
+          const client = await MongoClient.connect(process.env.MONGODB_URI!)
 
           try {
                const db = client.db('DAR_DB')
                let data = await db.collection('LogoURLs').find().toArray()
                return data
           } catch (error) {
-               return { message: error.message }
+               return { message: error }
           }
           finally {
                await client.close();
           }
      }
 
-     const getProductById = async (_id) => {
-          const client = await MongoClient.connect(process.env.MONGODB_URI)
+     const getProductById = async (_id: string) => {
+          const client = await MongoClient.connect(process.env.MONGODB_URI!)
           try {
                const db = client.db('DAR_DB')
                let product = await db.collection('Products').findOne({ _id: new ObjectId(_id) })
                return product
           } catch (error) {
-               return { message: error.message }
+               return { message: error }
           }
           finally {
                await client.close();
           }
      }
 
-     const getProductsByManufacturer = async (manufacturer) => {
-          const client = await MongoClient.connect(process.env.MONGODB_URI)
+     const getProductsByManufacturer = async (manufacturer: string) => {
+          const client = await MongoClient.connect(process.env.MONGODB_URI!)
           try {
                const db = client.db('DAR_DB')
-               let products = await db.collection('Products').find({ "manufacturer": `${ manufacturer }` }).toArray()
+               let products = await db.collection('Products').find({ "manufacturer": `${manufacturer}` }).toArray()
                return products
           } catch (error) {
-               return { message: error.message }
+               return { message: error }
           }
           finally {
                await client.close();
           }
      }
 
-     const getProductsByNameAndOrManufacturer = async (searchTerm) => {
+     const getProductsByNameAndOrManufacturer = async (searchTerm: string) => {
 
           const searchTermArray = searchTerm.split(" ")
 
-          const client = await MongoClient.connect(process.env.MONGODB_URI)
+          const client = await MongoClient.connect(process.env.MONGODB_URI!)
           try {
                const db = client.db('DAR_DB')
                let products = await db.collection('Products')
                     .find({
                          $or: [
-                              { "name": { $regex: `${ searchTermArray[0] }`, $options: 'i' } },
-                              { "manufacturer": { $regex: `${ searchTermArray[0] }`, $options: 'i' } },
-                              { "name": { $regex: `${ searchTermArray[1] }`, $options: 'i' } },
-                              { "manufacturer": { $regex: `${ searchTermArray[1] }`, $options: 'i' } },
+                              { "name": { $regex: `${searchTermArray[0]}`, $options: 'i' } },
+                              { "manufacturer": { $regex: `${searchTermArray[0]}`, $options: 'i' } },
+                              { "name": { $regex: `${searchTermArray[1]}`, $options: 'i' } },
+                              { "manufacturer": { $regex: `${searchTermArray[1]}`, $options: 'i' } },
                          ]
                     }
                     ).toArray()
 
                return products
           } catch (error) {
-               return { message: error.message }
+               return { message: error }
           }
           finally {
                await client.close();
@@ -138,58 +137,58 @@ export const productsServices = () => {
      }
 
      const getProductsByDiscount = async () => {
-          const client = await MongoClient.connect(process.env.MONGODB_URI)
+          const client = await MongoClient.connect(process.env.MONGODB_URI!)
           try {
                const db = client.db('DAR_DB')
                let products = await db.collection('Products').find({ discount: true }).toArray()
 
                return products
           } catch (error) {
-               return { message: error.message }
+               return { message: error }
           }
           finally {
                await client.close();
           }
      }
 
-     const getProductsByMainCategory = async (mainCategory) => {
+     const getProductsByMainCategory = async (mainCategory: string) => {
 
-          const client = await MongoClient.connect(process.env.MONGODB_URI)
+          const client = await MongoClient.connect(process.env.MONGODB_URI!)
           try {
                const db = client.db('DAR_DB')
-               let products = await db.collection('Products').find({ mainCategory: `${ mainCategory }` }).toArray()
+               let products = await db.collection('Products').find({ mainCategory: `${mainCategory}` }).toArray()
                return products
           } catch (error) {
-               return { message: error.message }
+               return { message: error }
           }
           finally {
                await client.close();
           }
      }
 
-     const getProductsByMainCategoryMidCategory = async (mainCategory, midCategory) => {
+     const getProductsByMainCategoryMidCategory = async (mainCategory: string, midCategory: string) => {
 
-          const client = await MongoClient.connect(process.env.MONGODB_URI)
+          const client = await MongoClient.connect(process.env.MONGODB_URI!)
           try {
                const db = client.db('DAR_DB')
                let products = await db.collection('Products').find({ mainCategory: mainCategory, midCategory: midCategory }).toArray()
                return products
           } catch (error) {
-               return { message: error.message }
+               return { message: error }
           }
           finally {
                await client.close();
           }
      }
 
-     const getProductsByMainCategoryMidCategorySubCategory = async (mainCategory, midCategory, subCategory) => {
-          const client = await MongoClient.connect(process.env.MONGODB_URI)
+     const getProductsByMainCategoryMidCategorySubCategory = async (mainCategory: string, midCategory: string, subCategory: string) => {
+          const client = await MongoClient.connect(process.env.MONGODB_URI!)
           try {
                const db = client.db('DAR_DB')
                let products = await db.collection('Products').find({ mainCategory: mainCategory, midCategory: midCategory, subCategory: subCategory }).toArray()
                return products
           } catch (error) {
-               return { message: error.message }
+               return { message: error }
           }
           finally {
                await client.close();
@@ -197,7 +196,7 @@ export const productsServices = () => {
      }
 
      const getAllManufacturers = async () => {
-          const client = await MongoClient.connect(process.env.MONGODB_URI)
+          const client = await MongoClient.connect(process.env.MONGODB_URI!)
 
           try {
                await client.connect();
@@ -205,7 +204,7 @@ export const productsServices = () => {
                const productsCollection = db.collection('Products');
 
                const manufacturers = await new Promise((resolve, reject) => {
-                    productsCollection.distinct("manufacturer", (error, manufacturers) => {
+                    productsCollection.distinct("manufacturer", (error: string, manufacturers: string) => {
                          if (error) {
                               reject(error);
                          } else {
@@ -222,14 +221,14 @@ export const productsServices = () => {
      }
 
      const getAllProducts = async () => {
-          const client = await MongoClient.connect(process.env.MONGODB_URI)
+          const client = await MongoClient.connect(process.env.MONGODB_URI!)
 
           try {
                const db = client.db('DAR_DB')
                let products = await db.collection('Products').find().toArray()
                return products
           } catch (error) {
-               return { message: error.message }
+               return { message: error }
           }
           finally {
                await client.close();

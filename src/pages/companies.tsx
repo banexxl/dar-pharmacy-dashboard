@@ -15,6 +15,7 @@ import {
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { CompanyCard } from 'src/sections/companies/company-card';
 import { CompaniesSearch } from 'src/sections/companies/companies-search';
+import { SessionProvider } from 'next-auth/react';
 
 const companies = [
   {
@@ -167,7 +168,7 @@ const Page = () => (
 
 );
 
-Page.getLayout = (page) => (
+Page.getLayout = (page: any) => (
   <DashboardLayout>
     {page}
   </DashboardLayout>

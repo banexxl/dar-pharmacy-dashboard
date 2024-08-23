@@ -11,13 +11,28 @@ type GetUserByEmailResult = User | null;
 
 export const userServices = () => {
 
-     const getAllUsers = async () => {
+     const getUsersByPage = async (page: number, limit: any) => {
+
           const client = await MongoClient.connect(process.env.MONGODB_URI!)
+          const parsedLimit = parseInt(limit, 10); // Parse limit as an integer
+
+          if (isNaN(parsedLimit) || parsedLimit <= 0) {
+               // Handle the case when the parsed limit is not a valid positive integer
+               return [];
+          }
 
           try {
-               const db = client.db('DAR_DB')
-               let data = await db.collection('Admins').find({}).toArray()
-               return data
+               const skip = page * limit;
+               const database = client.db('ACCOUNTS_DB');
+               const collection = database.collection('users');
+               const users = await collection
+                    .find({})
+                    .skip(skip)
+                    .limit(parsedLimit)
+                    .toArray();
+               console.log('customers from service:', users);
+
+               return users;
           } catch (error) {
                return { message: error }
           }
@@ -44,8 +59,25 @@ export const userServices = () => {
           }
      }
 
+     const getUsersCount = async () => {
+          const client = new MongoClient(process.env.MONGODB_URI!);
+
+          try {
+               await client.connect();
+               const database = client.db('ACCOUNTS_DB');
+               const collection = await database.collection('users').find({}).toArray();
+               return collection.length;
+          } catch (error: any) {
+               console.error('Error while fetching count:', error);
+               return 0; // Return false or handle the error accordingly
+          } finally {
+               await client.close(); // Ensure the client is closed after operation
+          }
+     }
+
      return {
-          getAllUsers,
-          getUserByEmail
+          getUsersByPage,
+          getUserByEmail,
+          getUsersCount
      }
 }

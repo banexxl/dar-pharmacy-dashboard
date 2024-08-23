@@ -41,7 +41,7 @@ export const AccountProfileDetails = () => {
   });
 
   const handleChange = useCallback(
-    (event) => {
+    (event: any) => {
       setValues((prevState) => ({
         ...prevState,
         [event.target.name]: event.target.value
@@ -51,7 +51,7 @@ export const AccountProfileDetails = () => {
   );
 
   const handleSubmit = useCallback(
-    (event) => {
+    (event: any) => {
       event.preventDefault();
     },
     []

@@ -9,7 +9,6 @@ import { Box, Button, Container, Stack, SvgIcon, Typography } from '@mui/materia
 import { useSelection } from 'src/hooks/use-selection';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { ProductsTable } from 'src/sections/products/products-table';
-import { applyPagination } from 'src/utils/apply-pagination';
 import { productsServices } from '../utils/product-services'
 import { useRouter } from 'next/navigation';
 import { TablePagination } from '@mui/material'
@@ -18,12 +17,6 @@ import { SessionProvider, useSession } from 'next-auth/react';
 
 
 const Page = (props: any) => {
-     // const products = useMemo(() => {
-     //      return applyPagination(props.products, props.page, props.limit);
-     // }, [props.products, props.page, props.limit]);
-     const session = useSession()
-     console.log('session', session);
-
 
      const productsIds = useMemo(() => {
           if (!Array.isArray(props.products)) {
@@ -162,7 +155,6 @@ const Page = (props: any) => {
                                         page={props.page}
                                         rowsPerPage={props.limit}
                                         selected={productsSelection.selected}
-                                        productsCount={props.productsCount}
                                    />
                                    <TablePagination
                                         component="div"

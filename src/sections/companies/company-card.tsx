@@ -3,7 +3,7 @@ import ArrowDownOnSquareIcon from '@heroicons/react/24/solid/ArrowDownOnSquareIc
 import ClockIcon from '@heroicons/react/24/solid/ClockIcon';
 import { Avatar, Box, Card, CardContent, Divider, Stack, SvgIcon, Typography } from '@mui/material';
 
-export const CompanyCard = (props) => {
+export const CompanyCard = (props: any) => {
   const { company } = props;
 
   return (

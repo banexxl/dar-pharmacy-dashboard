@@ -15,7 +15,7 @@ import {
 
 export const SettingsNotifications = () => {
   const handleSubmit = useCallback(
-    (event) => {
+    (event: any) => {
       event.preventDefault();
     },
     []
@@ -65,7 +65,6 @@ export const SettingsNotifications = () => {
               </Stack>
             </Grid>
             <Grid
-              item
               md={4}
               sm={6}
               xs={12}
