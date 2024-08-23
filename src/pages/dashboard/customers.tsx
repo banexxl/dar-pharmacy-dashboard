@@ -7,7 +7,7 @@ import { Box, Button, Container, Stack, SvgIcon, TablePagination, Typography } f
 import { useSelection } from 'src/hooks/use-selection';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { CustomersSearch } from 'src/sections/customer/customers-search';
-import { userServices } from '../utils/user-services'
+import { userServices } from '../../services/user-services'
 import { SessionProvider } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { CustomersTable } from '@/sections/customer/customers-table';

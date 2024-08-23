@@ -1,6 +1,6 @@
 import NextAuth, { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import { userServices } from "@/utils/user-services";
+import { userServices } from "@/services/user-services";
 
 // Define the User type
 type User = {

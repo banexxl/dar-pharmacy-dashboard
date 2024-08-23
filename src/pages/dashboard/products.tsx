@@ -9,7 +9,7 @@ import { Box, Button, Container, Stack, SvgIcon, Typography } from '@mui/materia
 import { useSelection } from 'src/hooks/use-selection';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { ProductsTable } from 'src/sections/products/products-table';
-import { productsServices } from '../utils/product-services'
+import { productsServices } from '../../services/product-services'
 import { useRouter } from 'next/navigation';
 import { TablePagination } from '@mui/material'
 import { AddProductForm } from '@/sections/products/new-product-form';
