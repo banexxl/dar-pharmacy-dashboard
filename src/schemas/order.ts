@@ -7,6 +7,7 @@ export type Order = {
      createdAt: Date;
      customer: ICustomer;
      items: IProduct[];
+     paymentMethod: string;
      total: number;
      status: string;
      logs: {

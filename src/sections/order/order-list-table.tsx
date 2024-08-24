@@ -5,6 +5,7 @@ import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
+import TableHead from '@mui/material/TableHead'; // Import TableHead
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
@@ -26,6 +27,18 @@ export const OrderListTable = (props: any) => {
   return (
     <div>
       <Table>
+        {/* Add Table Head */}
+        <TableHead>
+          <TableRow>
+            <TableCell align="center">Date</TableCell>
+            <TableCell align="left">Order Number</TableCell>
+            <TableCell align="right">Payment Method</TableCell>
+            <TableCell align="right">Customer Name</TableCell>
+            <TableCell align="right">Customer Email</TableCell>
+            <TableCell align="right">Status</TableCell>
+          </TableRow>
+        </TableHead>
+
         <TableBody>
           {items.map((order: Order) => {
             // Parse the date string into a Date object
@@ -63,7 +76,7 @@ export const OrderListTable = (props: any) => {
                         theme.palette.mode === 'dark' ? 'neutral.800' : 'neutral.200',
                       borderRadius: 2,
                       maxWidth: 'fit-content',
-                      ml: 3,
+                      ml: 5,
                       p: 1,
                     }}
                   >
@@ -80,7 +93,9 @@ export const OrderListTable = (props: any) => {
                       {createdAtDay}
                     </Typography>
                   </Box>
-                  <Box sx={{ ml: 2 }}>
+                </TableCell>
+                <TableCell align="left">
+                  <Box>
                     <Typography variant="subtitle2">{order.number}</Typography>
                     <Typography
                       color="text.secondary"
@@ -89,7 +104,10 @@ export const OrderListTable = (props: any) => {
                       Total of {totalAmount}
                     </Typography>
                   </Box>
-                </TableCell>
+                </TableCell> {/* Order Number */}
+                <TableCell align="right">{order.paymentMethod}</TableCell> {/* Payment Method */}
+                <TableCell align="right">{order.customer.name}</TableCell> {/* Customer Name */}
+                <TableCell align="right">{order.customer.email}</TableCell> {/* Customer Email */}
                 <TableCell align="right">
                   <SeverityPill color={statusColor}>{order.status}</SeverityPill>
                 </TableCell>
