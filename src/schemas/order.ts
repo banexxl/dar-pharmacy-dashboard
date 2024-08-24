@@ -3,7 +3,7 @@ import { ICustomer } from "./customer";
 
 export type PaymentMethod = 'credit card' | 'paypal' | 'cash' | 'check' | 'cash-on-delivery';
 
-export type OrderStatus = 'pending' | 'processing' | 'completed' | 'cancelled'
+export type OrderStatus = 'pending' | 'shipped' | 'delivered' | 'cancelled'
 
 export type Order = {
      _id: string;
