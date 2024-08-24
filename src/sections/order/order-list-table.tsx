@@ -32,10 +32,11 @@ export const OrderListTable = (props: any) => {
           <TableRow>
             <TableCell align="center">Date</TableCell>
             <TableCell align="left">Order Number</TableCell>
-            <TableCell align="right">Payment Method</TableCell>
-            <TableCell align="right">Customer Name</TableCell>
-            <TableCell align="right">Customer Email</TableCell>
-            <TableCell align="right">Status</TableCell>
+            <TableCell align='left'>Total</TableCell>
+            <TableCell align="left">Payment Method</TableCell>
+            <TableCell align="left">Customer Name</TableCell>
+            <TableCell align="left">Customer Email</TableCell>
+            <TableCell align="left">Status</TableCell>
           </TableRow>
         </TableHead>
 
@@ -97,18 +98,21 @@ export const OrderListTable = (props: any) => {
                 <TableCell align="left">
                   <Box>
                     <Typography variant="subtitle2">{order.orderNumber}</Typography>
-                    <Typography
-                      color="text.secondary"
-                      variant="body2"
-                    >
-                      Total of {totalAmount}
-                    </Typography>
+
                   </Box>
                 </TableCell> {/* Order Number */}
-                <TableCell align="right">{order.paymentMethod}</TableCell> {/* Payment Method */}
-                <TableCell align="right">{order.customer.name}</TableCell> {/* Customer Name */}
-                <TableCell align="right">{order.customer.email}</TableCell> {/* Customer Email */}
-                <TableCell align="right">
+                <TableCell>
+                  <Typography
+                    color="text.secondary"
+                    variant="body2"
+                  >
+                    RSD {totalAmount}
+                  </Typography>
+                </TableCell>
+                <TableCell align="left">{order.paymentMethod}</TableCell> {/* Payment Method */}
+                <TableCell align="left">{order.customer.name}</TableCell> {/* Customer Name */}
+                <TableCell align="left">{order.customer.email}</TableCell> {/* Customer Email */}
+                <TableCell align="left">
                   <SeverityPill color={statusColor}>{order.status}</SeverityPill>
                 </TableCell>
               </TableRow>
