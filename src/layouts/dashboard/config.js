@@ -21,7 +21,7 @@ export const items = [
      },
      {
           title: 'Customers',
-          path: '/customers?page=0&limit=5',
+          path: '/dashboard/customers?page=0&limit=5',
           icon: (
                <SvgIcon fontSize="small">
                     <UsersIcon />
@@ -30,7 +30,7 @@ export const items = [
      },
      {
           title: 'Products',
-          path: '/products?page=0&limit=5',
+          path: '/dashboard/products?page=0&limit=5',
           icon: (
                <SvgIcon fontSize="small">
                     <ShoppingBagIcon />

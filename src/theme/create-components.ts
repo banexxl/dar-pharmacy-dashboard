@@ -10,7 +10,7 @@ import {
 // Used only to create transitions
 const muiTheme = createTheme();
 
-export function createComponents(config) {
+export function createComponents(config: any) {
      const { palette } = config;
 
      return {
@@ -27,7 +27,7 @@ export function createComponents(config) {
                styleOverrides: {
                     root: {
                          borderRadius: '12px',
-                         textTransform: 'none'
+                         // textTransform: 'none'
                     },
                     sizeSmall: {
                          padding: '6px 16px'
@@ -53,7 +53,7 @@ export function createComponents(config) {
                styleOverrides: {
                     root: {
                          borderRadius: 20,
-                         [`&.${ paperClasses.elevation1 }`]: {
+                         [`&.${paperClasses.elevation1}`]: {
                               boxShadow: '0px 5px 22px rgba(0, 0, 0, 0.04), 0px 0px 0px 0.5px rgba(0, 0, 0, 0.03)'
                          },
                     }
@@ -168,17 +168,17 @@ export function createComponents(config) {
                          '&:after': {
                               display: 'none'
                          },
-                         [`&.${ filledInputClasses.disabled }`]: {
+                         [`&.${filledInputClasses.disabled}`]: {
                               backgroundColor: 'transparent'
                          },
-                         [`&.${ filledInputClasses.focused }`]: {
+                         [`&.${filledInputClasses.focused}`]: {
                               backgroundColor: 'transparent',
                               borderColor: palette.primary.main,
-                              boxShadow: `${ palette.primary.main } 0 0 0 2px`
+                              boxShadow: `${palette.primary.main} 0 0 0 2px`
                          },
-                         [`&.${ filledInputClasses.error }`]: {
+                         [`&.${filledInputClasses.error}`]: {
                               borderColor: palette.error.main,
-                              boxShadow: `${ palette.error.main } 0 0 0 2px`
+                              boxShadow: `${palette.error.main} 0 0 0 2px`
                          }
                     },
                     input: {
@@ -193,21 +193,21 @@ export function createComponents(config) {
                     root: {
                          '&:hover': {
                               backgroundColor: palette.action.hover,
-                              [`& .${ outlinedInputClasses.notchedOutline }`]: {
+                              [`& .${outlinedInputClasses.notchedOutline}`]: {
                                    borderColor: palette.neutral[200]
                               }
                          },
-                         [`&.${ outlinedInputClasses.focused }`]: {
+                         [`&.${outlinedInputClasses.focused}`]: {
                               backgroundColor: 'transparent',
-                              [`& .${ outlinedInputClasses.notchedOutline }`]: {
+                              [`& .${outlinedInputClasses.notchedOutline}`]: {
                                    borderColor: palette.primary.main,
-                                   boxShadow: `${ palette.primary.main } 0 0 0 2px`
+                                   boxShadow: `${palette.primary.main} 0 0 0 2px`
                               }
                          },
-                         [`&.${ filledInputClasses.error }`]: {
-                              [`& .${ outlinedInputClasses.notchedOutline }`]: {
+                         [`&.${filledInputClasses.error}`]: {
+                              [`& .${outlinedInputClasses.notchedOutline}`]: {
                                    borderColor: palette.error.main,
-                                   boxShadow: `${ palette.error.main } 0 0 0 2px`
+                                   boxShadow: `${palette.error.main} 0 0 0 2px`
                               }
                          }
                     },
@@ -230,17 +230,17 @@ export function createComponents(config) {
                     root: {
                          fontSize: 14,
                          fontWeight: 500,
-                         [`&.${ inputLabelClasses.filled }`]: {
+                         [`&.${inputLabelClasses.filled}`]: {
                               transform: 'translate(12px, 18px) scale(1)'
                          },
-                         [`&.${ inputLabelClasses.shrink }`]: {
-                              [`&.${ inputLabelClasses.standard }`]: {
+                         [`&.${inputLabelClasses.shrink}`]: {
+                              [`&.${inputLabelClasses.standard}`]: {
                                    transform: 'translate(0, -1.5px) scale(0.85)'
                               },
-                              [`&.${ inputLabelClasses.filled }`]: {
+                              [`&.${inputLabelClasses.filled}`]: {
                                    transform: 'translate(12px, 6px) scale(0.85)'
                               },
-                              [`&.${ inputLabelClasses.outlined }`]: {
+                              [`&.${inputLabelClasses.outlined}`]: {
                                    transform: 'translate(14px, -9px) scale(0.85)'
                               }
                          }
@@ -256,7 +256,7 @@ export function createComponents(config) {
                          minWidth: 'auto',
                          paddingLeft: 0,
                          paddingRight: 0,
-                         textTransform: 'none',
+                         // textTransform: 'none',
                          '& + &': {
                               marginLeft: 24
                          }
@@ -275,7 +275,7 @@ export function createComponents(config) {
                styleOverrides: {
                     root: {
                          borderBottom: 'none',
-                         [`& .${ tableCellClasses.root }`]: {
+                         [`& .${tableCellClasses.root}`]: {
                               borderBottom: 'none',
                               backgroundColor: palette.neutral[50],
                               color: palette.neutral[700],
@@ -283,9 +283,9 @@ export function createComponents(config) {
                               fontWeight: 600,
                               lineHeight: 1,
                               letterSpacing: 0.5,
-                              textTransform: 'uppercase'
+                              // textTransform: 'uppercase'
                          },
-                         [`& .${ tableCellClasses.paddingCheckbox }`]: {
+                         [`& .${tableCellClasses.paddingCheckbox}`]: {
                               paddingTop: 4,
                               paddingBottom: 4
                          }
