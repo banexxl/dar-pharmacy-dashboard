@@ -96,7 +96,7 @@ export const OrderListTable = (props: any) => {
                 </TableCell>
                 <TableCell align="left">
                   <Box>
-                    <Typography variant="subtitle2">{order.number}</Typography>
+                    <Typography variant="subtitle2">{order.orderNumber}</Typography>
                     <Typography
                       color="text.secondary"
                       variant="body2"

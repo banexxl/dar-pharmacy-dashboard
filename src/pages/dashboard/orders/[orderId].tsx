@@ -60,7 +60,7 @@ const Page = (order: Order) => {
                 spacing={3}
               >
                 <Stack spacing={1}>
-                  <Typography variant="h4">{order.number}</Typography>
+                  <Typography variant="h4">{order.orderNumber}</Typography>
                   <Stack
                     alignItems="center"
                     direction="row"
