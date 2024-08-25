@@ -108,7 +108,13 @@ export const OrderListTable = (props: any) => {
                     RSD {totalAmount}
                   </Typography>
                 </TableCell>
-                <TableCell align="left">{order.paymentMethod}</TableCell>
+                <TableCell align="left">{
+                  order.paymentMethod == 'cash-on-delivery' ? 'Pouzećem'
+                    : order.paymentMethod == 'cash' ? 'Gotovinom'
+                      : order.paymentMethod == 'check' ? 'Čekom'
+                        : order.paymentMethod == 'credit card' ? 'Kreditnom karticom'
+                          : order.paymentMethod == 'paypal' ? 'PayPal' : 'Nepoznato'
+                }</TableCell>
                 <TableCell align="left">{order.customer.name}</TableCell>
                 <TableCell align="left">{order.customer.email}</TableCell>
                 <TableCell align="left">

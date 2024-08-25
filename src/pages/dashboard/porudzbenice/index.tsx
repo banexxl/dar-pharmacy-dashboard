@@ -13,8 +13,6 @@ import { OrderListTable } from '@/sections/order/order-list-table';
 import { OrderListSearch } from '@/sections/order/order-list-search';
 import { Order } from '@/schemas/order';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
-import { useSelection } from '@/hooks/use-selection';
-import { useRouter } from 'next/router';
 import { useDialog } from '@/hooks/use-dialog';
 import { useMounted } from '@/hooks/use-mounted';
 
@@ -78,6 +76,8 @@ const useCurrentOrder = (orders: Order[], orderId: string | undefined) => {
 };
 
 const Page = (props: any) => {
+  console.log('props', props);
+
   const rootRef = useRef(null);
   const ordersSearch = useOrdersSearch();
   const dialog = useDialog();

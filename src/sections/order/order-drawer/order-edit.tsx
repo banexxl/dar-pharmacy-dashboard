@@ -1,9 +1,11 @@
 import PropTypes from 'prop-types';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import { Order } from '@/schemas/order';
+import moment from 'moment';
 
 const statusOptions = [
   {
@@ -24,10 +26,20 @@ const statusOptions = [
   },
 ];
 
-export const OrderEdit = (props: any) => {
+type OrderEditProps = {
+  onCancel?: () => void;
+  onSave?: () => void;
+  order?: Order;
+}
+
+export const OrderEdit = (props: OrderEditProps) => {
   const { onCancel, onSave, order } = props;
 
-  const createdAt = format(order.createdAt, 'dd/MM/yyyy HH:mm');
+  // Parse the ISO date string to a Date object
+  const createdAtDate = moment(order?.createdAt).toDate()
+
+  // Format the Date object
+  const createdAt = format(createdAtDate, 'dd/MM/yyyy HH:mm');
 
   return (
     <Stack spacing={6}>
@@ -39,52 +51,52 @@ export const OrderEdit = (props: any) => {
             fullWidth
             label="ID"
             name="id"
-            value={order.id}
+            value={order?._id}
           />
           <TextField
             disabled
             fullWidth
-            label="Number"
+            label="ID porudžbenice"
             name="number"
-            value={order.number}
+            value={order?.orderNumber}
           />
           <TextField
             disabled
             fullWidth
-            label="Customer name"
+            label="Ime"
             name="customer_name"
-            value={order.customer.name}
+            value={order?.customer.name}
           />
           <TextField
             disabled
             fullWidth
-            label="Date"
+            label="Datum"
             name="date"
             value={createdAt}
           />
           <TextField
             fullWidth
-            label="Address"
+            label="Adresa"
             name="address"
-            value={order.customer.address1}
+            value={order?.customer.streetAddress}
           />
           <TextField
             fullWidth
-            label="Country"
+            label="Država"
             name="country"
-            value={order.customer.country}
+            value={order?.customer.country}
           />
           <TextField
             fullWidth
-            label="State/Region"
+            label="Grad"
             name="state_region"
-            value={order.customer.city}
+            value={order?.customer.city}
           />
           <TextField
             fullWidth
-            label="Total Amount"
+            label="Ukupan iznos"
             name="amount"
-            value={order.totalAmount}
+            value={order?.total}
           />
           <TextField
             fullWidth
@@ -92,7 +104,7 @@ export const OrderEdit = (props: any) => {
             name="status"
             select
             SelectProps={{ native: true }}
-            value={order.status}
+            value={order?.status}
           >
             {statusOptions.map((option) => (
               <option
