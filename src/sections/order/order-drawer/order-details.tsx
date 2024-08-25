@@ -19,32 +19,8 @@ import { SeverityPill } from 'src/components/severity-pill';
 import { Scrollbar } from 'src/components/scrollbar';
 import { IProduct } from '@/sections/products/products-table';
 import { ICustomer } from '@/schemas/customer';
+import { OrderDetailsProps, OrderStatus, statusMap } from '@/schemas/order';
 
-
-export type OrderStatus = 'canceled' | 'complete' | 'pending' | 'rejected';
-
-interface Order {
-  _id: string;
-  status: OrderStatus;
-  createdAt: Date;
-  total: number;
-  items: IProduct[];
-  customer: ICustomer
-}
-
-export interface OrderDetailsProps {
-  onApprove: () => void;
-  onEdit: () => void;
-  onReject: () => void;
-  order: Order;
-}
-
-export const statusMap: Record<OrderStatus, string> = {
-  canceled: 'warning',
-  complete: 'success',
-  pending: 'info',
-  rejected: 'error',
-};
 
 export const OrderDetails = (props: OrderDetailsProps) => {
   const { onApprove, onEdit, onReject, order } = props;
@@ -85,16 +61,16 @@ export const OrderDetails = (props: OrderDetailsProps) => {
             disableGutters
 
             label="ID"
-            value={props.order._id}
+            value={order._id}
           />
           <PropertyListItem
             align={align}
             disableGutters
 
             label="Number"
-            value={order._id}
+            value={order.orderNumber}
           />
-          <PropertyListItem
+          < PropertyListItem
             align={align}
             disableGutters
             label="Customer"
@@ -184,22 +160,23 @@ export const OrderDetails = (props: OrderDetailsProps) => {
           <Table sx={{ minWidth: 400 }}>
             <TableHead>
               <TableRow>
-                <TableCell>Description</TableCell>
-                <TableCell>Billing Cycle</TableCell>
-                <TableCell>Amount</TableCell>
+                <TableCell>Naziv</TableCell>
+                <TableCell sx={{ wordWrap: 'break-word', maxWidth: '100px' }}>Jedinica / Količina</TableCell>
+                <TableCell sx={{ wordWrap: 'break-word', maxWidth: '80px' }}>Broj artikla</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {items.map((item) => {
-                const unitAmount = numeral(item.quantityUnit).format(`RSD0,0.00`);
-
                 return (
                   <TableRow key={item._id}>
                     <TableCell>
-                      {item.name} x {item.quantity}
+                      {item.name}
                     </TableCell>
                     {/* <TableCell>{item.billingCycle}</TableCell> */}
-                    <TableCell>{unitAmount}</TableCell>
+                    <TableCell>{item.quantity}/{item.quantityUnit}</TableCell>
+                    <TableCell>
+                      {item.count}
+                    </TableCell>
                   </TableRow>
                 );
               })}

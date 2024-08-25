@@ -11,7 +11,7 @@ import { SvgIcon } from '@mui/material';
 
 export const items = [
      {
-          title: 'Overview',
+          title: 'Pregled',
           path: '/',
           icon: (
                <SvgIcon fontSize="small">
@@ -20,8 +20,8 @@ export const items = [
           )
      },
      {
-          title: 'Customers',
-          path: '/dashboard/customers?page=0&limit=5',
+          title: 'Klijenti',
+          path: '/dashboard/klijent?page=0&limit=5',
           icon: (
                <SvgIcon fontSize="small">
                     <UsersIcon />
@@ -29,8 +29,8 @@ export const items = [
           )
      },
      {
-          title: 'Products',
-          path: '/dashboard/products?page=0&limit=5',
+          title: 'Artikli',
+          path: '/dashboard/artikli?page=0&limit=5',
           icon: (
                <SvgIcon fontSize="small">
                     <ShoppingBagIcon />
@@ -38,8 +38,8 @@ export const items = [
           )
      },
      {
-          title: 'Orders',
-          path: '/dashboard/orders?page=0&limit=5',
+          title: 'Porudžbenice',
+          path: '/dashboard/porudzbenice?page=0&limit=5',
           icon: (
                <SvgIcon fontSize="small">
                     <ShoppingCartIcon />

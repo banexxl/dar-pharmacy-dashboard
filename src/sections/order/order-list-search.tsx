@@ -12,37 +12,44 @@ import Tabs from '@mui/material/Tabs';
 import TextField from '@mui/material/TextField';
 
 import { useUpdateEffect } from 'src/hooks/use-update-effect';
+import { OrderStatus } from '@/schemas/order';
 
-const tabOptions = [
+type TabOptions = {
+  label: string;
+  value: OrderStatus | 'all';
+};
+
+
+const tabOptions: TabOptions[] = [
   {
-    label: 'All',
+    label: 'Sve',
     value: 'all',
   },
   {
-    label: 'Canceled',
-    value: 'canceled',
+    label: 'Otkazano',
+    value: 'cancelled',
   },
   {
-    label: 'Completed',
-    value: 'complete',
+    label: 'Dostavljeno',
+    value: 'delivered',
   },
   {
-    label: 'Pending',
+    label: 'Na čekanju',
     value: 'pending',
   },
   {
-    label: 'Rejected',
-    value: 'rejected',
+    label: 'Poslato',
+    value: 'shipped',
   },
 ];
 
 const sortOptions = [
   {
-    label: 'Newest',
+    label: 'Najnovije',
     value: 'desc',
   },
   {
-    label: 'Oldest',
+    label: 'Najsatarije',
     value: 'asc',
   },
 ];
@@ -138,7 +145,7 @@ export const OrderListSearch = (props: any) => {
             fullWidth
             inputProps={{ ref: queryRef }}
             name="orderNumber"
-            placeholder="Search by order number"
+            placeholder="Pretraži po broju porudžbenice"
             startAdornment={
               <InputAdornment position="start">
                 <SvgIcon>
@@ -149,7 +156,7 @@ export const OrderListSearch = (props: any) => {
           />
         </Box>
         <TextField
-          label="Sort By"
+          label="Sortiraj po"
           name="sort"
           onChange={handleSortChange}
           select

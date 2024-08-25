@@ -10,8 +10,7 @@ import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import { SeverityPill } from 'src/components/severity-pill';
-import { OrderDetailsProps, OrderStatus, statusMap } from './order-drawer/order-details';
-import { Order } from '@/schemas/order';
+import { Order, OrderStatus, statusMap } from '@/schemas/order';
 
 export const OrderListTable = (props: any) => {
   const {
@@ -30,12 +29,12 @@ export const OrderListTable = (props: any) => {
         {/* Add Table Head */}
         <TableHead>
           <TableRow>
-            <TableCell align="center">Date</TableCell>
-            <TableCell align="left">Order Number</TableCell>
-            <TableCell align='left'>Total</TableCell>
-            <TableCell align="left">Payment Method</TableCell>
-            <TableCell align="left">Customer Name</TableCell>
-            <TableCell align="left">Customer Email</TableCell>
+            <TableCell align="center">Datum</TableCell>
+            <TableCell align="left">Broj porudžbenice</TableCell>
+            <TableCell align='left'>Suma</TableCell>
+            <TableCell align="left">Način plaćanja</TableCell>
+            <TableCell align="left">Ime</TableCell>
+            <TableCell align="left">Email</TableCell>
             <TableCell align="left">Status</TableCell>
           </TableRow>
         </TableHead>
@@ -100,7 +99,7 @@ export const OrderListTable = (props: any) => {
                     <Typography variant="subtitle2">{order.orderNumber}</Typography>
 
                   </Box>
-                </TableCell> {/* Order Number */}
+                </TableCell>
                 <TableCell>
                   <Typography
                     color="text.secondary"
@@ -109,9 +108,9 @@ export const OrderListTable = (props: any) => {
                     RSD {totalAmount}
                   </Typography>
                 </TableCell>
-                <TableCell align="left">{order.paymentMethod}</TableCell> {/* Payment Method */}
-                <TableCell align="left">{order.customer.name}</TableCell> {/* Customer Name */}
-                <TableCell align="left">{order.customer.email}</TableCell> {/* Customer Email */}
+                <TableCell align="left">{order.paymentMethod}</TableCell>
+                <TableCell align="left">{order.customer.name}</TableCell>
+                <TableCell align="left">{order.customer.email}</TableCell>
                 <TableCell align="left">
                   <SeverityPill color={statusColor}>{order.status}</SeverityPill>
                 </TableCell>

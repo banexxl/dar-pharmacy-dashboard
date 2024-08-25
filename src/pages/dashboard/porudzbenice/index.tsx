@@ -88,6 +88,7 @@ const Page = (props: any) => {
   });
 
   const currentOrder = useCurrentOrder(ordersStore.orders, dialog.data);
+  console.log('currentOrder', currentOrder);
 
   const isMounted = useMounted();
 
@@ -146,7 +147,7 @@ const Page = (props: any) => {
                 spacing={4}
               >
                 <div>
-                  <Typography variant="h4">Orders</Typography>
+                  <Typography variant="h4">Porudžbenice</Typography>
                 </div>
                 <div>
                   <Button
@@ -157,7 +158,7 @@ const Page = (props: any) => {
                     }
                     variant="contained"
                   >
-                    Add
+                    Dodaj
                   </Button>
                 </div>
               </Stack>
