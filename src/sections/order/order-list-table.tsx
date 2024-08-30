@@ -23,20 +23,6 @@ export const OrderListTable = (props: any) => {
     rowsPerPage = 0,
   } = props;
 
-  console.log('page', page);
-  console.log('rowsPerPage', rowsPerPage);
-
-
-  const handlePageChange = (event: any, newPage: number) => {
-    console.log('event', event);
-    console.log('newPage', newPage);
-
-    onPageChange(event, newPage); // Ensure correct parameters are passed
-  };
-
-  const handleRowsPerPageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    onRowsPerPageChange(event); // Handle the change in the number of rows per page
-  };
 
   return (
     <div>
@@ -128,8 +114,8 @@ export const OrderListTable = (props: any) => {
       <TablePagination
         component="div"
         count={count}
-        onPageChange={handlePageChange}
-        onRowsPerPageChange={handleRowsPerPageChange}
+        onPageChange={onPageChange}
+        onRowsPerPageChange={onRowsPerPageChange}
         page={page}
         rowsPerPage={rowsPerPage}
         rowsPerPageOptions={[5, 10, 25]}
