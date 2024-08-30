@@ -19,7 +19,7 @@ import { SeverityPill } from 'src/components/severity-pill';
 import { Scrollbar } from 'src/components/scrollbar';
 import { IProduct } from '@/sections/products/products-table';
 import { ICustomer } from '@/schemas/customer';
-import { OrderDetailsProps, OrderStatus, statusMap } from '@/schemas/order';
+import { OrderDetailsProps, OrderStatus } from '@/schemas/order';
 
 
 export const OrderDetails = (props: OrderDetailsProps) => {
@@ -27,7 +27,6 @@ export const OrderDetails = (props: OrderDetailsProps) => {
   const lgUp = useMediaQuery((theme: any) => theme.breakpoints.up('lg'));
   // Ensure createdAt is a valid date
   const createdAt = order.createdAt ? format(new Date(order.createdAt), 'dd/MM/yyyy HH:mm') : 'Invalid Date';
-  const statusColor = statusMap[order.status as OrderStatus] || 'default'; // Provide default value
   const totalAmount = numeral(order.total).format(`RSD0,0.00`);
   const align = lgUp ? 'horizontal' : 'vertical';
   const items = order.items || [];
@@ -127,7 +126,12 @@ export const OrderDetails = (props: OrderDetailsProps) => {
 
             label="Status"
           >
-            <SeverityPill color={statusColor}>{order.status}</SeverityPill>
+            <SeverityPill color={
+              order.status == 'pending' ? 'warning' :
+                order.status == 'shipped' ? 'info' :
+                  order.status == 'delivered' ? 'success' :
+                    order.status == 'cancelled' ? 'error' : 'warning'
+            }>{order.status}</SeverityPill>
           </PropertyListItem>
         </PropertyList>
         <Stack
