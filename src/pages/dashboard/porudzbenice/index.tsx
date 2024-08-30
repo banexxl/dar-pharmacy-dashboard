@@ -28,15 +28,36 @@ const useOrdersSearch = () => {
     rowsPerPage: 5,
     sortBy: 'createdAt',
     sortDir: 'desc',
+    tab: 'all'
   });
 
   const handleFiltersChange = useCallback((filters: any) => {
-    console.log('filters', filters);
+    console.log('usao u handleFiltersChange', filters);
 
     setState((prevState) => ({
       ...prevState,
       filters,
     }));
+  }, []);
+
+  const handlePageChange = useCallback((event: any, page: any) => {
+    console.log('usao u handlePageChange');
+
+    setState((prevState) => ({
+      ...prevState,
+      page,
+    }));
+  }, []);
+
+  const handleRowsPerPageChange = useCallback((event: any) => {
+    console.log('usao u handleRowsPerPageChange');
+
+    setState((prevState) => ({
+      ...prevState,
+      page: 0,
+      rowsPerPage: parseInt(event.target.value, 10),
+    }));
+
   }, []);
 
   const handleSortChange = useCallback((sortDir: any) => {
@@ -46,20 +67,13 @@ const useOrdersSearch = () => {
     }));
   }, []);
 
-  const handlePageChange = useCallback((event: any, page: any) => {
+  const handleTabsChange = useCallback((event: any, tab: any) => {
+    console.log('usao u   ', tab);
+
     setState((prevState) => ({
       ...prevState,
-      page,
+      tab,
     }));
-  }, []);
-
-  const handleRowsPerPageChange = useCallback((event: any) => {
-    setState((prevState) => ({
-      ...prevState,
-      page: 0,
-      rowsPerPage: parseInt(event.target.value, 10),
-    }));
-
   }, []);
 
   return {
@@ -67,6 +81,7 @@ const useOrdersSearch = () => {
     handleSortChange,
     handlePageChange,
     handleRowsPerPageChange,
+    handleTabsChange,
     state,
   };
 };
@@ -170,6 +185,7 @@ const Page = (props: any) => {
             <Divider />
             <OrderListSearch
               onFiltersChange={ordersSearch.handleFiltersChange}
+              onTabChange={ordersSearch.handleTabsChange}
               onSortChange={ordersSearch.handleSortChange}
               sortBy={ordersSearch.state.sortBy}
               sortDir={ordersSearch.state.sortDir}
@@ -194,6 +210,7 @@ const Page = (props: any) => {
               rowsPerPage={ordersSearch.state.rowsPerPage}
               sortDir={ordersSearch.state.sortDir as SortDir}
               sortBy={ordersSearch.state.sortBy as SortBy}
+              tab={ordersSearch.state.tab}
             />
           </OrderListContainer>
           <OrderDrawer

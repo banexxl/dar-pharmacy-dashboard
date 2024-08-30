@@ -63,11 +63,15 @@ export const OrderListTable = (props: any) => {
     rowsPerPage = 0,
     sortBy,
     sortDir,
+    tab
   } = props;
+
+  console.log('tab u tabeli', tab);
 
   const visibleRows = useMemo(
     () =>
       [...items]
+        .filter(order => tab === 'all' || order.status === tab)
         .sort(getComparator(sortDir, sortBy))
         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
     [sortDir, sortBy, page, rowsPerPage],
@@ -183,4 +187,5 @@ OrderListTable.propTypes = {
   rowsPerPage: PropTypes.number,
   sortBy: PropTypes.string.isRequired,
   sortDir: PropTypes.string.isRequired,
+  tab: PropTypes.string.isRequired
 };

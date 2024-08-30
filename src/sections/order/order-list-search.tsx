@@ -13,6 +13,7 @@ import TextField from '@mui/material/TextField';
 
 import { useUpdateEffect } from 'src/hooks/use-update-effect';
 import { OrderStatus } from '@/schemas/order';
+import { ta } from 'date-fns/locale';
 
 type TabOptions = {
   label: string;
@@ -54,8 +55,7 @@ const sortOptions = [
 ];
 
 interface Filters {
-  query?: string;
-  status?: string;
+  query?: string
 }
 
 export const OrderListSearch = (props: any) => {
@@ -63,48 +63,54 @@ export const OrderListSearch = (props: any) => {
   const {
     onFiltersChange,
     onSortChange,
+    onTabChange,
     sortBy = 'createdAt',
     sortDir = 'asc',
+    tab = 'all'
   } = props;
   const queryRef = useRef<HTMLInputElement>(null);
-  const [currentTab, setCurrentTab] = useState('all');
-  const [filters, setFilters] = useState<Filters>({
+
+  const [filter, setFilter] = useState<Filters>({
     query: undefined,
-    status: undefined,
   });
 
   const handleFiltersUpdate = useCallback(() => {
-    onFiltersChange?.(filters);
-  }, [filters, onFiltersChange]);
+    console.log('usao u handleFiltersUpdate', filter);
+
+    onFiltersChange?.(filter);
+  }, [filter, onFiltersChange]);
 
   useUpdateEffect(() => {
     handleFiltersUpdate();
   }, []);
 
-  const handleTabsChange = useCallback((event: any, tab: any) => {
-    setCurrentTab(tab);
-    const status = tab === 'all' ? undefined : tab;
+  const handleTabsChange = useCallback((event: any) => {
+    console.log('usao u handletabschange event je', event);
 
-    setFilters((prevState) => ({
-      ...prevState,
-      status,
-    }));
-  }, []);
+    const tab = event.target.outerText;
+    console.log('tab', tab);
+
+    onTabChange?.(tab);
+  },
+    [onTabChange]
+  );
 
   const handleQueryChange = useCallback((event: React.FormEvent) => {
     event.preventDefault();
     const query = queryRef.current?.value || '';
-    setFilters((prevState) => ({
+
+    setFilter((prevState) => ({
       ...prevState,
       query,
     }));
   }, []);
 
-  const handleSortChange = useCallback(
-    (event: any) => {
-      const sortDir = event.target.value;
-      onSortChange?.(sortDir);
-    },
+  const handleSortChange = useCallback((event: any) => {
+    console.log('usao u handleSortChange');
+
+    const sortDir = event.target.value;
+    onSortChange?.(sortDir);
+  },
     [onSortChange]
   );
 
@@ -116,8 +122,9 @@ export const OrderListSearch = (props: any) => {
         scrollButtons="auto"
         sx={{ px: 3 }}
         textColor="primary"
-        value={currentTab}
+        value={tab}
         variant="scrollable"
+        name='tab'
       >
         {tabOptions.map((tab) => (
           <Tab
@@ -179,7 +186,9 @@ export const OrderListSearch = (props: any) => {
 
 OrderListSearch.propTypes = {
   onFiltersChange: PropTypes.func,
+  onTabChange: PropTypes.func,
   onSortChange: PropTypes.func,
   sortBy: PropTypes.string,
   sortDir: PropTypes.oneOf(['asc', 'desc']),
+  tab: PropTypes.oneOf(['all', 'cancelled', 'delivered', 'pending', 'shipped']),
 };
