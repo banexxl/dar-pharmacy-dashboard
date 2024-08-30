@@ -11,6 +11,32 @@ import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import { SeverityPill } from 'src/components/severity-pill';
 import { Order } from '@/schemas/order';
+import { useMemo, useState } from 'react';
+
+
+function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
+  if (b[orderBy] < a[orderBy]) {
+    return -1;
+  }
+  if (b[orderBy] > a[orderBy]) {
+    return 1;
+  }
+  return 0;
+}
+
+type OrderBy = 'asc' | 'desc';
+
+function getComparator<Key extends keyof any>(
+  order: OrderBy,
+  orderBy: Key,
+): (
+  a: { [key in Key]: number | string },
+  b: { [key in Key]: number | string },
+) => number {
+  return order === 'desc'
+    ? (a, b) => descendingComparator(a, b, orderBy)
+    : (a, b) => -descendingComparator(a, b, orderBy);
+}
 
 export const OrderListTable = (props: any) => {
   const {
@@ -22,6 +48,17 @@ export const OrderListTable = (props: any) => {
     page = 0,
     rowsPerPage = 0,
   } = props;
+
+  const [order, setOrder] = useState<OrderBy>('asc');
+  const [orderBy, setOrderBy] = useState<keyof Order>('createdAt');
+
+  const visibleRows = useMemo(
+    () =>
+      [...items]
+        .sort(getComparator(order, orderBy))
+        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
+    [order, orderBy, page, rowsPerPage],
+  );
 
 
   return (
@@ -40,7 +77,7 @@ export const OrderListTable = (props: any) => {
         </TableHead>
 
         <TableBody>
-          {items.map((order: Order) => {
+          {visibleRows.map((order: Order) => {
 
             const createdAtDate = new Date(order.createdAt);
 
