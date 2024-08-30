@@ -76,7 +76,6 @@ const useCurrentOrder = (orders: Order[], orderId: string | undefined) => {
 };
 
 const Page = (props: any) => {
-  console.log('props', props);
 
   const rootRef = useRef(null);
   const ordersSearch = useOrdersSearch();
@@ -88,7 +87,6 @@ const Page = (props: any) => {
   });
 
   const currentOrder = useCurrentOrder(ordersStore.orders, dialog.data);
-  console.log('currentOrder', currentOrder);
 
   const isMounted = useMounted();
 
@@ -195,16 +193,12 @@ const Page = (props: any) => {
 
 export async function getServerSideProps(context: any) {
   try {
-    const page = context.query.page || 1;
-    const limit = context.query.limit || 5;
 
     const allOrders = await ordersServices().getAllOrders();
 
     return {
       props: {
         allOrders: JSON.parse(JSON.stringify(allOrders)),
-        page: parseInt(page),
-        limit: parseInt(limit),
       },
     };
   } catch (error) {
@@ -212,8 +206,6 @@ export async function getServerSideProps(context: any) {
     return {
       props: {
         allOrders: [],
-        page: 1,
-        limit: 5,
       },
     };
   }

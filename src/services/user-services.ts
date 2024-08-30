@@ -24,7 +24,7 @@ export const userServices = () => {
           try {
                const skip = page * limit;
                const database = client.db('ACCOUNTS_DB');
-               const collection = database.collection('users');
+               const collection = database.collection('Users');
                const users = await collection
                     .find({})
                     .skip(skip)
