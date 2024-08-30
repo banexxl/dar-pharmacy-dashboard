@@ -30,8 +30,6 @@ export const userServices = () => {
                     .skip(skip)
                     .limit(parsedLimit)
                     .toArray();
-               console.log('customers from service:', users);
-
                return users;
           } catch (error) {
                return { message: error }

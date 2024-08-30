@@ -215,7 +215,6 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }: any) => {
                     },
                     body: JSON.stringify(values),
                });
-               console.log(responseValues);
                if (responseValues.ok) {
 
                     onSubmitSuccess();
@@ -505,7 +504,6 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }: any) => {
                                                             title: 'Neee',
                                                             text: 'Nešto je pošlo po zlu :(',
                                                        })
-                                                       console.log(error);
                                                   }}
                                                   content={{
                                                        button({ ready }: any) {

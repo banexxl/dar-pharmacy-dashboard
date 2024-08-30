@@ -14,8 +14,6 @@ import { CustomersTable } from '@/sections/customer/customers-table';
 
 
 const CustomersPage = (props: any) => {
-     console.log('pageprops', props);
-
      const customerIDs = useMemo(() => {
           if (!Array.isArray(props.customers)) {
                return [];

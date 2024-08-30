@@ -37,7 +37,6 @@ export const authOptions: NextAuthOptions = {
           },
           async redirect({ url, baseUrl }: any) {
                const redirectUrl = url.startsWith('/') ? new URL(url, baseUrl).toString() : url;
-               console.log(`[next-auth] Redirecting to "${redirectUrl}" (resolved from url "${url}" and baseUrl "${baseUrl}")`);
                return redirectUrl;
           }
      },

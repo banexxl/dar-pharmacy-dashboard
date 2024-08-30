@@ -19,8 +19,6 @@ export default async function handler(request: NextApiRequest, response: NextApi
                return response.status(200).json({ message: 'Product successfully added!' });
           }
           else if (request.method === 'DELETE') {
-               //const idsToDelete = request.body.selected.map((_id: any) => new ObjectId(_id))
-               console.log(request.body);
 
                try {
                     const newUrl = request.body.imageID.substring(request.body.imageID.lastIndexOf("/") + 1);

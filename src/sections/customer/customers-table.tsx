@@ -19,8 +19,6 @@ import { getInitials } from 'src/utils/get-initials';
 import Image from 'next/image';
 
 export const CustomersTable = (props: any) => {
-     console.log('table props', props.items);
-
      const {
           count = 0,
           items = [],

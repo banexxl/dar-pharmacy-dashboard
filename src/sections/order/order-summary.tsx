@@ -20,8 +20,6 @@ interface OrderSummaryProps {
 }
 
 export const OrderSummary = (props: OrderSummaryProps) => {
-  console.log('props', props);
-
   const { order, ...other } = props;
   const mdUp = useMediaQuery((theme: any) => theme.breakpoints.up('md'));
   const [status, setStatus] = useState(statusOptions[0]);
