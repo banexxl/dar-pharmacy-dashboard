@@ -24,18 +24,32 @@ function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   return 0;
 }
 
-type OrderBy = 'asc' | 'desc';
+export type SortDir = 'asc' | 'desc';
 
-function getComparator<Key extends keyof any>(
-  order: OrderBy,
-  orderBy: Key,
+export type SortBy = 'createdAt' | 'orderNumber' | 'total' | 'paymentMethod' | 'customer.name' | 'customer.email' | 'status';
+
+function getComparator<SortBy extends string | number | symbol>(
+  sortDir: SortDir,
+  sortBy: SortBy,
 ): (
-  a: { [key in Key]: number | string },
-  b: { [key in Key]: number | string },
+  a: { [key in SortBy]: number | string },
+  b: { [key in SortBy]: number | string },
 ) => number {
-  return order === 'desc'
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy);
+  return sortDir === 'desc'
+    ? (a, b) => descendingComparator(a, b, sortBy)
+    : (a, b) => -descendingComparator(a, b, sortBy);
+}
+
+type OrderListTableProps = {
+  count?: number;
+  items?: Order[];
+  onPageChange?: (event: any, page: number) => void;
+  onRowsPerPageChange?: (event: any) => void;
+  onSelect?: (orderId: string) => void;
+  page?: number;
+  rowsPerPage?: number;
+  sortBy: SortBy;
+  sortDir: SortDir;
 }
 
 export const OrderListTable = (props: any) => {
@@ -47,17 +61,18 @@ export const OrderListTable = (props: any) => {
     onSelect,
     page = 0,
     rowsPerPage = 0,
+    sortBy,
+    sortDir,
   } = props;
 
-  const [order, setOrder] = useState<OrderBy>('asc');
-  const [orderBy, setOrderBy] = useState<keyof Order>('createdAt');
+
 
   const visibleRows = useMemo(
     () =>
       [...items]
-        .sort(getComparator(order, orderBy))
+        .sort(getComparator(sortDir, sortBy))
         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
-    [order, orderBy, page, rowsPerPage],
+    [sortDir, sortBy, page, rowsPerPage],
   );
 
 
@@ -169,4 +184,6 @@ OrderListTable.propTypes = {
   onSelect: PropTypes.func,
   page: PropTypes.number,
   rowsPerPage: PropTypes.number,
+  sortBy: PropTypes.string.isRequired,
+  sortDir: PropTypes.string.isRequired,
 };

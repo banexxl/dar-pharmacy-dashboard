@@ -9,7 +9,7 @@ import Typography from '@mui/material/Typography';
 import { ordersServices } from '@/services/order-services';
 import { OrderDrawer } from '@/sections/order/order-drawer';
 import { OrderListContainer } from '@/sections/order/order-list-container';
-import { OrderListTable } from '@/sections/order/order-list-table';
+import { OrderListTable, SortBy, SortDir } from '@/sections/order/order-list-table';
 import { OrderListSearch } from '@/sections/order/order-list-search';
 import { Order } from '@/schemas/order';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
@@ -18,6 +18,7 @@ import { useMounted } from '@/hooks/use-mounted';
 import { TablePagination } from '@mui/material'
 
 const useOrdersSearch = () => {
+
   const [state, setState] = useState({
     filters: {
       query: undefined,
@@ -189,6 +190,8 @@ const Page = (props: any) => {
               onSelect={onSelect}
               page={ordersSearch.state.page}
               rowsPerPage={ordersSearch.state.rowsPerPage}
+              sortDir={ordersSearch.state.sortDir as SortDir}
+              sortBy={ordersSearch.state.sortBy as SortBy}
             />
           </OrderListContainer>
           <OrderDrawer

@@ -19,7 +19,6 @@ type TabOptions = {
   value: OrderStatus | 'all';
 };
 
-
 const tabOptions: TabOptions[] = [
   {
     label: 'Sve',
@@ -64,7 +63,7 @@ export const OrderListSearch = (props: any) => {
   const {
     onFiltersChange,
     onSortChange,
-    // sortBy = 'createdAt',
+    sortBy = 'createdAt',
     sortDir = 'asc',
   } = props;
   const queryRef = useRef<HTMLInputElement>(null);
