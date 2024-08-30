@@ -18,9 +18,6 @@ import { OrderLogs } from '@/sections/order/order-logs';
 
 const Page = (order: Order) => {
 
-  console.log('order', order);
-
-
   if (!order) {
     return null;
   }

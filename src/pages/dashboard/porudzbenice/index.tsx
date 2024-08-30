@@ -31,6 +31,8 @@ const useOrdersSearch = () => {
   });
 
   const handleFiltersChange = useCallback((filters: any) => {
+    console.log('filters', filters);
+
     setState((prevState) => ({
       ...prevState,
       filters,

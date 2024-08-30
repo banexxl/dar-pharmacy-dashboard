@@ -11,14 +11,14 @@ import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import { SeverityPill } from 'src/components/severity-pill';
 import { Order } from '@/schemas/order';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 
 
-function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
-  if (b[orderBy] < a[orderBy]) {
+function descendingComparator<T>(a: T, b: T, sortBy: keyof T) {
+  if (b[sortBy] < a[sortBy]) {
     return -1;
   }
-  if (b[orderBy] > a[orderBy]) {
+  if (b[sortBy] > a[sortBy]) {
     return 1;
   }
   return 0;
@@ -40,17 +40,17 @@ function getComparator<SortBy extends string | number | symbol>(
     : (a, b) => -descendingComparator(a, b, sortBy);
 }
 
-type OrderListTableProps = {
-  count?: number;
-  items?: Order[];
-  onPageChange?: (event: any, page: number) => void;
-  onRowsPerPageChange?: (event: any) => void;
-  onSelect?: (orderId: string) => void;
-  page?: number;
-  rowsPerPage?: number;
-  sortBy: SortBy;
-  sortDir: SortDir;
-}
+// type OrderListTableProps = {
+//   count?: number;
+//   items?: Order[];
+//   onPageChange?: (event: any, page: number) => void;
+//   onRowsPerPageChange?: (event: any) => void;
+//   onSelect?: (orderId: string) => void;
+//   page?: number;
+//   rowsPerPage?: number;
+//   sortBy: SortBy;
+//   sortDir: SortDir;
+// }
 
 export const OrderListTable = (props: any) => {
   const {
@@ -65,8 +65,6 @@ export const OrderListTable = (props: any) => {
     sortDir,
   } = props;
 
-
-
   const visibleRows = useMemo(
     () =>
       [...items]
@@ -74,7 +72,6 @@ export const OrderListTable = (props: any) => {
         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
     [sortDir, sortBy, page, rowsPerPage],
   );
-
 
   return (
     <div>
