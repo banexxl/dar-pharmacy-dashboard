@@ -14,16 +14,84 @@ import { useRouter } from 'next/navigation';
 import { TablePagination } from '@mui/material'
 import { AddProductForm } from '@/sections/products/new-product-form';
 import { SessionProvider, useSession } from 'next-auth/react';
+import { useMounted } from '@/hooks/use-mounted';
+
+
+const useProductSearch = () => {
+
+     const [state, setState] = useState({
+          query: '',
+          page: 0,
+          rowsPerPage: 5,
+          sortBy: 'createdAt',
+          sortDir: 'desc',
+     })
+
+     const handleQueryChange = useCallback((filters: any) => {
+          setState((prevState) => ({
+               ...prevState,
+               filters,
+          }));
+     }, []);
+
+     const handlePageChange = useCallback((event: any, page: any) => {
+          setState((prevState) => ({
+               ...prevState,
+               page,
+          }));
+     }, []);
+
+     const handleRowsPerPageChange = useCallback((event: any) => {
+          setState((prevState) => ({
+               ...prevState,
+               page: 0,
+               rowsPerPage: parseInt(event.target.value, 10),
+          }));
+
+     }, []);
+
+     const handleSortChange = useCallback((sortDir: any) => {
+          setState((prevState) => ({
+               ...prevState,
+               sortDir,
+          }));
+     }, []);
+
+     return {
+          handleQueryChange,
+          handleSortChange,
+          handlePageChange,
+          handleRowsPerPageChange,
+          state,
+     };
+};
 
 
 const Page = (props: any) => {
+
+     const productSearch = useProductSearch();
 
      const productsIds = useMemo(() => {
           if (!Array.isArray(props.products)) {
                return [];
           }
-          return props.products.map((product: any) => product._id);
+          return props.allProducts.map((product: any) => product._id);
      }, [props.products]);
+
+
+     const [productStore, setProductStore] = useState({
+          allProducts: [],
+     });
+
+     const isMounted = useMounted();
+
+     useEffect(() => {
+          if (isMounted()) {
+               setProductStore({
+                    allProducts: props.allProducts,
+               });
+          }
+     }, [isMounted, props.allProducts]);
 
      const [open, setOpen] = useState(false)
      const productsSelection = useSelection(productsIds);
@@ -38,14 +106,14 @@ const Page = (props: any) => {
           setOpen(false)
      }
 
-     const handleRowsPerPageChange = (event: any) => {
-          router.push(`products/?page=0&limit=${event.target.value}`);
-          return (event.target.value)
-     }
+     // const handleRowsPerPageChange = (event: any) => {
+     //      router.push(`products/?page=0&limit=${event.target.value}`);
+     //      return (event.target.value)
+     // }
 
-     const handlePageChange = (event: any, newPage: any) => {
-          router.push(`/products?page=${newPage}&limit=${props.limit}`);
-     }
+     // const handlePageChange = (event: any, newPage: any) => {
+     //      router.push(`/products?page=${newPage}&limit=${props.limit}`);
+     // }
 
      const handleRebuild = async () => {
 
@@ -138,11 +206,11 @@ const Page = (props: any) => {
                                    </Stack>
                                    <TablePagination
                                         component="div"
-                                        count={props.productsCount}
-                                        onPageChange={handlePageChange}
-                                        onRowsPerPageChange={handleRowsPerPageChange}
-                                        page={props.page}
-                                        rowsPerPage={props.limit}
+                                        count={productStore.allProducts.length}
+                                        onPageChange={productSearch.handlePageChange}
+                                        onRowsPerPageChange={productSearch.handleRowsPerPageChange}
+                                        page={productSearch.state.page}
+                                        rowsPerPage={productSearch.state.rowsPerPage}
                                         rowsPerPageOptions={[5, 10, 25, 50, 100, 200]}
                                         showFirstButton
                                         showLastButton
@@ -150,19 +218,19 @@ const Page = (props: any) => {
                                    //labelDisplayedRows={({ from, to, count }) => { return `${ from }–${ to } od ${ count !== -1 ? count : `više od ${ to }` }`; }}
                                    />
                                    <ProductsTable
-                                        count={props.products.length || 0}
-                                        items={props.products}
-                                        page={props.page}
-                                        rowsPerPage={props.limit}
+                                        count={productStore.allProducts.length}
+                                        items={productStore.allProducts}
+                                        page={productSearch.state.page}
+                                        rowsPerPage={productSearch.state.rowsPerPage}
                                         selected={productsSelection.selected}
                                    />
                                    <TablePagination
                                         component="div"
-                                        count={props.productsCount}
-                                        onPageChange={handlePageChange}
-                                        onRowsPerPageChange={handleRowsPerPageChange}
-                                        page={props.page}
-                                        rowsPerPage={props.limit}
+                                        count={productStore.allProducts.length}
+                                        onPageChange={productSearch.handlePageChange}
+                                        onRowsPerPageChange={productSearch.handleRowsPerPageChange}
+                                        page={productSearch.state.page}
+                                        rowsPerPage={productSearch.state.rowsPerPage}
                                         rowsPerPageOptions={[5, 10, 25, 50, 100, 200]}
                                         showFirstButton
                                         showLastButton
@@ -194,29 +262,18 @@ const Page = (props: any) => {
 
 export async function getServerSideProps(context: any) {
      try {
-          const page = context.query.page || 1
-          const limit = context.query.limit || 5
-
-          const products = await productsServices().getProductsByPage(page, limit);
-          const productsCount = await productsServices().getProductsCount();
+          const allProducts = await productsServices().getAllProducts();
 
           return {
                props: {
-                    products: JSON.parse(JSON.stringify(products)),
-                    productsCount: JSON.parse(JSON.stringify(productsCount)),
-                    page: parseInt(context.query.page),
-                    limit: parseInt(context.query.limit)
+                    allProducts: JSON.parse(JSON.stringify(allProducts)),
                },
           };
      } catch (error) {
           console.error("Error fetching products:", error);
           return {
                props: {
-                    products: [],
-                    productsCount: 0,
-                    page: 1,
-                    limit: 5,
-                    error: "Failed to fetch products. Please try again later.",
+                    allProducts: [],
                },
           };
      }

@@ -14,7 +14,7 @@ import { Order } from '@/schemas/order';
 import { useMemo } from 'react';
 
 
-function descendingComparator<T>(a: T, b: T, sortBy: keyof T) {
+export function descendingComparator<T>(a: T, b: T, sortBy: keyof T) {
   if (b[sortBy] < a[sortBy]) {
     return -1;
   }
@@ -28,7 +28,7 @@ export type SortDir = 'asc' | 'desc';
 
 export type SortBy = 'createdAt' | 'orderNumber' | 'total' | 'paymentMethod' | 'customer.name' | 'customer.email' | 'status';
 
-function getComparator<SortBy extends string | number | symbol>(
+export function getComparator<SortBy extends string | number | symbol>(
   sortDir: SortDir,
   sortBy: SortBy,
 ): (

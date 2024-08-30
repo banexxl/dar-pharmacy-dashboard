@@ -5,9 +5,10 @@ import {
      OutlinedInput,
      Stack, SvgIcon, Switch, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography, useTheme
 } from '@mui/material';
+import PropTypes from 'prop-types';
 import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
 import Image from 'next/image';
-import { Fragment, useState } from 'react';
+import { Fragment, useMemo, useState } from 'react';
 import { Scrollbar } from 'src/components/scrollbar';
 import { SeverityPill } from '@/components/severity-pill';
 import { fetchSubCategoryOptions } from './new-product-form';
@@ -18,6 +19,7 @@ import { UploadButton } from "../../utils/image-upload-components";
 import { mainCategoryOptions, manufacturerOptions, midCategoryOptions, quantityUnitOptions } from './new-product-schema';
 import MagnifyingGlassIcon from '@heroicons/react/24/solid/MagnifyingGlassIcon';
 import ClearIcon from '@mui/icons-material/Clear';
+import { getComparator } from '../order/order-list-table';
 
 export interface IProduct {
      bestSeller: boolean;
@@ -43,7 +45,18 @@ export interface IProduct {
      _id?: string;
 }
 
-export const ProductsTable = ({ items }: any) => {
+export const ProductsTable = (props: any) => {
+
+     const {
+          items = [],
+          page = 0,
+          rowsPerPage = 5,
+          sortDir = 'desc',
+          sortBy = 'createdAt',
+          onSelect = () => { },
+          count = 0,
+     } = props;
+
 
      const [currentProductID, setCurrentProductID] = useState(null);
      const [currentProductObject, setCurrentProductObject] = useState<IProduct | null>();
@@ -206,8 +219,19 @@ export const ProductsTable = ({ items }: any) => {
           setSearchQuery(event.target.value);
      };
 
-     const filteredItems = items.filter((product: IProduct) =>
-          product.name.toLowerCase().includes(searchQuery.toLowerCase())
+     // const filteredItems = items.filter((product: IProduct) =>
+     //      product.name.toLowerCase().includes(searchQuery.toLowerCase())
+     // );
+
+     const visibleRows = useMemo(
+          () =>
+               [...items]
+                    .filter((product: IProduct) =>
+                         !searchQuery || product.name.toLowerCase().includes(searchQuery.toLowerCase())
+                    )
+                    .sort(getComparator(sortDir, sortBy))
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
+          [searchQuery, items, page, rowsPerPage],
      );
 
 
@@ -276,8 +300,8 @@ export const ProductsTable = ({ items }: any) => {
                               </TableHead>
                               <TableBody>
                                    {
-                                        filteredItems.length > 0 ?
-                                             filteredItems.map((product: IProduct) => {
+                                        visibleRows.length > 0 ?
+                                             visibleRows.map((product: IProduct) => {
                                                   //const isSelected = selected.includes(product._id);
                                                   const isCurrent = product._id === currentProductID;
                                                   // const price = numeral(product.price).format(`${product.currency}0,0.00`);
@@ -1097,18 +1121,16 @@ export const ProductsTable = ({ items }: any) => {
      );
 };
 
-
-
-// ProductsTable.propTypes = {
-//           count: PropTypes.number,
-//           items: PropTypes.array,
-//           onDeselectAll: PropTypes.func,
-//           onDeselectOne: PropTypes.func,
-//           onPageChange: PropTypes.func,
-//           onRowsPerPageChange: PropTypes.func,
-//           onSelectAll: PropTypes.func,
-//           onSelectOne: PropTypes.func,
-//           page: PropTypes.number,
-//           rowsPerPage: PropTypes.number,
-//           selected: PropTypes.array
-// };
+ProductsTable.propTypes = {
+     count: PropTypes.number,
+     items: PropTypes.array,
+     onDeselectAll: PropTypes.func,
+     onDeselectOne: PropTypes.func,
+     onPageChange: PropTypes.func,
+     onRowsPerPageChange: PropTypes.func,
+     onSelectAll: PropTypes.func,
+     onSelectOne: PropTypes.func,
+     page: PropTypes.number,
+     rowsPerPage: PropTypes.number,
+     selected: PropTypes.array
+};

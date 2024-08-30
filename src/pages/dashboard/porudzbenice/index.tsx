@@ -36,8 +36,6 @@ const useOrdersSearch = () => {
   }, []);
 
   const handlePageChange = useCallback((event: any, page: any) => {
-    console.log('usao u handlePageChange');
-
     setState((prevState) => ({
       ...prevState,
       page,
@@ -45,8 +43,6 @@ const useOrdersSearch = () => {
   }, []);
 
   const handleRowsPerPageChange = useCallback((event: any) => {
-    console.log('usao u handleRowsPerPageChange');
-
     setState((prevState) => ({
       ...prevState,
       page: 0,
