@@ -54,64 +54,47 @@ const sortOptions = [
   },
 ];
 
-interface Filters {
-  query?: string
-}
-
 export const OrderListSearch = (props: any) => {
 
   const {
-    onFiltersChange,
+    onQueryChange,
     onSortChange,
     onTabChange,
     sortBy = 'createdAt',
     sortDir = 'asc',
-    tab = 'all'
+    tab = 'all',
+    query = ''
   } = props;
-  const queryRef = useRef<HTMLInputElement>(null);
 
-  const [filter, setFilter] = useState<Filters>({
-    query: undefined,
-  });
+  const queryRef = useRef<HTMLInputElement>(null)
 
-  const handleFiltersUpdate = useCallback(() => {
-    console.log('usao u handleFiltersUpdate', filter);
+  // const handleFiltersUpdate = useCallback(() => {
+  //   onFiltersChange?.(filter);
+  // }, [filter, onFiltersChange]);
 
-    onFiltersChange?.(filter);
-  }, [filter, onFiltersChange]);
+  // useUpdateEffect(() => {
+  //   handleFiltersUpdate();
+  // }, []);
 
-  useUpdateEffect(() => {
-    handleFiltersUpdate();
-  }, []);
-
-  const handleTabsChange = useCallback((event: any) => {
-    console.log('usao u handletabschange event je', event);
-
-    const tab = event.target.outerText;
-    console.log('tab', tab);
-
-    onTabChange?.(tab);
-  },
-    [onTabChange]
-  );
-
-  const handleQueryChange = useCallback((event: React.FormEvent) => {
+  const handleQueryChange = useCallback((event: any) => {
     event.preventDefault();
-    const query = queryRef.current?.value || '';
-
-    setFilter((prevState) => ({
-      ...prevState,
-      query,
-    }));
-  }, []);
+    // const query = queryRef.current?.value || '';
+    const query = event.target.value;
+    onQueryChange?.(query);
+  }, [onQueryChange]);
 
   const handleSortChange = useCallback((event: any) => {
-    console.log('usao u handleSortChange');
-
     const sortDir = event.target.value;
     onSortChange?.(sortDir);
   },
     [onSortChange]
+  );
+
+  const handleTabsChange = useCallback((event: any, newValue: string) => {
+    const tab = newValue
+    onTabChange?.(tab);
+  },
+    [onTabChange]
   );
 
   return (
@@ -185,10 +168,11 @@ export const OrderListSearch = (props: any) => {
 };
 
 OrderListSearch.propTypes = {
-  onFiltersChange: PropTypes.func,
+  onQueryChange: PropTypes.func,
   onTabChange: PropTypes.func,
   onSortChange: PropTypes.func,
   sortBy: PropTypes.string,
   sortDir: PropTypes.oneOf(['asc', 'desc']),
   tab: PropTypes.oneOf(['all', 'cancelled', 'delivered', 'pending', 'shipped']),
+  query: PropTypes.string
 };

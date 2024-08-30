@@ -20,10 +20,7 @@ import { TablePagination } from '@mui/material'
 const useOrdersSearch = () => {
 
   const [state, setState] = useState({
-    filters: {
-      query: undefined,
-      status: undefined,
-    },
+    query: undefined,
     page: 0,
     rowsPerPage: 5,
     sortBy: 'createdAt',
@@ -31,9 +28,7 @@ const useOrdersSearch = () => {
     tab: 'all'
   });
 
-  const handleFiltersChange = useCallback((filters: any) => {
-    console.log('usao u handleFiltersChange', filters);
-
+  const handleQueryChange = useCallback((filters: any) => {
     setState((prevState) => ({
       ...prevState,
       filters,
@@ -68,7 +63,7 @@ const useOrdersSearch = () => {
   }, []);
 
   const handleTabsChange = useCallback((event: any, tab: any) => {
-    console.log('usao u   ', tab);
+    console.log('usao u handleTabsChange  ', tab);
 
     setState((prevState) => ({
       ...prevState,
@@ -77,7 +72,7 @@ const useOrdersSearch = () => {
   }, []);
 
   return {
-    handleFiltersChange,
+    handleQueryChange,
     handleSortChange,
     handlePageChange,
     handleRowsPerPageChange,
@@ -184,11 +179,13 @@ const Page = (props: any) => {
             </Box>
             <Divider />
             <OrderListSearch
-              onFiltersChange={ordersSearch.handleFiltersChange}
+              onQueryChange={ordersSearch.handleQueryChange}
               onTabChange={ordersSearch.handleTabsChange}
               onSortChange={ordersSearch.handleSortChange}
               sortBy={ordersSearch.state.sortBy}
               sortDir={ordersSearch.state.sortDir}
+              query={ordersSearch.state.query}
+              tab={ordersSearch.state.tab}
             />
             <Divider />
             <TablePagination

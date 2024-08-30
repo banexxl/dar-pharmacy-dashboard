@@ -71,7 +71,7 @@ export const OrderListTable = (props: any) => {
   const visibleRows = useMemo(
     () =>
       [...items]
-        .filter(order => tab === 'all' || order.status === tab)
+        // .filter(order => tab === 'all' || order.status === tab)
         .sort(getComparator(sortDir, sortBy))
         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
     [sortDir, sortBy, page, rowsPerPage],
