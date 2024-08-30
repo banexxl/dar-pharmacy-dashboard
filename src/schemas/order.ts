@@ -37,10 +37,3 @@ export interface OrderDetailsProps {
      onReject: () => void;
      order: Order;
 }
-
-export const statusMap: Record<OrderStatus, string> = {
-     pending: indigo.dark,
-     shipped: info.dark,
-     delivered: success.dark,
-     cancelled: error.dark
-};
