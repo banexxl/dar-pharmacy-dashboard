@@ -58,6 +58,7 @@ export const OrderListTable = (props: any) => {
     items = [],
     onPageChange = () => { },
     onRowsPerPageChange,
+    onTabChange,
     onSelect,
     page = 0,
     rowsPerPage = 0,
@@ -66,15 +67,13 @@ export const OrderListTable = (props: any) => {
     tab
   } = props;
 
-  console.log('tab u tabeli', tab);
-
   const visibleRows = useMemo(
     () =>
       [...items]
-        // .filter(order => tab === 'all' || order.status === tab)
+        .filter(order => tab === 'all' || order.status === tab)
         .sort(getComparator(sortDir, sortBy))
         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
-    [sortDir, sortBy, page, rowsPerPage],
+    [items, tab, sortDir, sortBy, page, rowsPerPage],
   );
 
   return (
@@ -182,6 +181,7 @@ OrderListTable.propTypes = {
   items: PropTypes.array,
   onPageChange: PropTypes.func,
   onRowsPerPageChange: PropTypes.func,
+  onTabChange: PropTypes.func,
   onSelect: PropTypes.func,
   page: PropTypes.number,
   rowsPerPage: PropTypes.number,

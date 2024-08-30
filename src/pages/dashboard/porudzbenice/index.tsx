@@ -20,13 +20,13 @@ import { TablePagination } from '@mui/material'
 const useOrdersSearch = () => {
 
   const [state, setState] = useState({
-    query: undefined,
+    query: '',
     page: 0,
     rowsPerPage: 5,
     sortBy: 'createdAt',
     sortDir: 'desc',
     tab: 'all'
-  });
+  })
 
   const handleQueryChange = useCallback((filters: any) => {
     setState((prevState) => ({
@@ -62,9 +62,7 @@ const useOrdersSearch = () => {
     }));
   }, []);
 
-  const handleTabsChange = useCallback((event: any, tab: any) => {
-    console.log('usao u handleTabsChange  ', tab);
-
+  const handleTabsChange = useCallback((tab: string) => {
     setState((prevState) => ({
       ...prevState,
       tab,
@@ -207,6 +205,7 @@ const Page = (props: any) => {
               rowsPerPage={ordersSearch.state.rowsPerPage}
               sortDir={ordersSearch.state.sortDir as SortDir}
               sortBy={ordersSearch.state.sortBy as SortBy}
+              onTabChange={ordersSearch.handleTabsChange}
               tab={ordersSearch.state.tab}
             />
           </OrderListContainer>

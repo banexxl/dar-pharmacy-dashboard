@@ -39,7 +39,7 @@ export const items = [
      },
      {
           title: 'Porudžbenice',
-          path: '/dashboard/porudzbenice?page=0&limit=5',
+          path: '/dashboard/porudzbenice',
           icon: (
                <SvgIcon fontSize="small">
                     <ShoppingCartIcon />
