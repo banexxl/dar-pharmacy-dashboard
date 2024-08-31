@@ -15,8 +15,6 @@ import { ordersServices } from '@/services/order-services';
 import { userServices } from '@/services/user-services';
 import { productsServices } from '@/services/product-services';
 
-const now = new Date();
-
 const calculatePercentageChange = (currentMonthSum: number, lastMonthSum: number): string => {
      if (lastMonthSum === 0) {
           return currentMonthSum > 0 ? '100' : '0'; // If last month's sum is 0, return infinity or 0
@@ -29,8 +27,6 @@ const calculatePercentageChange = (currentMonthSum: number, lastMonthSum: number
 const Page = (props: any) => {
 
      const percantageChange = calculatePercentageChange(props.sumForCurrentMonth, props.sumOfLastMonthOrders)
-     console.log('props', props);
-
 
      return (
           <SessionProvider>
