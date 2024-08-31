@@ -1,3 +1,4 @@
+import { Order } from "@/schemas/order";
 import { MongoClient } from "mongodb"
 import { ObjectId } from "mongodb"
 
@@ -78,8 +79,154 @@ export const ordersServices = () => {
           }
      }
 
+     const getSumOfAllOrders = async (): Promise<number | { message: string }> => {
+
+          const client = await MongoClient.connect(process.env.MONGODB_URI!);
+
+          try {
+               const db = client.db('ORDERS_DB');
+               const result = await db.collection('Orders').aggregate([
+                    {
+                         $group: {
+                              _id: null, // Group all documents together
+                              totalSum: { $sum: '$total' }, // Sum up the 'total' field
+                         },
+                    },
+               ]).toArray();
+
+               const sum = result[0]?.totalSum || 0; // If no documents found, return 0
+               console.log('Sum of all orders:', sum);
+
+               return sum;
+          } catch (error) {
+               return { message: (error as Error).message };
+          } finally {
+               await client.close();
+          }
+     };
+
+     const getSumOfLastMonthsOrders = async (months: number): Promise<number | { message: string }> => {
+
+          const client = await MongoClient.connect(process.env.MONGODB_URI!);
+
+          try {
+               const db = client.db('ORDERS_DB');
+               const result = await db.collection('Orders').aggregate([
+                    {
+                         $match: {
+                              createdAt: {
+                                   $gte: new Date(new Date().setMonth(new Date().getMonth() - months)),
+                                   $lt: new Date(),
+                              },
+                         },
+                    },
+                    {
+                         $group: {
+                              _id: null,
+                              total: { $sum: '$total' },
+                         },
+                    },
+               ]).toArray();
+
+               const sum = result[0]?.totalSum || 0;
+               console.log(`Sum of orders for the last ${months} months:`, sum);
+
+               return sum;
+          } catch (error) {
+               return { message: (error as Error).message };
+          } finally {
+               await client.close();
+          }
+     }
+
+     const getSumOfLastMonthOrders = async (): Promise<number | { message: string }> => {
+          const client = await MongoClient.connect(process.env.MONGODB_URI!);
+
+          try {
+               const db = client.db('ORDERS_DB');
+               const ordersCollection = db.collection('Orders');
+
+               // Get the current date
+               const now = new Date();
+
+               // Calculate the start and end of the last month
+               const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1); // 1st day of the previous month
+               const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999); // Last day of the previous month
+
+               // Aggregation pipeline to filter and sum
+               const result = await ordersCollection.aggregate([
+                    {
+                         $match: {
+                              createdAt: {
+                                   $gte: startOfLastMonth,
+                                   $lte: endOfLastMonth,
+                              },
+                         },
+                    },
+                    {
+                         $group: {
+                              _id: null, // Group all documents together
+                              total: { $sum: '$total' }, // Sum up the 'total' field
+                         },
+                    },
+               ]).toArray();
+
+               const sum = result[0]?.totalSum || 0; // If no documents found, return 0
+               return sum;
+          } catch (error) {
+               return { message: (error as Error).message };
+          } finally {
+               await client.close();
+          }
+     };
+
+     const getSumOfCurrentMonthOrders = async (): Promise<number | { message: string }> => {
+          const client = await MongoClient.connect(process.env.MONGODB_URI!);
+
+          try {
+               const db = client.db('ORDERS_DB');
+               const ordersCollection = db.collection('Orders');
+
+               // Get the current date
+               const now = new Date();
+
+               // Calculate the start of the current month and the current date/time
+               const startOfCurrentMonth = new Date(now.getFullYear(), now.getMonth(), 1); // 1st day of the current month
+               const endOfCurrentMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999); // Last day of the current month
+
+               // Aggregation pipeline to filter and sum
+               const result = await ordersCollection.aggregate([
+                    {
+                         $match: {
+                              createdAt: {
+                                   $gte: startOfCurrentMonth,
+                                   $lte: endOfCurrentMonth,
+                              },
+                         },
+                    },
+                    {
+                         $group: {
+                              _id: null, // Group all documents together
+                              totalSum: { $sum: '$total' }, // Sum up the 'total' field
+                         },
+                    },
+               ]).toArray();
+
+               const sum = result[0]?.totalSum || 0; // If no documents found, return 0
+               return sum;
+          } catch (error) {
+               return { message: (error as Error).message };
+          } finally {
+               await client.close();
+          }
+     };
+
 
      return {
+          getSumOfCurrentMonthOrders,
+          getSumOfLastMonthOrders,
+          getSumOfLastMonthsOrders,
+          getSumOfAllOrders,
           getAllOrders,
           getOrdersByPage,
           getOrdersCount,

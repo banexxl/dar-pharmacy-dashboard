@@ -4,8 +4,16 @@ import ArrowUpIcon from '@heroicons/react/24/solid/ArrowUpIcon';
 import CurrencyDollarIcon from '@heroicons/react/24/solid/CurrencyDollarIcon';
 import { Avatar, Card, CardContent, Stack, SvgIcon, Typography } from '@mui/material';
 
-export const OverviewBudget = (props) => {
-  const { difference, positive = false, sx, value } = props;
+export const OverviewBudget = (props: any) => {
+  const { difference, positive = false, sx, value, title, subTitle } = props;
+
+  const formatNumber = (number: number) => {
+    return new Intl.NumberFormat('de-DE', {
+      style: 'decimal',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(number);
+  };
 
   return (
     <Card sx={sx}>
@@ -21,10 +29,10 @@ export const OverviewBudget = (props) => {
               color="text.secondary"
               variant="overline"
             >
-              Budget
+              {title} (rsd)
             </Typography>
             <Typography variant="h4">
-              {value}
+              {formatNumber(value)}
             </Typography>
           </Stack>
           <Avatar
@@ -68,7 +76,7 @@ export const OverviewBudget = (props) => {
               color="text.secondary"
               variant="caption"
             >
-              Since last month
+              {subTitle}
             </Typography>
           </Stack>
         )}
@@ -81,5 +89,7 @@ OverviewBudget.prototypes = {
   difference: PropTypes.number,
   positive: PropTypes.bool,
   sx: PropTypes.object,
-  value: PropTypes.string.isRequired
+  value: PropTypes.string.isRequired,
+  title: PropTypes.string.isRequired,
+  subTitle: PropTypes.string,
 };

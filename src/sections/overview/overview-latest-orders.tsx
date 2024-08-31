@@ -24,7 +24,7 @@ const statusMap = {
   refunded: 'error'
 };
 
-export const OverviewLatestOrders = (props) => {
+export const OverviewLatestOrders = (props: any) => {
   const { orders = [], sx } = props;
 
   return (
@@ -50,7 +50,7 @@ export const OverviewLatestOrders = (props) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {orders.map((order) => {
+              {orders.map((order: any) => {
                 const createdAt = format(order.createdAt, 'dd/MM/yyyy');
 
                 return (
@@ -68,9 +68,9 @@ export const OverviewLatestOrders = (props) => {
                       {createdAt}
                     </TableCell>
                     <TableCell>
-                      <SeverityPill color={statusMap[order.status]}>
+                      {/* <SeverityPill color={statusMap[order.status]}>
                         {order.status}
-                      </SeverityPill>
+                      </SeverityPill> */}
                     </TableCell>
                   </TableRow>
                 );

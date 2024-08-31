@@ -21,7 +21,7 @@ export const items = [
      },
      {
           title: 'Klijenti',
-          path: '/dashboard/klijenti?page=0&limit=5',
+          path: '/dashboard/klijenti',
           icon: (
                <SvgIcon fontSize="small">
                     <UsersIcon />
