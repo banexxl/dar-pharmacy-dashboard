@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import Head from 'next/head';
 import ArrowDownOnSquareIcon from '@heroicons/react/24/solid/ArrowDownOnSquareIcon';
 import ArrowUpOnSquareIcon from '@heroicons/react/24/solid/ArrowUpOnSquareIcon';
@@ -11,9 +11,59 @@ import { userServices } from '../../services/user-services'
 import { SessionProvider } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { CustomersTable } from '@/sections/customer/customers-table';
+import { useMounted } from '@/hooks/use-mounted';
 
+const useClientSearch = () => {
+
+     const [state, setState] = useState({
+          query: '',
+          page: 0,
+          rowsPerPage: 5,
+          sortBy: 'name',
+          sortDir: 'desc',
+     })
+
+     const handleQueryChange = useCallback((filters: any) => {
+          setState((prevState) => ({
+               ...prevState,
+               filters,
+          }));
+     }, []);
+
+     const handlePageChange = useCallback((event: any, page: any) => {
+          setState((prevState) => ({
+               ...prevState,
+               page,
+          }));
+     }, []);
+
+     const handleRowsPerPageChange = useCallback((event: any) => {
+          setState((prevState) => ({
+               ...prevState,
+               page: 0,
+               rowsPerPage: parseInt(event.target.value, 10),
+          }));
+
+     }, []);
+
+     const handleSortChange = useCallback((sortDir: any) => {
+          setState((prevState) => ({
+               ...prevState,
+               sortDir,
+          }));
+     }, []);
+
+     return {
+          handleQueryChange,
+          handleSortChange,
+          handlePageChange,
+          handleRowsPerPageChange,
+          state,
+     };
+};
 
 const CustomersPage = (props: any) => {
+
      const customerIDs = useMemo(() => {
           if (!Array.isArray(props.customers)) {
                return [];
@@ -21,17 +71,26 @@ const CustomersPage = (props: any) => {
           return props.customers.map((customer: any) => customer._id);
      }, [props.customers]);
 
-     const customersSelection = useSelection(customerIDs);
      const router = useRouter();
+     const clientSearch = useClientSearch();
 
-     const handleRowsPerPageChange = (event: any) => {
-          router.push(`customers/?page=0&limit=${event.target.value}`);
-          return (event.target.value)
-     }
+     const customersSelection = useSelection(customerIDs);
 
-     const handlePageChange = (event: any, newPage: any) => {
-          router.push(`/customers?page=${newPage}&limit=${props.limit}`);
-     }
+     const [clientStore, setClientStore] = useState({
+          allClients: [],
+     });
+
+     const isMounted = useMounted();
+
+     useEffect(() => {
+          if (isMounted()) {
+               setClientStore({
+                    allClients: props.allClients,
+               });
+          }
+     }, [isMounted, props.allProducts]);
+
+
 
      return (
           <SessionProvider>
@@ -101,35 +160,34 @@ const CustomersPage = (props: any) => {
                               <CustomersSearch />
                               < TablePagination
                                    component="div"
-                                   count={props.customersCount}
-                                   onPageChange={handlePageChange}
-                                   onRowsPerPageChange={handleRowsPerPageChange}
-                                   page={props.page}
-                                   rowsPerPage={props.limit}
-                                   rowsPerPageOptions={[5, 10, 25, 50, 100, 200]}
+                                   count={clientStore.allClients.length || 0}
+                                   onPageChange={clientSearch.handlePageChange}
+                                   onRowsPerPageChange={clientSearch.handleRowsPerPageChange}
+                                   page={clientSearch.state.page}
+                                   rowsPerPage={clientSearch.state.rowsPerPage}
+                                   rowsPerPageOptions={[5, 10, 25, 50, 100]}
                                    showFirstButton
                                    showLastButton
                                    labelRowsPerPage={'Broj po stranici'}
-                              //labelDisplayedRows={({ from, to, count }) => { return `${ from }–${ to } od ${ count !== -1 ? count : `više od ${ to }` }`; }}
                               />
                               <CustomersTable
-                                   count={props.customers.length || 0}
-                                   items={props.customers}
-                                   page={props.page}
-                                   rowsPerPage={props.limit}
+                                   count={clientStore.allClients.length}
+                                   items={clientStore.allClients}
+                                   page={clientSearch.state.page}
+                                   rowsPerPage={clientSearch.state.rowsPerPage}
                                    selected={customersSelection.selected}
                               />
                               < TablePagination
-                                   count={props.customersCount}
-                                   onPageChange={handlePageChange}
-                                   onRowsPerPageChange={handleRowsPerPageChange}
-                                   page={props.page}
-                                   rowsPerPage={props.limit}
-                                   rowsPerPageOptions={[5, 10, 25, 50, 100, 200]}
+                                   component="div"
+                                   count={clientStore.allClients.length || 0}
+                                   onPageChange={clientSearch.handlePageChange}
+                                   onRowsPerPageChange={clientSearch.handleRowsPerPageChange}
+                                   page={clientSearch.state.page}
+                                   rowsPerPage={clientSearch.state.rowsPerPage}
+                                   rowsPerPageOptions={[5, 10, 25, 50, 100]}
                                    showFirstButton
                                    showLastButton
                                    labelRowsPerPage={'Broj po stranici'}
-                              //labelDisplayedRows={({ from, to, count }) => { return `${ from }–${ to } od ${ count !== -1 ? count : `više od ${ to }` }`; }}
                               />
                          </Stack>
                     </Container>
@@ -140,28 +198,18 @@ const CustomersPage = (props: any) => {
 
 export async function getServerSideProps(context: any) {
      try {
-          const page = context.query.page || 1
-          const limit = context.query.limit || 5
 
-          const customers = await userServices().getUsersByPage(page, limit);
-          const customersCount = await userServices().getUsersCount();
+          const allClients = await userServices().getAllUsers()
 
           return {
                props: {
-                    customers: JSON.parse(JSON.stringify(customers)),
-                    customersCount: JSON.parse(JSON.stringify(customersCount)),
-                    page: parseInt(context.query.page),
-                    limit: parseInt(context.query.limit)
+                    allClients: JSON.parse(JSON.stringify(allClients)),
                },
           };
      } catch (error) {
-          console.error("Error fetching customers:", error);
           return {
                props: {
-                    customers: [],
-                    customersCount: 0,
-                    page: 1,
-                    limit: 5,
+                    allClients: [],
                     error: "Failed to fetch customers. Please try again later.",
                },
           };

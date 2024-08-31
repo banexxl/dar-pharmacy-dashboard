@@ -17,6 +17,9 @@ import {
 import { Scrollbar } from 'src/components/scrollbar';
 import { getInitials } from 'src/utils/get-initials';
 import Image from 'next/image';
+import { useMemo } from 'react';
+import { ICustomer } from '@/schemas/customer';
+import { getComparator } from '../order/order-list-table';
 
 export const CustomersTable = (props: any) => {
      const {
@@ -30,11 +33,24 @@ export const CustomersTable = (props: any) => {
           onSelectOne,
           page = 0,
           rowsPerPage = 0,
-          selected = []
+          selected = [],
+          sortDir = 'desc',
+          sortBy = 'name',
      } = props;
 
      const selectedSome = (selected.length > 0) && (selected.length < items.length);
      const selectedAll = (items.length > 0) && (selected.length === items.length);
+
+     const visibleRows = useMemo(
+          () =>
+               [...items]
+                    // .filter((customer: ICustomer) =>
+                    //      !searchQuery || customer.name.toLowerCase().includes(searchQuery.toLowerCase())
+                    // )
+                    .sort(getComparator(sortDir, sortBy))
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
+          [items, page, rowsPerPage],
+     );
 
      return (
           <Card>
@@ -70,7 +86,7 @@ export const CustomersTable = (props: any) => {
                               </TableHead>
                               <TableBody>
                                    {
-                                        props.items.map((customer: any) => {
+                                        visibleRows.map((customer: any) => {
                                              const isSelected = selected.includes(customer.id);
 
                                              return (

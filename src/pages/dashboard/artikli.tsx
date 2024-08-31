@@ -106,15 +106,6 @@ const Page = (props: any) => {
           setOpen(false)
      }
 
-     // const handleRowsPerPageChange = (event: any) => {
-     //      router.push(`products/?page=0&limit=${event.target.value}`);
-     //      return (event.target.value)
-     // }
-
-     // const handlePageChange = (event: any, newPage: any) => {
-     //      router.push(`/products?page=${newPage}&limit=${props.limit}`);
-     // }
-
      const handleRebuild = async () => {
 
           try {

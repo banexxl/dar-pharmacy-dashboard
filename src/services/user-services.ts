@@ -73,7 +73,24 @@ export const userServices = () => {
           }
      }
 
+     const getAllUsers = async () => {
+          const client = new MongoClient(process.env.MONGODB_URI!);
+
+          try {
+               await client.connect();
+               const database = client.db('ACCOUNTS_DB');
+               const collection = await database.collection('Users').find({}).toArray();
+               return collection;
+          } catch (error: any) {
+               console.error('Error while fetching count:', error);
+               return 0; // Return false or handle the error accordingly
+          } finally {
+               await client.close(); // Ensure the client is closed after operation
+          }
+     }
+
      return {
+          getAllUsers,
           getUsersByPage,
           getUserByEmail,
           getUsersCount
