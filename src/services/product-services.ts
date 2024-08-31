@@ -235,8 +235,25 @@ export const productsServices = () => {
           }
      }
 
-
+     const getLastNumberOfProducts = async (numberOfProducts: number) => {
+          const client = await MongoClient.connect(process.env.MONGODB_URI!);
+          try {
+               const db = client.db('DAR_DB');
+               const products = await db
+                    .collection('Products')
+                    .find()
+                    .sort({ updatedAt: -1 })  // Sort by updatedAt in descending order
+                    .limit(numberOfProducts)
+                    .toArray();
+               return products;
+          } catch (error) {
+               return { message: (error as Error).message };
+          } finally {
+               await client.close();
+          }
+     };
      return {
+          getLastNumberOfProducts,
           getAllProducts,
           getProductsByPage,
           getProductsCount,

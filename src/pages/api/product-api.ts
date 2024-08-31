@@ -1,41 +1,37 @@
-import { MongoClient, ObjectId } from 'mongodb'
-import type { NextApiRequest, NextApiResponse } from 'next/types'
+import { MongoClient, ObjectId } from 'mongodb';
+import type { NextApiRequest, NextApiResponse } from 'next/types';
 import { UTApi } from 'uploadthing/server';
 
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
-
-     const mongoClient = await MongoClient.connect(process.env.MONGODB_URI!, {})
-     const dbProducts = mongoClient.db('DAR_DB').collection('Products')
+     const mongoClient = await MongoClient.connect(process.env.MONGODB_URI!, {});
+     const dbProducts = mongoClient.db('DAR_DB').collection('Products');
 
      try {
           if (request.method === 'GET') {
-
-               const allProducts = await dbProducts.find({}).toArray()
+               const allProducts = await dbProducts.find({}).toArray();
                return response.status(200).json({ message: 'Products found!', data: allProducts });
-
           } else if (request.method === 'POST') {
-               const newProduct = request.body
-               await dbProducts.insertOne(newProduct)
+               const newProduct = {
+                    ...request.body,
+                    updatedAt: new Date() // Set updatedAt to the current date and time
+               };
+               await dbProducts.insertOne(newProduct);
                return response.status(200).json({ message: 'Product successfully added!' });
-          }
-          else if (request.method === 'DELETE') {
-
+          } else if (request.method === 'DELETE') {
                try {
-                    const newUrl = request.body.imageID.substring(request.body.imageID.lastIndexOf("/") + 1);
-                    const utapi = new UTApi()
+                    const newUrl = request.body.imageID.substring(request.body.imageID.lastIndexOf('/') + 1);
+                    const utapi = new UTApi();
                     await utapi.deleteFiles(newUrl);
 
-                    await dbProducts.deleteOne({ _id: new ObjectId(request.body.currentProductID) })
+                    await dbProducts.deleteOne({ _id: new ObjectId(request.body.currentProductID) });
                     return response.status(200).json({ message: 'Product successfully deleted!' });
                } catch (error) {
-                    alert(error);
+                    return response.status(500).json({ error: 'Error deleting product.' });
                }
-          }
-          else if (request.method === 'PUT') {
-               //const idsToDelete = request.body.selected.map((_id: any) => new ObjectId(_id))
-
+          } else if (request.method === 'PUT') {
                try {
-                    await dbProducts.findOneAndUpdate({ _id: new ObjectId(request.body._id) },
+                    await dbProducts.findOneAndUpdate(
+                         { _id: new ObjectId(request.body._id) },
                          {
                               $set: {
                                    bestSeller: request.body.bestSeller,
@@ -57,15 +53,16 @@ export default async function handler(request: NextApiRequest, response: NextApi
                                    quantity: request.body.quantity,
                                    quantityUnit: request.body.quantityUnit,
                                    subCategory: request.body.subCategory,
-                                   warning: request.body.warning
+                                   warning: request.body.warning,
+                                   updatedAt: new Date() // Update the updatedAt field to the current date and time
                               }
-                         })
+                         }
+                    );
                     return response.status(200).json({ message: 'Product successfully updated!' });
                } catch (error) {
-                    alert(error);
+                    return response.status(500).json({ error: 'Error updating product.' });
                }
-          }
-          else {
+          } else {
                return response.status(405).json({ error: 'Method not allowed!' });
           }
      } catch (error) {
@@ -74,5 +71,3 @@ export default async function handler(request: NextApiRequest, response: NextApi
           await mongoClient.close();
      }
 }
-
-

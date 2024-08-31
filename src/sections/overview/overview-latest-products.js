@@ -16,6 +16,7 @@ import {
   ListItemText,
   SvgIcon
 } from '@mui/material';
+import Link from 'next/link';
 
 export const OverviewLatestProducts = (props) => {
   const { products = [], sx } = props;
@@ -26,7 +27,9 @@ export const OverviewLatestProducts = (props) => {
       <List>
         {products.map((product, index) => {
           const hasDivider = index < products.length - 1;
-          const ago = formatDistanceToNow(product.updatedAt);
+          // Convert updatedAt to a Date object
+          const updatedAtDate = new Date(product.updatedAt);
+          const ago = formatDistanceToNow(updatedAtDate);
 
           return (
             <ListItem
@@ -35,11 +38,11 @@ export const OverviewLatestProducts = (props) => {
             >
               <ListItemAvatar>
                 {
-                  product.image
+                  product.imageURL
                     ? (
                       <Box
                         component="img"
-                        src={product.image}
+                        src={product.imageURL}
                         sx={{
                           borderRadius: 1,
                           height: 48,
@@ -62,7 +65,7 @@ export const OverviewLatestProducts = (props) => {
               <ListItemText
                 primary={product.name}
                 primaryTypographyProps={{ variant: 'subtitle1' }}
-                secondary={`Updated ${ago} ago`}
+                secondary={`Updated ${ ago } ago`}
                 secondaryTypographyProps={{ variant: 'body2' }}
               />
               <IconButton edge="end">
@@ -86,7 +89,9 @@ export const OverviewLatestProducts = (props) => {
           size="small"
           variant="text"
         >
-          View all
+          <Link href={'/dashboard/artikli'}>
+            Pogledaj sve
+          </Link>
         </Button>
       </CardActions>
     </Card>
