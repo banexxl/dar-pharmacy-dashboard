@@ -86,13 +86,13 @@ export const CustomersTable = (props: any) => {
                               </TableHead>
                               <TableBody>
                                    {
-                                        visibleRows.map((customer: any) => {
-                                             const isSelected = selected.includes(customer.id);
+                                        visibleRows.map((customer: ICustomer) => {
+                                             const isSelected = selected.includes(customer._id);
 
                                              return (
                                                   <TableRow
                                                        hover
-                                                       key={customer.id}
+                                                       key={customer._id}
                                                        selected={isSelected}
                                                   >
                                                        <TableCell padding="checkbox" >
@@ -100,9 +100,9 @@ export const CustomersTable = (props: any) => {
                                                                  checked={isSelected}
                                                                  onChange={(event) => {
                                                                       if (event.target.checked) {
-                                                                           onSelectOne?.(customer.id);
+                                                                           onSelectOne?.(customer._id);
                                                                       } else {
-                                                                           onDeselectOne?.(customer.id);
+                                                                           onDeselectOne?.(customer._id);
                                                                       }
                                                                  }
                                                                  }
@@ -127,7 +127,17 @@ export const CustomersTable = (props: any) => {
                                                             {customer.email}
                                                        </TableCell>
                                                        < TableCell >
-                                                            <Image src={customer.image} width={80} height={80} alt='image' />
+                                                            <Image
+                                                                 src={
+                                                                      customer.gender == 'male' ? '/assets/avatars/avatar-omar-darboe.png' :
+                                                                           customer.gender == 'female' ? '/assets/avatars/avatar-neha-punita.png' :
+                                                                                '/assets/avatars/avatar-omar-darboe.png'
+                                                                 }
+                                                                 width={80}
+                                                                 height={80}
+                                                                 alt='image'
+                                                                 style={{ borderRadius: '50%' }}
+                                                            />
                                                        </TableCell>
                                                   </TableRow>
                                              );

@@ -9,4 +9,5 @@ export type ICustomer = {
      country: string;
      phoneNumber: string;
      emailVerified: Date;
+     gender: 'male' | 'female'
 };
