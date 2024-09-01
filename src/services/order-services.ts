@@ -95,8 +95,6 @@ export const ordersServices = () => {
                ]).toArray();
 
                const sum = result[0]?.totalSum || 0; // If no documents found, return 0
-               console.log('Sum of all orders:', sum);
-
                return sum;
           } catch (error) {
                return { message: (error as Error).message };
@@ -129,8 +127,6 @@ export const ordersServices = () => {
                ]).toArray();
 
                const sum = result[0]?.totalSum || 0;
-               console.log(`Sum of orders for the last ${months} months:`, sum);
-
                return sum;
           } catch (error) {
                return { message: (error as Error).message };
