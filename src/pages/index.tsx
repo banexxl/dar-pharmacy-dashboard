@@ -184,8 +184,8 @@ export async function getServerSideProps(context: any) {
                sumForCurrentMonth: JSON.parse(JSON.stringify(sumForCurrentMonth)),
                lastNProducts: JSON.parse(JSON.stringify(lastNProducts)),
                lastNOrders: JSON.parse(JSON.stringify(lastNOrders)),
-               monthlySumForCurrentYear: JSON.parse(JSON.stringify(monthlySumForCurrentYear)),
-               monthlySumForLastYear: JSON.parse(JSON.stringify(monthlySumForLastYear)),
+               // monthlySumForCurrentYear: JSON.parse(JSON.stringify(monthlySumForCurrentYear)),
+               // monthlySumForLastYear: JSON.parse(JSON.stringify(monthlySumForLastYear)),
           },
      };
 }
