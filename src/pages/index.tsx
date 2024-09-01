@@ -159,8 +159,8 @@ export default Page;
 
 export async function getServerSideProps(context: any) {
 
-     const allClients = await userServices().getAllUsers()
-     const sumOfAllOrders = await ordersServices().getSumOfAllOrders()
+     // const allClients = await userServices().getAllUsers()
+     // const sumOfAllOrders = await ordersServices().getSumOfAllOrders()
      const sumOfLastMonthsOrders = await ordersServices().getSumOfLastMonthsOrders(1)
      const sumOfLastMonthOrders = await ordersServices().getSumOfLastMonthOrders()
      const sumForCurrentMonth = await ordersServices().getSumOfCurrentMonthOrders()
@@ -171,8 +171,8 @@ export async function getServerSideProps(context: any) {
 
      return {
           props: {
-               allClients: JSON.parse(JSON.stringify(allClients)),
-               sumOfAllOrders: JSON.parse(JSON.stringify(sumOfAllOrders)),
+               // allClients: JSON.parse(JSON.stringify(allClients)),
+               // sumOfAllOrders: JSON.parse(JSON.stringify(sumOfAllOrders)),
                sumOfLastMonthsOrders: JSON.parse(JSON.stringify(sumOfLastMonthsOrders)),
                sumOfLastMonthOrders: JSON.parse(JSON.stringify(sumOfLastMonthOrders)),
                sumForCurrentMonth: JSON.parse(JSON.stringify(sumForCurrentMonth)),

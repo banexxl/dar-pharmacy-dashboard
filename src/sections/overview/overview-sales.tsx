@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
 import { Chart } from 'src/components/chart';
-// import Link from 'next/link';
+import Link from 'next/link';
 import { indigo } from '@/theme/colors';
 
 const useChartOptions = () => {
@@ -83,7 +83,7 @@ const useChartOptions = () => {
         'Jul',
         'Avg',
         'Sep',
-        'Okt',
+        'Ot',
         'Nov',
         'Dec'
       ],
@@ -148,9 +148,9 @@ export const OverviewSales = (props: any) => {
           )}
           size="small"
         >
-          {/* <Link href={'/dashboard/porudzbenice'} style={{ textDecoration: 'none', color: indigo.main }}> */}
-          Porudzbenice
-          {/* </Link> */}
+          <Link href={'/dashboard/porudzbenice'} style={{ textDecoration: 'none', color: indigo.main }}>
+            Porudzbenice
+          </Link>
         </Button>
       </CardActions>
     </Card>
