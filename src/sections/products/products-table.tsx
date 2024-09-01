@@ -43,6 +43,7 @@ export interface IProduct {
      subCategory: string;
      warning: string;
      _id?: string;
+     updatedAt?: string;
 }
 
 export const ProductsTable = (props: any) => {

@@ -17,24 +17,26 @@ import {
   SvgIcon
 } from '@mui/material';
 import Link from 'next/link';
+import { IProduct } from '../products/products-table';
 
-export const OverviewLatestProducts = (props) => {
+export const OverviewLatestProducts = (props: any) => {
+
   const { products = [], sx } = props;
 
   return (
     <Card sx={sx}>
-      <CardHeader title="Latest Products" />
+      <CardHeader title="Poslednje dodati artikli" />
       <List>
-        {products.map((product, index) => {
+        {products.map((product: IProduct, index: number) => {
           const hasDivider = index < products.length - 1;
           // Convert updatedAt to a Date object
-          const updatedAtDate = new Date(product.updatedAt);
+          const updatedAtDate = new Date(product.updatedAt!);
           const ago = formatDistanceToNow(updatedAtDate);
 
           return (
             <ListItem
               divider={hasDivider}
-              key={product.id}
+              key={product._id}
             >
               <ListItemAvatar>
                 {
@@ -65,7 +67,7 @@ export const OverviewLatestProducts = (props) => {
               <ListItemText
                 primary={product.name}
                 primaryTypographyProps={{ variant: 'subtitle1' }}
-                secondary={`Izmenjen ${ ago } ago`}
+                secondary={`Izmenjen ${ago} ago`}
                 secondaryTypographyProps={{ variant: 'body2' }}
               />
               <IconButton edge="end">

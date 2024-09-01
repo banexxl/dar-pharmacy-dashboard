@@ -252,6 +252,7 @@ export const productsServices = () => {
                await client.close();
           }
      };
+
      return {
           getLastNumberOfProducts,
           getAllProducts,

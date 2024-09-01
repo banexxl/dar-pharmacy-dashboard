@@ -1,4 +1,4 @@
-import { format } from 'date-fns';
+import { format, formatDistanceToNow } from 'date-fns';
 import PropTypes from 'prop-types';
 import ArrowRightIcon from '@heroicons/react/24/solid/ArrowRightIcon';
 import {
@@ -17,6 +17,8 @@ import {
 } from '@mui/material';
 import { Scrollbar } from 'src/components/scrollbar';
 import { SeverityPill } from 'src/components/severity-pill';
+import Link from 'next/link';
+import { Order } from '@/schemas/order';
 
 const statusMap = {
   pending: 'warning',
@@ -25,11 +27,12 @@ const statusMap = {
 };
 
 export const OverviewLatestOrders = (props: any) => {
+
   const { orders = [], sx } = props;
 
   return (
     <Card sx={sx}>
-      <CardHeader title="Latest Orders" />
+      <CardHeader title="Poslednje porudžbenice" />
       <Scrollbar sx={{ flexGrow: 1 }}>
         <Box sx={{ minWidth: 800 }}>
           <Table>
@@ -50,27 +53,34 @@ export const OverviewLatestOrders = (props: any) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {orders.map((order: any) => {
-                const createdAt = format(order.createdAt, 'dd/MM/yyyy');
-
+              {orders.map((order: Order) => {
+                //const createdAt = format(order.createdAt, 'dd/MM/yyyy');
+                const createdAt = new Date(order.createdAt);
+                const ago = formatDistanceToNow(createdAt);
                 return (
                   <TableRow
                     hover
-                    key={order.id}
+                    key={order.orderNumber}
                   >
                     <TableCell>
-                      {order.ref}
+                      {order.orderNumber}
                     </TableCell>
                     <TableCell>
                       {order.customer.name}
                     </TableCell>
                     <TableCell>
-                      {createdAt}
+                      {ago}
                     </TableCell>
                     <TableCell>
-                      {/* <SeverityPill color={statusMap[order.status]}>
+                      <SeverityPill color={
+                        order.status == 'pending' ? 'warning'
+                          : order.status == 'delivered' ? 'success'
+                            : order.status == 'cancelled' ? 'error'
+                              : order.status == 'shipped' ? 'info'
+                                : 'primary'
+                      }>
                         {order.status}
-                      </SeverityPill> */}
+                      </SeverityPill>
                     </TableCell>
                   </TableRow>
                 );
@@ -91,7 +101,9 @@ export const OverviewLatestOrders = (props: any) => {
           size="small"
           variant="text"
         >
-          View all
+          <Link href='/dashboard/porudzbenice'>
+            Pogledaj sve
+          </Link>
         </Button>
       </CardActions>
     </Card>

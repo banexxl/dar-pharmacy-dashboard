@@ -221,8 +221,27 @@ export const ordersServices = () => {
           }
      };
 
+     const getLastNumberOfOrders = async (numberOfOrders: number) => {
+          const client = await MongoClient.connect(process.env.MONGODB_URI!);
+          try {
+               const db = client.db('ORDERS_DB');
+               const orders = await db
+                    .collection('Orders')
+                    .find()
+                    .sort({ createdAt: -1 })  // Sort by updatedAt in descending order
+                    .limit(numberOfOrders)
+                    .toArray();
+               return orders;
+          } catch (error) {
+               return { message: (error as Error).message };
+          } finally {
+               await client.close();
+          }
+     };
+
 
      return {
+          getLastNumberOfOrders,
           getSumOfCurrentMonthOrders,
           getSumOfLastMonthOrders,
           getSumOfLastMonthsOrders,
