@@ -78,12 +78,12 @@ const useChartOptions = () => {
         'Feb',
         'Mar',
         'Apr',
-        'May',
+        'Maj',
         'Jun',
         'Jul',
-        'Aug',
+        'Avg',
         'Sep',
-        'Oct',
+        'Okt',
         'Nov',
         'Dec'
       ],
@@ -148,9 +148,9 @@ export const OverviewSales = (props: any) => {
           )}
           size="small"
         >
-          <Link href={'/dashboard/porudzbenice'} style={{ textDecoration: 'none', color: indigo.main }}>
-            Porudzbenice
-          </Link>
+          {/* <Link href={'/dashboard/porudzbenice'} style={{ textDecoration: 'none', color: indigo.main }}> */}
+          Porudzbenice
+          {/* </Link> */}
         </Button>
       </CardActions>
     </Card>
