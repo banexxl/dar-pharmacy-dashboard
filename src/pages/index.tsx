@@ -67,10 +67,10 @@ const Page = (props: any) => {
                                    lg={3}
                               >
                                    <OverviewTotalCustomers
-                                        difference={16}
-                                        positive={false}
+                                        difference={(props.usersActiveThisWeek.length - props.usersActiveLastWeek.length) / props.usersActiveLastWeek.length * 100}
+                                        positive={props.usersActiveThisWeek.length > props.usersActiveLastWeek.length}
                                         sx={{ height: '100%' }}
-                                        value="1.6k"
+                                        value={props.usersActiveThisWeek.length}
                                    />
                               </Grid>
                               <Grid
@@ -159,14 +159,16 @@ export default Page;
 export async function getServerSideProps(context: any) {
      try {
           // Fetch data in parallel
-          const [sumOfLastMonthsOrders, sumOfLastMonthOrders, sumForCurrentMonth, lastNProducts, lastNOrders, monthlySumForCurrentYear, monthlySumForLastYear] = await Promise.all([
+          const [sumOfLastMonthsOrders, sumOfLastMonthOrders, sumForCurrentMonth, lastNProducts, lastNOrders, monthlySumForCurrentYear, monthlySumForLastYear, usersActiveThisWeek, usersActiveLastWeek] = await Promise.all([
                ordersServices().getSumOfLastMonthsOrders(1),
                ordersServices().getSumOfLastMonthOrders(),
                ordersServices().getSumOfCurrentMonthOrders(),
                productsServices().getLastNumberOfProducts(5),
                ordersServices().getLastNumberOfOrders(6),
                ordersServices().getMonthlyOrderSumsForYear(0),
-               ordersServices().getMonthlyOrderSumsForYear(-1)
+               ordersServices().getMonthlyOrderSumsForYear(-1),
+               userServices().getUsersActiveInWeek(0),
+               userServices().getUsersActiveInWeek(-1)
           ]);
 
           return {
@@ -178,6 +180,8 @@ export async function getServerSideProps(context: any) {
                     lastNOrders: JSON.parse(JSON.stringify(lastNOrders)),
                     monthlySumForCurrentYear: JSON.parse(JSON.stringify(monthlySumForCurrentYear)),
                     monthlySumForLastYear: JSON.parse(JSON.stringify(monthlySumForLastYear)),
+                    usersActiveThisWeek: JSON.parse(JSON.stringify(usersActiveThisWeek)),
+                    usersActiveLastWeek: JSON.parse(JSON.stringify(usersActiveLastWeek))
                },
           };
      } catch (error) {

@@ -89,7 +89,45 @@ export const userServices = () => {
           }
      }
 
+     const getUsersActiveInWeek = async (weekOffset: number) => {
+          const client = new MongoClient(process.env.MONGODB_URI!);
+
+          try {
+               await client.connect();
+               const database = client.db('ACCOUNTS_DB');
+
+               // Get current date
+               const now = new Date();
+
+               // Calculate the start and end of the target week
+               const startOfWeek = new Date(
+                    now.getFullYear(),
+                    now.getMonth(),
+                    now.getDate() - now.getDay() + weekOffset * 7 // Calculate the start of the week with the offset
+               );
+               const endOfWeek = new Date(startOfWeek);
+               endOfWeek.setDate(startOfWeek.getDate() + 7); // End of the week is 7 days after the start
+
+               // Fetch users whose 'emailVerified' date is within the date range
+               const activeUsers = await database.collection('Users').find({
+                    emailVerified: {
+                         $gte: startOfWeek,
+                         $lt: endOfWeek
+                    }
+               }).toArray();
+
+               return activeUsers; // Return the count of active users
+          } catch (error: any) {
+               console.error('Error while fetching active users count:', error);
+               return 0; // Handle the error accordingly
+          } finally {
+               await client.close(); // Ensure the client is closed after operation
+          }
+     };
+
+
      return {
+          getUsersActiveInWeek,
           getAllUsers,
           getUsersByPage,
           getUserByEmail,

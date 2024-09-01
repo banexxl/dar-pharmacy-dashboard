@@ -7,6 +7,9 @@ import { Avatar, Card, CardContent, Stack, SvgIcon, Typography } from '@mui/mate
 export const OverviewTotalCustomers = (props) => {
   const { difference, positive = false, sx, value } = props;
 
+  console.log('aaaaaaa', props);
+
+
   return (
     <Card sx={sx}>
       <CardContent>
@@ -21,7 +24,7 @@ export const OverviewTotalCustomers = (props) => {
               color="text.secondary"
               variant="overline"
             >
-              Total Customers
+              Klijenti
             </Typography>
             <Typography variant="h4">
               {value}
@@ -61,14 +64,14 @@ export const OverviewTotalCustomers = (props) => {
                 color={positive ? 'success.main' : 'error.main'}
                 variant="body2"
               >
-                {difference}%
+                {difference.toFixed(2)}%
               </Typography>
             </Stack>
             <Typography
               color="text.secondary"
               variant="caption"
             >
-              Since last month
+              Aktivnih u odnosu na prošlu nedelju
             </Typography>
           </Stack>
         )}
