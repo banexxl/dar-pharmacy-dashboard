@@ -57,8 +57,6 @@ export const OrderEdit = (props: OrderEditProps) => {
       orderNumber: Yup.string().required('Order number is required'),
     }),
     onSubmit: (values) => {
-      console.log('onsubmit values:', values);
-
       if (onSave) {
         onSave(values); // Pass the updated values to the onSave handler
       }

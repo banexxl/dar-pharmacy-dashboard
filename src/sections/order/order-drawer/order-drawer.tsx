@@ -63,7 +63,10 @@ export const OrderDrawer = (props: any) => {
           }
         })
     } catch (error) {
-      console.error('Error while updating order:', error);  // Log the error for debugging
+      Swal.fire({
+        icon: 'error',
+        title: 'Došlo je do greške prilikom ažuriranja porudžbine!',
+      })
     }
   }
 
