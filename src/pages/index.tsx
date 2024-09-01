@@ -25,7 +25,6 @@ const calculatePercentageChange = (currentMonthSum: number, lastMonthSum: number
 };
 
 const Page = (props: any) => {
-     console.log(props.sumOfLastMonthOrders);
 
      const percantageChange = calculatePercentageChange(props.sumForCurrentMonth, props.sumOfLastMonthOrders)
 
@@ -94,7 +93,7 @@ const Page = (props: any) => {
                                         value="$15k"
                                    />
                               </Grid>
-                              <Grid
+                              {/* <Grid
                                    xs={12}
                                    lg={8}
                               >
@@ -111,7 +110,7 @@ const Page = (props: any) => {
                                         ]}
                                         sx={{ height: '100%' }}
                                    />
-                              </Grid>
+                              </Grid> */}
                               <Grid
                                    xs={12}
                                    md={6}
@@ -167,8 +166,8 @@ export async function getServerSideProps(context: any) {
      const sumForCurrentMonth = await ordersServices().getSumOfCurrentMonthOrders()
      const lastNProducts = await productsServices().getLastNumberOfProducts(5)
      const lastNOrders = await ordersServices().getLastNumberOfOrders(6)
-     const monthlySumForCurrentYear = await ordersServices().getMonthlyOrderSumsForYear(0)
-     const monthlySumForLastYear = await ordersServices().getMonthlyOrderSumsForYear(-1)
+     // const monthlySumForCurrentYear = await ordersServices().getMonthlyOrderSumsForYear(0)
+     // const monthlySumForLastYear = await ordersServices().getMonthlyOrderSumsForYear(-1)
 
      return {
           props: {
@@ -179,8 +178,8 @@ export async function getServerSideProps(context: any) {
                sumForCurrentMonth: JSON.parse(JSON.stringify(sumForCurrentMonth)),
                lastNProducts: JSON.parse(JSON.stringify(lastNProducts)),
                lastNOrders: JSON.parse(JSON.stringify(lastNOrders)),
-               monthlySumForCurrentYear: JSON.parse(JSON.stringify(monthlySumForCurrentYear)),
-               monthlySumForLastYear: JSON.parse(JSON.stringify(monthlySumForLastYear)),
+               // monthlySumForCurrentYear: JSON.parse(JSON.stringify(monthlySumForCurrentYear)),
+               // monthlySumForLastYear: JSON.parse(JSON.stringify(monthlySumForLastYear)),
           },
      };
 }
