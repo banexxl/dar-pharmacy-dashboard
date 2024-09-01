@@ -254,24 +254,27 @@ export const ordersServices = () => {
                     },
                     {
                          $group: {
-                              _id: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" } }, // Group by year and month
+                              _id: { month: { $month: "$createdAt" } }, // Group by month only
                               total: { $sum: "$total" } // Calculate the sum of 'total' for each group
                          }
                     },
                     {
                          $sort: { "_id.month": 1 } // Sort by month in ascending order
-                    },
-                    {
-                         $project: {
-                              _id: 0, // Exclude the _id field from the output
-                              year: "$_id.year",
-                              month: "$_id.month",
-                              total: 1
-                         }
                     }
                ]).toArray();
 
-               return monthlySums;
+               // Fill in missing months with total = 0 if there are no records
+               const filledMonthlySums = Array.from({ length: 12 }, (_, i) => {
+                    const month = i + 1; // Month is 1-based (January is 1, December is 12)
+                    const monthData = monthlySums.find((m) => m._id.month === month);
+                    return {
+                         year: targetYear,
+                         month,
+                         total: monthData ? monthData.total : 0 // Default to 0 if no records for the month
+                    };
+               });
+
+               return filledMonthlySums;
           } catch (error) {
                return { message: (error as Error).message };
           } finally {
