@@ -4,9 +4,9 @@ import { Box, Container, Unstable_Grid2 as Grid } from '@mui/material';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { OverviewBudget } from 'src/sections/overview/overview-budget';
 import { OverviewLatestProducts } from 'src/sections/overview/overview-latest-products';
-import { OverviewSales } from 'src/sections/overview/overview-sales';
 import { OverviewTasksProgress } from 'src/sections/overview/overview-tasks-progress';
 import { OverviewTotalCustomers } from 'src/sections/overview/overview-total-customers';
+import { OverviewSales } from '@/sections/overview/overview-sales';
 import { OverviewTotalProfit } from 'src/sections/overview/overview-total-profit';
 import { OverviewTraffic } from 'src/sections/overview/overview-traffic';
 import { SessionProvider } from 'next-auth/react';
@@ -25,7 +25,7 @@ const calculatePercentageChange = (currentMonthSum: number, lastMonthSum: number
 };
 
 const Page = (props: any) => {
-     console.log(props);
+     console.log(props.sumOfLastMonthOrders);
 
      const percantageChange = calculatePercentageChange(props.sumForCurrentMonth, props.sumOfLastMonthOrders)
 
@@ -57,8 +57,8 @@ const Page = (props: any) => {
                                         difference={percantageChange}
                                         positive
                                         sx={{ height: '100%' }}
-                                        value={props.sumOfAllOrders}
-                                        title="Bruto pazara"
+                                        value={props.sumForCurrentMonth}
+                                        title="Tekući mesec"
                                         subTitle="U odnosu na prosli mesec"
                                    />
                               </Grid>
@@ -101,12 +101,12 @@ const Page = (props: any) => {
                                    <OverviewSales
                                         chartSeries={[
                                              {
-                                                  name: 'This year',
-                                                  data: [18, 16, 5, 8, 3, 14, 14, 16, 17, 19, 18, 20]
+                                                  name: 'Ova godina',
+                                                  data: props.monthlySumForCurrentYear.map((month: any) => month.total)
                                              },
                                              {
-                                                  name: 'Last year',
-                                                  data: [12, 11, 4, 6, 2, 9, 9, 10, 11, 12, 13, 13]
+                                                  name: 'Prošla godina',
+                                                  data: props.monthlySumForLastYear.map((month: any) => month.total)
                                              }
                                         ]}
                                         sx={{ height: '100%' }}
@@ -167,6 +167,8 @@ export async function getServerSideProps(context: any) {
      const sumForCurrentMonth = await ordersServices().getSumOfCurrentMonthOrders()
      const lastNProducts = await productsServices().getLastNumberOfProducts(5)
      const lastNOrders = await ordersServices().getLastNumberOfOrders(6)
+     const monthlySumForCurrentYear = await ordersServices().getMonthlyOrderSumsForYear(0)
+     const monthlySumForLastYear = await ordersServices().getMonthlyOrderSumsForYear(-1)
 
      return {
           props: {
@@ -176,7 +178,9 @@ export async function getServerSideProps(context: any) {
                sumOfLastMonthOrders: JSON.parse(JSON.stringify(sumOfLastMonthOrders)),
                sumForCurrentMonth: JSON.parse(JSON.stringify(sumForCurrentMonth)),
                lastNProducts: JSON.parse(JSON.stringify(lastNProducts)),
-               lastNOrders: JSON.parse(JSON.stringify(lastNOrders))
+               lastNOrders: JSON.parse(JSON.stringify(lastNOrders)),
+               monthlySumForCurrentYear: JSON.parse(JSON.stringify(monthlySumForCurrentYear)),
+               monthlySumForLastYear: JSON.parse(JSON.stringify(monthlySumForLastYear)),
           },
      };
 }

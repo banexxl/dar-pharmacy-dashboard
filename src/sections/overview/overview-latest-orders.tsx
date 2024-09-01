@@ -19,6 +19,7 @@ import { Scrollbar } from 'src/components/scrollbar';
 import { SeverityPill } from 'src/components/severity-pill';
 import Link from 'next/link';
 import { Order } from '@/schemas/order';
+import { indigo } from '@/theme/colors';
 
 const statusMap = {
   pending: 'warning',
@@ -94,14 +95,14 @@ export const OverviewLatestOrders = (props: any) => {
         <Button
           color="inherit"
           endIcon={(
-            <SvgIcon fontSize="small">
+            <SvgIcon fontSize="small" style={{ textDecoration: 'none', color: indigo.main }}>
               <ArrowRightIcon />
             </SvgIcon>
           )}
           size="small"
           variant="text"
         >
-          <Link href='/dashboard/porudzbenice'>
+          <Link href='/dashboard/porudzbenice' style={{ textDecoration: 'none', color: indigo.main }}>
             Pogledaj sve
           </Link>
         </Button>

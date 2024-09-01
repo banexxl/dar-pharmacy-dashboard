@@ -1,7 +1,9 @@
 import { formatDistanceToNow } from 'date-fns';
 import PropTypes from 'prop-types';
 import ArrowRightIcon from '@heroicons/react/24/solid/ArrowRightIcon';
-import EllipsisVerticalIcon from '@heroicons/react/24/solid/EllipsisVerticalIcon';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import Link from 'next/link';
+import { IProduct } from '../products/products-table';
 import {
   Box,
   Button,
@@ -16,8 +18,8 @@ import {
   ListItemText,
   SvgIcon
 } from '@mui/material';
-import Link from 'next/link';
-import { IProduct } from '../products/products-table';
+import { indigo } from '@/theme/colors';
+
 
 export const OverviewLatestProducts = (props: any) => {
 
@@ -71,9 +73,11 @@ export const OverviewLatestProducts = (props: any) => {
                 secondaryTypographyProps={{ variant: 'body2' }}
               />
               <IconButton edge="end">
-                <SvgIcon>
-                  <EllipsisVerticalIcon />
-                </SvgIcon>
+                <Link href={'/dashboard/artikli/'} style={{ textDecoration: 'none', color: indigo.main }}>
+                  <SvgIcon>
+                    <OpenInNewIcon />
+                  </SvgIcon>
+                </Link>
               </IconButton>
             </ListItem>
           );
@@ -84,14 +88,14 @@ export const OverviewLatestProducts = (props: any) => {
         <Button
           color="inherit"
           endIcon={(
-            <SvgIcon fontSize="small">
+            <SvgIcon fontSize="small" style={{ textDecoration: 'none', color: indigo.main }}>
               <ArrowRightIcon />
             </SvgIcon>
           )}
           size="small"
           variant="text"
         >
-          <Link href={'/dashboard/artikli'}>
+          <Link href={'/dashboard/artikli'} style={{ textDecoration: 'none', color: indigo.main }}>
             Pogledaj sve
           </Link>
         </Button>

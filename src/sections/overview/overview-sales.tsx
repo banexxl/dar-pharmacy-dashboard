@@ -12,6 +12,8 @@ import {
 } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
 import { Chart } from 'src/components/chart';
+import Link from 'next/link';
+import { indigo } from '@/theme/colors';
 
 const useChartOptions = () => {
   const theme = useTheme();
@@ -94,7 +96,7 @@ const useChartOptions = () => {
     },
     yaxis: {
       labels: {
-        formatter: (value) => (value > 0 ? `${value}K` : `${value}`),
+        formatter: (value: number) => (value > 0 ? `${value}K` : `${value}`),
         offsetX: -10,
         style: {
           colors: theme.palette.text.secondary
@@ -104,7 +106,7 @@ const useChartOptions = () => {
   };
 };
 
-export const OverviewSales = (props) => {
+export const OverviewSales = (props: any) => {
   const { chartSeries, sx } = props;
   const chartOptions = useChartOptions();
 
@@ -124,7 +126,7 @@ export const OverviewSales = (props) => {
             Sync
           </Button>
         )}
-        title="Sales"
+        title="Prodaja"
       />
       <CardContent>
         <Chart
@@ -140,13 +142,15 @@ export const OverviewSales = (props) => {
         <Button
           color="inherit"
           endIcon={(
-            <SvgIcon fontSize="small">
+            <SvgIcon fontSize="small" style={{ color: indigo.main }}>
               <ArrowRightIcon />
             </SvgIcon>
           )}
           size="small"
         >
-          Overview
+          <Link href={'/dashboard/porudzbenice'} style={{ textDecoration: 'none', color: indigo.main }}>
+            Porudzbenice
+          </Link>
         </Button>
       </CardActions>
     </Card>

@@ -239,8 +239,52 @@ export const ordersServices = () => {
           }
      };
 
+     const getMonthlyOrderSumsForYear = async (yearOffset: number) => {
+          const client = await MongoClient.connect(process.env.MONGODB_URI!);
+          try {
+               const db = client.db('ORDERS_DB');
+               const currentYear = new Date().getFullYear();
+               const targetYear = currentYear + yearOffset; // If yearOffset is 0, it's current year; if -1, it's last year, etc.
+
+               const monthlySums = await db.collection('Orders').aggregate([
+                    {
+                         $match: {
+                              // Match only documents from the target year
+                              createdAt: {
+                                   $gte: new Date(`${targetYear}-01-01`),
+                                   $lt: new Date(`${targetYear + 1}-01-01`)
+                              }
+                         }
+                    },
+                    {
+                         $group: {
+                              _id: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" } }, // Group by year and month
+                              total: { $sum: "$total" } // Calculate the sum of 'total' for each group
+                         }
+                    },
+                    {
+                         $sort: { "_id.month": 1 } // Sort by month in ascending order
+                    },
+                    {
+                         $project: {
+                              _id: 0, // Exclude the _id field from the output
+                              year: "$_id.year",
+                              month: "$_id.month",
+                              total: 1
+                         }
+                    }
+               ]).toArray();
+
+               return monthlySums;
+          } catch (error) {
+               return { message: (error as Error).message };
+          } finally {
+               await client.close();
+          }
+     };
 
      return {
+          getMonthlyOrderSumsForYear,
           getLastNumberOfOrders,
           getSumOfCurrentMonthOrders,
           getSumOfLastMonthOrders,
