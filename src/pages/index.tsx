@@ -166,9 +166,9 @@ export async function getServerSideProps(context: any) {
      const sumOfLastMonthsOrders1 = await ordersServices().getSumOfLastMonthsOrders(1)
      const sumOfLastMonthOrders1 = await ordersServices().getSumOfLastMonthOrders()
      const sumOfLastMonthsOrders2 = await ordersServices().getSumOfLastMonthsOrders(1)
-     const sumOfLastMonthOrders2 = await ordersServices().getSumOfLastMonthOrders()
-     const sumOfLastMonthsOrders3 = await ordersServices().getSumOfLastMonthsOrders(1)
-     const sumOfLastMonthOrders3 = await ordersServices().getSumOfLastMonthOrders()
+     // const sumOfLastMonthOrders2 = await ordersServices().getSumOfLastMonthOrders()
+     // const sumOfLastMonthsOrders3 = await ordersServices().getSumOfLastMonthsOrders(1)
+     // const sumOfLastMonthOrders3 = await ordersServices().getSumOfLastMonthOrders()
 
      const sumForCurrentMonth = await ordersServices().getSumOfCurrentMonthOrders()
      const lastNProducts = await productsServices().getLastNumberOfProducts(5)
