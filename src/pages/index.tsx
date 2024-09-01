@@ -159,10 +159,14 @@ export default Page;
 
 export async function getServerSideProps(context: any) {
 
-     const allClients = await userServices().getAllUsers()
-     const sumOfAllOrders = await ordersServices().getSumOfAllOrders()
-     const sumOfLastMonthsOrders = await ordersServices().getSumOfLastMonthsOrders(1)
-     const sumOfLastMonthOrders = await ordersServices().getSumOfLastMonthOrders()
+     // const allClients = await userServices().getAllUsers()
+     // const sumOfAllOrders = await ordersServices().getSumOfAllOrders()
+     // const sumOfLastMonthsOrders = await ordersServices().getSumOfLastMonthsOrders(1)
+     // const sumOfLastMonthOrders = await ordersServices().getSumOfLastMonthOrders()
+     const allClients = ['client1', 'client2', 'client3']
+     const sumOfAllOrders = [1, 2, 3]
+     const sumOfLastMonthsOrders = 12
+     const sumOfLastMonthOrders = 13
      const sumForCurrentMonth = await ordersServices().getSumOfCurrentMonthOrders()
      const lastNProducts = await productsServices().getLastNumberOfProducts(5)
      const lastNOrders = await ordersServices().getLastNumberOfOrders(6)
