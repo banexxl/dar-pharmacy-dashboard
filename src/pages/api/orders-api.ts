@@ -37,7 +37,7 @@ export default async function handler(request: NextApiRequest, response: NextApi
           const result = await ordersCollection.updateOne(
                { orderNumber: orderNumber },
                {
-                    $set: { 'customer.streetAddress': address, 'customer.city': city, 'customer.country': country, 'status': status },
+                    $set: { 'customer.streetAddress': address, 'customer.city': city, 'customer.country': country, 'status': status, 'createdAt': new Date() },
                     $push: { logs: logEntry } as any,
                }
           )
