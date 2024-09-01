@@ -50,12 +50,14 @@ export const ordersServices = () => {
           }
      }
 
-     const getOrderById = async (_id: string) => {
+     const getOrderById = async (orderNumber: string) => {
           const client = await MongoClient.connect(process.env.MONGODB_URI!)
           try {
                const db = client.db('ORDERS_DB')
-               let order = await db.collection('Orders').findOne({ _id: new ObjectId(_id) })
+               let order = await db.collection('Orders').findOne({ orderNumber: orderNumber })
+               console.log(order);
                return order
+
           } catch (error) {
                return { message: error }
           }

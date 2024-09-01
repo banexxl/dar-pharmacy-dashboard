@@ -156,7 +156,12 @@ export const OrderListTable = (props: any) => {
                       order.status == 'shipped' ? 'info' :
                         order.status == 'delivered' ? 'success' :
                           order.status == 'cancelled' ? 'error' : 'warning'
-                  }>{order.status}</SeverityPill>
+                  }>{
+                      order.status == 'pending' ? 'Na čekanju' :
+                        order.status == 'shipped' ? 'Poslato' :
+                          order.status == 'delivered' ? 'Dostavljeno' :
+                            order.status == 'cancelled' ? 'Otkazano' : 'Na čekanju'
+                    }</SeverityPill>
                 </TableCell>
               </TableRow>
             );

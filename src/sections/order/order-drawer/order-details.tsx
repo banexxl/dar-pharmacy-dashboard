@@ -40,7 +40,7 @@ export const OrderDetails = (props: OrderDetailsProps) => {
           justifyContent="space-between"
           spacing={3}
         >
-          <Typography variant="h6">Details</Typography>
+          <Typography variant="h6">Detalji</Typography>
           <Button
             color="inherit"
             onClick={onEdit}
@@ -51,7 +51,7 @@ export const OrderDetails = (props: OrderDetailsProps) => {
               </SvgIcon>
             }
           >
-            Edit
+            Izmeni
           </Button>
         </Stack>
         <PropertyList>
@@ -66,13 +66,13 @@ export const OrderDetails = (props: OrderDetailsProps) => {
             align={align}
             disableGutters
 
-            label="Number"
+            label="Broj porudžbine"
             value={order.orderNumber}
           />
           < PropertyListItem
             align={align}
             disableGutters
-            label="Customer"
+            label="Kupac"
           >
             <Typography
               color="text.secondary"
@@ -103,7 +103,7 @@ export const OrderDetails = (props: OrderDetailsProps) => {
             align={align}
             disableGutters
 
-            label="Date"
+            label="Datum"
             value={createdAt}
           />
           {/* <PropertyListItem
@@ -117,7 +117,7 @@ export const OrderDetails = (props: OrderDetailsProps) => {
             align={align}
             disableGutters
 
-            label="Total Amount"
+            label="Total"
             value={totalAmount}
           />
           <PropertyListItem
@@ -131,10 +131,15 @@ export const OrderDetails = (props: OrderDetailsProps) => {
                 order.status == 'shipped' ? 'info' :
                   order.status == 'delivered' ? 'success' :
                     order.status == 'cancelled' ? 'error' : 'warning'
-            }>{order.status}</SeverityPill>
+            }>{
+                order.status == 'pending' ? 'Na čekanju' :
+                  order.status == 'shipped' ? 'Poslato' :
+                    order.status == 'delivered' ? 'Dostavljeno' :
+                      order.status == 'cancelled' ? 'Otkazano' : 'Na čekanju'
+              }</SeverityPill>
           </PropertyListItem>
         </PropertyList>
-        <Stack
+        {/* <Stack
           alignItems="center"
           direction="row"
           flexWrap="wrap"
@@ -156,7 +161,7 @@ export const OrderDetails = (props: OrderDetailsProps) => {
           >
             Reject
           </Button>
-        </Stack>
+        </Stack> */}
       </Stack>
       <Stack spacing={3}>
         <Typography variant="h6">Line items</Typography>

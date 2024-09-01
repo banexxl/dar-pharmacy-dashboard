@@ -11,11 +11,14 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 
 import { OrderDetails } from './order-details';
 import { OrderEdit } from './order-edit';
+import Swal from 'sweetalert2';
+import { useRouter } from 'next/router';
 
 export const OrderDrawer = (props: any) => {
   const { container, onClose, open, order } = props;
   const [isEditing, setIsEditing] = useState(false);
   const lgUp = useMediaQuery((theme: any) => theme.breakpoints.up('lg'));
+  const router = useRouter();
 
   const handleEditOpen = useCallback(() => {
     setIsEditing(true);
@@ -24,6 +27,46 @@ export const OrderDrawer = (props: any) => {
   const handleEditCancel = useCallback(() => {
     setIsEditing(false);
   }, []);
+
+  const handleEditSave = async (values: any) => {
+    const orderObejct = {
+      address: values.address,
+      country: values.country,
+      city: values.city,
+      status: values.status,
+      orderNumber: props.order.orderNumber
+    }
+
+    try {
+      await fetch(`/api/orders-api/`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',  // Set the Content-Type header
+        },
+        body: JSON.stringify(orderObejct),  // Convert the values to a JSON string
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          setIsEditing(false);
+          if (data.message === 'Order updated successfully') {
+            router.push('/dashboard/porudzbenice');
+            Swal.fire({
+              icon: 'success',
+              title: 'Porudžbina je uspešno ažurirana!',
+            })
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Došlo je do greške prilikom ažuriranja porudžbine!',
+              text: data.message,
+            })
+          }
+        })
+    } catch (error) {
+      console.error('Error while updating order:', error);  // Log the error for debugging
+    }
+  }
+
 
   let content = null;
 
@@ -70,7 +113,7 @@ export const OrderDrawer = (props: any) => {
           ) : (
             <OrderEdit
               onCancel={handleEditCancel}
-              onSave={handleEditCancel}
+              onSave={handleEditSave}
               order={order}
             />
           )}

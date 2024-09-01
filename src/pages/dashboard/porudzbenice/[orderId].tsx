@@ -15,14 +15,16 @@ import { Order } from '@/schemas/order';
 import { OrderSummary } from '@/sections/order/order-summary';
 import { OrderItems } from '@/sections/order/order-items';
 import { OrderLogs } from '@/sections/order/order-logs';
+import { ordersServices } from '@/services/order-services';
 
 const Page = (order: Order) => {
 
   if (!order) {
     return null;
   }
+  console.log('orderrrrrrrrr', order);
 
-  const createdAt = format(order.createdAt, 'dd/MM/yyyy HH:mm');
+  // const createdAt = format(order.createdAt, 'dd/MM/yyyy HH:mm');
 
   return (
     <>
@@ -39,7 +41,7 @@ const Page = (order: Order) => {
               <Link
                 color="text.primary"
                 component={Link}
-                href={'/dashboard/orders'}
+                href={'/dashboard/porudzbenice'}
                 sx={{
                   alignItems: 'center',
                   display: 'inline-flex',
@@ -75,7 +77,7 @@ const Page = (order: Order) => {
                     <SvgIcon color="action">
                       <CalendarIcon />
                     </SvgIcon>
-                    <Typography variant="body2">{createdAt}</Typography>
+                    {/* <Typography variant="body2">{createdAt}</Typography> */}
                   </Stack>
                 </Stack>
                 <div>
@@ -121,3 +123,13 @@ const Page = (order: Order) => {
 Page.getLayout = (page: any) => <DashboardLayout>{page}</DashboardLayout>;
 
 export default Page;
+
+export async function getServerSideProps(context: any) {
+  const { orderId } = context.params;
+
+  const order = await ordersServices().getOrderById(orderId);
+
+  return {
+    props: JSON.parse(JSON.stringify(order)),
+  };
+}

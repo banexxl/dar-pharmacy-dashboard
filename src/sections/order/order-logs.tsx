@@ -31,7 +31,12 @@ export const OrderLogs = (props: any) => {
         >
           {logs.map((log: any, index: any) => {
             const showConnector = logs.length - 1 > index;
-            const createdAt = format(log.createdAt, 'MMM dd, h:mm a');
+
+            // Ensure `log.createdAt` is a valid date
+            const createdAtDate = new Date(log.createdAt);
+            const createdAt = isNaN(createdAtDate.getTime())
+              ? 'Invalid date'
+              : format(createdAtDate, 'MMM dd, h:mm a');
 
             return (
               <TimelineItem
