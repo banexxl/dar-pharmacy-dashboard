@@ -240,7 +240,7 @@ export const ordersServices = () => {
           try {
                const db = client.db('ORDERS_DB');
                const currentYear = new Date().getFullYear();
-               const targetYear = currentYear + yearOffset; // If yearOffset is 0, it's current year; if -1, it's last year, etc.
+               const targetYear = currentYear + yearOffset; // If yearOffset is 0, it's the current year; if -1, it's the last year, etc.
 
                const monthlySums = await db.collection('Orders').aggregate([
                     {
@@ -268,6 +268,50 @@ export const ordersServices = () => {
                               month: "$_id.month",
                               total: 1
                          }
+                    },
+                    {
+                         $group: {
+                              _id: "$year",
+                              months: { $push: { month: "$month", total: "$total" } }
+                         }
+                    },
+                    {
+                         $addFields: {
+                              months: {
+                                   $map: {
+                                        input: { $range: [1, 13] }, // Generate an array [1, 2, ..., 12] for all months
+                                        as: "month",
+                                        in: {
+                                             month: "$$month",
+                                             total: {
+                                                  $let: {
+                                                       vars: {
+                                                            foundMonth: {
+                                                                 $arrayElemAt: [
+                                                                      {
+                                                                           $filter: {
+                                                                                input: "$months",
+                                                                                as: "m",
+                                                                                cond: { $eq: ["$$m.month", "$$month"] }
+                                                                           }
+                                                                      },
+                                                                      0
+                                                                 ]
+                                                            }
+                                                       },
+                                                       in: { $ifNull: ["$$foundMonth.total", 0] } // If no orders are found for the month, return 0
+                                                  }
+                                             }
+                                        }
+                                   }
+                              }
+                         }
+                    },
+                    {
+                         $unwind: "$months"
+                    },
+                    {
+                         $replaceRoot: { newRoot: "$months" }
                     }
                ]).toArray();
 
@@ -278,6 +322,7 @@ export const ordersServices = () => {
                await client.close();
           }
      };
+
 
      return {
           getMonthlyOrderSumsForYear,

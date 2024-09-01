@@ -14,6 +14,7 @@ import { alpha, useTheme } from '@mui/material/styles';
 import { Chart } from 'src/components/chart';
 import Link from 'next/link';
 import { indigo } from '@/theme/colors';
+import { formatNumber } from './overview-budget';
 
 const useChartOptions = () => {
   const theme = useTheme();
@@ -96,7 +97,7 @@ const useChartOptions = () => {
     },
     yaxis: {
       labels: {
-        formatter: (value: number) => (value > 0 ? `${value}K` : `${value}`),
+        formatter: (value: number) => formatNumber(value),
         offsetX: -10,
         style: {
           colors: theme.palette.text.secondary
