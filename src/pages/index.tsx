@@ -55,7 +55,7 @@ const Page = (props: any) => {
                               >
                                    <OverviewBudget
                                         difference={percantageChange}
-                                        positive
+                                        positive={props.sumForCurrentMonth > props.sumOfLastMonthOrders}
                                         sx={{ height: '100%' }}
                                         value={props.sumForCurrentMonth}
                                         title="Tekući mesec"
