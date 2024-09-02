@@ -13,6 +13,8 @@ export const formatNumber = (number: number) => {
 };
 
 export const OverviewBudget = (props: any) => {
+  console.log(props);
+
   const { difference, positive = false, sx, value, title, subTitle } = props;
 
 

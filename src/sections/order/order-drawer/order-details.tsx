@@ -20,6 +20,7 @@ import { Scrollbar } from 'src/components/scrollbar';
 import { IProduct } from '@/sections/products/products-table';
 import { ICustomer } from '@/schemas/customer';
 import { OrderDetailsProps, OrderStatus } from '@/schemas/order';
+import Link from 'next/link';
 
 
 export const OrderDetails = (props: OrderDetailsProps) => {
@@ -139,29 +140,31 @@ export const OrderDetails = (props: OrderDetailsProps) => {
               }</SeverityPill>
           </PropertyListItem>
         </PropertyList>
-        {/* <Stack
+        <Stack
           alignItems="center"
           direction="row"
           flexWrap="wrap"
           justifyContent="flex-end"
           spacing={2}
         >
-          <Button
-            onClick={onApprove}
-            size="small"
-            variant="contained"
-          >
-            Approve
-          </Button>
-          <Button
+          <Link href={`/dashboard/porudzbenice/${order.orderNumber}`}>
+            <Button
+              onClick={onApprove}
+              size="small"
+              variant="contained"
+            >
+              Detalji {order.orderNumber}
+            </Button>
+          </Link>
+          {/* <Button
             color="error"
             onClick={onReject}
             size="small"
             variant="outlined"
           >
             Reject
-          </Button>
-        </Stack> */}
+          </Button> */}
+        </Stack>
       </Stack>
       <Stack spacing={3}>
         <Typography variant="h6">Line items</Typography>
@@ -193,7 +196,7 @@ export const OrderDetails = (props: OrderDetailsProps) => {
           </Table>
         </Scrollbar>
       </Stack>
-    </Stack>
+    </Stack >
   );
 };
 
