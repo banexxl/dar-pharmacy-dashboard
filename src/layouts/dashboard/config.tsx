@@ -17,7 +17,8 @@ export const items = [
                <SvgIcon fontSize="small">
                     <ChartBarIcon />
                </SvgIcon>
-          )
+          ),
+          disabled: false
      },
      {
           title: 'Klijenti',
@@ -26,7 +27,8 @@ export const items = [
                <SvgIcon fontSize="small">
                     <UsersIcon />
                </SvgIcon>
-          )
+          ),
+          disabled: false
      },
      {
           title: 'Artikli',
@@ -35,7 +37,8 @@ export const items = [
                <SvgIcon fontSize="small">
                     <ShoppingBagIcon />
                </SvgIcon>
-          )
+          ),
+          disabled: false
      },
      {
           title: 'Porudžbenice',
@@ -44,6 +47,7 @@ export const items = [
                <SvgIcon fontSize="small">
                     <ShoppingCartIcon />
                </SvgIcon>
-          )
+          ),
+          disabled: false
      },
 ];

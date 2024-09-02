@@ -16,12 +16,14 @@ import {
 import { Logo } from 'src/components/logo';
 import { Scrollbar } from 'src/components/scrollbar';
 import { items } from './config';
+import { indigo } from '@/theme/colors';
 import { SideNavItem } from './side-nav-item';
 
-export const SideNav = (props) => {
+
+export const SideNav = (props: any) => {
      const { open, onClose } = props;
      const pathname = usePathname();
-     const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
+     const lgUp = useMediaQuery((theme: any) => theme.breakpoints.up('lg'));
 
      const content = (
           <Scrollbar
@@ -55,7 +57,7 @@ export const SideNav = (props) => {
                               <Logo />
                          </Box>
                          <Typography
-                              color="error.main"
+                              color={indigo.main}
                               variant="h5">
                               Apoteka DAR
                          </Typography>
@@ -85,7 +87,7 @@ export const SideNav = (props) => {
                                         <SideNavItem
                                              active={active}
                                              disabled={item.disabled}
-                                             external={item.external}
+                                             // external={item.external}
                                              icon={item.icon}
                                              key={item.title}
                                              path={item.path}
