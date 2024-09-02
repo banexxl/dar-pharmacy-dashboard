@@ -5,7 +5,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Swal from 'sweetalert2'
 import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
-import { Box, Button, Container, Stack, SvgIcon, Typography } from '@mui/material';
+import { Box, Button, Container, Stack, SvgIcon, Theme, Typography, useMediaQuery } from '@mui/material';
 import { useSelection } from 'src/hooks/use-selection';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { ProductsTable } from 'src/sections/products/products-table';
@@ -70,6 +70,7 @@ const useProductSearch = () => {
 const Page = (props: any) => {
 
      const productSearch = useProductSearch();
+     const isScreentoMedium = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'));
 
      const productsIds = useMemo(() => {
           if (!Array.isArray(props.products)) {
@@ -167,34 +168,36 @@ const Page = (props: any) => {
                                              </Typography>
                                         </Stack>
 
-                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', height: '40px', width: '40%' }}>
-                                             <Button
-                                                  startIcon={(
-                                                       <SvgIcon fontSize="small">
-                                                            <PlusIcon />
-                                                       </SvgIcon>
-                                                  )}
-                                                  variant="contained"
-                                                  onClick={() => {
-                                                       setOpen(true)
-                                                  }}
-                                             >
-                                                  Dodaj proizvod
-                                             </Button>
-                                             <Button
-                                                  startIcon={(
-                                                       <SvgIcon fontSize="small">
-                                                            <PlusIcon />
-                                                       </SvgIcon>
-                                                  )}
-                                                  variant="contained"
-                                                  onClick={handleRebuild}
-                                                  disabled={loading}
-                                             >
-                                                  {loading ? 'Šaljem' : 'Pošalji izmene na sajt'}
-                                             </Button>
-                                        </Box>
                                    </Stack>
+                                   <Box sx={{ display: 'flex', justifyContent: 'space-between', height: isScreentoMedium ? '120px' : '40px', width: '40%', flexDirection: isScreentoMedium ? 'column' : 'row' }}>
+                                        <Button
+                                             startIcon={(
+                                                  <SvgIcon fontSize="small">
+                                                       <PlusIcon />
+                                                  </SvgIcon>
+                                             )}
+                                             variant="contained"
+                                             onClick={() => {
+                                                  setOpen(true)
+                                             }}
+                                             sx={{ width: isScreentoMedium ? '220px' : 'auto' }}
+                                        >
+                                             Dodaj proizvod
+                                        </Button>
+                                        <Button
+                                             startIcon={(
+                                                  <SvgIcon fontSize="small">
+                                                       <PlusIcon />
+                                                  </SvgIcon>
+                                             )}
+                                             variant="contained"
+                                             onClick={handleRebuild}
+                                             sx={{ width: isScreentoMedium ? '22     0px' : 'auto' }}
+                                             disabled={loading}
+                                        >
+                                             {loading ? 'Šaljem' : 'Pošalji izmene na sajt'}
+                                        </Button>
+                                   </Box>
                                    <TablePagination
                                         component="div"
                                         count={productStore.allProducts.length}
