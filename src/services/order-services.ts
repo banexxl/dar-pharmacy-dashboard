@@ -1,15 +1,17 @@
 import { Order } from "@/schemas/order";
-import { MongoClient } from "mongodb";
-import { ObjectId } from "mongodb";
+import { MongoClient } from "mongodb"
+import { ObjectId } from "mongodb"
 
 export const ordersServices = () => {
 
      const getOrdersByPage = async (page: any, limit: any) => {
-          const client = new MongoClient(process.env.MONGODB_URI!);
+
+          const client = new MongoClient(process.env.MONGODB_URI!)
           const db = client.db('ORDERS_DB');
           const parsedLimit = parseInt(limit, 10); // Parse limit as an integer
 
           if (isNaN(parsedLimit) || parsedLimit <= 0) {
+               // Handle the case when the parsed limit is not a valid positive integer
                return [];
           }
 
@@ -46,53 +48,52 @@ export const ordersServices = () => {
           } finally {
                await client.close();
           }
-     };
+     }
 
      const getOrderById = async (orderNumber: string) => {
-          const client = await MongoClient.connect(process.env.MONGODB_URI!);
+          const client = await MongoClient.connect(process.env.MONGODB_URI!)
           try {
-               const db = client.db('ORDERS_DB');
-               let order = await db.collection('Orders').findOne({ orderNumber: orderNumber });
+               const db = client.db('ORDERS_DB')
+               let order = await db.collection('Orders').findOne({ orderNumber: orderNumber })
                console.log(order);
-               return order;
+               return order
+
           } catch (error) {
-               return { message: error };
+               return { message: error }
           }
           finally {
                await client.close();
           }
-     };
+     }
 
      const getAllOrders = async () => {
-          const client = await MongoClient.connect(process.env.MONGODB_URI!);
+          const client = await MongoClient.connect(process.env.MONGODB_URI!)
+
           try {
-               const db = client.db('ORDERS_DB');
-               let orders = await db.collection('Orders').find().toArray();
-               return orders;
+               const db = client.db('ORDERS_DB')
+               let orders = await db.collection('Orders').find().toArray()
+               return orders
           } catch (error) {
-               return { message: error };
+               return { message: error }
           }
           finally {
                await client.close();
           }
-     };
+     }
 
      const getSumOfAllOrders = async (): Promise<number | { message: string }> => {
+
           const client = await MongoClient.connect(process.env.MONGODB_URI!);
+
           try {
                const db = client.db('ORDERS_DB');
                const result = await db.collection('Orders').aggregate([
                     {
-                         $match: {
-                              status: { $ne: 'cancelled' } // Exclude cancelled orders
-                         }
-                    },
-                    {
                          $group: {
-                              _id: null,
-                              totalSum: { $sum: '$total' } // Sum up the 'total' field
-                         }
-                    }
+                              _id: null, // Group all documents together
+                              totalSum: { $sum: '$total' }, // Sum up the 'total' field
+                         },
+                    },
                ]).toArray();
 
                const sum = result[0]?.totalSum || 0; // If no documents found, return 0
@@ -105,7 +106,9 @@ export const ordersServices = () => {
      };
 
      const getSumOfLastMonthsOrders = async (months: number): Promise<number | { message: string }> => {
+
           const client = await MongoClient.connect(process.env.MONGODB_URI!);
+
           try {
                const db = client.db('ORDERS_DB');
                const result = await db.collection('Orders').aggregate([
@@ -115,15 +118,14 @@ export const ordersServices = () => {
                                    $gte: new Date(new Date().setMonth(new Date().getMonth() - months)),
                                    $lt: new Date(),
                               },
-                              status: { $ne: 'cancelled' } // Exclude cancelled orders
-                         }
+                         },
                     },
                     {
                          $group: {
                               _id: null,
-                              totalSum: { $sum: '$total' } // Sum up the 'total' field
-                         }
-                    }
+                              total: { $sum: '$total' },
+                         },
+                    },
                ]).toArray();
 
                const sum = result[0]?.totalSum || 0;
@@ -133,10 +135,11 @@ export const ordersServices = () => {
           } finally {
                await client.close();
           }
-     };
+     }
 
      const getSumOfLastMonthOrders = async (): Promise<number | { message: string }> => {
           const client = await MongoClient.connect(process.env.MONGODB_URI!);
+
           try {
                const db = client.db('ORDERS_DB');
                const ordersCollection = db.collection('Orders');
@@ -156,15 +159,14 @@ export const ordersServices = () => {
                                    $gte: startOfLastMonth,
                                    $lte: endOfLastMonth,
                               },
-                              status: { $ne: 'cancelled' } // Exclude cancelled orders
-                         }
+                         },
                     },
                     {
                          $group: {
-                              _id: null,
-                              totalSum: { $sum: '$total' } // Sum up the 'total' field
-                         }
-                    }
+                              _id: null, // Group all documents together
+                              total: { $sum: '$total' }, // Sum up the 'total' field
+                         },
+                    },
                ]).toArray();
 
                const sum = result[0]?.totalSum || 0; // If no documents found, return 0
@@ -178,6 +180,7 @@ export const ordersServices = () => {
 
      const getSumOfCurrentMonthOrders = async (): Promise<number | { message: string }> => {
           const client = await MongoClient.connect(process.env.MONGODB_URI!);
+
           try {
                const db = client.db('ORDERS_DB');
                const ordersCollection = db.collection('Orders');
@@ -197,15 +200,14 @@ export const ordersServices = () => {
                                    $gte: startOfCurrentMonth,
                                    $lte: endOfCurrentMonth,
                               },
-                              status: { $ne: 'cancelled' } // Exclude cancelled orders
-                         }
+                         },
                     },
                     {
                          $group: {
-                              _id: null,
-                              totalSum: { $sum: '$total' } // Sum up the 'total' field
-                         }
-                    }
+                              _id: null, // Group all documents together
+                              totalSum: { $sum: '$total' }, // Sum up the 'total' field
+                         },
+                    },
                ]).toArray();
 
                const sum = result[0]?.totalSum || 0; // If no documents found, return 0
@@ -245,25 +247,77 @@ export const ordersServices = () => {
                const monthlySums = await db.collection('Orders').aggregate([
                     {
                          $match: {
+                              // Match only documents from the target year
                               createdAt: {
                                    $gte: new Date(`${targetYear}-01-01`),
                                    $lt: new Date(`${targetYear + 1}-01-01`)
-                              },
-                              status: { $ne: 'cancelled' } // Exclude cancelled orders
+                              }
                          }
                     },
                     {
                          $group: {
-                              _id: { year: { $year: '$createdAt' }, month: { $month: '$createdAt' } },
-                              totalSum: { $sum: '$total' }
+                              _id: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" } }, // Group by year and month
+                              total: { $sum: "$total" } // Calculate the sum of 'total' for each group
                          }
                     },
                     {
-                         $sort: { '_id.month': 1 } // Sort by month in ascending order
+                         $sort: { "_id.month": 1 } // Sort by month in ascending order
+                    },
+                    {
+                         $project: {
+                              _id: 0, // Exclude the _id field from the output
+                              year: "$_id.year",
+                              month: "$_id.month",
+                              total: 1
+                         }
+                    },
+                    {
+                         $group: {
+                              _id: "$year",
+                              months: { $push: { month: "$month", total: "$total" } }
+                         }
+                    },
+                    {
+                         $addFields: {
+                              months: {
+                                   $map: {
+                                        input: { $range: [1, 13] }, // Generate an array [1, 2, ..., 12] for all months
+                                        as: "month",
+                                        in: {
+                                             month: "$$month",
+                                             total: {
+                                                  $let: {
+                                                       vars: {
+                                                            foundMonth: {
+                                                                 $arrayElemAt: [
+                                                                      {
+                                                                           $filter: {
+                                                                                input: "$months",
+                                                                                as: "m",
+                                                                                cond: { $eq: ["$$m.month", "$$month"] }
+                                                                           }
+                                                                      },
+                                                                      0
+                                                                 ]
+                                                            }
+                                                       },
+                                                       in: { $ifNull: ["$$foundMonth.total", 0] } // If no orders are found for the month, return 0
+                                                  }
+                                             }
+                                        }
+                                   }
+                              }
+                         }
+                    },
+                    {
+                         $unwind: "$months"
+                    },
+                    {
+                         $replaceRoot: { newRoot: "$months" }
                     }
                ]).toArray();
 
-               return monthlySums.map(entry => ({ month: entry._id.month, total: entry.totalSum }));
+               return monthlySums;
           } catch (error) {
                return { message: (error as Error).message };
           } finally {
@@ -271,16 +325,18 @@ export const ordersServices = () => {
           }
      };
 
+
      return {
+          getMonthlyOrderSumsForYear,
+          getLastNumberOfOrders,
+          getSumOfCurrentMonthOrders,
+          getSumOfLastMonthOrders,
+          getSumOfLastMonthsOrders,
+          getSumOfAllOrders,
+          getAllOrders,
           getOrdersByPage,
           getOrdersCount,
           getOrderById,
-          getAllOrders,
-          getSumOfAllOrders,
-          getSumOfLastMonthsOrders,
-          getSumOfLastMonthOrders,
-          getSumOfCurrentMonthOrders,
-          getLastNumberOfOrders,
-          getMonthlyOrderSumsForYear
-     };
-};
+
+     }
+}

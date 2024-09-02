@@ -70,7 +70,7 @@ export const OverviewBudget = (props: any) => {
                 color={positive ? 'success.main' : 'error.main'}
                 variant="body2"
               >
-                {difference}
+                {difference}%
               </Typography>
             </Stack>
             <Typography
