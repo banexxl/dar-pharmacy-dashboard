@@ -22,7 +22,6 @@ const Page = (order: Order) => {
   if (!order) {
     return null;
   }
-  console.log('orderrrrrrrrr', order);
 
   // const createdAt = format(order.createdAt, 'dd/MM/yyyy HH:mm');
 

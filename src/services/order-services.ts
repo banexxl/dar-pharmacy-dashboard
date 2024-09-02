@@ -56,7 +56,6 @@ export const ordersServices = () => {
           try {
                const db = client.db('ORDERS_DB')
                let order = await db.collection('Orders').findOne({ orderNumber: orderNumber })
-               console.log(order);
                return order
 
           } catch (error) {
