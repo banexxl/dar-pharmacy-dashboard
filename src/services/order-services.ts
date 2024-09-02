@@ -225,7 +225,6 @@ export const ordersServices = () => {
                          },
                     },
                ]).toArray();
-               console.log(result);
 
                const sum = result[0]?.total || 0; // If no documents found, return 0
                return sum;

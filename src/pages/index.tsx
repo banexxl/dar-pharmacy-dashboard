@@ -21,7 +21,7 @@ const calculatePercentageChange = (currentMonthSum: number, lastMonthSum: number
      }
 
      const percentageChange = ((currentMonthSum - lastMonthSum) / lastMonthSum) * 100;
-     return `${percentageChange.toFixed(2)}%`; // Return percentage change formatted to 2 decimal places
+     return `${percentageChange.toFixed(2)}`; // Return percentage change formatted to 2 decimal places
 };
 
 const Page = (props: any) => {
