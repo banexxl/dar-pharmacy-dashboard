@@ -7,9 +7,6 @@ import { Avatar, Card, CardContent, Stack, SvgIcon, Typography } from '@mui/mate
 export const OverviewTotalCustomers = (props) => {
   const { difference, positive = false, sx, value } = props;
 
-  console.log('aaaaaaa', props);
-
-
   return (
     <Card sx={sx}>
       <CardContent>

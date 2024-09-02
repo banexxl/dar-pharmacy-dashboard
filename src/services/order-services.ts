@@ -1,4 +1,5 @@
 import { Order } from "@/schemas/order";
+import { stat } from "fs";
 import { MongoClient } from "mongodb"
 import { ObjectId } from "mongodb"
 
@@ -91,12 +92,15 @@ export const ordersServices = () => {
                     {
                          $group: {
                               _id: null, // Group all documents together
-                              totalSum: { $sum: '$total' }, // Sum up the 'total' field
+                              status: {
+                                   $ne: 'cancelled'
+                              },
+                              total: { $sum: '$total' }, // Sum up the 'total' field
                          },
                     },
                ]).toArray();
 
-               const sum = result[0]?.totalSum || 0; // If no documents found, return 0
+               const sum = result[0]?.total || 0; // If no documents found, return 0
                return sum;
           } catch (error) {
                return { message: (error as Error).message };
@@ -118,6 +122,10 @@ export const ordersServices = () => {
                                    $gte: new Date(new Date().setMonth(new Date().getMonth() - months)),
                                    $lt: new Date(),
                               },
+                              // Match only documents that doesn't have the 'cancelled' status
+                              status: {
+                                   $ne: 'cancelled'
+                              }
                          },
                     },
                     {
@@ -128,7 +136,7 @@ export const ordersServices = () => {
                     },
                ]).toArray();
 
-               const sum = result[0]?.totalSum || 0;
+               const sum = result[0]?.total || 0;
                return sum;
           } catch (error) {
                return { message: (error as Error).message };
@@ -159,6 +167,10 @@ export const ordersServices = () => {
                                    $gte: startOfLastMonth,
                                    $lte: endOfLastMonth,
                               },
+                              // Match only documents that doesn't have the 'cancelled' status
+                              status: {
+                                   $ne: 'cancelled'
+                              }
                          },
                     },
                     {
@@ -169,7 +181,7 @@ export const ordersServices = () => {
                     },
                ]).toArray();
 
-               const sum = result[0]?.totalSum || 0; // If no documents found, return 0
+               const sum = result[0]?.total || 0; // If no documents found, return 0
                return sum;
           } catch (error) {
                return { message: (error as Error).message };
@@ -200,17 +212,22 @@ export const ordersServices = () => {
                                    $gte: startOfCurrentMonth,
                                    $lte: endOfCurrentMonth,
                               },
+                              // Match only documents that doesn't have the 'cancelled' status
+                              status: {
+                                   $ne: 'cancelled'
+                              }
                          },
                     },
                     {
                          $group: {
                               _id: null, // Group all documents together
-                              totalSum: { $sum: '$total' }, // Sum up the 'total' field
+                              total: { $sum: '$total' }, // Sum up the 'total' field
                          },
                     },
                ]).toArray();
+               console.log(result);
 
-               const sum = result[0]?.totalSum || 0; // If no documents found, return 0
+               const sum = result[0]?.total || 0; // If no documents found, return 0
                return sum;
           } catch (error) {
                return { message: (error as Error).message };
@@ -251,6 +268,10 @@ export const ordersServices = () => {
                               createdAt: {
                                    $gte: new Date(`${targetYear}-01-01`),
                                    $lt: new Date(`${targetYear + 1}-01-01`)
+                              },
+                              // Match only documents that doesn't have the 'cancelled' status
+                              status: {
+                                   $ne: 'cancelled'
                               }
                          }
                     },
