@@ -155,10 +155,10 @@ export const OrderEdit = (props: OrderEditProps) => {
           </Stack>
           <Stack alignItems="center" direction="row" flexWrap="wrap" spacing={2}>
             <Button color="primary" type="submit" size="small" variant="contained">
-              Save changes
+              Sačuvaj
             </Button>
             <Button color="inherit" onClick={onCancel} size="small">
-              Cancel
+              Odustani
             </Button>
           </Stack>
         </Stack>

@@ -44,6 +44,7 @@ export const OrderDetails = (props: OrderDetailsProps) => {
           <Typography variant="h6">Detalji</Typography>
           <Button
             color="inherit"
+            disabled={order.status === 'delivered' || order.status === 'cancelled'}
             onClick={onEdit}
             size="small"
             startIcon={
