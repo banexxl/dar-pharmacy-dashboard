@@ -54,7 +54,9 @@ export default async function handler(request: NextApiRequest, response: NextApi
                                    quantityUnit: request.body.quantityUnit,
                                    subCategory: request.body.subCategory,
                                    warning: request.body.warning,
-                                   updatedAt: new Date() // Update the updatedAt field to the current date and time
+                                   updatedAt: new Date(), // Update the updatedAt field to the current date and time
+                                   promotionText: request.body.promotionText,
+                                   promoting: request.body.promoting
                               }
                          }
                     );

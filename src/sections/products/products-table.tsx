@@ -44,6 +44,8 @@ export interface IProduct {
      warning: string;
      _id?: string;
      updatedAt?: string;
+     promotionText?: string;
+     promoting?: boolean;
 }
 
 export const ProductsTable = (props: any) => {
@@ -101,6 +103,7 @@ export const ProductsTable = (props: any) => {
      }
 
      const handleProductUpdateClick = () => {
+          console.log(currentProductObject);
 
           Swal.fire({
                title: 'Da li ste sigurni?',
@@ -119,6 +122,7 @@ export const ProductsTable = (props: any) => {
      }
 
      const handleUpdateProduct = async (currentProductObject: any) => {
+
           try {
                //API CALL
                const response = await fetch('/api/product-api', {
@@ -664,6 +668,26 @@ export const ProductsTable = (props: any) => {
                                                                                                          }
                                                                                                     />
                                                                                                </Grid>
+                                                                                               <Grid key={Math.random()}
+                                                                                                    item
+                                                                                                    md={6}
+                                                                                                    xs={12}
+                                                                                               >
+                                                                                                    <TextField key={Math.random()}
+                                                                                                         defaultValue={currentProductObject?.promotionText}
+                                                                                                         fullWidth
+                                                                                                         disabled={!currentProductObject?.promoting}
+                                                                                                         label="Promo tekst"
+                                                                                                         name={product.promotionText}
+                                                                                                         onBlur={(e: any) =>
+                                                                                                              setCurrentProductObject((previousObject: any) => ({
+                                                                                                                   ...previousObject,
+                                                                                                                   promotionText: e.target.value
+
+                                                                                                              }))
+                                                                                                         }
+                                                                                                    />
+                                                                                               </Grid>
                                                                                           </Grid>
                                                                                      </Grid>
                                                                                      <Grid key={Math.random()}
@@ -764,7 +788,7 @@ export const ProductsTable = (props: any) => {
                                                                                                     <TextField key={Math.random()}
                                                                                                          defaultValue={currentProductObject?.discountAmount}
                                                                                                          fullWidth
-                                                                                                         disabled={loading}
+                                                                                                         disabled={!currentProductObject?.discount}
                                                                                                          label="Iznos popusta"
                                                                                                          name="discountAmount"
                                                                                                          onBlur={(e) => {
@@ -910,6 +934,25 @@ export const ProductsTable = (props: any) => {
                                                                                                     />
                                                                                                     <Typography key={Math.random()} variant="subtitle2">
                                                                                                          Popust
+                                                                                                    </Typography>
+                                                                                               </Grid>
+                                                                                               <Grid key={Math.random()}
+                                                                                                    item
+                                                                                                    md={6}
+                                                                                                    xs={12}
+                                                                                                    sx={{
+                                                                                                         alignItems: 'center',
+                                                                                                         display: 'flex',
+                                                                                                    }}
+                                                                                               >
+                                                                                                    <Switch key={Math.random()} disabled={loading} checked={currentProductObject!.promoting}
+                                                                                                         onChange={() => setCurrentProductObject((previousObject: any) => ({
+                                                                                                              ...previousObject,
+                                                                                                              promoting: !previousObject.promoting
+                                                                                                         }))}
+                                                                                                    />
+                                                                                                    <Typography key={Math.random()} variant="subtitle2">
+                                                                                                         Promocija
                                                                                                     </Typography>
                                                                                                </Grid>
                                                                                           </Grid>
