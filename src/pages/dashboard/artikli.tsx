@@ -121,7 +121,7 @@ const Page = (props: any) => {
                          title: 'Success',
                          text: 'Proizvodi uspešno poslati! Sačekajte par minuta i osvežite stranicu!',
                     })
-                    router.push('/products/?page=0&limit=10')
+                    // router.refresh()
                } else {
                     const errorData = await response.json(); // Parse the error response
 
