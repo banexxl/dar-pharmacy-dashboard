@@ -1,7 +1,7 @@
 "use client"
 import React, { useState } from 'react';
 import { useFormik } from 'formik';
-import { TextField, Typography, Button, Checkbox, FormControlLabel, Box, Input, Card, CardContent, Grid, MenuItem, Stack, Container, IconButton, CardActionArea, colors } from '@mui/material';
+import { TextField, Typography, Button, Checkbox, FormControlLabel, Box, Input, Card, CardContent, Grid, MenuItem, Stack, Container, IconButton, CardActionArea, colors, useMediaQuery } from '@mui/material';
 import { Form, Formik, FormikErrors, FormikTouched } from 'formik';
 import PhotoCamera from "@mui/icons-material/PhotoCamera";
 import { initialValues, mainCategoryOptions, manufacturerOptions, midCategoryOptions, newProductSchema, quantityUnitOptions } from './new-product-schema'
@@ -14,7 +14,7 @@ import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
 import Image from 'next/image';
 import { LoadingButton } from '@mui/lab';
 import "@uploadthing/react/styles.css";
-import { useTheme } from '@mui/material/styles';
+import { Theme, useTheme } from '@mui/material/styles';
 import { UploadButton } from "../../utils/image-upload-components";
 import { IProduct } from './products-table';
 
@@ -186,6 +186,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }: any) => {
      const [loading, setLoading] = useState(false)
      const [subCategoryOptions, setSubCategoryOptions] = useState<any>([]);
      const [isSubCategoryEnabled, setIsSubCategoryEnabled] = useState(false);
+     const isScreentoMedium = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'));
 
      const handleMidCategoryChange = async (event: any) => {
           const selectedMidCategory = event.target.value;
@@ -641,7 +642,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }: any) => {
                                         InputProps={{ inputProps: { min: 0, max: 100 } }}
                                    />
 
-                                   <Box sx={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
+                                   <Box sx={{ gap: '10px', display: 'flex', maxWidth: '300px', justifyContent: 'space-between', flexDirection: isScreentoMedium ? 'column' : 'row' }}>
                                         <Button
                                              variant="contained"
                                              color="primary"

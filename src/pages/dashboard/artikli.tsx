@@ -169,7 +169,7 @@ const Page = (props: any) => {
                                         </Stack>
 
                                    </Stack>
-                                   <Box sx={{ display: 'flex', justifyContent: 'space-between', height: isScreentoMedium ? '120px' : '40px', width: '40%', flexDirection: isScreentoMedium ? 'column' : 'row' }}>
+                                   <Box sx={{ gap: '20px', display: 'flex', justifyContent: 'space-between', height: isScreentoMedium ? '120px' : '40px', width: '40%', flexDirection: isScreentoMedium ? 'column' : 'row' }}>
                                         <Button
                                              startIcon={(
                                                   <SvgIcon fontSize="small">
@@ -180,7 +180,11 @@ const Page = (props: any) => {
                                              onClick={() => {
                                                   setOpen(true)
                                              }}
-                                             sx={{ width: isScreentoMedium ? '220px' : 'auto' }}
+                                             sx={{
+                                                  width: isScreentoMedium ? '220px' : 'auto',
+                                                  padding: '5px',
+                                                  height: '60px'
+                                             }}
                                         >
                                              Dodaj proizvod
                                         </Button>
@@ -192,7 +196,11 @@ const Page = (props: any) => {
                                              )}
                                              variant="contained"
                                              onClick={handleRebuild}
-                                             sx={{ width: isScreentoMedium ? '22     0px' : 'auto' }}
+                                             sx={{
+                                                  width: isScreentoMedium ? '220px' : 'auto',
+                                                  padding: '5px',
+                                                  height: '60px'
+                                             }}
                                              disabled={loading}
                                         >
                                              {loading ? 'Šaljem' : 'Pošalji izmene na sajt'}
