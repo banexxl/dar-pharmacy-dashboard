@@ -86,7 +86,7 @@ export const SideNav = (props: any) => {
                                    return (
                                         <SideNavItem
                                              active={active}
-                                             disabled={item.disabled}
+                                             disabled={item.disabled!}
                                              // external={item.external}
                                              icon={item.icon}
                                              key={item.title}

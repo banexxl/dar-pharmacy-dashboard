@@ -3,6 +3,7 @@ import CogIcon from '@heroicons/react/24/solid/CogIcon';
 import LockClosedIcon from '@heroicons/react/24/solid/LockClosedIcon';
 import ShoppingBagIcon from '@heroicons/react/24/solid/ShoppingBagIcon';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import UserIcon from '@heroicons/react/24/solid/UserIcon';
 import UserPlusIcon from '@heroicons/react/24/solid/UserPlusIcon';
 import UsersIcon from '@heroicons/react/24/solid/UsersIcon';
@@ -50,4 +51,13 @@ export const items = [
           ),
           disabled: false
      },
+     {
+          title: 'Kanban',
+          path: '/dashboard/kanban',
+          icon: (
+               <SvgIcon fontSize="small">
+                    <AssignmentTurnedInIcon />
+               </SvgIcon>
+          ),
+     }
 ];
