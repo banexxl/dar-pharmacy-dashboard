@@ -39,14 +39,14 @@ export const userServices = () => {
           }
      }
 
-     const getUserByEmail = async (email: string): Promise<GetUserByEmailResult> => {
+     const getUserByEmailAndRole = async (email: string, role: string): Promise<GetUserByEmailResult> => {
 
           const client = new MongoClient(process.env.MONGODB_URI!);
 
           try {
                await client.connect();
-               const database = client.db('DAR_DB');
-               const collection = await database.collection('Admins').find({ email: email }).toArray();
+               const database = client.db('ACCOUNTS_DB');
+               const collection = await database.collection('Accounts').find({ email: email, role: role }).toArray();
                const user = collection[0] as User;
                return user;
           } catch (error: any) {
@@ -130,7 +130,7 @@ export const userServices = () => {
           getUsersActiveInWeek,
           getAllUsers,
           getUsersByPage,
-          getUserByEmail,
+          getUserByEmailAndRole,
           getUsersCount
      }
 }
