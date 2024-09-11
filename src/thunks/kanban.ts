@@ -1,19 +1,19 @@
+import { Board } from '@/schemas/kanban';
 import { slice } from 'src/slices/kanban';
 import type { AppThunk } from 'src/store';
 
-const API_BASE_URL = '/api'; // Base URL for API calls
-
-type GetBoardParams = {
-  boardId: string;
-}
-
-const getBoard = (boardId: string): AppThunk =>
-  async (dispatch: any): Promise<void> => {
-    const response = await fetch(`${API_BASE_URL}/boards/${boardId}`);
+const getBoard = (boardId: string): AppThunk => async (dispatch): Promise<void> => {
+  try {
+    const response = await fetch(`api/kanban/boards/${boardId}`);
     const data = await response.json();
+    console.log('Fetched board data:', data); // Log the data here
 
-    dispatch(slice.actions.getBoard(data._id));
-  };
+    dispatch(slice.actions.getBoard(data)); // Dispatch the entire board object, not just the boardId
+  } catch (error) {
+    console.error('Failed to fetch board:', error);
+  }
+};
+
 
 type CreateColumnParams = {
   name: string;
@@ -22,7 +22,7 @@ type CreateColumnParams = {
 const createColumn =
   (params: CreateColumnParams): AppThunk =>
     async (dispatch: any): Promise<void> => {
-      const response = await fetch(`${API_BASE_URL}/columns`, {
+      const response = await fetch(`api/kanban/columns`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(params),
@@ -42,7 +42,7 @@ type UpdateColumnParams = {
 const updateColumn =
   (params: UpdateColumnParams): AppThunk =>
     async (dispatch: any): Promise<void> => {
-      const response = await fetch(`${API_BASE_URL}/columns/${params.columnId}`, {
+      const response = await fetch(`api/kanban/columns/${params.columnId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(params.update),
@@ -59,7 +59,7 @@ type ClearColumnParams = {
 const clearColumn =
   (params: ClearColumnParams): AppThunk =>
     async (dispatch: any): Promise<void> => {
-      await fetch(`${API_BASE_URL}/columns/${params.columnId}/clear`, {
+      await fetch(`api/kanban/columns/${params.columnId}/clear`, {
         method: 'POST',
       });
 
@@ -73,7 +73,7 @@ type DeleteColumnParams = {
 const deleteColumn =
   (params: DeleteColumnParams): AppThunk =>
     async (dispatch: any): Promise<void> => {
-      await fetch(`${API_BASE_URL}/columns/${params.columnId}`, {
+      await fetch(`api/kanban/columns/${params.columnId}`, {
         method: 'DELETE',
       });
 
@@ -88,7 +88,7 @@ type CreateTaskParams = {
 const createTask =
   (params: CreateTaskParams): AppThunk =>
     async (dispatch: any): Promise<void> => {
-      const response = await fetch(`${API_BASE_URL}/tasks`, {
+      const response = await fetch(`api/kanban/tasks`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(params),
@@ -111,7 +111,7 @@ type UpdateTaskParams = {
 const updateTask =
   (params: UpdateTaskParams): AppThunk =>
     async (dispatch: any): Promise<void> => {
-      const response = await fetch(`${API_BASE_URL}/tasks/${params.taskId}`, {
+      const response = await fetch(`api/kanban/tasks/${params.taskId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(params.update),
@@ -130,7 +130,7 @@ type MoveTaskParams = {
 const moveTask =
   (params: MoveTaskParams): AppThunk =>
     async (dispatch: any): Promise<void> => {
-      await fetch(`${API_BASE_URL}/tasks/${params.taskId}/move`, {
+      await fetch(`api/kanban/tasks/${params.taskId}/move`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(params),
@@ -146,7 +146,7 @@ type DeleteTaskParams = {
 const deleteTask =
   (params: DeleteTaskParams): AppThunk =>
     async (dispatch: any): Promise<void> => {
-      await fetch(`${API_BASE_URL}/tasks/${params.taskId}`, {
+      await fetch(`api/kanban/tasks/${params.taskId}`, {
         method: 'DELETE',
       });
 
@@ -161,7 +161,7 @@ type AddCommentParams = {
 const addComment =
   (params: AddCommentParams): AppThunk =>
     async (dispatch: any): Promise<void> => {
-      const response = await fetch(`${API_BASE_URL}/comments`, {
+      const response = await fetch(`api/kanban/comments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(params),
@@ -184,7 +184,7 @@ type AddCheckListParams = {
 const addChecklist =
   (params: AddCheckListParams): AppThunk =>
     async (dispatch: any): Promise<void> => {
-      const response = await fetch(`${API_BASE_URL}/checklists`, {
+      const response = await fetch(`api/kanban/checklists`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(params),
@@ -208,7 +208,7 @@ type UpdateChecklistParams = {
 const updateChecklist =
   (params: UpdateChecklistParams): AppThunk =>
     async (dispatch: any): Promise<void> => {
-      const response = await fetch(`${API_BASE_URL}/checklists/${params.checklistId}`, {
+      const response = await fetch(`api/kanban/checklists/${params.checklistId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(params.update),
@@ -231,7 +231,7 @@ type DeleteChecklistParams = {
 const deleteChecklist =
   (params: DeleteChecklistParams): AppThunk =>
     async (dispatch: any): Promise<void> => {
-      await fetch(`${API_BASE_URL}/checklists/${params.checklistId}`, {
+      await fetch(`api/kanban/checklists/${params.checklistId}`, {
         method: 'DELETE',
       });
 
@@ -247,7 +247,7 @@ type AddCheckItemParams = {
 const addCheckItem =
   (params: AddCheckItemParams): AppThunk =>
     async (dispatch: any): Promise<void> => {
-      const response = await fetch(`${API_BASE_URL}/checkitems`, {
+      const response = await fetch(`api/kanban/checkitems`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(params),
@@ -276,7 +276,7 @@ type UpdateCheckItemParams = {
 const updateCheckItem =
   (params: UpdateCheckItemParams): AppThunk =>
     async (dispatch: any): Promise<void> => {
-      const response = await fetch(`${API_BASE_URL}/checkitems/${params.checkItemId}`, {
+      const response = await fetch(`api/kanban/checkitems/${params.checkItemId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(params.update),
@@ -301,7 +301,7 @@ type DeleteCheckItemParams = {
 const deleteCheckItem =
   (params: DeleteCheckItemParams): AppThunk =>
     async (dispatch: any): Promise<void> => {
-      await fetch(`${API_BASE_URL}/checkitems/${params.checkItemId}`, {
+      await fetch(`api/kanban/checkitems/${params.checkItemId}`, {
         method: 'DELETE',
       });
 

@@ -1,16 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
-import type { NextPage } from 'next';
 import type { DropResult } from 'react-beautiful-dnd';
 import { DragDropContext } from 'react-beautiful-dnd';
 import toast from 'react-hot-toast';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
-
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { useDispatch, useSelector } from 'src/store';
 import { TaskModal } from '@/sections/kanban/task-modal';
@@ -19,27 +15,32 @@ import { ColumnCard } from '@/sections/kanban/column-card';
 import { thunks } from '@/thunks/kanban';
 import { KanbanService } from '@/services/kanban-services';
 import { Board } from '@/schemas/kanban';
-import { TextField } from '@mui/material';
+import { Divider, TextField } from '@mui/material';
+import { indigo } from '@/theme/colors';
 
 const useColumnsIds = (): string[] => {
   const { columns } = useSelector((state: any) => state.kanban);
   return columns.allIds;
 };
 
-const useBoard = (boardId: string): void => {
-  console.log('useBoard s id', boardId);
+const useBoard = (board: Board | null | undefined): void => {
+  console.log('usao u useBoard na glavnoj strnici', board);
 
   const dispatch = useDispatch();
 
   const handleBoardGet = useCallback((boardId: string): void => {
-    return dispatch(thunks.getBoard(boardId));
+    if (boardId) {
+      dispatch(thunks.getBoard(boardId));
+    }
   },
     [dispatch]
   );
 
   useEffect(() => {
-    handleBoardGet(boardId);
-  }, [boardId, handleBoardGet]);
+    if (board) {  // Properly check if boardId is not null or empty
+      handleBoardGet(board._id);
+    }
+  }, [board, handleBoardGet]);
 };
 
 type PageProps = {
@@ -50,17 +51,12 @@ const Page = ({ boards }: PageProps) => {
   const dispatch = useDispatch();
   const columnsIds = useColumnsIds();
   const [currentTaskId, setCurrentTaskId] = useState<string | null>(null);
-  const [selectedBoardId, setSelectedBoardId] = useState<string | null>(
-    boards.length > 0 ? boards[0]._id : null
-  );
-
+  const [selectedBoard, setSelectedBoard] = useState<Board | null>();
   // Fetch board data whenever the selected board changes
-  selectedBoardId &&
-    useBoard
-
+  useBoard(selectedBoard);
 
   const handleBoardChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setSelectedBoardId(event.target.value as string);
+    setSelectedBoard(event.target.value as Board);
   };
 
   const handleDragEnd = useCallback(
@@ -210,10 +206,14 @@ const Page = ({ boards }: PageProps) => {
           <FormControl fullWidth sx={{ mb: 3 }}>
             <TextField
               select
-              value={selectedBoardId || ''}
+              value={selectedBoard || ''}
               onChange={(e: any) => handleBoardChange(e)}
               label="Izaberi tablu"
             >
+              {/* Add a "Clear Selection" option */}
+              <MenuItem key="clear" value="" onSelect={() => setSelectedBoard(null)}>
+                Očisti izbor
+              </MenuItem>
               {
                 boards && boards.length === 0 ? (
                   <MenuItem key="empty" value="">
@@ -228,40 +228,38 @@ const Page = ({ boards }: PageProps) => {
             </TextField>
           </FormControl>
         </Box>
+        <Divider sx={{ borderBottomWidth: '2px', borderColor: indigo.dark }} />
         {
-          !selectedBoardId ??
-          <DragDropContext onDragEnd={handleDragEnd}>
-            <Box
-              sx={{
-                display: 'flex',
-                flexGrow: 1,
-                flexShrink: 1,
-                overflowX: 'auto',
-                overflowY: 'hidden',
-                px: 3,
-                py: 3,
-              }}
-            >
-              <Stack
-                alignItems="flex-start"
-                direction="row"
-                spacing={3}
+          selectedBoard && (
+            <DragDropContext onDragEnd={handleDragEnd}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexGrow: 1,
+                  flexShrink: 1,
+                  overflowX: 'auto',
+                  overflowY: 'hidden',
+                  px: 3,
+                  py: 3,
+                }}
               >
-                {columnsIds.map((columnId: string) => (
-                  <ColumnCard
-                    key={columnId}
-                    columnId={columnId}
-                    onClear={() => handleColumnClear(columnId)}
-                    onDelete={() => handleColumnDelete(columnId)}
-                    onRename={(name) => handleColumnRename(columnId, name)}
-                    onTaskAdd={(name) => handleTaskAdd(columnId, name)}
-                    onTaskOpen={handleTaskOpen}
-                  />
-                ))}
-                <ColumnAdd onAdd={handleColumnAdd} />
-              </Stack>
-            </Box>
-          </DragDropContext>
+                <Stack alignItems="flex-start" direction="row" spacing={3}>
+                  {columnsIds.map((columnId: string) => (
+                    <ColumnCard
+                      key={columnId}
+                      columnId={columnId}
+                      onClear={() => handleColumnClear(columnId)}
+                      onDelete={() => handleColumnDelete(columnId)}
+                      onRename={(name) => handleColumnRename(columnId, name)}
+                      onTaskAdd={(name) => handleTaskAdd(columnId, name)}
+                      onTaskOpen={handleTaskOpen}
+                    />
+                  ))}
+                  <ColumnAdd onAdd={handleColumnAdd} />
+                </Stack>
+              </Box>
+            </DragDropContext>
+          )
         }
       </Box>
       <TaskModal

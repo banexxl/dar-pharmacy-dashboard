@@ -46,23 +46,11 @@ type UpdateChecklistAction = PayloadAction<{ taskId: string; checklist: Checklis
 
 type DeleteChecklistAction = PayloadAction<{ taskId: string; checklistId: string }>;
 
-type AddCheckItemAction = PayloadAction<{
-  taskId: string;
-  checklistId: string;
-  checkItem: CheckItem;
-}>;
+type AddCheckItemAction = PayloadAction<{ taskId: string; checklistId: string; checkItem: CheckItem; }>;
 
-type UpdateCheckItemAction = PayloadAction<{
-  taskId: string;
-  checklistId: string;
-  checkItem: CheckItem;
-}>;
+type UpdateCheckItemAction = PayloadAction<{ taskId: string; checklistId: string; checkItem: CheckItem; }>;
 
-type DeleteCheckItemAction = PayloadAction<{
-  taskId: string;
-  checklistId: string;
-  checkItemId: string;
-}>;
+type DeleteCheckItemAction = PayloadAction<{ taskId: string; checklistId: string; checkItemId: string; }>;
 
 const initialState: KanbanState = {
   isLoaded: false,
@@ -82,6 +70,8 @@ const initialState: KanbanState = {
 
 const reducers = {
   getBoard(state: KanbanState, action: GetBoardAction): void {
+    console.log('usao u getBoard reducer', action.payload);
+
     const board = action.payload;
 
     state.columns.byId = objFromArray(board.columns);
