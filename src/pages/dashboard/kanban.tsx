@@ -52,6 +52,7 @@ const Page = ({ boards }: PageProps) => {
   const router = useRouter();
   const [currentTaskId, setCurrentTaskId] = useState<string | null>(null);
   const [selectedBoardId, setSelectedBoardId] = useState<string | null>();
+  const [boardData, setBoardData] = useState<Board[]>(boards);
   // Fetch board data whenever the selected board changes
   useBoard(selectedBoardId);
 
@@ -230,7 +231,10 @@ const Page = ({ boards }: PageProps) => {
           allowEscapeKey: true,
           allowOutsideClick: true,
         })
-        router.reload();
+        setBoardData([
+          ...boardData,
+          { _id: newBoard.insertedId, title: boardName, columns: [], tasks: [], members: [] },
+        ]);
       } else {
         sweetalert2.fire({
           icon: 'error',
@@ -277,7 +281,7 @@ const Page = ({ boards }: PageProps) => {
               <MenuItem key="clear" value="" onSelect={() => setSelectedBoardId(null)}>
                 Očisti izbor
               </MenuItem>
-              {boards.map((board: Board) => (
+              {boardData.map((board: Board) => (
                 <MenuItem key={board._id.toString()} value={board._id!.toString()}>
                   {board.title}
                 </MenuItem>
