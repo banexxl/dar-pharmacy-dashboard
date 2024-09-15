@@ -18,6 +18,7 @@ import { Board } from '@/schemas/kanban';
 import { Button, Divider, Modal, TextField, Theme, useMediaQuery } from '@mui/material';
 import { indigo } from '@/theme/colors';
 import sweetalert2 from 'sweetalert2';
+import { useRouter } from 'next/router';
 
 const useColumnsIds = (): string[] => {
   const { columns } = useSelector((state: any) => state.kanban);
@@ -46,14 +47,11 @@ type PageProps = {
 };
 
 const Page = ({ boards }: PageProps) => {
-  console.log('page boards', boards);
-
   const dispatch = useDispatch();
   const columnsIds = useColumnsIds();
+  const router = useRouter();
   const [currentTaskId, setCurrentTaskId] = useState<string | null>(null);
   const [selectedBoardId, setSelectedBoardId] = useState<string | null>();
-  console.log('selectedBoardId', selectedBoardId);
-
   // Fetch board data whenever the selected board changes
   useBoard(selectedBoardId);
 
@@ -119,7 +117,8 @@ const Page = ({ boards }: PageProps) => {
         });
       }
     }
-  }, [dispatch]);
+  }, [dispatch]
+  );
 
   const handleColumnClear = useCallback(async (columnId: string): Promise<void> => {
     try {
@@ -192,11 +191,13 @@ const Page = ({ boards }: PageProps) => {
 
   const handleTaskOpen = useCallback((taskId: string): void => {
     setCurrentTaskId(taskId);
-  }, []);
+  }, []
+  );
 
   const handleTaskClose = useCallback((): void => {
     setCurrentTaskId(null);
-  }, []);
+  }, []
+  );
 
   const [openModal, setOpenModal] = useState(false);
   const [boardName, setBoardName] = useState('');
@@ -213,7 +214,7 @@ const Page = ({ boards }: PageProps) => {
     setError('');
 
     try {
-      await fetch('/api/kanban/boards', {
+      const addBoardResponse = await fetch('/api/kanban/boards', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -221,6 +222,23 @@ const Page = ({ boards }: PageProps) => {
         body: JSON.stringify({ title: boardName }),
       });
       // Optionally, refresh the list of boards after successful creation
+      const newBoard = await addBoardResponse.json();
+      if (newBoard.acknowledged && newBoard.insertedId !== '') {
+        sweetalert2.fire({
+          icon: 'success',
+          title: 'Tabla kreirana',
+          allowEscapeKey: true,
+          allowOutsideClick: true,
+        })
+        router.reload();
+      } else {
+        sweetalert2.fire({
+          icon: 'error',
+          title: 'Greška prilikom kreiranja table',
+          allowEscapeKey: true,
+          allowOutsideClick: true,
+        })
+      }
       handleCloseModal();
     } catch (err) {
       console.error('Failed to create board:', err);
@@ -260,7 +278,7 @@ const Page = ({ boards }: PageProps) => {
                 Očisti izbor
               </MenuItem>
               {boards.map((board: Board) => (
-                <MenuItem key={board._id.toString()} value={board.title}>
+                <MenuItem key={board._id.toString()} value={board._id!.toString()}>
                   {board.title}
                 </MenuItem>
               ))}
@@ -296,6 +314,9 @@ const Page = ({ boards }: PageProps) => {
               />
               <Button variant="contained" onClick={handleSubmit}>
                 Kreiraj
+              </Button>
+              <Button variant="outlined" onClick={handleCloseModal} sx={{ ml: 2 }}>
+                Otkaži
               </Button>
             </Box>
           </Modal>

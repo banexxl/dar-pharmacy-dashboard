@@ -103,8 +103,6 @@ export const ProductsTable = (props: any) => {
      }
 
      const handleProductUpdateClick = () => {
-          console.log(currentProductObject);
-
           Swal.fire({
                title: 'Da li ste sigurni?',
                text: "Možete izmeniti artikl u svakom momentu...",

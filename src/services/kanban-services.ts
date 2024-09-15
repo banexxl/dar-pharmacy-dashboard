@@ -120,8 +120,6 @@ export const KanbanService = () => {
                     name,
                     taskIds: []
                });
-               console.log('Column inserted', columnInsertResult);
-
                // Step 2: Update the board to include the full column object
                const boardUpdateResult = await boardCollection.updateOne(
                     { _id: new ObjectId(boardId) },
@@ -134,8 +132,6 @@ export const KanbanService = () => {
                          } as any
                     } // Push the full column object to the board
                );
-
-               console.log('Board updated', boardUpdateResult);
 
                return { columnInsertResult, boardUpdateResult }; // Return both results for reference
 
@@ -196,7 +192,6 @@ export const KanbanService = () => {
                     { $set: { 'columns.$.tasks': [] } } // Clear tasks in the column
                );
 
-               console.log('Column cleared:', updateResult);
                return true;
           } catch (err) {
                console.error('Error clearing column:', err);
@@ -233,7 +228,6 @@ export const KanbanService = () => {
                     }
                );
 
-               console.log('Column deleted:', updateResult);
                return true;
           } catch (err) {
                console.error('Error deleting column:', err);

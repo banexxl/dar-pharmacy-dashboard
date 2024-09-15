@@ -468,7 +468,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
     return columns.map((column) => {
       return {
         label: column.name!,
-        value: column._id!.toString(),
+        value: column._id?.toString(),
       };
     });
   }, [columns]);

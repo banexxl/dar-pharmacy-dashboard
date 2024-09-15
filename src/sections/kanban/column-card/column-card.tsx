@@ -28,11 +28,8 @@ interface ColumnCardProps {
 }
 
 export const ColumnCard: FC<ColumnCardProps> = (props) => {
-  console.log('usao u column-card.tsx', props);
-
   const { columnId, onTaskAdd, onTaskOpen, onClear, onDelete, onRename, ...other } = props;
   const column = useColumn(columnId);
-  console.log('column', column);
 
   if (!column) {
     return null;
@@ -70,7 +67,7 @@ export const ColumnCard: FC<ColumnCardProps> = (props) => {
         }}
       >
         <Droppable
-          droppableId={column._id.toString()}
+          droppableId={column._id?.toString() ? column._id.toString() : ''}
           type="task"
         >
           {(droppableProvider): JSX.Element => (

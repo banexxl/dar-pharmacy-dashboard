@@ -22,10 +22,6 @@ export const authOptions: NextAuthOptions = {
           async signIn({ account, profile }: any) {
                if (account.provider === "google") {
                     const user = await userServices().getUserByEmailAndRole(profile.email, 'admin');
-                    console.log('user', user);
-                    console.log('profile', profile);
-
-
                     return profile.email_verified && profile.email.endsWith("@gmail.com") && user?.email ? true : false;
                }
                return false; // Do different verification for other providers that don't have `email_verified`

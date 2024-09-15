@@ -5,15 +5,11 @@ import sweetalert2 from 'sweetalert2';
 
 
 const getBoard = (boardId: string): AppThunk => async (dispatch): Promise<void> => {
-  console.log('usao u getBoard', boardId);
-
   try {
     const response = await fetch(`/api/kanban/boards/${boardId}`, {
       method: 'GET',
     });
     const data = await response.json();
-    console.log('data', data);
-
     dispatch(slice.actions.getBoard(data)); // Dispatch the entire board object, not just the boardId
   } catch (error) {
     console.error('Failed to fetch board:', error);
