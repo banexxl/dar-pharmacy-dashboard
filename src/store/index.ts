@@ -1,7 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 import type { TypedUseSelectorHook } from 'react-redux';
 import { useDispatch as useReduxDispatch, useSelector as useReduxSelector } from 'react-redux';
-import { ThunkAction } from 'redux-thunk';  // Import redux-thunk
+import { ThunkAction, thunk } from 'redux-thunk';  // Import redux-thunk
 import type { Action } from '@reduxjs/toolkit';
 
 import { rootReducer } from './root-reducer';
@@ -10,6 +10,7 @@ import { rootReducer } from './root-reducer';
 export const store = configureStore({
   reducer: rootReducer,
   devTools: true,
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(thunk),
 });
 
 export type RootState = ReturnType<typeof store.getState>;

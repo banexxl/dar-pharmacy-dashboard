@@ -108,8 +108,8 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
   const columns = useColumns();
   const task = useTask(taskId);
   const column = useColumn(task?.columnId);
-  const author = useAuthor(task?.authorId);
-  const assignees = useAssignees(task?.assigneesIds);
+  const author = useAuthor(task?.author._id.toString());
+  const assignees = useAssignees(task?.assignees.map((assignee) => assignee._id.toString()) || []);
   const mdUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
   const [currentTab, setCurrentTab] = useState<string>('overview');
   const [nameCopy, setNameCopy] = useState<string>(task?.name || '');
@@ -150,7 +150,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
       try {
         await dispatch(
           thunks.moveTask({
-            taskId: task!._id,
+            taskId: task!._id.toString(),
             position: 0,
             columnId,
           })
@@ -168,7 +168,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
     try {
       await dispatch(
         thunks.deleteTask({
-          taskId: task!._id,
+          taskId: task!._id.toString(),
         })
       );
       onClose?.();
@@ -183,7 +183,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
       try {
         await dispatch(
           thunks.updateTask({
-            taskId: task!._id,
+            taskId: task!._id.toString(),
             update: {
               name,
             },
@@ -231,7 +231,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
         try {
           await dispatch(
             thunks.updateTask({
-              taskId: task!._id,
+              taskId: task!._id.toString(),
               update: {
                 description,
               },
@@ -256,7 +256,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
     try {
       await dispatch(
         thunks.updateTask({
-          taskId: task!._id,
+          taskId: task!._id.toString(),
           update: { isSubscribed: true },
         })
       );
@@ -270,7 +270,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
     try {
       await dispatch(
         thunks.updateTask({
-          taskId: task!._id,
+          taskId: task!._id.toString(),
           update: { isSubscribed: false },
         })
       );
@@ -285,7 +285,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
       try {
         await dispatch(
           thunks.updateTask({
-            taskId: task!._id,
+            taskId: task!._id.toString(),
             update: {
               labels,
             },
@@ -303,7 +303,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
     try {
       await dispatch(
         thunks.addChecklist({
-          taskId: task!._id,
+          taskId: task!._id.toString(),
           name: 'Untitled Checklist',
         })
       );
@@ -318,7 +318,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
       try {
         await dispatch(
           thunks.updateChecklist({
-            taskId: task!._id,
+            taskId: task!._id.toString(),
             checklistId,
             update: { name },
           })
@@ -336,7 +336,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
       try {
         await dispatch(
           thunks.deleteChecklist({
-            taskId: task!._id,
+            taskId: task!._id.toString(),
             checklistId,
           })
         );
@@ -353,7 +353,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
       try {
         await dispatch(
           thunks.addCheckItem({
-            taskId: task!._id,
+            taskId: task!._id.toString(),
             checklistId,
             name,
           })
@@ -371,7 +371,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
       try {
         await dispatch(
           thunks.deleteCheckItem({
-            taskId: task!._id,
+            taskId: task!._id.toString(),
             checklistId,
             checkItemId,
           })
@@ -389,7 +389,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
       try {
         await dispatch(
           thunks.updateCheckItem({
-            taskId: task!._id,
+            taskId: task!._id.toString(),
             checklistId,
             checkItemId,
             update: {
@@ -410,7 +410,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
       try {
         await dispatch(
           thunks.updateCheckItem({
-            taskId: task!._id,
+            taskId: task!._id.toString(),
             checklistId,
             checkItemId,
             update: {
@@ -431,7 +431,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
       try {
         await dispatch(
           thunks.updateCheckItem({
-            taskId: task!._id,
+            taskId: task!._id.toString(),
             checklistId,
             checkItemId,
             update: {
@@ -452,7 +452,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
       try {
         await dispatch(
           thunks.addComment({
-            taskId: task!._id,
+            taskId: task!._id.toString(),
             message,
           })
         );
@@ -467,8 +467,8 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
   const statusOptions = useMemo(() => {
     return columns.map((column) => {
       return {
-        label: column.name,
-        value: column._id,
+        label: column.name!,
+        value: column._id!.toString(),
       };
     });
   }, [columns]);
@@ -494,7 +494,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
             <TaskStatus
               onChange={(columnId) => handleMove(columnId)}
               options={statusOptions}
-              value={column._id}
+              value={column._id!.toString().toString()}
             />
           </div>
           <Stack
@@ -622,7 +622,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
                   <AvatarGroup max={5}>
                     {assignees.map((assignee) => (
                       <Avatar
-                        key={assignee._id}
+                        key={assignee._id.toString()}
                         src={assignee.avatar || undefined}
                       />
                     ))}
@@ -657,7 +657,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
                 >
                   {task.attachments.map((attachment) => (
                     <Avatar
-                      key={attachment._id}
+                      key={attachment._id!.toString().toString()}
                       src={attachment.url || undefined}
                       sx={{
                         height: 64,
@@ -753,23 +753,23 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
             <Stack spacing={2}>
               {task.checklists.map((checklist) => (
                 <TaskChecklist
-                  key={checklist._id}
+                  key={checklist._id!.toString()}
                   checklist={checklist}
-                  onCheckItemAdd={(name) => handleCheckItemAdd(checklist._id, name)}
+                  onCheckItemAdd={(name) => handleCheckItemAdd(checklist._id!.toString(), name)}
                   onCheckItemDelete={(checkItemId) =>
-                    handleCheckItemDelete(checklist._id, checkItemId)
+                    handleCheckItemDelete(checklist._id!.toString(), checkItemId)
                   }
                   onCheckItemCheck={(checkItemId) =>
-                    handleCheckItemCheck(checklist._id, checkItemId)
+                    handleCheckItemCheck(checklist._id!.toString(), checkItemId)
                   }
                   onCheckItemUncheck={(checkItemId) =>
-                    handleCheckItemUncheck(checklist._id, checkItemId)
+                    handleCheckItemUncheck(checklist._id!.toString(), checkItemId)
                   }
                   onCheckItemRename={(checkItemId, name) =>
-                    handleCheckItemRename(checklist._id, checkItemId, name)
+                    handleCheckItemRename(checklist._id!.toString(), checkItemId, name)
                   }
-                  onDelete={() => handleChecklistDelete(checklist._id)}
-                  onRename={(name) => handleChecklistRename(checklist._id, name)}
+                  onDelete={() => handleChecklistDelete(checklist._id!.toString())}
+                  onRename={(name) => handleChecklistRename(checklist._id!.toString(), name)}
                 />
               ))}
               <Button
@@ -789,7 +789,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
             <Stack spacing={2}>
               {task.comments.map((comment) => (
                 <TaskComment
-                  key={comment._id}
+                  key={comment._id!.toString()}
                   comment={comment}
                 />
               ))}

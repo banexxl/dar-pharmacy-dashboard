@@ -1,12 +1,18 @@
-import { Board } from '@/schemas/kanban';
+import { getSession } from 'next-auth/react';
 import { slice } from 'src/slices/kanban';
 import type { AppThunk } from 'src/store';
+import sweetalert2 from 'sweetalert2';
+
 
 const getBoard = (boardId: string): AppThunk => async (dispatch): Promise<void> => {
+  console.log('usao u getBoard', boardId);
+
   try {
-    const response = await fetch(`api/kanban/boards/${boardId}`);
+    const response = await fetch(`/api/kanban/boards/${boardId}`, {
+      method: 'GET',
+    });
     const data = await response.json();
-    console.log('Fetched board data:', data); // Log the data here
+    console.log('data', data);
 
     dispatch(slice.actions.getBoard(data)); // Dispatch the entire board object, not just the boardId
   } catch (error) {
@@ -14,23 +20,36 @@ const getBoard = (boardId: string): AppThunk => async (dispatch): Promise<void> 
   }
 };
 
-
 type CreateColumnParams = {
   name: string;
+  boardId: string;
 };
 
-const createColumn =
-  (params: CreateColumnParams): AppThunk =>
-    async (dispatch: any): Promise<void> => {
-      const response = await fetch(`api/kanban/columns`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(params),
-      });
-      const data = await response.json();
+export const createColumn = (params: CreateColumnParams): AppThunk => async (dispatch): Promise<void> => {
 
-      dispatch(slice.actions.createColumn(data));
-    };
+  try {
+    const response = await fetch(`/api/kanban/columns`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to create column');
+    } else {
+      const data = await response.json();
+      dispatch(slice.actions.createColumn(data))
+      sweetalert2.fire({
+        icon: 'success',
+        title: 'Uspešno dodata kolona',
+        allowEscapeKey: true,
+        allowOutsideClick: true,
+      });
+    }
+  } catch (error) {
+    console.error('Error while creating column:', error);
+  }
+};
 
 type UpdateColumnParams = {
   columnId: string;
@@ -88,14 +107,51 @@ type CreateTaskParams = {
 const createTask =
   (params: CreateTaskParams): AppThunk =>
     async (dispatch: any): Promise<void> => {
-      const response = await fetch(`api/kanban/tasks`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(params),
-      });
-      const data = await response.json();
+      try {
+        // Fetch the session to get the authenticated user
+        const session = await getSession();
 
-      dispatch(slice.actions.createTask(data));
+        if (!session) {
+          throw new Error('User not authenticated');
+        }
+
+        // Add userId to the task request body
+        const requestBody = {
+          columnId: params.columnId,
+          name: params.name,
+          userId: session.user?.name, // Authenticated user's ID from NextAuth session
+        };
+
+        const response = await fetch(`/api/kanban/tasks`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(requestBody),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to create task');
+        }
+
+        const data = await response.json();
+
+        // Dispatch the createTask action to update Redux store
+        dispatch(slice.actions.createTask(data));
+
+        // Show success alert
+        sweetalert2.fire({
+          icon: 'success',
+          title: 'Task successfully created',
+          allowEscapeKey: true,
+          allowOutsideClick: true,
+        });
+      } catch (error: any) {
+        console.error('Error while creating task:', error);
+        sweetalert2.fire({
+          icon: 'error',
+          title: 'Failed to create task',
+          text: error.toString(),
+        });
+      }
     };
 
 type UpdateTaskParams = {

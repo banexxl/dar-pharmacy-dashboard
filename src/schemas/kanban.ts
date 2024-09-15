@@ -1,33 +1,36 @@
+import { ObjectId } from "mongodb";
+
 export interface Attachment {
-  _id: string;
+  _id?: ObjectId;
+  uploadedDateTime: Date;
   type: 'image' | 'file';
   url: string;
 }
 
 export interface CheckItem {
-  _id: string;
+  _id?: ObjectId;
   name: string;
   state: 'incomplete' | 'complete';
 }
 
 export interface Checklist {
-  _id: string;
+  _id?: ObjectId;
   checkItems: CheckItem[];
   name: string;
 }
 
 export interface Comment {
-  _id: string;
+  _id?: ObjectId;
   authorId: string;
   createdAt: Date;
   message: string;
 }
 
 export interface Task {
-  _id: string;
-  assigneesIds: string[];
+  _id: ObjectId;
+  author: Member;
+  assignees: Member[];
   attachments: Attachment[];
-  authorId: string;
   checklists: Checklist[];
   columnId: string;
   comments: Comment[];
@@ -38,21 +41,22 @@ export interface Task {
   name: string;
 }
 
+
 export interface Column {
-  _id: string;
+  _id: ObjectId;
   taskIds: string[];
   name: string;
 }
 
 export interface Member {
-  _id: string;
+  _id: ObjectId;
   avatar: string | null;
   name: string;
 }
 
 export interface Board {
-  _id: string;
-  title: string;
+  _id: ObjectId;
+  title: string
   members: Member[];
   columns: Column[];
   tasks: Task[];

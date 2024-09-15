@@ -15,19 +15,17 @@ import { ColumnCard } from '@/sections/kanban/column-card';
 import { thunks } from '@/thunks/kanban';
 import { KanbanService } from '@/services/kanban-services';
 import { Board } from '@/schemas/kanban';
-import { Divider, TextField } from '@mui/material';
+import { Button, Divider, Modal, TextField, Theme, useMediaQuery } from '@mui/material';
 import { indigo } from '@/theme/colors';
+import sweetalert2 from 'sweetalert2';
 
 const useColumnsIds = (): string[] => {
   const { columns } = useSelector((state: any) => state.kanban);
   return columns.allIds;
 };
 
-const useBoard = (board: Board | null | undefined): void => {
-  console.log('usao u useBoard na glavnoj strnici', board);
-
+const useBoard = (boardId: string | null | undefined): void => {
   const dispatch = useDispatch();
-
   const handleBoardGet = useCallback((boardId: string): void => {
     if (boardId) {
       dispatch(thunks.getBoard(boardId));
@@ -37,10 +35,10 @@ const useBoard = (board: Board | null | undefined): void => {
   );
 
   useEffect(() => {
-    if (board) {  // Properly check if boardId is not null or empty
-      handleBoardGet(board._id);
+    if (boardId) {  // Properly check if boardId is not null or empty
+      handleBoardGet(boardId);  // Corrected typo to 'handleBoardGet'
     }
-  }, [board, handleBoardGet]);
+  }, [boardId, handleBoardGet]);
 };
 
 type PageProps = {
@@ -48,134 +46,147 @@ type PageProps = {
 };
 
 const Page = ({ boards }: PageProps) => {
+  console.log('page boards', boards);
+
   const dispatch = useDispatch();
   const columnsIds = useColumnsIds();
   const [currentTaskId, setCurrentTaskId] = useState<string | null>(null);
-  const [selectedBoard, setSelectedBoard] = useState<Board | null>();
+  const [selectedBoardId, setSelectedBoardId] = useState<string | null>();
+  console.log('selectedBoardId', selectedBoardId);
+
   // Fetch board data whenever the selected board changes
-  useBoard(selectedBoard);
+  useBoard(selectedBoardId);
 
   const handleBoardChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setSelectedBoard(event.target.value as Board);
+    setSelectedBoardId(event.target.value as string);
   };
 
-  const handleDragEnd = useCallback(
-    async ({ source, destination, draggableId }: DropResult): Promise<void> => {
-      try {
-        if (!destination) {
-          return;
-        }
-
-        if (source.droppableId === destination.droppableId && source.index === destination.index) {
-          return;
-        }
-
-        if (source.droppableId === destination.droppableId) {
-          await dispatch(
-            thunks.moveTask({
-              taskId: draggableId,
-              position: destination.index,
-            })
-          );
-        } else {
-          await dispatch(
-            thunks.moveTask({
-              taskId: draggableId,
-              position: destination.index,
-              columnId: destination.droppableId,
-            })
-          );
-        }
-      } catch (err) {
-        console.error(err);
-        toast.error('Something went wrong!');
+  const handleDragEnd = useCallback(async ({ source, destination, draggableId }: DropResult): Promise<void> => {
+    try {
+      if (!destination) {
+        return;
       }
-    },
+
+      if (source.droppableId === destination.droppableId && source.index === destination.index) {
+        return;
+      }
+
+      if (source.droppableId === destination.droppableId) {
+        await dispatch(
+          thunks.moveTask({
+            taskId: draggableId,
+            position: destination.index,
+          })
+        );
+      } else {
+        await dispatch(
+          thunks.moveTask({
+            taskId: draggableId,
+            position: destination.index,
+            columnId: destination.droppableId,
+          })
+        );
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error('Something went wrong!');
+    }
+  },
     [dispatch]
   );
 
-  const handleColumnAdd = useCallback(
-    async (name?: string) => {
+  const handleColumnAdd = useCallback(async (boardId: string, name?: string) => {
+    const trimmedColumn = name?.trim(); // Corrected typo to 'trimmedColumn'
+
+    if (!name || trimmedColumn === "") {  // Check for empty or whitespace-only names
+      sweetalert2.fire({
+        icon: 'error',
+        title: 'Naziv kolone ne može biti prazan',
+        allowEscapeKey: true,
+        allowOutsideClick: true,
+      });
+    } else {
       try {
-        await dispatch(
-          thunks.createColumn({
-            name: name || 'Untitled Column',
-          })
-        );
-        toast.success('Column created');
-      } catch (err) {
-        console.error(err);
-        toast.error('Something went wrong!');
+        //dispatch(thunks.getBoard(boardId));
+        dispatch(thunks.createColumn({ name: name, boardId })); // Dispatch thunk to create column
+      } catch (err: any) {
+        sweetalert2.fire({
+          icon: 'error',
+          title: 'Greška prilikom dodavanja kolone',
+          allowEscapeKey: true,
+          allowOutsideClick: true,
+          text: err.toString(),
+        });
       }
-    },
+    }
+  }, [dispatch]);
+
+  const handleColumnClear = useCallback(async (columnId: string): Promise<void> => {
+    try {
+      await dispatch(
+        thunks.clearColumn({
+          columnId,
+        })
+      );
+      toast.success('Column cleared');
+    } catch (err) {
+      console.error(err);
+      toast.error('Something went wrong!');
+    }
+  },
     [dispatch]
   );
 
-  const handleColumnClear = useCallback(
-    async (columnId: string): Promise<void> => {
-      try {
-        await dispatch(
-          thunks.clearColumn({
-            columnId,
-          })
-        );
-        toast.success('Column cleared');
-      } catch (err) {
-        console.error(err);
-        toast.error('Something went wrong!');
-      }
-    },
+  const handleColumnDelete = useCallback(async (columnId: string): Promise<void> => {
+    try {
+      await dispatch(
+        thunks.deleteColumn({
+          columnId,
+        })
+      );
+      toast.success('Column deleted');
+    } catch (err) {
+      console.error(err);
+      toast.error('Something went wrong!');
+    }
+  },
     [dispatch]
   );
 
-  const handleColumnDelete = useCallback(
-    async (columnId: string): Promise<void> => {
-      try {
-        await dispatch(
-          thunks.deleteColumn({
-            columnId,
-          })
-        );
-        toast.success('Column deleted');
-      } catch (err) {
-        console.error(err);
-        toast.error('Something went wrong!');
-      }
-    },
+  const handleColumnRename = useCallback(async (columnId: string, name: string): Promise<void> => {
+    try {
+      await dispatch(
+        thunks.updateColumn({
+          columnId,
+          update: { name },
+        })
+      );
+    } catch (err: any) {
+      sweetalert2.fire({
+        icon: 'error',
+        title: 'Failed to update column',
+        allowEscapeKey: true,
+        allowOutsideClick: true,
+        text: err.toString(),
+      })
+    }
+  },
     [dispatch]
   );
 
-  const handleColumnRename = useCallback(
-    async (columnId: string, name: string): Promise<void> => {
-      try {
-        await dispatch(
-          thunks.updateColumn({
-            columnId,
-            update: { name },
-          })
-        );
-      } catch (err) {
-        console.error(err);
-        toast.error('Something went wrong!');
-      }
-    },
-    [dispatch]
-  );
-
-  const handleTaskAdd = useCallback(
-    async (columnId: string, name?: string): Promise<void> => {
-      try {
-        await dispatch(
-          thunks.createTask({
-            columnId,
-            name: name || 'Untitled Task',
-          })
-        );
-      } catch (err) {
-        console.error(err);
-        toast.error('Something went wrong!');
-      }
-    },
+  const handleTaskAdd = useCallback(async (columnId: string, name?: string): Promise<void> => {
+    try {
+      await dispatch(
+        thunks.createTask({
+          columnId,
+          name: name || 'Untitled Task',
+        })
+      );
+    } catch (err) {
+      console.error(err);
+      toast.error('Something went wrong!');
+    }
+  },
     [dispatch]
   );
 
@@ -186,6 +197,35 @@ const Page = ({ boards }: PageProps) => {
   const handleTaskClose = useCallback((): void => {
     setCurrentTaskId(null);
   }, []);
+
+  const [openModal, setOpenModal] = useState(false);
+  const [boardName, setBoardName] = useState('');
+  const [error, setError] = useState('');
+  const isScreentoMedium = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'));
+  const handleOpenModal = () => setOpenModal(true);
+  const handleCloseModal = () => setOpenModal(false);
+
+  const handleSubmit = async () => {
+    if (!boardName) {
+      setError('Board name is required');
+      return;
+    }
+    setError('');
+
+    try {
+      await fetch('/api/kanban/boards', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ title: boardName }),
+      });
+      // Optionally, refresh the list of boards after successful creation
+      handleCloseModal();
+    } catch (err) {
+      console.error('Failed to create board:', err);
+    }
+  };
 
   return (
     <>
@@ -200,37 +240,69 @@ const Page = ({ boards }: PageProps) => {
         }}
       >
         <Box sx={{ px: 3 }}>
-          <Typography variant="h4" gutterBottom>
-            Kanban Tabla
-          </Typography>
+          <Box sx={{ display: 'flex', flexDirection: isScreentoMedium ? 'column' : 'row', gap: '20px' }}>
+            <Typography variant="h4" gutterBottom>
+              Kanban Tabla
+            </Typography>
+            {/* Button to open the modal */}
+            <Button variant="contained" onClick={handleOpenModal} sx={{ maxWidth: '200px', marginBottom: '20px' }}>
+              Dodaj novu tablu
+            </Button>
+          </Box>
           <FormControl fullWidth sx={{ mb: 3 }}>
             <TextField
               select
-              value={selectedBoard || ''}
-              onChange={(e: any) => handleBoardChange(e)}
+              value={selectedBoardId || ''}
+              onChange={handleBoardChange}
               label="Izaberi tablu"
             >
-              {/* Add a "Clear Selection" option */}
-              <MenuItem key="clear" value="" onSelect={() => setSelectedBoard(null)}>
+              <MenuItem key="clear" value="" onSelect={() => setSelectedBoardId(null)}>
                 Očisti izbor
               </MenuItem>
-              {
-                boards && boards.length === 0 ? (
-                  <MenuItem key="empty" value="">
-                    Trenutno nemamo nijednu tablu
-                  </MenuItem>
-                ) :
-                  boards.map((board: Board) => (
-                    <MenuItem key={board._id} value={board._id}>
-                      {board.title}
-                    </MenuItem>
-                  ))}
+              {boards.map((board: Board) => (
+                <MenuItem key={board._id.toString()} value={board.title}>
+                  {board.title}
+                </MenuItem>
+              ))}
             </TextField>
           </FormControl>
+          {/* Modal for adding a new board */}
+          <Modal open={openModal} onClose={handleCloseModal}>
+            <Box
+              sx={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                width: 400,
+                bgcolor: 'background.paper',
+                p: 4,
+                boxShadow: 24,
+                borderRadius: 2,
+              }}
+            >
+              <Typography variant="h6" gutterBottom>
+                Kreiraj novu tablu
+              </Typography>
+              <TextField
+                label="Naziv table"
+                fullWidth
+                value={boardName}
+                onChange={(e) => setBoardName(e.target.value)}
+                required
+                error={!!error}
+                helperText={error}
+                sx={{ mb: 3 }}
+              />
+              <Button variant="contained" onClick={handleSubmit}>
+                Kreiraj
+              </Button>
+            </Box>
+          </Modal>
         </Box>
         <Divider sx={{ borderBottomWidth: '2px', borderColor: indigo.dark }} />
         {
-          selectedBoard && (
+          selectedBoardId && (
             <DragDropContext onDragEnd={handleDragEnd}>
               <Box
                 sx={{
@@ -255,7 +327,7 @@ const Page = ({ boards }: PageProps) => {
                       onTaskOpen={handleTaskOpen}
                     />
                   ))}
-                  <ColumnAdd onAdd={handleColumnAdd} />
+                  <ColumnAdd onAdd={(e) => handleColumnAdd(selectedBoardId, e)} />
                 </Stack>
               </Box>
             </DragDropContext>
@@ -278,9 +350,14 @@ export default Page;
 export const getServerSideProps = async () => {
   const boards = await KanbanService().getAllBoards();
 
+  const serializedBoards = boards.map((board: Board) => ({
+    ...board,
+    _id: board._id.toString(),  // Convert ObjectId to string
+  }));
+
   return {
     props: {
-      boards: boards || [],
+      boards: serializedBoards || [],
     },
   };
 };

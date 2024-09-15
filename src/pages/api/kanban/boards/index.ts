@@ -7,11 +7,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
      try {
           switch (req.method) {
-               // case 'POST': { // Create a new board
-               //      const { name, members } = req.body;
-               //      const newBoard = await kanbanService.createBoard(name, members);
-               //      return res.status(201).json(newBoard);
-               // }
+               case 'POST': { // Create a new board
+                    const { title } = req.body;
+                    const newBoard = await kanbanService.addBoard(title);
+                    return res.status(201).json(newBoard);
+               }
                // case 'GET': { // Get all boards
                //      const boards = await kanbanService.getAllBoards();
                //      return res.status(200).json(boards);

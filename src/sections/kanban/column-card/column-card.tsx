@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 
 import { useSelector } from 'src/store';
-import type { Column } from 'src/schemas/kanban';
+import type { Column, Task } from 'src/schemas/kanban';
 
 import { TaskAdd } from '../task-add';
 import { TaskCard } from '../task-card';
@@ -28,14 +28,17 @@ interface ColumnCardProps {
 }
 
 export const ColumnCard: FC<ColumnCardProps> = (props) => {
+  console.log('usao u column-card.tsx', props);
+
   const { columnId, onTaskAdd, onTaskOpen, onClear, onDelete, onRename, ...other } = props;
   const column = useColumn(columnId);
+  console.log('column', column);
 
   if (!column) {
     return null;
   }
 
-  const tasksCount = column.taskIds.length;
+  const tasksCount = column.taskIds?.length;
 
   return (
     <Box
@@ -67,7 +70,7 @@ export const ColumnCard: FC<ColumnCardProps> = (props) => {
         }}
       >
         <Droppable
-          droppableId={column._id}
+          droppableId={column._id.toString()}
           type="task"
         >
           {(droppableProvider): JSX.Element => (
@@ -81,33 +84,35 @@ export const ColumnCard: FC<ColumnCardProps> = (props) => {
                 pt: 1.5,
               }}
             >
-              {column?.taskIds.map((taskId, index) => (
-                <Draggable
-                  key={taskId}
-                  draggableId={taskId}
-                  index={index}
-                >
-                  {(draggableProvided, snapshot): JSX.Element => (
-                    <Box
-                      ref={draggableProvided.innerRef}
-                      style={{ ...draggableProvided.draggableProps.style }}
-                      sx={{
-                        outline: 'none',
-                        py: 1.5,
-                      }}
-                      {...draggableProvided.draggableProps}
-                      {...draggableProvided.dragHandleProps}
-                    >
-                      <TaskCard
-                        key={taskId}
-                        dragging={snapshot.isDragging}
-                        onOpen={() => onTaskOpen?.(taskId)}
-                        taskId={taskId}
-                      />
-                    </Box>
-                  )}
-                </Draggable>
-              ))}
+              {
+                column?.taskIds &&
+                column?.taskIds.map((task: string, index: number) => (
+                  <Draggable
+                    key={task}
+                    draggableId={task}
+                    index={index}
+                  >
+                    {(draggableProvided, snapshot): JSX.Element => (
+                      <Box
+                        ref={draggableProvided.innerRef}
+                        style={{ ...draggableProvided.draggableProps.style }}
+                        sx={{
+                          outline: 'none',
+                          py: 1.5,
+                        }}
+                        {...draggableProvided.draggableProps}
+                        {...draggableProvided.dragHandleProps}
+                      >
+                        <TaskCard
+                          key={task}
+                          dragging={snapshot.isDragging}
+                          onOpen={() => onTaskOpen?.(task)}
+                          taskId={task}
+                        />
+                      </Box>
+                    )}
+                  </Draggable>
+                ))}
               {droppableProvider.placeholder}
             </Box>
           )}

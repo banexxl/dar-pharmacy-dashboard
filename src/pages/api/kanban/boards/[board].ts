@@ -6,11 +6,11 @@ import { NextApiRequest, NextApiResponse } from 'next';
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
      const kanbanService = KanbanService();
-     const { boardId } = req.query;
+
      try {
           switch (req.method) {
                case 'GET': { // Get a specific board
-                    const board = await kanbanService.getBoard(boardId as string);
+                    const board = await kanbanService.getBoard(req.query.board as string);
                     return res.status(200).json(board);
                }
                // case 'PUT': { // Update a specific board

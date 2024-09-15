@@ -1,6 +1,5 @@
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
-
 import type { Board, CheckItem, Checklist, Column, Comment, Member, Task } from 'src/schemas/kanban';
 import { objFromArray } from 'src/utils/obj-from-array';
 
@@ -19,6 +18,8 @@ interface KanbanState {
     allIds: string[];
   };
 }
+
+type AddBoardAction = PayloadAction<Board>;
 
 type GetBoardAction = PayloadAction<Board>;
 
@@ -69,29 +70,31 @@ const initialState: KanbanState = {
 };
 
 const reducers = {
+  addBoard(state: KanbanState, action: AddBoardAction): void {
+    const board = action.payload; // Assuming payload contains the full board data
+    state.columns.byId = objFromArray(board.columns);
+    state.columns.allIds = Object.keys(state.columns.byId);
+    state.members.byId = objFromArray(board.members);
+    state.members.allIds = Object.keys(state.members.byId);
+    state.isLoaded = true;
+  },
   getBoard(state: KanbanState, action: GetBoardAction): void {
-    console.log('usao u getBoard reducer', action.payload);
-
     const board = action.payload;
 
     state.columns.byId = objFromArray(board.columns);
     state.columns.allIds = Object.keys(state.columns.byId);
-    state.tasks.byId = objFromArray(board.tasks);
-    state.tasks.allIds = Object.keys(state.tasks.byId);
     state.members.byId = objFromArray(board.members);
     state.members.allIds = Object.keys(state.members.byId);
     state.isLoaded = true;
   },
   createColumn(state: KanbanState, action: CreateColumnAction): void {
-    const column = action.payload;
-
-    state.columns.byId[column._id] = column;
-    state.columns.allIds.push(column._id);
+    const column = action.payload; // Assuming payload contains the full column data
+    state.columns.byId[column._id.toString()] = column; // Adjust as per your schema, if `_id` is not correct
+    state.columns.allIds.push(column._id.toString());
   },
   updateColumn(state: KanbanState, action: UpdateColumnAction): void {
     const column = action.payload;
-
-    state.columns.byId[column._id] = column;
+    state.columns.byId[column._id!.toString()] = column;
   },
   clearColumn(state: KanbanState, action: ClearColumnAction): void {
     const columnId = action.payload;
@@ -118,16 +121,16 @@ const reducers = {
   createTask(state: KanbanState, action: CreateTaskAction): void {
     const task = action.payload;
 
-    state.tasks.byId[task._id] = task;
-    state.tasks.allIds.push(task._id);
+    state.tasks.byId[task._id.toString()] = task;
+    state.tasks.allIds.push(task._id.toString());
 
-    // Add the taskId reference to the column
-    state.columns.byId[task.columnId].taskIds.push(task._id);
+    // Add task to the column
+    state.columns.byId[task.columnId].taskIds.push(task._id.toString());
   },
   updateTask(state: KanbanState, action: UpdateTaskAction): void {
     const task = action.payload;
 
-    Object.assign(state.tasks.byId[task._id], task);
+    Object.assign(state.tasks.byId[task._id!.toString()], task);
   },
   moveTask(state: KanbanState, action: MoveTaskAction): void {
     const { taskId, position, columnId } = action.payload;
@@ -187,12 +190,12 @@ const reducers = {
     const { taskId, checklistId } = action.payload;
     const task = state.tasks.byId[taskId];
 
-    task.checklists = task.checklists.filter((checklist) => checklist._id !== checklistId);
+    task.checklists = task.checklists.filter((checklist) => checklist._id!.toString() !== checklistId);
   },
   addCheckItem(state: KanbanState, action: AddCheckItemAction): void {
     const { taskId, checklistId, checkItem } = action.payload;
     const task = state.tasks.byId[taskId];
-    const checklist = task.checklists.find((checklist) => checklist._id === checklistId);
+    const checklist = task.checklists.find((checklist) => checklist._id!.toString() === checklistId);
 
     if (!checklist) {
       return;
@@ -203,7 +206,7 @@ const reducers = {
   updateCheckItem(state: KanbanState, action: UpdateCheckItemAction): void {
     const { taskId, checklistId, checkItem } = action.payload;
     const task = state.tasks.byId[taskId];
-    const checklist = task.checklists.find((checklist) => checklist._id === checklistId);
+    const checklist = task.checklists.find((checklist) => checklist._id!.toString() === checklistId);
 
     if (!checklist) {
       return;
@@ -220,13 +223,13 @@ const reducers = {
   deleteCheckItem(state: KanbanState, action: DeleteCheckItemAction): void {
     const { taskId, checklistId, checkItemId } = action.payload;
     const task = state.tasks.byId[taskId];
-    const checklist = task.checklists.find((_checklist) => _checklist._id === checklistId);
+    const checklist = task.checklists.find((_checklist) => _checklist._id!.toString() === checklistId);
 
     if (!checklist) {
       return;
     }
 
-    checklist.checkItems = checklist.checkItems.filter((checkItem) => checkItem._id !== checkItemId);
+    checklist.checkItems = checklist.checkItems.filter((checkItem) => checkItem._id!.toString() !== checkItemId);
   },
 };
 

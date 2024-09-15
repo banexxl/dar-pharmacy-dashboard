@@ -8,6 +8,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           switch (req.method) {
                case 'POST': { // Create a new column
                     const { boardId, name } = req.body;
+
                     const newColumn = await KanbanService().createColumn(boardId, name);
                     return res.status(201).json(newColumn);
                }
