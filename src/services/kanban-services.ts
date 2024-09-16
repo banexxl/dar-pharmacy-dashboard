@@ -98,11 +98,18 @@ export const KanbanService = () => {
                     throw new Error('Board not found');
                }
 
-               // Step 2: Copy the board to 'Boards_history'
-               await db.collection('Boards_history').insertOne(board);
+               // Step 2: Create a new object for the history collection (with a new ID)
+               const { _id, ...boardDataWithoutId } = board; // Exclude the old _id field
 
-               // Step 3: Delete the board from 'Boards' after successful copy
-               const deleteResult = await db.collection('Boards').deleteOne({ id: new ObjectId(boardId) });
+               // Step 3: Insert the board into 'Boards_history' with a new ID
+               await db.collection('Boards_history').insertOne({
+                    ...boardDataWithoutId,
+                    originalBoardId: _id, // Keep track of the original board ID for reference
+                    movedToHistoryAt: new Date(), // Track when the board was moved to history
+               });
+
+               // Step 4: Delete the board from 'Boards' after successful copy
+               const deleteResult = await db.collection('Boards').deleteOne({ _id: new ObjectId(boardId) });
 
                return deleteResult;
           } catch (err) {
