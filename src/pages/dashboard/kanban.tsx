@@ -14,11 +14,11 @@ import { ColumnAdd } from '@/sections/kanban/column-add';
 import { ColumnCard } from '@/sections/kanban/column-card';
 import { thunks } from '@/thunks/kanban';
 import { KanbanService } from '@/services/kanban-services';
-import { Board } from '@/schemas/kanban';
+import { Board, Column } from '@/schemas/kanban';
 import { Button, Divider, Modal, TextField, Theme, useMediaQuery } from '@mui/material';
 import { indigo } from '@/theme/colors';
 import sweetalert2 from 'sweetalert2';
-import { useRouter } from 'next/router';
+import { createResourceId } from '@/utils/create-resource-id';
 
 const useColumnsIds = (): string[] => {
   const { columns } = useSelector((state: any) => state.kanban);
@@ -44,15 +44,24 @@ const useBoard = (boardId: string | null | undefined): void => {
 
 type PageProps = {
   boards: Board[];
+  columns: Column[];
+  tasks: string[];
 };
 
-const Page = ({ boards }: PageProps) => {
+const Page = ({ boards, columns, tasks }: PageProps) => {
+  console.log('page props', boards);
+  console.log('page props', columns);
+  console.log('page props', tasks);
+
+
   const dispatch = useDispatch();
   const columnsIds = useColumnsIds();
-  const router = useRouter();
+  console.log('columnsIds', columnsIds);
+
   const [currentTaskId, setCurrentTaskId] = useState<string | null>(null);
   const [selectedBoardId, setSelectedBoardId] = useState<string | null>();
   const [boardData, setBoardData] = useState<Board[]>(boards);
+  const [columnData, setColumnData] = useState<Column[]>(columns);
   // Fetch board data whenever the selected board changes
   useBoard(selectedBoardId);
 
@@ -94,7 +103,9 @@ const Page = ({ boards }: PageProps) => {
     [dispatch]
   );
 
-  const handleColumnAdd = useCallback(async (boardId: string, name?: string) => {
+  const handleColumnAdd = useCallback(async (boardId: string, name: string) => {
+    console.log('handleColumnAdd', boardId, name);
+
     const trimmedColumn = name?.trim(); // Corrected typo to 'trimmedColumn'
 
     if (!name || trimmedColumn === "") {  // Check for empty or whitespace-only names
@@ -106,8 +117,7 @@ const Page = ({ boards }: PageProps) => {
       });
     } else {
       try {
-        //dispatch(thunks.getBoard(boardId));
-        dispatch(thunks.createColumn({ name: name, boardId })); // Dispatch thunk to create column
+        dispatch(thunks.createColumn({ id: createResourceId(), boardId: boardId, name: name, taskIds: [] })); // Dispatch thunk to create column
       } catch (err: any) {
         sweetalert2.fire({
           icon: 'error',
@@ -249,6 +259,34 @@ const Page = ({ boards }: PageProps) => {
     }
   };
 
+  const handleDelete = async (boardId: string) => {
+    const result = await sweetalert2.fire({
+      title: 'Are you sure?',
+      text: "Do you really want to delete this board? This process cannot be undone.",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'No, keep it',
+    });
+
+    if (result.isConfirmed) {
+      try {
+        const res = await fetch(`/api/kanban/boards/${boardId}`, {
+          method: 'DELETE',
+        });
+
+        if (!res.ok) {
+          throw new Error('Failed to delete board');
+        }
+        setBoardData(boardData.filter((board) => board._id?.toString() !== boardId));
+
+        sweetalert2.fire('Deleted!', 'Your board has been deleted.', 'success');
+      } catch (error) {
+        sweetalert2.fire('Error', 'There was a problem deleting the board.', 'error');
+      }
+    }
+  };
+
   return (
     <>
       <Box
@@ -282,8 +320,17 @@ const Page = ({ boards }: PageProps) => {
                 Očisti izbor
               </MenuItem>
               {boardData.map((board: Board) => (
-                <MenuItem key={board._id.toString()} value={board._id!.toString()}>
+                <MenuItem key={board._id!.toString()} value={board._id!.toString()} sx={{ display: 'flex', justifyContent: 'space-between' }}>
                   {board.title}
+                  <Button
+                    variant="contained"
+                    color="error"
+                    size="small"
+                    onClick={() => handleDelete(board._id!.toString())}
+                    style={{ marginLeft: '10px' }}
+                  >
+                    Delete
+                  </Button>
                 </MenuItem>
               ))}
             </TextField>
@@ -374,15 +421,19 @@ export default Page;
 
 export const getServerSideProps = async () => {
   const boards = await KanbanService().getAllBoards();
+  const columns = boards.flatMap((board: Board) => board.columns);
+  const tasks = columns.flatMap((column: Column) => column.taskIds);
 
   const serializedBoards = boards.map((board: Board) => ({
     ...board,
-    _id: board._id.toString(),  // Convert ObjectId to string
+    _id: board._id!.toString(),  // Convert ObjectId to string
   }));
 
   return {
     props: {
       boards: serializedBoards || [],
+      columns: columns || [],
+      tasks: tasks || [],
     },
   };
 };

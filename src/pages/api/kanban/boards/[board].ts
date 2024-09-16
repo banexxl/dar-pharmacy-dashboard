@@ -18,10 +18,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                //      const updatedBoard = await kanbanService.updateBoard(boardId as string, update);
                //      return res.status(200).json(updatedBoard);
                // }
-               // case 'DELETE': { // Delete a specific board
-               //      await kanbanService.deleteBoard(boardId as string);
-               //      return res.status(204).end();
-               // }
+               case 'DELETE': { // Delete a specific board
+                    await kanbanService.deleteBoard(req.query.board as string);
+                    return res.status(204).end();
+               }
                default:
                     res.setHeader('Allow', ['GET', 'PUT', 'DELETE']);
                     return res.status(405).end(`Method ${req.method} Not Allowed`);

@@ -17,6 +17,8 @@ const getBoard = (boardId: string): AppThunk => async (dispatch): Promise<void> 
 };
 
 type CreateColumnParams = {
+  id: string;
+  taskIds: string[];
   name: string;
   boardId: string;
 };
@@ -34,7 +36,9 @@ export const createColumn = (params: CreateColumnParams): AppThunk => async (dis
       throw new Error('Failed to create column');
     } else {
       const data = await response.json();
-      dispatch(slice.actions.createColumn(data))
+      console.log('data', data);
+
+      dispatch(slice.actions.createColumn({ ...params, id: data.columnInsertResult.insertedId }));
       sweetalert2.fire({
         icon: 'success',
         title: 'Uspešno dodata kolona',

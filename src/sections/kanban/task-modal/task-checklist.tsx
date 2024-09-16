@@ -209,18 +209,18 @@ export const TaskChecklist: FC<TaskChecklistProps> = (props) => {
             spacing={1}
           >
             {checklist.checkItems.map((checkItem) => {
-              const isRenaming = checkItemId === checkItem._id!.toString();
+              const isRenaming = checkItemId === checkItem.id!.toString();
 
               return (
                 <TaskCheckItem
-                  key={checkItem._id!.toString()}
+                  key={checkItem.id!.toString()}
                   checkItem={checkItem}
-                  onCheck={() => onCheckItemCheck?.(checkItem._id!.toString())}
-                  onDelete={() => onCheckItemDelete?.(checkItem._id!.toString())}
+                  onCheck={() => onCheckItemCheck?.(checkItem.id!.toString())}
+                  onDelete={() => onCheckItemDelete?.(checkItem.id!.toString())}
                   onRenameCancel={handleCheckItemRenameCancel}
-                  onRenameComplete={(name) => handleCheckItemRenameComplete(checkItem._id!.toString(), name)}
-                  onRenameInit={() => handleCheckItemRenameInit(checkItem._id!.toString())}
-                  onUncheck={() => onCheckItemUncheck?.(checkItem._id!.toString())}
+                  onRenameComplete={(name) => handleCheckItemRenameComplete(checkItem.id!.toString(), name)}
+                  onRenameInit={() => handleCheckItemRenameInit(checkItem.id!.toString())}
+                  onUncheck={() => onCheckItemUncheck?.(checkItem.id!.toString())}
                   isRenaming={isRenaming}
                 />
               );

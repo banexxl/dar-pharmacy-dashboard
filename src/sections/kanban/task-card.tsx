@@ -35,7 +35,7 @@ const useAssignees = (assignees?: Member[]): Member[] => {
     }
 
     return assignees
-      .map((assignee: Member) => members.byId[assignee._id.toString()])
+      .map((assignee: Member) => members.byId[assignee.id!.toString()])
       .filter((assignee) => !!assignee);
   });
 };
@@ -153,7 +153,7 @@ export const TaskCard = forwardRef<HTMLDivElement, TaskCardProps>(function TaskC
           <AvatarGroup max={3}>
             {assignees.map((assignee) => (
               <Avatar
-                key={assignee._id.toString()}
+                key={assignee.id!.toString()}
                 src={assignee.avatar || undefined}
               />
             ))}
