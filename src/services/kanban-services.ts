@@ -7,7 +7,7 @@ const db = client.db('KANBAN_DB');
 const boardCollection = db.collection('Boards');
 
 const isBoard = (obj: any): obj is Board => {
-     return obj && typeof obj.id === 'object' && typeof obj.title === 'string';
+     return obj && typeof obj._id === 'object' && typeof obj.title === 'string';
 }
 
 
@@ -37,22 +37,24 @@ export const KanbanService = () => {
      };
 
      const getBoard = async (boardId: string): Promise<Board | null> => {
+
           const client = new MongoClient(process.env.MONGODB_URI!);
 
           try {
                const db = client.db('KANBAN_DB');
 
                // Fetch the board by its ID
-               const boardResult = await db.collection('Boards').findOne({ id: new ObjectId(boardId) });
+               const boardResult = await db.collection('Boards').findOne({ _id: new ObjectId(boardId) });
 
                if (!boardResult) return null; // Return null if no board is found
                //check type of boardResult
-               if (!boardResult || typeof boardResult.id === 'undefined' || typeof boardResult.title !== 'string') {
+               if (!boardResult || typeof boardResult._id === 'undefined' || typeof boardResult.title !== 'string') {
                     throw new Error('Board not found');
                }
                if (!isBoard(boardResult)) {
                     throw new Error('Object not of type Board');
                }
+               console.log('boardResult', boardResult);
 
                return boardResult as Board; // Return the board object
           } catch (err) {
@@ -129,7 +131,7 @@ export const KanbanService = () => {
                await client.connect(); // Connect to the database
 
                // Check if the board exists
-               const board = await boardCollection.findOne({ id: new ObjectId(boardId) });
+               const board = await boardCollection.findOne({ _id: new ObjectId(boardId) });
 
                if (!board) {
                     throw new Error('Board not found'); // Throw an error if the board is not found
@@ -137,7 +139,7 @@ export const KanbanService = () => {
 
                // Step 2: Update the board to include the full column object
                const boardUpdateResult = await boardCollection.updateOne(
-                    { id: new ObjectId(boardId) },
+                    { _id: new ObjectId(boardId) },
                     {
                          $push: {
                               columns: {
@@ -148,6 +150,7 @@ export const KanbanService = () => {
                          } as any
                     } // Push the full column object to the board
                );
+               console.log('boardUpdateResult', boardUpdateResult);
 
                return { boardUpdateResult }; // Return both results for reference
 

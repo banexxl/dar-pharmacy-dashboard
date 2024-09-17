@@ -10,6 +10,8 @@ const getBoard = (boardId: string): AppThunk => async (dispatch): Promise<void> 
       method: 'GET',
     });
     const data = await response.json();
+    console.log('data', data);
+
     dispatch(slice.actions.getBoard(data)); // Dispatch the entire board object, not just the boardId
   } catch (error) {
     console.error('Failed to fetch board:', error);
@@ -35,10 +37,7 @@ export const createColumn = (params: CreateColumnParams): AppThunk => async (dis
     if (!response.ok) {
       throw new Error('Failed to create column');
     } else {
-      const data = await response.json();
-      console.log('data', data);
-
-      dispatch(slice.actions.createColumn({ ...params, id: data.columnInsertResult.insertedId }));
+      dispatch(slice.actions.createColumn({ ...params }));
       sweetalert2.fire({
         icon: 'success',
         title: 'Uspešno dodata kolona',
@@ -89,70 +88,68 @@ type DeleteColumnParams = {
   columnId: string;
 };
 
-const deleteColumn =
-  (params: DeleteColumnParams): AppThunk =>
-    async (dispatch: any): Promise<void> => {
-      await fetch(`api/kanban/columns/${params.columnId}`, {
-        method: 'DELETE',
-      });
+const deleteColumn = (params: DeleteColumnParams): AppThunk =>
+  async (dispatch: any): Promise<void> => {
+    await fetch(`api/kanban/columns/${params.columnId}`, {
+      method: 'DELETE',
+    });
 
-      dispatch(slice.actions.deleteColumn(params.columnId));
-    };
+    dispatch(slice.actions.deleteColumn(params.columnId));
+  };
 
 type CreateTaskParams = {
   columnId: string;
   name: string;
 };
 
-const createTask =
-  (params: CreateTaskParams): AppThunk =>
-    async (dispatch: any): Promise<void> => {
-      try {
-        // Fetch the session to get the authenticated user
-        const session = await getSession();
+const createTask = (params: CreateTaskParams): AppThunk =>
+  async (dispatch: any): Promise<void> => {
+    try {
+      // Fetch the session to get the authenticated user
+      const session = await getSession();
 
-        if (!session) {
-          throw new Error('User not authenticated');
-        }
-
-        // Add userId to the task request body
-        const requestBody = {
-          columnId: params.columnId,
-          name: params.name,
-          userId: session.user?.name, // Authenticated user's ID from NextAuth session
-        };
-
-        const response = await fetch(`/api/kanban/tasks`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(requestBody),
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to create task');
-        }
-
-        const data = await response.json();
-
-        // Dispatch the createTask action to update Redux store
-        dispatch(slice.actions.createTask(data));
-
-        // Show success alert
-        sweetalert2.fire({
-          icon: 'success',
-          title: 'Task successfully created',
-          allowEscapeKey: true,
-          allowOutsideClick: true,
-        });
-      } catch (error: any) {
-        console.error('Error while creating task:', error);
-        sweetalert2.fire({
-          icon: 'error',
-          title: 'Failed to create task',
-          text: error.toString(),
-        });
+      if (!session) {
+        throw new Error('User not authenticated');
       }
-    };
+
+      // Add userId to the task request body
+      const requestBody = {
+        columnId: params.columnId,
+        name: params.name,
+        userId: session.user?.name, // Authenticated user's ID from NextAuth session
+      };
+
+      const response = await fetch(`/api/kanban/tasks`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create task');
+      }
+
+      const data = await response.json();
+
+      // Dispatch the createTask action to update Redux store
+      dispatch(slice.actions.createTask(data));
+
+      // Show success alert
+      sweetalert2.fire({
+        icon: 'success',
+        title: 'Task successfully created',
+        allowEscapeKey: true,
+        allowOutsideClick: true,
+      });
+    } catch (error: any) {
+      console.error('Error while creating task:', error);
+      sweetalert2.fire({
+        icon: 'error',
+        title: 'Failed to create task',
+        text: error.toString(),
+      });
+    }
+  };
 
 type UpdateTaskParams = {
   taskId: string;
@@ -164,18 +161,17 @@ type UpdateTaskParams = {
   };
 };
 
-const updateTask =
-  (params: UpdateTaskParams): AppThunk =>
-    async (dispatch: any): Promise<void> => {
-      const response = await fetch(`api/kanban/tasks/${params.taskId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(params.update),
-      });
-      const data = await response.json();
+const updateTask = (params: UpdateTaskParams): AppThunk =>
+  async (dispatch: any): Promise<void> => {
+    const response = await fetch(`api/kanban/tasks/${params.taskId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params.update),
+    });
+    const data = await response.json();
 
-      dispatch(slice.actions.updateTask(data));
-    };
+    dispatch(slice.actions.updateTask(data));
+  };
 
 type MoveTaskParams = {
   taskId: string;
@@ -183,77 +179,73 @@ type MoveTaskParams = {
   columnId?: string;
 };
 
-const moveTask =
-  (params: MoveTaskParams): AppThunk =>
-    async (dispatch: any): Promise<void> => {
-      await fetch(`api/kanban/tasks/${params.taskId}/move`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(params),
-      });
+const moveTask = (params: MoveTaskParams): AppThunk =>
+  async (dispatch: any): Promise<void> => {
+    await fetch(`api/kanban/tasks/${params.taskId}/move`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params),
+    });
 
-      dispatch(slice.actions.moveTask(params));
-    };
+    dispatch(slice.actions.moveTask(params));
+  };
 
 type DeleteTaskParams = {
   taskId: string;
 };
 
-const deleteTask =
-  (params: DeleteTaskParams): AppThunk =>
-    async (dispatch: any): Promise<void> => {
-      await fetch(`api/kanban/tasks/${params.taskId}`, {
-        method: 'DELETE',
-      });
+const deleteTask = (params: DeleteTaskParams): AppThunk =>
+  async (dispatch: any): Promise<void> => {
+    await fetch(`api/kanban/tasks/${params.taskId}`, {
+      method: 'DELETE',
+    });
 
-      dispatch(slice.actions.deleteTask(params.taskId));
-    };
+    dispatch(slice.actions.deleteTask(params.taskId));
+  };
 
 type AddCommentParams = {
   taskId: string;
   message: string;
 };
 
-const addComment =
-  (params: AddCommentParams): AppThunk =>
-    async (dispatch: any): Promise<void> => {
-      const response = await fetch(`api/kanban/comments`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(params),
-      });
-      const data = await response.json();
+const addComment = (params: AddCommentParams): AppThunk =>
+  async (dispatch: any): Promise<void> => {
+    const response = await fetch(`api/kanban/comments`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params),
+    });
+    const data = await response.json();
 
-      dispatch(
-        slice.actions.addComment({
-          taskId: params.taskId,
-          comment: data,
-        })
-      );
-    };
+    dispatch(
+      slice.actions.addComment({
+        taskId: params.taskId,
+        comment: data,
+      })
+    );
+  };
 
 type AddCheckListParams = {
   taskId: string;
   name: string;
 };
 
-const addChecklist =
-  (params: AddCheckListParams): AppThunk =>
-    async (dispatch: any): Promise<void> => {
-      const response = await fetch(`api/kanban/checklists`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(params),
-      });
-      const data = await response.json();
+const addChecklist = (params: AddCheckListParams): AppThunk =>
+  async (dispatch: any): Promise<void> => {
+    const response = await fetch(`api/kanban/checklists`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params),
+    });
+    const data = await response.json();
 
-      dispatch(
-        slice.actions.addChecklist({
-          taskId: params.taskId,
-          checklist: data,
-        })
-      );
-    };
+    dispatch(
+      slice.actions.addChecklist({
+        taskId: params.taskId,
+        checklist: data,
+      })
+    );
+  };
 
 type UpdateChecklistParams = {
   taskId: string;
@@ -261,38 +253,36 @@ type UpdateChecklistParams = {
   update: { name: string };
 };
 
-const updateChecklist =
-  (params: UpdateChecklistParams): AppThunk =>
-    async (dispatch: any): Promise<void> => {
-      const response = await fetch(`api/kanban/checklists/${params.checklistId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(params.update),
-      });
-      const data = await response.json();
+const updateChecklist = (params: UpdateChecklistParams): AppThunk =>
+  async (dispatch: any): Promise<void> => {
+    const response = await fetch(`api/kanban/checklists/${params.checklistId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params.update),
+    });
+    const data = await response.json();
 
-      dispatch(
-        slice.actions.updateChecklist({
-          taskId: params.taskId,
-          checklist: data,
-        })
-      );
-    };
+    dispatch(
+      slice.actions.updateChecklist({
+        taskId: params.taskId,
+        checklist: data,
+      })
+    );
+  };
 
 type DeleteChecklistParams = {
   taskId: string;
   checklistId: string;
 };
 
-const deleteChecklist =
-  (params: DeleteChecklistParams): AppThunk =>
-    async (dispatch: any): Promise<void> => {
-      await fetch(`api/kanban/checklists/${params.checklistId}`, {
-        method: 'DELETE',
-      });
+const deleteChecklist = (params: DeleteChecklistParams): AppThunk =>
+  async (dispatch: any): Promise<void> => {
+    await fetch(`api/kanban/checklists/${params.checklistId}`, {
+      method: 'DELETE',
+    });
 
-      dispatch(slice.actions.deleteChecklist(params));
-    };
+    dispatch(slice.actions.deleteChecklist(params));
+  };
 
 type AddCheckItemParams = {
   taskId: string;
@@ -300,24 +290,23 @@ type AddCheckItemParams = {
   name: string;
 };
 
-const addCheckItem =
-  (params: AddCheckItemParams): AppThunk =>
-    async (dispatch: any): Promise<void> => {
-      const response = await fetch(`api/kanban/checkitems`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(params),
-      });
-      const data = await response.json();
+const addCheckItem = (params: AddCheckItemParams): AppThunk =>
+  async (dispatch: any): Promise<void> => {
+    const response = await fetch(`api/kanban/checkitems`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params),
+    });
+    const data = await response.json();
 
-      dispatch(
-        slice.actions.addCheckItem({
-          taskId: params.taskId,
-          checklistId: params.checklistId,
-          checkItem: data,
-        })
-      );
-    };
+    dispatch(
+      slice.actions.addCheckItem({
+        taskId: params.taskId,
+        checklistId: params.checklistId,
+        checkItem: data,
+      })
+    );
+  };
 
 type UpdateCheckItemParams = {
   taskId: string;
@@ -329,24 +318,23 @@ type UpdateCheckItemParams = {
   };
 };
 
-const updateCheckItem =
-  (params: UpdateCheckItemParams): AppThunk =>
-    async (dispatch: any): Promise<void> => {
-      const response = await fetch(`api/kanban/checkitems/${params.checkItemId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(params.update),
-      });
-      const data = await response.json();
+const updateCheckItem = (params: UpdateCheckItemParams): AppThunk =>
+  async (dispatch: any): Promise<void> => {
+    const response = await fetch(`api/kanban/checkitems/${params.checkItemId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params.update),
+    });
+    const data = await response.json();
 
-      dispatch(
-        slice.actions.updateCheckItem({
-          taskId: params.taskId,
-          checklistId: params.checklistId,
-          checkItem: data,
-        })
-      );
-    };
+    dispatch(
+      slice.actions.updateCheckItem({
+        taskId: params.taskId,
+        checklistId: params.checklistId,
+        checkItem: data,
+      })
+    );
+  };
 
 type DeleteCheckItemParams = {
   taskId: string;
@@ -354,15 +342,14 @@ type DeleteCheckItemParams = {
   checkItemId: string;
 };
 
-const deleteCheckItem =
-  (params: DeleteCheckItemParams): AppThunk =>
-    async (dispatch: any): Promise<void> => {
-      await fetch(`api/kanban/checkitems/${params.checkItemId}`, {
-        method: 'DELETE',
-      });
+const deleteCheckItem = (params: DeleteCheckItemParams): AppThunk =>
+  async (dispatch: any): Promise<void> => {
+    await fetch(`api/kanban/checkitems/${params.checkItemId}`, {
+      method: 'DELETE',
+    });
 
-      dispatch(slice.actions.deleteCheckItem(params));
-    };
+    dispatch(slice.actions.deleteCheckItem(params));
+  };
 
 export const thunks = {
   addCheckItem,

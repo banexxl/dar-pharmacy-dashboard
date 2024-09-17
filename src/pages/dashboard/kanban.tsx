@@ -27,6 +27,7 @@ const useColumnsIds = (): string[] => {
 
 const useBoard = (boardId: string | null | undefined): void => {
   const dispatch = useDispatch();
+
   const handleBoardGet = useCallback((boardId: string): void => {
     if (boardId) {
       dispatch(thunks.getBoard(boardId));
@@ -316,9 +317,11 @@ const Page = ({ boards, columns, tasks }: PageProps) => {
               onChange={handleBoardChange}
               label="Izaberi tablu"
             >
+
               <MenuItem key="clear" value="" onSelect={() => setSelectedBoardId(null)}>
                 Očisti izbor
               </MenuItem>
+
               {boardData.map((board: Board) => (
                 <MenuItem key={board._id!.toString()} value={board._id!.toString()} sx={{ display: 'flex', justifyContent: 'space-between' }}>
                   {board.title}
