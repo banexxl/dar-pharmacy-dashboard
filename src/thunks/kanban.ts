@@ -1,4 +1,5 @@
 import { pushAlert } from '@/components/push-notifications';
+import { Member } from '@/schemas/kanban';
 import { getSession } from 'next-auth/react';
 import { slice } from 'src/slices/kanban';
 import type { AppThunk } from 'src/store';
@@ -113,25 +114,21 @@ const deleteColumn = (params: DeleteColumnParams): AppThunk =>
   };
 
 type CreateTaskParams = {
+  boardId: string;
   columnId: string;
   name: string;
+  createdBy: string;
 };
 
 const createTask = (params: CreateTaskParams): AppThunk =>
   async (dispatch: any): Promise<void> => {
     try {
-      // Fetch the session to get the authenticated user
-      const session = await getSession();
-
-      if (!session) {
-        throw new Error('User not authenticated');
-      }
-
       // Add userId to the task request body
       const requestBody = {
+        boardId: params.boardId,
         columnId: params.columnId,
         name: params.name,
-        userId: session.user?.name, // Authenticated user's ID from NextAuth session
+        createdBy: params.createdBy, // Authenticated user's ID from NextAuth session
       };
 
       const response = await fetch(`/api/kanban/tasks`, {
@@ -144,10 +141,8 @@ const createTask = (params: CreateTaskParams): AppThunk =>
         throw new Error('Failed to create task');
       }
 
-      const data = await response.json();
-
       // Dispatch the createTask action to update Redux store
-      dispatch(slice.actions.createTask(data));
+      dispatch(slice.actions.createTask(await response.json()));
 
       // Show success alert
       sweetalert2.fire({

@@ -28,8 +28,8 @@ export interface Comment {
 
 export interface Task {
   id?: string;
-  author: Member;
-  assignees: Member[];
+  createdBy: string;
+  assignedTo: Member[];
   attachments: Attachment[];
   checklists: Checklist[];
   columnId: string;
@@ -50,8 +50,10 @@ export interface Column {
 }
 
 export interface Member {
-  id?: string;
+  _id?: string;
   avatar: string | null;
+  email: string;
+  role: 'admin' | 'user';
   name: string;
 }
 

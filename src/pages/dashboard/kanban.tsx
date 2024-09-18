@@ -14,11 +14,12 @@ import { ColumnAdd } from '@/sections/kanban/column-add';
 import { ColumnCard } from '@/sections/kanban/column-card';
 import { thunks } from '@/thunks/kanban';
 import { KanbanService } from '@/services/kanban-services';
-import { Board, Column } from '@/schemas/kanban';
+import { Board, Column, Member, Task } from '@/schemas/kanban';
 import { Button, Divider, Modal, TextField, Theme, useMediaQuery } from '@mui/material';
 import { indigo } from '@/theme/colors';
 import sweetalert2 from 'sweetalert2';
 import { createResourceId } from '@/utils/create-resource-id';
+import { useSession } from 'next-auth/react';
 
 
 const useColumnsIds = (): string[] => {
@@ -57,6 +58,7 @@ const Page = ({ boards, columns, tasks }: PageProps) => {
   const [currentTaskId, setCurrentTaskId] = useState<string | null>(null);
   const [selectedBoardId, setSelectedBoardId] = useState<string | null>();
   const [boardData, setBoardData] = useState<Board[]>(boards);
+  const session = useSession();
   // Fetch board data whenever the selected board changes
   useBoard(selectedBoardId);
 
@@ -168,12 +170,16 @@ const Page = ({ boards, columns, tasks }: PageProps) => {
     [dispatch]
   );
 
-  const handleTaskAdd = useCallback(async (columnId: string, name?: string): Promise<void> => {
+  const handleTaskAdd = useCallback(async (boardId: string, columnId: string, name: string, createdBy: string): Promise<void> => {
+    console.log('page function handleTaskAdd', boardId, columnId, name, createdBy);
+
     try {
       await dispatch(
         thunks.createTask({
+          boardId,
           columnId,
-          name: name || 'Untitled Task',
+          name,
+          createdBy
         })
       );
     } catch (err) {
@@ -381,7 +387,7 @@ const Page = ({ boards, columns, tasks }: PageProps) => {
                       onClear={() => handleColumnClear(columnId)}
                       onDelete={() => handleColumnDelete(columnId)}
                       onRename={(name) => handleColumnRename(selectedBoardId, columnId, name)}
-                      onTaskAdd={(name) => handleTaskAdd(columnId, name)}
+                      onTaskAdd={(name) => handleTaskAdd(selectedBoardId, columnId, name!, session.data!.user!.name!)}
                       onTaskOpen={handleTaskOpen}
                     />
                   ))}

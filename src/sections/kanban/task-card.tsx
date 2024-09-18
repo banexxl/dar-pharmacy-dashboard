@@ -26,16 +26,16 @@ const useTask = (taskId: string): Task | undefined => {
   });
 };
 
-const useAssignees = (assignees?: Member[]): Member[] => {
+const useAssignees = (assignedTo?: Member[]): Member[] => {
   return useSelector((state: RootState) => {
     const { members } = state.kanban;
 
-    if (!assignees) {
+    if (!assignedTo) {
       return [];
     }
 
-    return assignees
-      .map((assignee: Member) => members.byId[assignee.id!.toString()])
+    return assignedTo
+      .map((assignee: Member) => members.byId[assignee._id!.toString()])
       .filter((assignee) => !!assignee);
   });
 };
@@ -49,13 +49,13 @@ interface TaskCardProps {
 export const TaskCard = forwardRef<HTMLDivElement, TaskCardProps>(function TaskCard(props, ref) {
   const { taskId, dragging = false, onOpen, ...other } = props;
   const task = useTask(taskId);
-  const assignees = useAssignees(task?.assignees);
+  const assignedTo = useAssignees(task?.assignedTo);
 
   if (!task) {
     return null;
   }
 
-  const hasAssignees = task.assignees.length > 0;
+  const hasAssignees = task.assignedTo.length > 0;
   const hasAttachments = task.attachments.length > 0;
   const hasChecklists = task.checklists.length > 0;
   const hasComments = task.comments.length > 0;
@@ -151,9 +151,9 @@ export const TaskCard = forwardRef<HTMLDivElement, TaskCardProps>(function TaskC
         </Stack>
         {hasAssignees && (
           <AvatarGroup max={3}>
-            {assignees.map((assignee) => (
+            {assignedTo.map((assignee) => (
               <Avatar
-                key={assignee.id!.toString()}
+                key={assignee._id!.toString()}
                 src={assignee.avatar || undefined}
               />
             ))}

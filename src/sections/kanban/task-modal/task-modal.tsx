@@ -109,7 +109,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
   const task = useTask(taskId);
   const column = useColumn(task?.columnId);
   const author = useAuthor(task?.author.id!.toString());
-  const assignees = useAssignees(task?.assignees.map((assignee) => assignee.id!.toString()) || []);
+  const assignedTo = useAssignees(task?.assignedTo.map((assignee) => assignee.id!.toString()) || []);
   const mdUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
   const [currentTab, setCurrentTab] = useState<string>('overview');
   const [nameCopy, setNameCopy] = useState<string>(task?.name || '');
@@ -620,7 +620,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
                   spacing={1}
                 >
                   <AvatarGroup max={5}>
-                    {assignees.map((assignee) => (
+                    {assignedTo.map((assignee) => (
                       <Avatar
                         key={assignee.id!.toString()}
                         src={assignee.avatar || undefined}

@@ -291,8 +291,8 @@ export const KanbanService = () => {
                // Manually map the MongoDB document to your Task interface
                const task: Task = {
                     id: result._id.toString(), // Convert ObjectId to string
-                    author: result.author, // Assuming these fields exist in the DB
-                    assignees: result.assignees,
+                    createdBy: result.author, // Assuming these fields exist in the DB
+                    assignedTo: result.assignedTo,
                     attachments: result.attachments,
                     checklists: result.checklists,
                     columnId: result.columnId,
@@ -313,7 +313,9 @@ export const KanbanService = () => {
           }
      };
 
-     const createTask = async (boardId: string, columnId: string, name: string, author: Member): Promise<Task> => {
+     const createTask = async (boardId: string, columnId: string, name: string, createdBy: string): Promise<any> => {
+          console.log('createTask', boardId, columnId, name, createdBy);
+
           const client = new MongoClient(process.env.MONGODB_URI!);
           const db = client.db('KANBAN_DB');
           const boardCollection = db.collection('Boards');
@@ -322,7 +324,7 @@ export const KanbanService = () => {
                await client.connect();
 
                // Find the board by ID
-               const board = await boardCollection.findOne({ id: new ObjectId(boardId) });
+               const board = await boardCollection.findOne({ _id: new ObjectId(boardId) });
                if (!board) throw new Error('Board not found');
 
                // Find the column in the board
@@ -332,9 +334,9 @@ export const KanbanService = () => {
                // Create the task object (without manually assigning id)
                const task: Task = {
                     id: createResourceId(),
-                    assignees: [],
+                    assignedTo: [],
                     attachments: [],
-                    author: author,
+                    createdBy: createdBy,
                     checklists: [],
                     columnId,
                     comments: [],
@@ -347,7 +349,7 @@ export const KanbanService = () => {
 
                // Update the board to add the new task and associate it with the column
                await boardCollection.updateOne(
-                    { id: new ObjectId(boardId) },
+                    { _id: new ObjectId(boardId) },
                     {
                          $push: { tasks: task } as any,  // Add the task to the board's tasks array
                          $addToSet: { 'columns.$[column].taskIds': task.id! }  // Add the task ID to the column's taskIds
