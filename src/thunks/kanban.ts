@@ -58,15 +58,11 @@ type UpdateColumnParams = {
 
 const updateColumn = (params: UpdateColumnParams): AppThunk =>
   async (dispatch: any): Promise<void> => {
-    console.log('thunk updateColumn', params);
-
     const response = await fetch(`/api/kanban/columns/${params.columnId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(params),
     });
-    const data = await response.json();
-    console.log('data', data);
     if (!response.ok) {
       sweetalert2.fire({
         icon: 'error',

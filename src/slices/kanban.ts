@@ -93,9 +93,6 @@ const reducers = {
     state.columns.allIds.push(column.id!);
   },
   updateColumn(state: KanbanState, action: UpdateColumnAction): void {
-    console.log('updateColumn', action.payload);
-    console.log('state', state);
-
     const column = action.payload;
     state.columns.byId[column.id!.toString()] = column;
   },

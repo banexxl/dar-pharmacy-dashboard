@@ -54,8 +54,6 @@ export const KanbanService = () => {
                if (!isBoard(boardResult)) {
                     throw new Error('Object not of type Board');
                }
-               console.log('boardResult', boardResult);
-
                return boardResult as Board; // Return the board object
           } catch (err) {
                console.error('Failed to fetch board:', err);
@@ -171,8 +169,6 @@ export const KanbanService = () => {
                          } as any
                     } // Push the full column object to the board
                );
-               console.log('boardUpdateResult', boardUpdateResult);
-
                return { boardUpdateResult }; // Return both results for reference
 
           } catch (err) {
@@ -184,10 +180,6 @@ export const KanbanService = () => {
      };
 
      const updateColumn = async (boardId: string, columnId: string, name: string): Promise<Column> => {
-          console.log('boardId', boardId);
-          console.log('columnId', columnId);
-          console.log('new name', name);
-
           try {
                await client.connect();
                const boardCollection = db.collection('Boards'); // Assuming you have the db object defined elsewhere
@@ -197,8 +189,6 @@ export const KanbanService = () => {
                     { $set: { 'columns.$.name': name } }, // Update only the matched column's name
                     { returnDocument: 'after' } // Return the updated document after the operation
                );
-
-               console.log('result', result);
 
                if (!result) throw new Error('Column not found');
 
