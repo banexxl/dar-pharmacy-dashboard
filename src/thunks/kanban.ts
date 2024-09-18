@@ -1,3 +1,4 @@
+import { pushAlert } from '@/components/push-notifications';
 import { getSession } from 'next-auth/react';
 import { slice } from 'src/slices/kanban';
 import type { AppThunk } from 'src/store';
@@ -10,8 +11,6 @@ const getBoard = (boardId: string): AppThunk => async (dispatch): Promise<void> 
       method: 'GET',
     });
     const data = await response.json();
-    console.log('data', data);
-
     dispatch(slice.actions.getBoard(data)); // Dispatch the entire board object, not just the boardId
   } catch (error) {
     console.error('Failed to fetch board:', error);
@@ -52,23 +51,43 @@ export const createColumn = (params: CreateColumnParams): AppThunk => async (dis
 
 type UpdateColumnParams = {
   columnId: string;
-  update: {
-    name: string;
-  };
+  boardId: string
+  name: string;
+  taskIds: string[];
 };
 
-const updateColumn =
-  (params: UpdateColumnParams): AppThunk =>
-    async (dispatch: any): Promise<void> => {
-      const response = await fetch(`api/kanban/columns/${params.columnId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(params.update),
-      });
-      const data = await response.json();
+const updateColumn = (params: UpdateColumnParams): AppThunk =>
+  async (dispatch: any): Promise<void> => {
+    console.log('thunk updateColumn', params);
 
-      dispatch(slice.actions.updateColumn(data));
-    };
+    const response = await fetch(`/api/kanban/columns/${params.columnId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params),
+    });
+    const data = await response.json();
+    console.log('data', data);
+    if (!response.ok) {
+      sweetalert2.fire({
+        icon: 'error',
+        title: 'Failed to update column',
+        allowEscapeKey: true,
+        allowOutsideClick: true,
+      })
+    }
+    dispatch(slice.actions.updateColumn({
+      id: params.columnId,
+      boardId: params.boardId,
+      name: params.name,
+      taskIds: params.taskIds
+    }));
+    sweetalert2.fire({
+      icon: 'success',
+      title: 'Uspešno ažurirana kolona',
+      allowEscapeKey: true,
+      allowOutsideClick: true,
+    })
+  };
 
 type ClearColumnParams = {
   columnId: string;

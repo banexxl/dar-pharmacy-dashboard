@@ -11,6 +11,8 @@ import { TaskCard } from '../task-card';
 import { ColumnHeader } from './column-header';
 
 const useColumn = (columnId: string): Column | undefined => {
+  console.log('useColumn', columnId);
+
   return useSelector((state) => {
     const { columns } = state.kanban;
 
@@ -35,7 +37,7 @@ export const ColumnCard: FC<ColumnCardProps> = (props) => {
     return null;
   }
 
-  const tasksCount = column.taskIds?.length;
+  const tasksCount = column.taskIds.length;
 
   return (
     <Box

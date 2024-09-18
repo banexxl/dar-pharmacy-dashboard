@@ -20,6 +20,7 @@ import { indigo } from '@/theme/colors';
 import sweetalert2 from 'sweetalert2';
 import { createResourceId } from '@/utils/create-resource-id';
 
+
 const useColumnsIds = (): string[] => {
   const { columns } = useSelector((state: any) => state.kanban);
   return columns.allIds;
@@ -50,19 +51,12 @@ type PageProps = {
 };
 
 const Page = ({ boards, columns, tasks }: PageProps) => {
-  console.log('page props', boards);
-  console.log('page props', columns);
-  console.log('page props', tasks);
-
 
   const dispatch = useDispatch();
   const columnsIds = useColumnsIds();
-  console.log('columnsIds', columnsIds);
-
   const [currentTaskId, setCurrentTaskId] = useState<string | null>(null);
   const [selectedBoardId, setSelectedBoardId] = useState<string | null>();
   const [boardData, setBoardData] = useState<Board[]>(boards);
-  const [columnData, setColumnData] = useState<Column[]>(columns);
   // Fetch board data whenever the selected board changes
   useBoard(selectedBoardId);
 
@@ -105,8 +99,6 @@ const Page = ({ boards, columns, tasks }: PageProps) => {
   );
 
   const handleColumnAdd = useCallback(async (boardId: string, name: string) => {
-    console.log('handleColumnAdd', boardId, name);
-
     const trimmedColumn = name?.trim(); // Corrected typo to 'trimmedColumn'
 
     if (!name || trimmedColumn === "") {  // Check for empty or whitespace-only names
@@ -164,23 +156,16 @@ const Page = ({ boards, columns, tasks }: PageProps) => {
     [dispatch]
   );
 
-  const handleColumnRename = useCallback(async (columnId: string, name: string): Promise<void> => {
-    try {
-      await dispatch(
-        thunks.updateColumn({
-          columnId,
-          update: { name },
-        })
-      );
-    } catch (err: any) {
-      sweetalert2.fire({
-        icon: 'error',
-        title: 'Failed to update column',
-        allowEscapeKey: true,
-        allowOutsideClick: true,
-        text: err.toString(),
-      })
-    }
+  const handleColumnRename = useCallback(async (boardId: string, columnId: string, name: string): Promise<void> => {
+    console.log('handleColumnRename', columnId, name);
+
+    await dispatch(thunks.updateColumn({
+      columnId,
+      boardId,
+      name,
+      taskIds: tasks,
+    })
+    );
   },
     [dispatch]
   );
@@ -397,7 +382,7 @@ const Page = ({ boards, columns, tasks }: PageProps) => {
                       columnId={columnId}
                       onClear={() => handleColumnClear(columnId)}
                       onDelete={() => handleColumnDelete(columnId)}
-                      onRename={(name) => handleColumnRename(columnId, name)}
+                      onRename={(name) => handleColumnRename(selectedBoardId, columnId, name)}
                       onTaskAdd={(name) => handleTaskAdd(columnId, name)}
                       onTaskOpen={handleTaskOpen}
                     />
@@ -424,8 +409,8 @@ export default Page;
 
 export const getServerSideProps = async () => {
   const boards = await KanbanService().getAllBoards();
-  const columns = boards.flatMap((board: Board) => board.columns);
-  const tasks = columns.flatMap((column: Column) => column.taskIds);
+  const columnsByBoards = boards.map((board: Board) => board.columns);
+  const tasks = columnsByBoards.map((columns: Column[]) => columns.map((column: Column) => column.taskIds).flat()).flat();
 
   const serializedBoards = boards.map((board: Board) => ({
     ...board,
@@ -435,7 +420,7 @@ export const getServerSideProps = async () => {
   return {
     props: {
       boards: serializedBoards || [],
-      columns: columns || [],
+      columns: columnsByBoards || [],
       tasks: tasks || [],
     },
   };

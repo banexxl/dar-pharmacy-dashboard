@@ -88,15 +88,14 @@ const reducers = {
     state.isLoaded = true;
   },
   createColumn(state: KanbanState, action: CreateColumnAction): void {
-    console.log('createColumn', action.payload);
-    console.log('state', state);
-
-
     const column = action.payload; // Assuming payload contains the full column data
     state.columns.byId[column.id!] = column; // Adjust as per your schema, if `id` is not correct
     state.columns.allIds.push(column.id!);
   },
   updateColumn(state: KanbanState, action: UpdateColumnAction): void {
+    console.log('updateColumn', action.payload);
+    console.log('state', state);
+
     const column = action.payload;
     state.columns.byId[column.id!.toString()] = column;
   },
@@ -110,11 +109,11 @@ const reducers = {
     state.columns.byId[columnId].taskIds = [];
 
     // Delete the tasks from state
-    taskIds.forEach((taskId) => {
+    taskIds!.forEach((taskId) => {
       delete state.tasks.byId[taskId];
     });
 
-    state.tasks.allIds = state.tasks.allIds.filter((taskId) => taskIds.includes(taskId));
+    state.tasks.allIds = state.tasks.allIds.filter((taskId) => taskIds!.includes(taskId));
   },
   deleteColumn(state: KanbanState, action: DeleteColumnAction): void {
     const columnId = action.payload;
@@ -129,7 +128,7 @@ const reducers = {
     state.tasks.allIds.push(task.id!);
 
     // Add task to the column
-    state.columns.byId[task.columnId].taskIds.push(task.id!);
+    state.columns.byId[task.columnId].taskIds!.push(task.id!);
   },
   updateTask(state: KanbanState, action: UpdateTaskAction): void {
     const task = action.payload;
@@ -141,7 +140,7 @@ const reducers = {
     const sourceColumnId = state.tasks.byId[taskId].columnId;
 
     // Remove task from source column
-    state.columns.byId[sourceColumnId].taskIds = state.columns.byId[sourceColumnId].taskIds.filter(
+    state.columns.byId[sourceColumnId].taskIds = state.columns.byId[sourceColumnId].taskIds!.filter(
       (_taskId) => _taskId !== taskId
     );
 
@@ -150,7 +149,7 @@ const reducers = {
       // Change task's columnId reference
       state.tasks.byId[taskId].columnId = columnId;
       // Push the taskId to the specified position
-      state.columns.byId[columnId].taskIds.splice(position, 0, taskId);
+      state.columns.byId[columnId].taskIds!.splice(position, 0, taskId);
     } else {
       // Push the taskId to the specified position
       state.columns.byId[sourceColumnId].taskIds.splice(position, 0, taskId);
@@ -162,7 +161,7 @@ const reducers = {
 
     delete state.tasks.byId[taskId];
     state.tasks.allIds = state.tasks.allIds.filter((_taskId) => _taskId !== taskId);
-    state.columns.byId[columnId].taskIds = state.columns.byId[columnId].taskIds.filter(
+    state.columns.byId[columnId].taskIds = state.columns.byId[columnId].taskIds!.filter(
       (_taskId) => _taskId !== taskId
     );
   },

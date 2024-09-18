@@ -122,6 +122,27 @@ export const KanbanService = () => {
           }
      };
 
+     const getColumnsByBoards = async (boardId: string): Promise<Column[]> => {
+          const client = new MongoClient(process.env.MONGODB_URI!);
+          const db = client.db('KANBAN_DB');
+
+          try {
+               await client.connect();
+
+               // Fetch the board by its ID
+               const board = await db.collection('Boards').findOne({ _id: new ObjectId(boardId) });
+
+               if (!board) throw new Error('Board not found');
+
+               return board.columns;
+          } catch (err) {
+               console.error('Error fetching columns:', err);
+               return [];
+          } finally {
+               await client.close();
+          }
+     }
+
      const createColumn = async (boardId: string, name: string) => {
           const client = new MongoClient(process.env.MONGODB_URI!);
           const db = client.db('KANBAN_DB');
@@ -162,22 +183,30 @@ export const KanbanService = () => {
           }
      };
 
-     const updateColumn = async (boardId: string, columnId: string, update: Partial<Column>): Promise<Column> => {
-          const client = new MongoClient(process.env.MONGODB_URI!);
-          const db = client.db('KANBAN_DB');
-          const boardCollection = db.collection('Boards');
+     const updateColumn = async (boardId: string, columnId: string, name: string): Promise<Column> => {
+          console.log('boardId', boardId);
+          console.log('columnId', columnId);
+          console.log('new name', name);
 
           try {
                await client.connect();
+               const boardCollection = db.collection('Boards'); // Assuming you have the db object defined elsewhere
 
                const result = await boardCollection.findOneAndUpdate(
-                    { id: new ObjectId(boardId), 'columns.id': columnId },
-                    { $set: { 'columns.$': update } }, // Update the column
-                    { returnDocument: 'after' }
+                    { _id: new ObjectId(boardId), 'columns.id': columnId }, // Match the board and column
+                    { $set: { 'columns.$.name': name } }, // Update only the matched column's name
+                    { returnDocument: 'after' } // Return the updated document after the operation
                );
 
-               if (!result!.value) throw new Error('Column not found');
-               return result!.value.columns.find((c: Column) => c.id!.toString() === columnId); // Return the updated column
+               console.log('result', result);
+
+               if (!result) throw new Error('Column not found');
+
+               // Return the updated column
+               const updatedColumn = result.columns.find((c: Column) => c.id!.toString() === columnId);
+               if (!updatedColumn) throw new Error('Updated column not found');
+
+               return updatedColumn;
           } catch (err) {
                console.error('Error updating column:', err);
                throw err;
@@ -185,6 +214,7 @@ export const KanbanService = () => {
                await client.close();
           }
      };
+
 
      const clearColumn = async (boardId: string, columnId: string): Promise<boolean> => {
           const client = new MongoClient(process.env.MONGODB_URI!);
@@ -713,6 +743,7 @@ export const KanbanService = () => {
           getBoard,
           addBoard,
           deleteBoard,
+          getColumnsByBoards,
           createColumn,
           updateColumn,
           clearColumn,
