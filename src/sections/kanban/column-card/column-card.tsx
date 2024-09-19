@@ -29,8 +29,6 @@ interface ColumnCardProps {
 export const ColumnCard: FC<ColumnCardProps> = (props) => {
   const { columnId, onTaskAdd, onTaskOpen, onClear, onDelete, onRename, ...other } = props;
   const column = useColumn(columnId);
-  console.log('columncard', column);
-
   if (!column) {
     return null;
   }

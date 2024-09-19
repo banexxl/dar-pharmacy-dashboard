@@ -239,7 +239,8 @@ export const KanbanService = () => {
           }
      };
 
-     const deleteColumn = async (boardId: string, columnId: string): Promise<boolean> => {
+     const deleteColumn = async (params: any): Promise<boolean> => {
+          const paramsData = JSON.parse(params);
           const client = new MongoClient(process.env.MONGODB_URI!);
           const db = client.db('KANBAN_DB');
           const boardCollection = db.collection('Boards');
@@ -248,25 +249,31 @@ export const KanbanService = () => {
                await client.connect();
 
                // Fetch the board
-               const board = await boardCollection.findOne({ id: new ObjectId(boardId) });
+               const board = await boardCollection.findOne({ _id: ObjectId.createFromHexString(paramsData.boardId) });
                if (!board) throw new Error('Board not found');
 
                // Find the column
-               const column = board.columns.find((c: Column) => c.id!.toString() === columnId);
+               const column = board.columns.find((c: Column) => c.id!.toString() === paramsData.columnId);
                if (!column) throw new Error('Column not found');
 
                // Remove all tasks associated with the column
-               await db.collection('Tasks').deleteMany({ columnId });
+               const updatedTasks = board.tasks.filter((task: Task) => task.columnId !== paramsData.columnId);
+
+               // Update the board with the new tasks array (without the tasks from the deleted column)
+               await boardCollection.updateOne(
+                    { _id: paramsData.boardId },
+                    { $set: { tasks: updatedTasks } }
+               );
 
                // Remove the column from the board
                const updateResult = await boardCollection.updateOne(
-                    { id: new ObjectId(boardId) },
+                    { _id: ObjectId.createFromHexString(paramsData.boardId) },
                     {
-                         $pull: { columns: { id: columnId } } as any, // Remove the column
+                         $pull: { columns: { id: paramsData.columnId } as any } // Remove the column
                     }
                );
 
-               return true;
+               return updateResult.modifiedCount > 0;
           } catch (err) {
                console.error('Error deleting column:', err);
                throw err;

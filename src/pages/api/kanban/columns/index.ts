@@ -17,11 +17,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                     const updatedColumn = await KanbanService().updateColumn(boardId, columnId, update);
                     return res.status(200).json(updatedColumn);
                }
-               case 'DELETE': { // Delete a specific column
-                    const { boardId, columnId } = req.body;
-                    await KanbanService().deleteColumn(boardId, columnId);
-                    return res.status(204).end();
-               }
                default:
                     res.setHeader('Allow', ['POST']);
                     return res.status(405).end(`Method ${req.method} Not Allowed`);

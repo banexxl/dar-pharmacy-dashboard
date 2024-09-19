@@ -91,8 +91,11 @@ const reducers = {
   },
   createColumn(state: KanbanState, action: CreateColumnAction): void {
     const column = action.payload; // Assuming payload contains the full column data
+    console.log('column', column);
+
     state.columns.byId[column.id!] = column; // Adjust as per your schema, if `id` is not correct
     state.columns.allIds.push(column.id!);
+
   },
   updateColumn(state: KanbanState, action: UpdateColumnAction): void {
     const column = action.payload;

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { DropResult } from 'react-beautiful-dnd';
 import { DragDropContext } from 'react-beautiful-dnd';
-import toast from 'react-hot-toast';
+import toast, { Toaster } from 'react-hot-toast';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
@@ -60,7 +60,6 @@ const Page = ({ boards, columnIds, taskIds }: PageProps) => {
   const session = useSession();
   // Fetch board data whenever the selected board changes
   useBoard(selectedBoardId);
-  console.log('taskIds', taskIds);
 
   const handleBoardChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setSelectedBoardId(event.target.value as string);
@@ -104,23 +103,13 @@ const Page = ({ boards, columnIds, taskIds }: PageProps) => {
     const trimmedColumn = name?.trim(); // Corrected typo to 'trimmedColumn'
 
     if (!name || trimmedColumn === "") {  // Check for empty or whitespace-only names
-      sweetalert2.fire({
-        icon: 'error',
-        title: 'Naziv kolone ne može biti prazan',
-        allowEscapeKey: true,
-        allowOutsideClick: true,
-      });
+      toast.error('Naziv kolone je obavezan!');
     } else {
       try {
         dispatch(thunks.createColumn({ id: createResourceId(), boardId: boardId, name: name, taskIds: [] })); // Dispatch thunk to create column
+        toast.success('Kolona dodata!');
       } catch (err: any) {
-        sweetalert2.fire({
-          icon: 'error',
-          title: 'Greška prilikom dodavanja kolone',
-          allowEscapeKey: true,
-          allowOutsideClick: true,
-          text: err.toString(),
-        });
+        toast.error('Greška prilikom dodavanja kolone!');
       }
     }
   }, [dispatch]
@@ -142,25 +131,36 @@ const Page = ({ boards, columnIds, taskIds }: PageProps) => {
     [dispatch]
   );
 
-  const handleColumnDelete = useCallback(async (columnId: string): Promise<void> => {
-    try {
-      await dispatch(
-        thunks.deleteColumn({
-          columnId,
-        })
-      );
-      toast.success('Column deleted');
-    } catch (err) {
-      console.error(err);
-      toast.error('Something went wrong!');
-    }
+  const handleColumnDelete = useCallback(async (selectedBoardId: string, columnId: string): Promise<void> => {
+
+    sweetalert2.fire({
+      title: 'Upozorenje!',
+      text: "Da li stvarno želite da obrišete kolonu?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Da!',
+      cancelButtonText: 'Ne!',
+    }).then(async (result: any) => {
+      if (result.isConfirmed) {
+        try {
+          await dispatch(
+            thunks.deleteColumn({
+              boardId: selectedBoardId!,
+              columnId,
+            })
+          );
+          toast.success('Kolona izbrisana!')
+        } catch (err) {
+          toast.error('Došlo je do greške!');
+        }
+      }
+    })
+
   },
     [dispatch]
   );
 
   const handleColumnRename = useCallback(async (boardId: string, columnId: string, name: string, taskIds: string[]): Promise<void> => {
-    console.log('handleColumnRename', boardId, columnId, name, taskIds);
-
     await dispatch(thunks.updateColumn({
       columnId,
       boardId,
@@ -314,7 +314,7 @@ const Page = ({ boards, columnIds, taskIds }: PageProps) => {
               {boardData.map((board: Board) => (
                 <MenuItem key={board._id!.toString()} value={board._id!.toString()} sx={{ display: 'flex', justifyContent: 'space-between' }}>
                   {board.title}
-                  <Button
+                  {/* <Button
                     variant="contained"
                     color="error"
                     size="small"
@@ -322,7 +322,7 @@ const Page = ({ boards, columnIds, taskIds }: PageProps) => {
                     style={{ marginLeft: '10px' }}
                   >
                     Delete
-                  </Button>
+                  </Button> */}
                 </MenuItem>
               ))}
             </TextField>
@@ -385,7 +385,7 @@ const Page = ({ boards, columnIds, taskIds }: PageProps) => {
                       key={columnId}
                       columnId={columnId}
                       onClear={() => handleColumnClear(columnId)}
-                      onDelete={() => handleColumnDelete(columnId)}
+                      onDelete={() => handleColumnDelete(selectedBoardId, columnId)}
                       onRename={(name) => handleColumnRename(selectedBoardId, columnId, name, taskIds)}
                       onTaskAdd={(name) => handleTaskAdd(selectedBoardId, columnId, name!, session.data!.user!.name!)}
                       onTaskOpen={handleTaskOpen}
@@ -403,6 +403,7 @@ const Page = ({ boards, columnIds, taskIds }: PageProps) => {
         open={!!currentTaskId}
         taskId={currentTaskId || undefined}
       />
+      <Toaster />
     </>
   );
 };

@@ -35,12 +35,6 @@ export const createColumn = (params: CreateColumnParams): AppThunk => async (dis
       throw new Error('Failed to create column');
     } else {
       dispatch(slice.actions.createColumn({ ...params }));
-      sweetalert2.fire({
-        icon: 'success',
-        title: 'Uspešno dodata kolona',
-        allowEscapeKey: true,
-        allowOutsideClick: true,
-      });
     }
   } catch (error) {
     console.error('Error while creating column:', error);
@@ -56,8 +50,6 @@ type UpdateColumnParams = {
 
 const updateColumn = (params: UpdateColumnParams): AppThunk =>
   async (dispatch: any): Promise<void> => {
-    console.log('params', params);
-
     const response = await fetch(`/api/kanban/columns/${params.columnId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -71,8 +63,6 @@ const updateColumn = (params: UpdateColumnParams): AppThunk =>
         allowOutsideClick: true,
       })
     }
-    console.log('params', params.taskIds);
-
     dispatch(slice.actions.updateColumn({
       id: params.columnId,
       boardId: params.boardId,
@@ -94,7 +84,7 @@ type ClearColumnParams = {
 const clearColumn =
   (params: ClearColumnParams): AppThunk =>
     async (dispatch: any): Promise<void> => {
-      await fetch(`api/kanban/columns/${params.columnId}/clear`, {
+      await fetch(`/api/kanban/columns/${params.columnId}/clear`, {
         method: 'POST',
       });
 
@@ -102,16 +92,22 @@ const clearColumn =
     };
 
 type DeleteColumnParams = {
+  boardId: string;
   columnId: string;
 };
 
 const deleteColumn = (params: DeleteColumnParams): AppThunk =>
   async (dispatch: any): Promise<void> => {
-    await fetch(`api/kanban/columns/${params.columnId}`, {
+    const deleteResponse = await fetch(`/api/kanban/columns/${params.columnId}`, {
       method: 'DELETE',
+      body: JSON.stringify({ boardId: params.boardId, columnId: params.columnId }),
     });
 
-    dispatch(slice.actions.deleteColumn(params.columnId));
+    if (!deleteResponse.ok) {
+      throw new Error('Failed to delete column');
+    } else {
+      dispatch(slice.actions.deleteColumn(params.columnId));
+    }
   };
 
 type CreateTaskParams = {
@@ -174,7 +170,7 @@ type UpdateTaskParams = {
 
 const updateTask = (params: UpdateTaskParams): AppThunk =>
   async (dispatch: any): Promise<void> => {
-    const response = await fetch(`api/kanban/tasks/${params.taskId}`, {
+    const response = await fetch(`/api/kanban/tasks/${params.taskId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(params.update),
@@ -192,7 +188,7 @@ type MoveTaskParams = {
 
 const moveTask = (params: MoveTaskParams): AppThunk =>
   async (dispatch: any): Promise<void> => {
-    await fetch(`api/kanban/tasks/${params.taskId}/move`, {
+    await fetch(`/api/kanban/tasks/${params.taskId}/move`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(params),
@@ -207,7 +203,7 @@ type DeleteTaskParams = {
 
 const deleteTask = (params: DeleteTaskParams): AppThunk =>
   async (dispatch: any): Promise<void> => {
-    await fetch(`api/kanban/tasks/${params.taskId}`, {
+    await fetch(`/api/kanban/tasks/${params.taskId}`, {
       method: 'DELETE',
     });
 
@@ -221,7 +217,7 @@ type AddCommentParams = {
 
 const addComment = (params: AddCommentParams): AppThunk =>
   async (dispatch: any): Promise<void> => {
-    const response = await fetch(`api/kanban/comments`, {
+    const response = await fetch(`/api/kanban/comments`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(params),
@@ -243,7 +239,7 @@ type AddCheckListParams = {
 
 const addChecklist = (params: AddCheckListParams): AppThunk =>
   async (dispatch: any): Promise<void> => {
-    const response = await fetch(`api/kanban/checklists`, {
+    const response = await fetch(`/api/kanban/checklists`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(params),
@@ -266,7 +262,7 @@ type UpdateChecklistParams = {
 
 const updateChecklist = (params: UpdateChecklistParams): AppThunk =>
   async (dispatch: any): Promise<void> => {
-    const response = await fetch(`api/kanban/checklists/${params.checklistId}`, {
+    const response = await fetch(`/api/kanban/checklists/${params.checklistId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(params.update),
@@ -288,7 +284,7 @@ type DeleteChecklistParams = {
 
 const deleteChecklist = (params: DeleteChecklistParams): AppThunk =>
   async (dispatch: any): Promise<void> => {
-    await fetch(`api/kanban/checklists/${params.checklistId}`, {
+    await fetch(`/api/kanban/checklists/${params.checklistId}`, {
       method: 'DELETE',
     });
 
@@ -303,7 +299,7 @@ type AddCheckItemParams = {
 
 const addCheckItem = (params: AddCheckItemParams): AppThunk =>
   async (dispatch: any): Promise<void> => {
-    const response = await fetch(`api/kanban/checkitems`, {
+    const response = await fetch(`/api/kanban/checkitems`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(params),
@@ -331,7 +327,7 @@ type UpdateCheckItemParams = {
 
 const updateCheckItem = (params: UpdateCheckItemParams): AppThunk =>
   async (dispatch: any): Promise<void> => {
-    const response = await fetch(`api/kanban/checkitems/${params.checkItemId}`, {
+    const response = await fetch(`/api/kanban/checkitems/${params.checkItemId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(params.update),
@@ -355,7 +351,7 @@ type DeleteCheckItemParams = {
 
 const deleteCheckItem = (params: DeleteCheckItemParams): AppThunk =>
   async (dispatch: any): Promise<void> => {
-    await fetch(`api/kanban/checkitems/${params.checkItemId}`, {
+    await fetch(`/api/kanban/checkitems/${params.checkItemId}`, {
       method: 'DELETE',
     });
 
