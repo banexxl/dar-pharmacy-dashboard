@@ -108,8 +108,8 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
   const columns = useColumns();
   const task = useTask(taskId);
   const column = useColumn(task?.columnId);
-  const author = useAuthor(task?.author.id!.toString());
-  const assignedTo = useAssignees(task?.assignedTo.map((assignee) => assignee.id!.toString()) || []);
+  const author = useAuthor(task?.createdBy!.toString());
+  const assignedTo = useAssignees(task?.assignedTo.map((assignee) => assignee._id!.toString()) || []);
   const mdUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
   const [currentTab, setCurrentTab] = useState<string>('overview');
   const [nameCopy, setNameCopy] = useState<string>(task?.name || '');
@@ -622,7 +622,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
                   <AvatarGroup max={5}>
                     {assignedTo.map((assignee) => (
                       <Avatar
-                        key={assignee.id!.toString()}
+                        key={assignee._id!.toString()}
                         src={assignee.avatar || undefined}
                       />
                     ))}
