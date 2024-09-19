@@ -11,11 +11,8 @@ import { TaskCard } from '../task-card';
 import { ColumnHeader } from './column-header';
 
 const useColumn = (columnId: string): Column | undefined => {
-  console.log('useColumn', columnId);
-
   return useSelector((state) => {
     const { columns } = state.kanban;
-
     return columns.byId[columnId];
   });
 };

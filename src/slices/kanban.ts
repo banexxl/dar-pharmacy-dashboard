@@ -83,6 +83,8 @@ const reducers = {
 
     state.columns.byId = objFromArray(board.columns);
     state.columns.allIds = Object.keys(state.columns.byId);
+    state.tasks.byId = objFromArray(board.tasks);
+    state.tasks.allIds = Object.keys(state.tasks.byId);
     state.members.byId = objFromArray(board.members);
     state.members.allIds = Object.keys(state.members.byId);
     state.isLoaded = true;

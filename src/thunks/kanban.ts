@@ -1,6 +1,3 @@
-import { pushAlert } from '@/components/push-notifications';
-import { Member } from '@/schemas/kanban';
-import { getSession } from 'next-auth/react';
 import { slice } from 'src/slices/kanban';
 import type { AppThunk } from 'src/store';
 import sweetalert2 from 'sweetalert2';
@@ -12,6 +9,8 @@ const getBoard = (boardId: string): AppThunk => async (dispatch): Promise<void> 
       method: 'GET',
     });
     const data = await response.json();
+    console.log('data', data);
+
     dispatch(slice.actions.getBoard(data)); // Dispatch the entire board object, not just the boardId
   } catch (error) {
     console.error('Failed to fetch board:', error);

@@ -22,10 +22,10 @@ import { createResourceId } from '@/utils/create-resource-id';
 import { useSession } from 'next-auth/react';
 
 
-const useColumnsIds = (): string[] => {
-  const { columns } = useSelector((state: any) => state.kanban);
-  return columns.allIds;
-};
+// const useColumnsIds = (): string[] => {
+//   const { columns } = useSelector((state: any) => state.kanban);
+//   return columns.allIds;
+// };
 
 const useBoard = (boardId: string | null | undefined): void => {
   const dispatch = useDispatch();
@@ -47,14 +47,15 @@ const useBoard = (boardId: string | null | undefined): void => {
 
 type PageProps = {
   boards: Board[];
-  columns: Column[];
+  columnIds: string[][];
   tasks: string[];
 };
 
-const Page = ({ boards, columns, tasks }: PageProps) => {
+const Page = ({ boards, columnIds, tasks }: PageProps) => {
+  console.log('columnIds', columnIds);
 
   const dispatch = useDispatch();
-  const columnsIds = useColumnsIds();
+  // const columnsIds = useColumnsIds();
   const [currentTaskId, setCurrentTaskId] = useState<string | null>(null);
   const [selectedBoardId, setSelectedBoardId] = useState<string | null>();
   const [boardData, setBoardData] = useState<Board[]>(boards);
@@ -380,7 +381,7 @@ const Page = ({ boards, columns, tasks }: PageProps) => {
                 }}
               >
                 <Stack alignItems="flex-start" direction="row" spacing={3}>
-                  {columnsIds.map((columnId: string) => (
+                  {columnIds[0].map((columnId: string) => (
                     <ColumnCard
                       key={columnId}
                       columnId={columnId}
@@ -413,8 +414,9 @@ export default Page;
 
 export const getServerSideProps = async () => {
   const boards = await KanbanService().getAllBoards();
-  const columnsByBoards = boards.map((board: Board) => board.columns);
-  const tasks = columnsByBoards.map((columns: Column[]) => columns.map((column: Column) => column.taskIds).flat()).flat();
+  const columnIdsByBoards = boards.map((board: Board) => board.columns.map((column: Column) => column.id!.toString()));
+  // const tasks = columnIdsByBoards.map((columnIds: string[]) => columnIds.map((columnId: string) => KanbanService().getTasksByColumn(columnId)));
+
 
   const serializedBoards = boards.map((board: Board) => ({
     ...board,
@@ -424,8 +426,8 @@ export const getServerSideProps = async () => {
   return {
     props: {
       boards: serializedBoards || [],
-      columns: columnsByBoards || [],
-      tasks: tasks || [],
+      columnIds: columnIdsByBoards || [],
+      // tasks: tasks || [],
     },
   };
 };
