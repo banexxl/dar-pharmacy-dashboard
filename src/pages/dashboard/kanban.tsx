@@ -48,12 +48,10 @@ const useBoard = (boardId: string | null | undefined): void => {
 type PageProps = {
   boards: Board[];
   columnIds: string[][];
-  tasks: string[];
+  taskIds: string[];
 };
 
-const Page = ({ boards, columnIds, tasks }: PageProps) => {
-  console.log('columnIds', columnIds);
-
+const Page = ({ boards, columnIds, taskIds }: PageProps) => {
   const dispatch = useDispatch();
   // const columnsIds = useColumnsIds();
   const [currentTaskId, setCurrentTaskId] = useState<string | null>(null);
@@ -62,6 +60,7 @@ const Page = ({ boards, columnIds, tasks }: PageProps) => {
   const session = useSession();
   // Fetch board data whenever the selected board changes
   useBoard(selectedBoardId);
+  console.log('taskIds', taskIds);
 
   const handleBoardChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setSelectedBoardId(event.target.value as string);
@@ -159,12 +158,14 @@ const Page = ({ boards, columnIds, tasks }: PageProps) => {
     [dispatch]
   );
 
-  const handleColumnRename = useCallback(async (boardId: string, columnId: string, name: string): Promise<void> => {
+  const handleColumnRename = useCallback(async (boardId: string, columnId: string, name: string, taskIds: string[]): Promise<void> => {
+    console.log('handleColumnRename', boardId, columnId, name, taskIds);
+
     await dispatch(thunks.updateColumn({
       columnId,
       boardId,
       name,
-      taskIds: tasks,
+      taskIds,
     })
     );
   },
@@ -172,8 +173,6 @@ const Page = ({ boards, columnIds, tasks }: PageProps) => {
   );
 
   const handleTaskAdd = useCallback(async (boardId: string, columnId: string, name: string, createdBy: string): Promise<void> => {
-    console.log('page function handleTaskAdd', boardId, columnId, name, createdBy);
-
     try {
       await dispatch(
         thunks.createTask({
@@ -387,7 +386,7 @@ const Page = ({ boards, columnIds, tasks }: PageProps) => {
                       columnId={columnId}
                       onClear={() => handleColumnClear(columnId)}
                       onDelete={() => handleColumnDelete(columnId)}
-                      onRename={(name) => handleColumnRename(selectedBoardId, columnId, name)}
+                      onRename={(name) => handleColumnRename(selectedBoardId, columnId, name, taskIds)}
                       onTaskAdd={(name) => handleTaskAdd(selectedBoardId, columnId, name!, session.data!.user!.name!)}
                       onTaskOpen={handleTaskOpen}
                     />
@@ -413,10 +412,12 @@ Page.getLayout = (page: any) => <DashboardLayout>{page}</DashboardLayout>;
 export default Page;
 
 export const getServerSideProps = async () => {
-  const boards = await KanbanService().getAllBoards();
-  const columnIdsByBoards = boards.map((board: Board) => board.columns.map((column: Column) => column.id!.toString()));
-  // const tasks = columnIdsByBoards.map((columnIds: string[]) => columnIds.map((columnId: string) => KanbanService().getTasksByColumn(columnId)));
 
+  const boards = await KanbanService().getAllBoards();
+
+  const columnIdsByBoards = boards.map((board: Board) => board.columns.map((column: Column) => column.id!.toString()));
+
+  const taskIdsFromBoardByColumn = boards.map((board: Board) => board.columns.map((column: Column) => column.taskIds!.map((taskId: string) => taskId.toString())));
 
   const serializedBoards = boards.map((board: Board) => ({
     ...board,
@@ -427,7 +428,7 @@ export const getServerSideProps = async () => {
     props: {
       boards: serializedBoards || [],
       columnIds: columnIdsByBoards || [],
-      // tasks: tasks || [],
+      taskIds: taskIdsFromBoardByColumn[0][0] || [],
     },
   };
 };

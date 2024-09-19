@@ -29,12 +29,13 @@ interface ColumnCardProps {
 export const ColumnCard: FC<ColumnCardProps> = (props) => {
   const { columnId, onTaskAdd, onTaskOpen, onClear, onDelete, onRename, ...other } = props;
   const column = useColumn(columnId);
+  console.log('columncard', column);
 
   if (!column) {
     return null;
   }
 
-  const tasksCount = column.taskIds.length;
+  const tasksCount = column.taskIds?.length;
 
   return (
     <Box
@@ -56,7 +57,7 @@ export const ColumnCard: FC<ColumnCardProps> = (props) => {
         onClear={onClear}
         onDelete={onDelete}
         onRename={onRename}
-        tasksCount={tasksCount}
+        tasksCount={tasksCount || 0}
       />
       <Box
         sx={{

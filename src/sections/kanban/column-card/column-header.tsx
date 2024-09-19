@@ -54,14 +54,13 @@ export const ColumnHeader: FC<ColumnHeaderProps> = (props) => {
     setNameCopy(event.target.value);
   }, []);
 
-  const handleNameKeyUp = useCallback(
-    (event: KeyboardEvent<HTMLInputElement>): void => {
-      if (event.code === 'Enter') {
-        if (nameCopy && nameCopy !== name) {
-          onRename?.(nameCopy);
-        }
+  const handleNameKeyUp = useCallback((event: KeyboardEvent<HTMLInputElement>): void => {
+    if (event.code === 'Enter') {
+      if (nameCopy && nameCopy !== name) {
+        onRename?.(nameCopy);
       }
-    },
+    }
+  },
     [nameCopy, name, onRename]
   );
 

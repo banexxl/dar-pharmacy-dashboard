@@ -45,7 +45,7 @@ export interface Task {
 export interface Column {
   id?: string;
   boardId?: string;
-  taskIds: string[];
+  taskIds?: string[];
   name: string;
 }
 

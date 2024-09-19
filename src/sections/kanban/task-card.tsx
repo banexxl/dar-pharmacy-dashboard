@@ -20,10 +20,7 @@ import type { Member, Task } from 'src/schemas/kanban';
 
 const useTask = (taskId: string): Task | undefined => {
   return useSelector((state: RootState) => {
-    console.log('state', state);
-
     const { tasks } = state.kanban;
-
     return tasks.byId[taskId];
   });
 };
@@ -51,8 +48,6 @@ interface TaskCardProps {
 export const TaskCard = forwardRef<HTMLDivElement, TaskCardProps>(function TaskCard(props, ref) {
   const { taskId, dragging = false, onOpen, ...other } = props;
   const task = useTask(taskId);
-  console.log('task', taskId);
-
   const assignedTo = useAssignees(task?.assignedTo);
 
   if (!task) {

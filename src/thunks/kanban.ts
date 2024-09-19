@@ -9,8 +9,6 @@ const getBoard = (boardId: string): AppThunk => async (dispatch): Promise<void> 
       method: 'GET',
     });
     const data = await response.json();
-    console.log('data', data);
-
     dispatch(slice.actions.getBoard(data)); // Dispatch the entire board object, not just the boardId
   } catch (error) {
     console.error('Failed to fetch board:', error);
@@ -53,11 +51,13 @@ type UpdateColumnParams = {
   columnId: string;
   boardId: string
   name: string;
-  taskIds: string[];
+  taskIds?: string[];
 };
 
 const updateColumn = (params: UpdateColumnParams): AppThunk =>
   async (dispatch: any): Promise<void> => {
+    console.log('params', params);
+
     const response = await fetch(`/api/kanban/columns/${params.columnId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -71,11 +71,13 @@ const updateColumn = (params: UpdateColumnParams): AppThunk =>
         allowOutsideClick: true,
       })
     }
+    console.log('params', params.taskIds);
+
     dispatch(slice.actions.updateColumn({
       id: params.columnId,
       boardId: params.boardId,
       name: params.name,
-      taskIds: params.taskIds
+      taskIds: params?.taskIds,
     }));
     sweetalert2.fire({
       icon: 'success',

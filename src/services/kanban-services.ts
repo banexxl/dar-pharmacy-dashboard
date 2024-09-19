@@ -205,7 +205,6 @@ export const KanbanService = () => {
           }
      };
 
-
      const clearColumn = async (boardId: string, columnId: string): Promise<boolean> => {
           const client = new MongoClient(process.env.MONGODB_URI!);
           const db = client.db('KANBAN_DB');
@@ -313,9 +312,28 @@ export const KanbanService = () => {
           }
      };
 
-     const createTask = async (boardId: string, columnId: string, name: string, createdBy: string): Promise<any> => {
-          console.log('createTask', boardId, columnId, name, createdBy);
+     const getTasksFromBoard = async (boardId: string): Promise<Task[]> => {
+          const client = new MongoClient(process.env.MONGODB_URI!);
+          const db = client.db('KANBAN_DB');
 
+          try {
+               await client.connect();
+
+               // Fetch the board by its ID
+               const board = await db.collection('Boards').findOne({ _id: new ObjectId(boardId) });
+
+               if (!board) throw new Error('Board not found');
+
+               return board.tasks;
+          } catch (err) {
+               console.error('Error fetching tasks:', err);
+               return [];
+          } finally {
+               await client.close();
+          }
+     }
+
+     const createTask = async (boardId: string, columnId: string, name: string, createdBy: string): Promise<any> => {
           const client = new MongoClient(process.env.MONGODB_URI!);
           const db = client.db('KANBAN_DB');
           const boardCollection = db.collection('Boards');
@@ -741,6 +759,7 @@ export const KanbanService = () => {
           clearColumn,
           deleteColumn,
           getTask,
+          getTasksFromBoard,
           createTask,
           updateTask,
           moveTask,

@@ -313,21 +313,20 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
     }
   }, [dispatch, task]);
 
-  const handleChecklistRename = useCallback(
-    async (checklistId: string, name: string): Promise<void> => {
-      try {
-        await dispatch(
-          thunks.updateChecklist({
-            taskId: task!.id!.toString(),
-            checklistId,
-            update: { name },
-          })
-        );
-      } catch (err) {
-        console.error(err);
-        toast.error('Something went wrong!');
-      }
-    },
+  const handleChecklistRename = useCallback(async (checklistId: string, name: string): Promise<void> => {
+    try {
+      await dispatch(
+        thunks.updateChecklist({
+          taskId: task!.id!.toString(),
+          checklistId,
+          update: { name },
+        })
+      );
+    } catch (err) {
+      console.error(err);
+      toast.error('Something went wrong!');
+    }
+  },
     [dispatch, task]
   );
 

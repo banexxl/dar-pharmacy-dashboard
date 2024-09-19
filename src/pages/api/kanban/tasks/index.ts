@@ -4,9 +4,6 @@ import { NextApiRequest, NextApiResponse } from 'next';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
-     console.log('req.body', req.body);
-
-
      try {
           switch (req.method) {
                case 'POST': { // Create a new task
