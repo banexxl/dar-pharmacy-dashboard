@@ -93,17 +93,14 @@ type ClearColumnParams = {
   columnId: string;
 };
 
-const clearColumn =
-  (params: ClearColumnParams): AppThunk =>
-    async (dispatch: any): Promise<void> => {
-      await fetch(`/api/kanban/columns/${params.columnId}/clear`, {
-        method: 'POST',
-      });
+const clearColumn = (params: ClearColumnParams): AppThunk =>
+  async (dispatch: any): Promise<void> => {
+    await fetch(`/api/kanban/columns/${params.columnId}/clear`, {
+      method: 'POST',
+    });
 
-      dispatch(slice.actions.clearColumn(params.columnId));
-    };
-
-
+    dispatch(slice.actions.clearColumn(params.columnId));
+  };
 
 type CreateTaskParams = {
   boardId: string;
@@ -144,6 +141,31 @@ const createTask = (params: CreateTaskParams): AppThunk =>
     }
   };
 
+type DeleteTaskParams = {
+  boardId: string;
+  taskId: string;
+};
+
+const deleteTask = (params: DeleteTaskParams): AppThunk =>
+  async (dispatch: any): Promise<void> => {
+    const deleteTaskResponse = await fetch(`/api/kanban/tasks/`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params),
+    });
+    if (!deleteTaskResponse.ok) {
+      toast.error('Neuspešno brisanje taska!');
+    } else {
+      try {
+        dispatch(slice.actions.deleteTask(params.taskId));
+        toast.success('Task uspešno obrisan!');
+      } catch (error) {
+        toast.error('Neuspešno brisanje taska!');
+      }
+
+    }
+  };
+
 type UpdateTaskParams = {
   taskId: string;
   update: {
@@ -181,19 +203,6 @@ const moveTask = (params: MoveTaskParams): AppThunk =>
     });
 
     dispatch(slice.actions.moveTask(params));
-  };
-
-type DeleteTaskParams = {
-  taskId: string;
-};
-
-const deleteTask = (params: DeleteTaskParams): AppThunk =>
-  async (dispatch: any): Promise<void> => {
-    await fetch(`/api/kanban/tasks/${params.taskId}`, {
-      method: 'DELETE',
-    });
-
-    dispatch(slice.actions.deleteTask(params.taskId));
   };
 
 type AddCommentParams = {

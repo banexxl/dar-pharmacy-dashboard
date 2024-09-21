@@ -383,6 +383,7 @@ const Page = ({ boards }: PageProps) => {
       <TaskModal
         onClose={handleTaskClose}
         open={!!currentTaskId}
+        boardId={selectedBoardId || undefined}
         taskId={currentTaskId || undefined}
       />
       <Toaster />
@@ -398,9 +399,9 @@ export const getServerSideProps = async () => {
 
   const boards = await KanbanService().getAllBoards();
 
-  const columnIdsByBoards = boards.map((board: Board) => board.columns.map((column: Column) => column?._id!.toString()));
+  // const columnIdsByBoards = boards.map((board: Board) => board.columns.map((column: Column) => column?._id!.toString()));
 
-  const taskIdsFromBoardByColumn = boards.map((board: Board) => board.columns.map((column: Column) => column?.taskIds!.map((taskId: string) => taskId.toString())));
+  // const taskIdsFromBoardByColumn = boards.map((board: Board) => board.columns.map((column: Column) => column?.taskIds!.map((taskId: string) => taskId.toString())));
 
   const serializedBoards = boards.map((board: Board) => ({
     ...board,

@@ -100,10 +100,11 @@ interface TaskModalProps {
   onClose?: () => void;
   open?: boolean;
   taskId?: string;
+  boardId?: string;
 }
 
 export const TaskModal: FC<TaskModalProps> = (props) => {
-  const { taskId, onClose, open = false, ...other } = props;
+  const { taskId, onClose, open = false, boardId, ...other } = props;
   const dispatch = useDispatch();
   const columns = useColumns();
   const task = useTask(taskId);
@@ -168,6 +169,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
     try {
       await dispatch(
         thunks.deleteTask({
+          boardId: boardId!.toString(),
           taskId: task!._id!.toString(),
         })
       );
@@ -823,4 +825,5 @@ TaskModal.propTypes = {
   onClose: PropTypes.func,
   open: PropTypes.bool,
   taskId: PropTypes.string,
+  boardId: PropTypes.string,
 };

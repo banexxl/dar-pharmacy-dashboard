@@ -15,6 +15,21 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                          return res.status(400).json({ error: error.message });
                     }
                }
+               case 'GET': { // Get a specific task
+                    const task = await KanbanService().getTask('aaaaaa');
+                    return res.status(200).json(task);
+               }
+               case 'PUT': { // Update a specific task
+                    const { update } = req.body;
+                    const updatedTask = await KanbanService().updateTask('boardId as string', 'taskId as string', update);
+                    return res.status(200).json(updatedTask);
+               }
+               case 'DELETE': { // Delete a specific task
+                    const { boardId, taskId } = req.body;
+
+                    await KanbanService().deleteTask(boardId, taskId);
+                    return res.status(204).end();
+               }
                default:
                     return res.status(405).end(`Method ${req.method} Not Allowed`);
           }

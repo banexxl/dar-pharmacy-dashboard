@@ -461,6 +461,7 @@ export const KanbanService = () => {
      };
 
      const deleteTask = async (boardId: string, taskId: string): Promise<boolean> => {
+
           const client = new MongoClient(process.env.MONGODB_URI!);
           const db = client.db('KANBAN_DB');
           const boardCollection = db.collection('Boards');
