@@ -101,6 +101,7 @@ const reducers = {
     // Ensure the new state reference is created for allIds
     state.columns.allIds = [...state.columns.allIds, column._id!];
   },
+
   deleteColumn(state: KanbanState, action: DeleteColumnAction): void {
     const columnId = action.payload;
 
@@ -111,7 +112,6 @@ const reducers = {
     // Update allIds immutably
     state.columns.allIds = state.columns.allIds.filter((id) => id !== columnId);
   },
-
   updateColumn(state: KanbanState, action: UpdateColumnAction): void {
     const column = action.payload;
     state.columns.byId[column._id!.toString()] = column;

@@ -10,7 +10,6 @@ const isBoard = (obj: any): obj is Board => {
      return obj && typeof obj._id === 'object' && typeof obj.title === 'string';
 }
 
-
 // Kanban Service Functions
 export const KanbanService = () => {
 
@@ -150,7 +149,9 @@ export const KanbanService = () => {
           }
      }
 
-     const createColumn = async (boardId: string, name: string) => {
+     const createColumn = async (boardId: string, columnId: string, name: string) => {
+          console.log('createColumn', columnId, boardId, name);
+
           const client = new MongoClient(process.env.MONGODB_URI!);
           const db = client.db('KANBAN_DB');
           const boardCollection = db.collection('Boards');
@@ -171,7 +172,7 @@ export const KanbanService = () => {
                     {
                          $push: {
                               columns: {
-                                   _id: createResourceId(),
+                                   _id: columnId, // Generate a new column ID
                                    name,
                                    taskIds: []
                               }
@@ -249,6 +250,8 @@ export const KanbanService = () => {
      };
 
      const deleteColumn = async (params: any): Promise<boolean> => {
+          console.log('delete columnID', params);
+
           const paramsData = JSON.parse(params);
           const client = new MongoClient(process.env.MONGODB_URI!);
           const db = client.db('KANBAN_DB');

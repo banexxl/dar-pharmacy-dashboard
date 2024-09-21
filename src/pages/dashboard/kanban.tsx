@@ -18,8 +18,8 @@ import { Board, Column, Member, Task } from '@/schemas/kanban';
 import { Button, Divider, Modal, TextField, Theme, useMediaQuery } from '@mui/material';
 import { indigo } from '@/theme/colors';
 import sweetalert2 from 'sweetalert2';
-import { createResourceId } from '@/utils/create-resource-id';
 import { useSession } from 'next-auth/react';
+import { createResourceId } from '@/utils/create-resource-id';
 
 
 const useColumnsIds = (): string[] => {
@@ -32,7 +32,7 @@ const useBoard = (boardId: string | null | undefined): void => {
 
   const handleBoardGet = useCallback((boardId: string): void => {
     if (boardId) {
-      dispatch(thunks.getBoard(boardId));
+      dispatch(thunks.getBoard(boardId))
     }
   },
     [dispatch]
@@ -47,13 +47,11 @@ const useBoard = (boardId: string | null | undefined): void => {
 
 type PageProps = {
   boards: Board[];
-  columnIds: string[][];
-  taskIds: string[];
 };
 
 const Page = ({ boards }: PageProps) => {
   const dispatch = useDispatch();
-  const columnsIds = useColumnsIds();
+  const columnIds = useColumnsIds();
   const [currentTaskId, setCurrentTaskId] = useState<string | null>(null);
   const [selectedBoardId, setSelectedBoardId] = useState<string | null>();
   const [boardData, setBoardData] = useState<Board[]>(boards);
@@ -101,7 +99,7 @@ const Page = ({ boards }: PageProps) => {
 
   const handleColumnAdd = useCallback(async (boardId: string, name: string) => {
     const trimmedColumn = name?.trim(); // Corrected typo to 'trimmedColumn'
-    const columnId = createResourceId();
+    const columnId = createResourceId()
     if (!name || trimmedColumn === "") {  // Check for empty or whitespace-only names
       toast.error('Naziv kolone je obavezan!');
     } else {
@@ -126,7 +124,7 @@ const Page = ({ boards }: PageProps) => {
     }).then(async (result: any) => {
       if (result.isConfirmed) {
         try {
-          await dispatch(thunks.deleteColumn({ boardId: selectedBoardId!, columnId }));
+          await dispatch(thunks.deleteColumn({ boardId: selectedBoardId!, columnId: columnId }));
           toast.success('Kolona izbrisana!')
         } catch (err) {
           toast.error('Došlo je do greške!');
@@ -354,8 +352,8 @@ const Page = ({ boards }: PageProps) => {
               >
                 <Stack alignItems="flex-start" direction="row" spacing={3}>
                   {
-                    columnsIds &&
-                    columnsIds.map((columnId: string) => (
+                    columnIds &&
+                    columnIds.map((columnId: string) => (
                       <ColumnCard
                         key={columnId}
                         columnId={columnId}

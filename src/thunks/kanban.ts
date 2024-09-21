@@ -23,11 +23,13 @@ type CreateColumnParams = {
 };
 
 export const createColumn = (params: CreateColumnParams): AppThunk => async (dispatch): Promise<void> => {
+  console.log('createColumn params', params);
+
   try {
     const response = await fetch(`/api/kanban/columns`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(params),
+      body: JSON.stringify({ ...params }),
     });
     const createColumnResponse = await response.json();
 
@@ -35,8 +37,6 @@ export const createColumn = (params: CreateColumnParams): AppThunk => async (dis
       toast.error('Neuspešno kreiranje kolone!');
     } else {
       if (createColumnResponse.boardUpdateResult.modifiedCount === 1) {
-        console.log('createColumnResponse', createColumnResponse);
-
         await dispatch(slice.actions.createColumn(params));
         toast.success('Kolona uspešno kreirana!');
       }
