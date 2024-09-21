@@ -35,6 +35,8 @@ export const createColumn = (params: CreateColumnParams): AppThunk => async (dis
       toast.error('Neuspešno kreiranje kolone!');
     } else {
       if (createColumnResponse.boardUpdateResult.modifiedCount === 1) {
+        console.log('createColumnResponse', createColumnResponse);
+
         await dispatch(slice.actions.createColumn(params));
         toast.success('Kolona uspešno kreirana!');
       }
@@ -43,6 +45,25 @@ export const createColumn = (params: CreateColumnParams): AppThunk => async (dis
     console.error('Error while creating column:', error);
   }
 };
+
+type DeleteColumnParams = {
+  boardId: string;
+  columnId: string;
+};
+
+const deleteColumn = (params: DeleteColumnParams): AppThunk =>
+  async (dispatch: any): Promise<void> => {
+    const deleteResponse = await fetch(`/api/kanban/columns/${params.columnId}`, {
+      method: 'DELETE',
+      body: JSON.stringify({ boardId: params.boardId, columnId: params.columnId }),
+    });
+
+    if (!deleteResponse.ok) {
+      toast.error('Neuspešno brisanje kolone!');
+    } else {
+      dispatch(slice.actions.deleteColumn(params.columnId));
+    }
+  };
 
 type UpdateColumnParams = {
   columnId: string;
@@ -84,24 +105,7 @@ const clearColumn =
       dispatch(slice.actions.clearColumn(params.columnId));
     };
 
-type DeleteColumnParams = {
-  boardId: string;
-  columnId: string;
-};
 
-const deleteColumn = (params: DeleteColumnParams): AppThunk =>
-  async (dispatch: any): Promise<void> => {
-    const deleteResponse = await fetch(`/api/kanban/columns/${params.columnId}`, {
-      method: 'DELETE',
-      body: JSON.stringify({ boardId: params.boardId, columnId: params.columnId }),
-    });
-
-    if (!deleteResponse.ok) {
-      toast.error('Neuspešno brisanje kolone!');
-    } else {
-      dispatch(slice.actions.deleteColumn(params.columnId));
-    }
-  };
 
 type CreateTaskParams = {
   boardId: string;
@@ -130,9 +134,11 @@ const createTask = (params: CreateTaskParams): AppThunk =>
       if (!response.ok) {
         toast.error('Neuspešno kreiranje taska!');
       }
+      const data = await response.json();
+      console.log('data', data);
 
       // Dispatch the createTask action to update Redux store
-      dispatch(slice.actions.createTask(await response.json()));
+      dispatch(slice.actions.createTask(data));
 
       // Show success alert
       toast.success('Task kreiran!');

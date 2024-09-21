@@ -22,10 +22,10 @@ import { createResourceId } from '@/utils/create-resource-id';
 import { useSession } from 'next-auth/react';
 
 
-// const useColumnsIds = (): string[] => {
-//   const { columns } = useSelector((state: any) => state.kanban);
-//   return columns.allIds;
-// };
+const useColumnsIds = (): string[] => {
+  const { columns } = useSelector((state: any) => state.kanban);
+  return columns.allIds;
+};
 
 const useBoard = (boardId: string | null | undefined): void => {
   const dispatch = useDispatch();
@@ -51,9 +51,9 @@ type PageProps = {
   taskIds: string[];
 };
 
-const Page = ({ boards, columnIds, taskIds }: PageProps) => {
+const Page = ({ boards }: PageProps) => {
   const dispatch = useDispatch();
-  // const columnsIds = useColumnsIds();
+  const columnsIds = useColumnsIds();
   const [currentTaskId, setCurrentTaskId] = useState<string | null>(null);
   const [selectedBoardId, setSelectedBoardId] = useState<string | null>();
   const [boardData, setBoardData] = useState<Board[]>(boards);
@@ -114,6 +114,30 @@ const Page = ({ boards, columnIds, taskIds }: PageProps) => {
   }, [dispatch]
   );
 
+  const handleColumnDelete = useCallback(async (selectedBoardId: string, columnId: string): Promise<void> => {
+
+    sweetalert2.fire({
+      title: 'Upozorenje!',
+      text: "Da li stvarno želite da obrišete kolonu?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Da!',
+      cancelButtonText: 'Ne!',
+    }).then(async (result: any) => {
+      if (result.isConfirmed) {
+        try {
+          await dispatch(thunks.deleteColumn({ boardId: selectedBoardId!, columnId }));
+          toast.success('Kolona izbrisana!')
+        } catch (err) {
+          toast.error('Došlo je do greške!');
+        }
+      }
+    })
+
+  },
+    [dispatch]
+  );
+
   const handleColumnClear = useCallback(async (columnId: string): Promise<void> => {
     try {
       await dispatch(
@@ -130,41 +154,11 @@ const Page = ({ boards, columnIds, taskIds }: PageProps) => {
     [dispatch]
   );
 
-  const handleColumnDelete = useCallback(async (selectedBoardId: string, columnId: string): Promise<void> => {
-
-    sweetalert2.fire({
-      title: 'Upozorenje!',
-      text: "Da li stvarno želite da obrišete kolonu?",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Da!',
-      cancelButtonText: 'Ne!',
-    }).then(async (result: any) => {
-      if (result.isConfirmed) {
-        try {
-          await dispatch(
-            thunks.deleteColumn({
-              boardId: selectedBoardId!,
-              columnId,
-            })
-          );
-          toast.success('Kolona izbrisana!')
-        } catch (err) {
-          toast.error('Došlo je do greške!');
-        }
-      }
-    })
-
-  },
-    [dispatch]
-  );
-
-  const handleColumnRename = useCallback(async (boardId: string, columnId: string, name: string, taskIds: string[]): Promise<void> => {
+  const handleColumnRename = useCallback(async (boardId: string, columnId: string, name: string): Promise<void> => {
     await dispatch(thunks.updateColumn({
       columnId,
       boardId,
       name,
-      taskIds,
     })
     );
   },
@@ -172,13 +166,7 @@ const Page = ({ boards, columnIds, taskIds }: PageProps) => {
   );
 
   const handleTaskAdd = useCallback(async (boardId: string, columnId: string, name: string, createdBy: string): Promise<void> => {
-    try {
-      await dispatch(thunks.createTask({ boardId, columnId, name, createdBy })
-      );
-    } catch (err) {
-      console.error(err);
-      toast.error('Something went wrong!');
-    }
+    await dispatch(thunks.createTask({ boardId, columnId, name, createdBy }))
   },
     [dispatch]
   );
@@ -366,14 +354,14 @@ const Page = ({ boards, columnIds, taskIds }: PageProps) => {
               >
                 <Stack alignItems="flex-start" direction="row" spacing={3}>
                   {
-                    columnIds[0] &&
-                    columnIds[0].map((columnId: string) => (
+                    columnsIds &&
+                    columnsIds.map((columnId: string) => (
                       <ColumnCard
                         key={columnId}
                         columnId={columnId}
                         onClear={() => handleColumnClear(columnId)}
                         onDelete={() => handleColumnDelete(selectedBoardId, columnId)}
-                        onRename={(name) => handleColumnRename(selectedBoardId, columnId, name, taskIds)}
+                        onRename={(name) => handleColumnRename(selectedBoardId, columnId, name)}
                         onTaskAdd={(name) => handleTaskAdd(selectedBoardId, columnId, name!, session.data!.user!.name!)}
                         onTaskOpen={handleTaskOpen}
                       />
@@ -386,7 +374,7 @@ const Page = ({ boards, columnIds, taskIds }: PageProps) => {
                 color="error"
                 size="small"
                 onClick={() => handleDelete(selectedBoardId)}
-                style={{ marginLeft: '10px', maxWidth: '200px' }}
+                style={{ margin: '30px', maxWidth: '200px' }}
               >
                 Obriši tablu
               </Button>
@@ -424,8 +412,8 @@ export const getServerSideProps = async () => {
   return {
     props: {
       boards: serializedBoards || [],
-      columnIds: columnIdsByBoards || [],
-      taskIds: taskIdsFromBoardByColumn[0] && taskIdsFromBoardByColumn[0].length > 0 ? taskIdsFromBoardByColumn[0][0] : [],
+      // columnIds: columnIdsByBoards || [],
+      // taskIds: taskIdsFromBoardByColumn[0] && taskIdsFromBoardByColumn[0].length > 0 ? taskIdsFromBoardByColumn[0][0] : [],
     },
   };
 };

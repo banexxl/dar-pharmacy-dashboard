@@ -90,10 +90,28 @@ const reducers = {
     state.isLoaded = true;
   },
   createColumn(state: KanbanState, action: CreateColumnAction): void {
-    const column = action.payload; // Assuming payload contains the full column data
-    state.columns.byId[column._id!] = column; // Adjust as per your schema, if `id` is not correct
-    state.columns.allIds.push(column._id!);
+    const column = action.payload;
+
+    // Immutably update the state
+    state.columns.byId = {
+      ...state.columns.byId,
+      [column._id!]: column,
+    };
+
+    // Ensure the new state reference is created for allIds
+    state.columns.allIds = [...state.columns.allIds, column._id!];
   },
+  deleteColumn(state: KanbanState, action: DeleteColumnAction): void {
+    const columnId = action.payload;
+
+    // Delete the column by creating a new reference to state.columns.byId
+    const { [columnId]: deletedColumn, ...remainingColumns } = state.columns.byId;
+    state.columns.byId = remainingColumns;
+
+    // Update allIds immutably
+    state.columns.allIds = state.columns.allIds.filter((id) => id !== columnId);
+  },
+
   updateColumn(state: KanbanState, action: UpdateColumnAction): void {
     const column = action.payload;
     state.columns.byId[column._id!.toString()] = column;
@@ -113,11 +131,6 @@ const reducers = {
     });
 
     state.tasks.allIds = state.tasks.allIds.filter((taskId) => taskIds!.includes(taskId));
-  },
-  deleteColumn(state: KanbanState, action: DeleteColumnAction): void {
-    const columnId = action.payload;
-    delete state.columns.byId[columnId];
-    state.columns.allIds = state.columns.allIds.filter((columnId) => columnId !== columnId);
   },
   createTask(state: KanbanState, action: CreateTaskAction): void {
     const task = action.payload;

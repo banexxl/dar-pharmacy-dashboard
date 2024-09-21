@@ -260,6 +260,7 @@ export const KanbanService = () => {
                // Fetch the board
                const board = await boardCollection.findOne({ _id: ObjectId.createFromHexString(paramsData.boardId) });
                if (!board) throw new Error('Board not found');
+               console.log(paramsData.columnId);
 
                // Find the column
                const column = board.columns.find((c: Column) => c._id!.toString() === paramsData.columnId);
