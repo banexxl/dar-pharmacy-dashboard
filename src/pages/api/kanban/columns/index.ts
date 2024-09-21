@@ -7,10 +7,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
      try {
           switch (req.method) {
                case 'POST': { // Create a new column
-                    console.log('req.body', req.body);
-
                     const { _id, boardId, name } = req.body;
-
                     const newColumn = await KanbanService().createColumn(boardId, _id, name);
                     return res.status(201).json(newColumn);
                }

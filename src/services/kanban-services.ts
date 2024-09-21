@@ -150,8 +150,6 @@ export const KanbanService = () => {
      }
 
      const createColumn = async (boardId: string, columnId: string, name: string) => {
-          console.log('createColumn', columnId, boardId, name);
-
           const client = new MongoClient(process.env.MONGODB_URI!);
           const db = client.db('KANBAN_DB');
           const boardCollection = db.collection('Boards');
@@ -250,8 +248,6 @@ export const KanbanService = () => {
      };
 
      const deleteColumn = async (params: any): Promise<boolean> => {
-          console.log('delete columnID', params);
-
           const paramsData = JSON.parse(params);
           const client = new MongoClient(process.env.MONGODB_URI!);
           const db = client.db('KANBAN_DB');
@@ -263,8 +259,6 @@ export const KanbanService = () => {
                // Fetch the board
                const board = await boardCollection.findOne({ _id: ObjectId.createFromHexString(paramsData.boardId) });
                if (!board) throw new Error('Board not found');
-               console.log(paramsData.columnId);
-
                // Find the column
                const column = board.columns.find((c: Column) => c._id!.toString() === paramsData.columnId);
                if (!column) throw new Error('Column not found');

@@ -14,6 +14,13 @@ export function createComponents(config: any) {
      const { palette } = config;
 
      return {
+          //there was a warning about aria-hidden so I added this
+          MuiSvgIcon: {
+               defaultProps: {
+                    // Set aria-hidden to false
+                    'aria-hidden': false,
+               },
+          },
           MuiAvatar: {
                styleOverrides: {
                     root: {

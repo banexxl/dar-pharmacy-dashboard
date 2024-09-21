@@ -23,8 +23,6 @@ type CreateColumnParams = {
 };
 
 export const createColumn = (params: CreateColumnParams): AppThunk => async (dispatch): Promise<void> => {
-  console.log('createColumn params', params);
-
   try {
     const response = await fetch(`/api/kanban/columns`, {
       method: 'POST',
@@ -135,8 +133,6 @@ const createTask = (params: CreateTaskParams): AppThunk =>
         toast.error('Neuspešno kreiranje taska!');
       }
       const data = await response.json();
-      console.log('data', data);
-
       // Dispatch the createTask action to update Redux store
       dispatch(slice.actions.createTask(data));
 
