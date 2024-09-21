@@ -65,7 +65,7 @@ export const ColumnCard: FC<ColumnCardProps> = (props) => {
         }}
       >
         <Droppable
-          droppableId={column.id?.toString() ? column.id.toString() : ''}
+          droppableId={column._id?.toString() ? column._id.toString() : ''}
           type="task"
         >
           {(droppableProvider): JSX.Element => (

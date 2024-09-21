@@ -101,13 +101,12 @@ const Page = ({ boards, columnIds, taskIds }: PageProps) => {
 
   const handleColumnAdd = useCallback(async (boardId: string, name: string) => {
     const trimmedColumn = name?.trim(); // Corrected typo to 'trimmedColumn'
-
+    const columnId = createResourceId();
     if (!name || trimmedColumn === "") {  // Check for empty or whitespace-only names
       toast.error('Naziv kolone je obavezan!');
     } else {
       try {
-        dispatch(thunks.createColumn({ id: createResourceId(), boardId: boardId, name: name, taskIds: [] })); // Dispatch thunk to create column
-        toast.success('Kolona dodata!');
+        await dispatch(thunks.createColumn({ _id: columnId, boardId: boardId, name: name, taskIds: [] })); // Dispatch thunk to create column
       } catch (err: any) {
         toast.error('Greška prilikom dodavanja kolone!');
       }
@@ -174,13 +173,7 @@ const Page = ({ boards, columnIds, taskIds }: PageProps) => {
 
   const handleTaskAdd = useCallback(async (boardId: string, columnId: string, name: string, createdBy: string): Promise<void> => {
     try {
-      await dispatch(
-        thunks.createTask({
-          boardId,
-          columnId,
-          name,
-          createdBy
-        })
+      await dispatch(thunks.createTask({ boardId, columnId, name, createdBy })
       );
     } catch (err) {
       console.error(err);
@@ -266,13 +259,14 @@ const Page = ({ boards, columnIds, taskIds }: PageProps) => {
         });
 
         if (!res.ok) {
-          throw new Error('Failed to delete board');
+          toast.error('Tablu nije moguće obrisati!');
+        } else {
+          setBoardData(boardData.filter((board) => board._id?.toString() !== boardId));
+          toast.success('Tabla uspešno obrisana!');
         }
-        setBoardData(boardData.filter((board) => board._id?.toString() !== boardId));
 
-        sweetalert2.fire('Deleted!', 'Your board has been deleted.', 'success');
       } catch (error) {
-        sweetalert2.fire('Error', 'There was a problem deleting the board.', 'error');
+        toast.error('Tablu nije moguće obrisati!');
       }
     }
   };
@@ -314,15 +308,6 @@ const Page = ({ boards, columnIds, taskIds }: PageProps) => {
               {boardData.map((board: Board) => (
                 <MenuItem key={board._id!.toString()} value={board._id!.toString()} sx={{ display: 'flex', justifyContent: 'space-between' }}>
                   {board.title}
-                  {/* <Button
-                    variant="contained"
-                    color="error"
-                    size="small"
-                    onClick={() => handleDelete(board._id!.toString())}
-                    style={{ marginLeft: '10px' }}
-                  >
-                    Delete
-                  </Button> */}
                 </MenuItem>
               ))}
             </TextField>
@@ -380,20 +365,31 @@ const Page = ({ boards, columnIds, taskIds }: PageProps) => {
                 }}
               >
                 <Stack alignItems="flex-start" direction="row" spacing={3}>
-                  {columnIds[0].map((columnId: string) => (
-                    <ColumnCard
-                      key={columnId}
-                      columnId={columnId}
-                      onClear={() => handleColumnClear(columnId)}
-                      onDelete={() => handleColumnDelete(selectedBoardId, columnId)}
-                      onRename={(name) => handleColumnRename(selectedBoardId, columnId, name, taskIds)}
-                      onTaskAdd={(name) => handleTaskAdd(selectedBoardId, columnId, name!, session.data!.user!.name!)}
-                      onTaskOpen={handleTaskOpen}
-                    />
-                  ))}
+                  {
+                    columnIds[0] &&
+                    columnIds[0].map((columnId: string) => (
+                      <ColumnCard
+                        key={columnId}
+                        columnId={columnId}
+                        onClear={() => handleColumnClear(columnId)}
+                        onDelete={() => handleColumnDelete(selectedBoardId, columnId)}
+                        onRename={(name) => handleColumnRename(selectedBoardId, columnId, name, taskIds)}
+                        onTaskAdd={(name) => handleTaskAdd(selectedBoardId, columnId, name!, session.data!.user!.name!)}
+                        onTaskOpen={handleTaskOpen}
+                      />
+                    ))}
                   <ColumnAdd onAdd={(e) => handleColumnAdd(selectedBoardId, e)} />
                 </Stack>
               </Box>
+              <Button
+                variant="contained"
+                color="error"
+                size="small"
+                onClick={() => handleDelete(selectedBoardId)}
+                style={{ marginLeft: '10px', maxWidth: '200px' }}
+              >
+                Obriši tablu
+              </Button>
             </DragDropContext>
           )
         }
@@ -416,9 +412,9 @@ export const getServerSideProps = async () => {
 
   const boards = await KanbanService().getAllBoards();
 
-  const columnIdsByBoards = boards.map((board: Board) => board.columns.map((column: Column) => column.id!.toString()));
+  const columnIdsByBoards = boards.map((board: Board) => board.columns.map((column: Column) => column?._id!.toString()));
 
-  const taskIdsFromBoardByColumn = boards.map((board: Board) => board.columns.map((column: Column) => column.taskIds!.map((taskId: string) => taskId.toString())));
+  const taskIdsFromBoardByColumn = boards.map((board: Board) => board.columns.map((column: Column) => column?.taskIds!.map((taskId: string) => taskId.toString())));
 
   const serializedBoards = boards.map((board: Board) => ({
     ...board,
@@ -429,7 +425,7 @@ export const getServerSideProps = async () => {
     props: {
       boards: serializedBoards || [],
       columnIds: columnIdsByBoards || [],
-      taskIds: taskIdsFromBoardByColumn[0][0] || [],
+      taskIds: taskIdsFromBoardByColumn[0] && taskIdsFromBoardByColumn[0].length > 0 ? taskIdsFromBoardByColumn[0][0] : [],
     },
   };
 };

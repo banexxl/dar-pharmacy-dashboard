@@ -1,6 +1,6 @@
+import toast from 'react-hot-toast';
 import { slice } from 'src/slices/kanban';
 import type { AppThunk } from 'src/store';
-import sweetalert2 from 'sweetalert2';
 
 
 const getBoard = (boardId: string): AppThunk => async (dispatch): Promise<void> => {
@@ -16,25 +16,28 @@ const getBoard = (boardId: string): AppThunk => async (dispatch): Promise<void> 
 };
 
 type CreateColumnParams = {
-  id: string;
+  _id?: string;
   taskIds: string[];
   name: string;
   boardId: string;
 };
 
 export const createColumn = (params: CreateColumnParams): AppThunk => async (dispatch): Promise<void> => {
-
   try {
     const response = await fetch(`/api/kanban/columns`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(params),
     });
+    const createColumnResponse = await response.json();
 
-    if (!response.ok) {
-      throw new Error('Failed to create column');
+    if (createColumnResponse.boardUpdateResult.modifiedCount === 0) {
+      toast.error('Neuspešno kreiranje kolone!');
     } else {
-      dispatch(slice.actions.createColumn({ ...params }));
+      if (createColumnResponse.boardUpdateResult.modifiedCount === 1) {
+        await dispatch(slice.actions.createColumn(params));
+        toast.success('Kolona uspešno kreirana!');
+      }
     }
   } catch (error) {
     console.error('Error while creating column:', error);
@@ -56,25 +59,15 @@ const updateColumn = (params: UpdateColumnParams): AppThunk =>
       body: JSON.stringify(params),
     });
     if (!response.ok) {
-      sweetalert2.fire({
-        icon: 'error',
-        title: 'Failed to update column',
-        allowEscapeKey: true,
-        allowOutsideClick: true,
-      })
+      toast.error('Neuspešno ažuriranje kolone!');
     }
     dispatch(slice.actions.updateColumn({
-      id: params.columnId,
+      _id: params.columnId,
       boardId: params.boardId,
       name: params.name,
       taskIds: params?.taskIds,
     }));
-    sweetalert2.fire({
-      icon: 'success',
-      title: 'Uspešno ažurirana kolona',
-      allowEscapeKey: true,
-      allowOutsideClick: true,
-    })
+    toast.success('Kolona uspešno ažurirana!');
   };
 
 type ClearColumnParams = {
@@ -104,7 +97,7 @@ const deleteColumn = (params: DeleteColumnParams): AppThunk =>
     });
 
     if (!deleteResponse.ok) {
-      throw new Error('Failed to delete column');
+      toast.error('Neuspešno brisanje kolone!');
     } else {
       dispatch(slice.actions.deleteColumn(params.columnId));
     }
@@ -135,26 +128,17 @@ const createTask = (params: CreateTaskParams): AppThunk =>
       });
 
       if (!response.ok) {
-        throw new Error('Failed to create task');
+        toast.error('Neuspešno kreiranje taska!');
       }
 
       // Dispatch the createTask action to update Redux store
       dispatch(slice.actions.createTask(await response.json()));
 
       // Show success alert
-      sweetalert2.fire({
-        icon: 'success',
-        title: 'Task successfully created',
-        allowEscapeKey: true,
-        allowOutsideClick: true,
-      });
+      toast.success('Task kreiran!');
     } catch (error: any) {
       console.error('Error while creating task:', error);
-      sweetalert2.fire({
-        icon: 'error',
-        title: 'Failed to create task',
-        text: error.toString(),
-      });
+      toast.error('Neuspešno kreiranje taska!');
     }
   };
 

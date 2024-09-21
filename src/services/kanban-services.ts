@@ -26,8 +26,17 @@ export const KanbanService = () => {
                if (!boardResults || !Array.isArray(boardResults)) {
                     throw new Error('Failed to fetch boards');
                }
-               // Assume that MongoDB returns the correct structure and directly return it as Board[]
-               return boardResults as Board[];
+
+               // Map MongoDB results to Board type
+               const boards: Board[] = boardResults.map((board: any) => ({
+                    _id: board._id,  // Convert ObjectId to string if needed
+                    title: board.title,
+                    members: board.members || [],
+                    columns: board.columns || [],
+                    tasks: board.tasks || [],
+               }));
+
+               return boards;
           } catch (err) {
                console.error('Error fetching boards:', err);
                return [];
@@ -162,7 +171,7 @@ export const KanbanService = () => {
                     {
                          $push: {
                               columns: {
-                                   id: createResourceId(),
+                                   _id: createResourceId(),
                                    name,
                                    taskIds: []
                               }
@@ -185,7 +194,7 @@ export const KanbanService = () => {
                const boardCollection = db.collection('Boards'); // Assuming you have the db object defined elsewhere
 
                const result = await boardCollection.findOneAndUpdate(
-                    { _id: new ObjectId(boardId), 'columns.id': columnId }, // Match the board and column
+                    { _id: new ObjectId(boardId), 'columns._id': columnId }, // Match the board and column
                     { $set: { 'columns.$.name': name } }, // Update only the matched column's name
                     { returnDocument: 'after' } // Return the updated document after the operation
                );
@@ -193,7 +202,7 @@ export const KanbanService = () => {
                if (!result) throw new Error('Column not found');
 
                // Return the updated column
-               const updatedColumn = result.columns.find((c: Column) => c.id!.toString() === columnId);
+               const updatedColumn = result.columns.find((c: Column) => c._id!.toString() === columnId);
                if (!updatedColumn) throw new Error('Updated column not found');
 
                return updatedColumn;
@@ -214,11 +223,11 @@ export const KanbanService = () => {
                await client.connect();
 
                // Fetch the board
-               const board = await boardCollection.findOne({ id: new ObjectId(boardId) });
+               const board = await boardCollection.findOne({ _id: new ObjectId(boardId) });
                if (!board) throw new Error('Board not found');
 
                // Find the column
-               const column = board.columns.find((c: Column) => c.id!.toString() === columnId);
+               const column = board.columns.find((c: Column) => c._id!.toString() === columnId);
                if (!column) throw new Error('Column not found');
 
                // Remove all tasks associated with the column
@@ -226,7 +235,7 @@ export const KanbanService = () => {
 
                // Update the board to clear tasks in the column
                const updateResult = await boardCollection.updateOne(
-                    { id: new ObjectId(boardId), 'columns.id': columnId },
+                    { _id: new ObjectId(boardId), 'columns._id': columnId },
                     { $set: { 'columns.$.tasks': [] } } // Clear tasks in the column
                );
 
@@ -253,7 +262,7 @@ export const KanbanService = () => {
                if (!board) throw new Error('Board not found');
 
                // Find the column
-               const column = board.columns.find((c: Column) => c.id!.toString() === paramsData.columnId);
+               const column = board.columns.find((c: Column) => c._id!.toString() === paramsData.columnId);
                if (!column) throw new Error('Column not found');
 
                // Remove all tasks associated with the column
@@ -269,7 +278,7 @@ export const KanbanService = () => {
                const updateResult = await boardCollection.updateOne(
                     { _id: ObjectId.createFromHexString(paramsData.boardId) },
                     {
-                         $pull: { columns: { id: paramsData.columnId } as any } // Remove the column
+                         $pull: { columns: { _id: paramsData.columnId } as any } // Remove the column
                     }
                );
 
@@ -296,7 +305,7 @@ export const KanbanService = () => {
 
                // Manually map the MongoDB document to your Task interface
                const task: Task = {
-                    id: result._id.toString(), // Convert ObjectId to string
+                    _id: result._id.toString(), // Convert ObjectId to string
                     createdBy: result.author, // Assuming these fields exist in the DB
                     assignedTo: result.assignedTo,
                     attachments: result.attachments,
@@ -353,12 +362,12 @@ export const KanbanService = () => {
                if (!board) throw new Error('Board not found');
 
                // Find the column in the board
-               const column = board.columns.find((c: Column) => c.id!.toString() === columnId);
+               const column = board.columns.find((c: Column) => c._id!.toString() === columnId);
                if (!column) throw new Error('Column not found');
 
                // Create the task object (without manually assigning id)
                const task: Task = {
-                    id: createResourceId(),
+                    _id: createResourceId(),
                     assignedTo: [],
                     attachments: [],
                     createdBy: createdBy,
@@ -377,9 +386,9 @@ export const KanbanService = () => {
                     { _id: new ObjectId(boardId) },
                     {
                          $push: { tasks: task } as any,  // Add the task to the board's tasks array
-                         $addToSet: { 'columns.$[column].taskIds': task.id! }  // Add the task ID to the column's taskIds
+                         $addToSet: { 'columns.$[column].taskIds': task._id! }  // Add the task ID to the column's taskIds
                     },
-                    { arrayFilters: [{ 'column.id': columnId }] }  // Match the correct column
+                    { arrayFilters: [{ 'column._id': columnId }] }  // Match the correct column
                );
 
                return task;
@@ -398,13 +407,13 @@ export const KanbanService = () => {
 
                // Find and update the task within the board's tasks array
                const result = await boardCollection.findOneAndUpdate(
-                    { id: new ObjectId(boardId), 'tasks.id': taskId },
+                    { _id: new ObjectId(boardId), 'tasks._id': taskId },
                     { $set: { 'tasks.$': update } }, // Update the task with the provided values
                     { returnDocument: 'after' }
                );
 
                if (!result!.value) throw new Error('Task not found');
-               return result!.value.tasks.find((t: Task) => t.id!.toString() === taskId); // Return the updated task
+               return result!.value.tasks.find((t: Task) => t._id!.toString() === taskId); // Return the updated task
           } finally {
                await client.close();
           }
@@ -419,33 +428,33 @@ export const KanbanService = () => {
                await client.connect();
 
                // Fetch the board
-               const board = await boardCollection.findOne({ id: new ObjectId(boardId) });
+               const board = await boardCollection.findOne({ _id: new ObjectId(boardId) });
                if (!board) throw new Error('Board not found');
 
                // Find the task to move
-               const task = board.tasks.find((t: Task) => t.id!.toString() === taskId);
+               const task = board.tasks.find((t: Task) => t._id!.toString() === taskId);
                if (!task) throw new Error('Task not found');
 
                // Find the source column
-               const sourceColumn = board.columns.find((c: Column) => c.id === task.columnId);
+               const sourceColumn = board.columns.find((c: Column) => c._id === task.columnId);
                if (!sourceColumn) throw new Error('Source column not found');
 
                // Remove task ID from the source column's task list
-               sourceColumn.taskIds = sourceColumn.taskIds.filter((id: any) => id !== taskId);
+               sourceColumn.taskIds = sourceColumn.taskIds.filter((_id: any) => _id !== taskId);
 
                if (columnId) {
                     // Move task to the new column
-                    const destinationColumn = board.columns.find((c: Column) => c.id!.toString() === columnId);
+                    const destinationColumn = board.columns.find((c: Column) => c._id!.toString() === columnId);
                     if (!destinationColumn) throw new Error('Destination column not found');
-                    destinationColumn.taskIds.splice(position, 0, task.id); // Insert task at new position
+                    destinationColumn.taskIds.splice(position, 0, task._id); // Insert task at new position
                     task.columnId = columnId; // Update task's column ID
                } else {
                     // Reposition within the same column
-                    sourceColumn.taskIds.splice(position, 0, task.id);
+                    sourceColumn.taskIds.splice(position, 0, task._id);
                }
 
                // Update the board in the database
-               await boardCollection.updateOne({ id: new ObjectId(boardId) }, { $set: board });
+               await boardCollection.updateOne({ _id: new ObjectId(boardId) }, { $set: board });
 
                return true;
           } finally {
@@ -462,25 +471,25 @@ export const KanbanService = () => {
                await client.connect();
 
                // Fetch the board
-               const board = await boardCollection.findOne({ id: new ObjectId(boardId) });
+               const board = await boardCollection.findOne({ _id: new ObjectId(boardId) });
                if (!board) throw new Error('Board not found');
 
                // Find the task to delete
-               const task = board.tasks.find((t: Task) => t.id!.toString() === taskId);
+               const task = board.tasks.find((t: Task) => t._id!.toString() === taskId);
                if (!task) throw new Error('Task not found');
 
                // Find the column associated with the task
-               const column = board.columns.find((c: Column) => c.id === task.columnId);
+               const column = board.columns.find((c: Column) => c._id === task.columnId);
                if (column) {
                     // Remove the task ID from the column's taskIds array
-                    column.taskIds = column.taskIds.filter((id: any) => id !== taskId);
+                    column.taskIds = column.taskIds.filter((_id: any) => _id !== taskId);
                }
 
                // Remove the task from the board and update it
                await boardCollection.updateOne(
-                    { id: new ObjectId(boardId) },
+                    { _id: new ObjectId(boardId) },
                     {
-                         $pull: { tasks: { id: taskId }, 'columns.$[].taskIds': taskId } // Remove task from board and column
+                         $pull: { tasks: { _id: taskId }, 'columns.$[].taskIds': taskId } // Remove task from board and column
                     } as any
                );
 
@@ -499,7 +508,7 @@ export const KanbanService = () => {
 
           // Type checking and conversion to Comment[]
           const comments: Comment[] = result.map((comment: any) => ({
-               id: comment.id.toHexString(), // Assuming `id` is an ObjectId
+               _id: comment._id.toHexString(), // Assuming `id` is an ObjectId
                authorId: comment.authorId as string,
                createdAt: comment.createdAt as Date,
                message: comment.message as string,
@@ -518,11 +527,11 @@ export const KanbanService = () => {
                await client.connect();
 
                // Fetch the board by its ID
-               const board = await db.collection('Boards').findOne({ id: new ObjectId(boardId) });
+               const board = await db.collection('Boards').findOne({ _id: new ObjectId(boardId) });
                if (!board) throw new Error('Board not found');
 
                // Find the task within the board
-               const task = board.tasks.find((t: Task) => t.id === taskId);
+               const task = board.tasks.find((t: Task) => t._id === taskId);
                if (!task) throw new Error('Task not found');
 
                // Create a new comment (without manually adding an id)
@@ -537,7 +546,7 @@ export const KanbanService = () => {
 
                // Update the board with the new comment
                await db.collection('Boards').updateOne(
-                    { id: new ObjectId(boardId), "tasks.id": new ObjectId(taskId) },
+                    { _id: new ObjectId(boardId), "tasks._id": new ObjectId(taskId) },
                     { $push: { "tasks.$.comments": comment } as any }
                );
 
@@ -554,18 +563,18 @@ export const KanbanService = () => {
           const client = new MongoClient(process.env.MONGODB_URI!)
           await client.connect(); // Ensure connection to MongoDB
 
-          const board = await boardCollection.findOne({ id: new ObjectId(boardId) });
+          const board = await boardCollection.findOne({ _id: new ObjectId(boardId) });
           if (!board) throw new Error('Board not found');
 
-          const task = board.tasks.find((t: Task) => t.id!.toString() === taskId);
+          const task = board.tasks.find((t: Task) => t._id!.toString() === taskId);
           if (!task) throw new Error('Task not found');
 
-          const comment = task.comments.find((c: Comment) => c.id!.toString() === commentId);
+          const comment = task.comments.find((c: Comment) => c._id!.toString() === commentId);
           if (!comment) throw new Error('Comment not found');
 
           Object.assign(comment, update);
 
-          await boardCollection.updateOne({ id: new ObjectId(boardId) }, { $set: board });
+          await boardCollection.updateOne({ _id: new ObjectId(boardId) }, { $set: board });
           await client.close(); // Close connection
 
           return comment;
@@ -575,15 +584,15 @@ export const KanbanService = () => {
           const client = new MongoClient(process.env.MONGODB_URI!)
           await client.connect(); // Ensure connection to MongoDB
 
-          const board = await boardCollection.findOne({ id: new ObjectId(boardId) });
+          const board = await boardCollection.findOne({ _id: new ObjectId(boardId) });
           if (!board) throw new Error('Board not found');
 
-          const task = board.tasks.find((t: Task) => t.id!.toString() === taskId);
+          const task = board.tasks.find((t: Task) => t._id!.toString() === taskId);
           if (!task) throw new Error('Task not found');
 
-          task.comments = task.comments.filter((c: Comment) => c.id!.toString() !== commentId);
+          task.comments = task.comments.filter((c: Comment) => c._id!.toString() !== commentId);
 
-          await boardCollection.updateOne({ id: new ObjectId(boardId) }, { $set: board });
+          await boardCollection.updateOne({ _id: new ObjectId(boardId) }, { $set: board });
           await client.close(); // Close connection
      };
 
@@ -596,16 +605,16 @@ export const KanbanService = () => {
                await client.connect();
 
                // Find the board by ID
-               const board = await boardCollection.findOne({ id: new ObjectId(boardId) });
+               const board = await boardCollection.findOne({ _id: new ObjectId(boardId) });
                if (!board) throw new Error('Board not found');
 
                // Find the task within the board
-               const task = board.tasks.find((t: Task) => t.id === taskId);
+               const task = board.tasks.find((t: Task) => t._id === taskId);
                if (!task) throw new Error('Task not found');
 
                // Create a new checklist object
                const checklist: Checklist = {
-                    id: createResourceId(),  // Let MongoDB generate the id for the checklist
+                    _id: createResourceId(),  // Let MongoDB generate the id for the checklist
                     name,
                     checkItems: [],       // Empty checklist by default
                };
@@ -615,7 +624,7 @@ export const KanbanService = () => {
 
                // Update the board to add the checklist to the task
                await boardCollection.updateOne(
-                    { id: new ObjectId(boardId), "tasks.id": new ObjectId(taskId) },
+                    { _id: new ObjectId(boardId), "tasks._id": new ObjectId(taskId) },
                     { $push: { "tasks.$.checklists": checklist } as any } // Add checklist to the task
                );
 
@@ -629,18 +638,18 @@ export const KanbanService = () => {
           const client = new MongoClient(process.env.MONGODB_URI!)
           await client.connect(); // Ensure connection to MongoDB
 
-          const board = await boardCollection.findOne({ id: new ObjectId(boardId) });
+          const board = await boardCollection.findOne({ _id: new ObjectId(boardId) });
           if (!board) throw new Error('Board not found');
 
-          const task = board.tasks.find((t: Task) => t.id!.toString() === taskId);
+          const task = board.tasks.find((t: Task) => t._id!.toString() === taskId);
           if (!task) throw new Error('Task not found');
 
-          const checklist = task.checklists.find((c: Checklist) => c.id!.toString() === checklistId);
+          const checklist = task.checklists.find((c: Checklist) => c._id!.toString() === checklistId);
           if (!checklist) throw new Error('Checklist not found');
 
           Object.assign(checklist, update);
 
-          await boardCollection.updateOne({ id: new ObjectId(boardId) }, { $set: board });
+          await boardCollection.updateOne({ _id: new ObjectId(boardId) }, { $set: board });
           await client.close(); // Close connection
 
           return checklist;
@@ -650,15 +659,15 @@ export const KanbanService = () => {
           const client = new MongoClient(process.env.MONGODB_URI!)
           await client.connect(); // Ensure connection to MongoDB
 
-          const board = await boardCollection.findOne({ id: new ObjectId(boardId) });
+          const board = await boardCollection.findOne({ _id: new ObjectId(boardId) });
           if (!board) throw new Error('Board not found');
 
-          const task = board.tasks.find((t: Task) => t.id!.toString() === taskId);
+          const task = board.tasks.find((t: Task) => t._id!.toString() === taskId);
           if (!task) throw new Error('Task not found');
 
-          task.checklists = task.checklists.filter((c: Checklist) => c.id!.toString() !== checklistId);
+          task.checklists = task.checklists.filter((c: Checklist) => c._id!.toString() !== checklistId);
 
-          await boardCollection.updateOne({ id: new ObjectId(boardId) }, { $set: board });
+          await boardCollection.updateOne({ _id: new ObjectId(boardId) }, { $set: board });
           await client.close(); // Close connection
 
           return true;
@@ -673,32 +682,32 @@ export const KanbanService = () => {
                await client.connect();
 
                // Find the board by ID
-               const board = await boardCollection.findOne({ id: new ObjectId(boardId) });
+               const board = await boardCollection.findOne({ _id: new ObjectId(boardId) });
                if (!board) throw new Error('Board not found');
 
                // Find the task within the board
-               const task = board.tasks.find((t: Task) => t.id === taskId);
+               const task = board.tasks.find((t: Task) => t._id === taskId);
                if (!task) throw new Error('Task not found');
 
                // Find the checklist within the task
-               const checklist = task.checklists.find((c: Checklist) => c.id!.toString() === checklistId);
+               const checklist = task.checklists.find((c: Checklist) => c._id!.toString() === checklistId);
                if (!checklist) throw new Error('Checklist not found');
 
                // Create the new check item
                const checkItem: CheckItem = {
-                    id: createResourceId(),  // Let MongoDB generate the ID
+                    _id: createResourceId(),  // Let MongoDB generate the ID
                     name,
                     state: 'incomplete',
                };
 
                // Push the check item directly to the checklist's checkItems array
                await boardCollection.updateOne(
-                    { id: new ObjectId(boardId), "tasks.id": new ObjectId(taskId), "tasks.checklists.id": new ObjectId(checklistId) },
+                    { _id: new ObjectId(boardId), "tasks._id": new ObjectId(taskId), "tasks.checklists._id": new ObjectId(checklistId) },
                     { $push: { "tasks.$[task].checklists.$[checklist].checkItems": checkItem } as any },
                     {
                          arrayFilters: [
-                              { "task.id": new ObjectId(taskId) },
-                              { "checklist.id": new ObjectId(checklistId) }
+                              { "task._id": new ObjectId(taskId) },
+                              { "checklist._id": new ObjectId(checklistId) }
                          ]
                     }
                );
@@ -714,21 +723,21 @@ export const KanbanService = () => {
           const client = new MongoClient(process.env.MONGODB_URI!)
           await client.connect(); // Ensure connection to MongoDB
 
-          const board = await boardCollection.findOne({ id: new ObjectId(boardId) });
+          const board = await boardCollection.findOne({ _id: new ObjectId(boardId) });
           if (!board) throw new Error('Board not found');
 
-          const task = board.tasks.find((t: Task) => t.id!.toString() === taskId);
+          const task = board.tasks.find((t: Task) => t._id!.toString() === taskId);
           if (!task) throw new Error('Task not found');
 
-          const checklist = task.checklists.find((c: Checklist) => c.id!.toString() === checklistId);
+          const checklist = task.checklists.find((c: Checklist) => c._id!.toString() === checklistId);
           if (!checklist) throw new Error('Checklist not found');
 
-          const checkItem = checklist.checkItems.find((ci: CheckItem) => ci.id!.toString() === checkItemId);
+          const checkItem = checklist.checkItems.find((ci: CheckItem) => ci._id!.toString() === checkItemId);
           if (!checkItem) throw new Error('Check item not found');
 
           Object.assign(checkItem, update);
 
-          await boardCollection.updateOne({ id: new ObjectId(boardId) }, { $set: board });
+          await boardCollection.updateOne({ _id: new ObjectId(boardId) }, { $set: board });
           await client.close(); // Close connection
 
           return checkItem;
@@ -738,18 +747,18 @@ export const KanbanService = () => {
           const client = new MongoClient(process.env.MONGODB_URI!)
           await client.connect(); // Ensure connection to MongoDB
 
-          const board = await boardCollection.findOne({ id: new ObjectId(boardId) });
+          const board = await boardCollection.findOne({ _id: new ObjectId(boardId) });
           if (!board) throw new Error('Board not found');
 
-          const task = board.tasks.find((t: Task) => t.id!.toString() === taskId);
+          const task = board.tasks.find((t: Task) => t._id!.toString() === taskId);
           if (!task) throw new Error('Task not found');
 
-          const checklist = task.checklists.find((c: Checklist) => c.id!.toString() === checklistId);
+          const checklist = task.checklists.find((c: Checklist) => c._id!.toString() === checklistId);
           if (!checklist) throw new Error('Checklist not found');
 
-          checklist.checkItems = checklist.checkItems.filter((ci: CheckItem) => ci.id!.toString() !== checkItemId);
+          checklist.checkItems = checklist.checkItems.filter((ci: CheckItem) => ci._id!.toString() !== checkItemId);
 
-          await boardCollection.updateOne({ id: new ObjectId(boardId) }, { $set: board });
+          await boardCollection.updateOne({ _id: new ObjectId(boardId) }, { $set: board });
           await client.close(); // Close connection
 
           return true;
