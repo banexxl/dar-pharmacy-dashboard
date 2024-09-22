@@ -56,12 +56,112 @@ const Page = ({ boards }: PageProps) => {
   const [selectedBoardId, setSelectedBoardId] = useState<string | null>();
   const [boardData, setBoardData] = useState<Board[]>(boards);
   const session = useSession();
+  const [openModal, setOpenModal] = useState(false);
+  const [boardName, setBoardName] = useState('');
+  const [error, setError] = useState('');
+  const isScreentoMedium = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'));
+  const handleOpenModal = () => setOpenModal(true);
+  const handleCloseModal = () => setOpenModal(false);
   // Fetch board data whenever the selected board changes
   useBoard(selectedBoardId);
 
   const handleBoardChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setSelectedBoardId(event.target.value as string);
   };
+
+  const handleDeleteBoard = async () => {
+    await sweetalert2.fire({
+      title: 'Upozorenje!',
+      text: "Da li stvarno želite da obrišete tablu?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Da!',
+      cancelButtonText: 'Ne!',
+    }).then(async (result: any) => {
+      if (result.isConfirmed) {
+        await dispatch(thunks.deleteBoard(selectedBoardId!));
+        //Set selected board to an existing board
+        setBoardData((prev) => {
+          const newBoardData = prev.filter((board) => board._id !== selectedBoardId);
+          if (newBoardData.length > 0) {
+            setSelectedBoardId(newBoardData[0]._id);
+          } else {
+            setSelectedBoardId(null);
+          }
+          return newBoardData;
+        });
+      }
+    })
+  };
+
+  const handleColumnAdd = useCallback(async (boardId: string, name: string) => {
+    const trimmedColumn = name?.trim(); // Corrected typo to 'trimmedColumn'
+    const columnId = createResourceId()
+    if (!name || trimmedColumn === "") {  // Check for empty or whitespace-only names
+      toast.error('Naziv kolone je obavezan!');
+    } else {
+      await dispatch(thunks.createColumn({ _id: columnId, boardId: boardId, name: name, taskIds: [] })); // Dispatch thunk to create column
+    }
+  }, [dispatch]
+  );
+
+  const handleColumnDelete = useCallback(async (selectedBoardId: string, columnId: string): Promise<void> => {
+
+    sweetalert2.fire({
+      title: 'Upozorenje!',
+      text: "Da li stvarno želite da obrišete kolonu?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Da!',
+      cancelButtonText: 'Ne!',
+    }).then(async (result: any) => {
+      if (result.isConfirmed) {
+        await dispatch(thunks.deleteColumn({ boardId: selectedBoardId!, columnId: columnId }));
+      }
+    })
+
+  },
+    [dispatch]
+  );
+
+  const handleColumnClear = useCallback(async (columnId: string): Promise<void> => {
+    sweetalert2.fire({
+      title: 'Upozorenje!',
+      text: "Da li stvarno želite da ispraznite sve task-ve iz kolone?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Da!',
+      cancelButtonText: 'Ne!',
+    }).then(async (result: any) => {
+      if (result.isConfirmed) {
+        await dispatch(thunks.clearColumn({ columnId }))
+      }
+    })
+  },
+    [dispatch]
+  );
+
+  const handleColumnRename = useCallback(async (boardId: string, columnId: string, name: string): Promise<void> => {
+    await dispatch(thunks.updateColumn({ columnId, boardId, name, }));
+  },
+    [dispatch]
+  );
+
+  const handleTaskAdd = useCallback(async (boardId: string, columnId: string, name: string, createdBy: string): Promise<void> => {
+    await dispatch(thunks.createTask({ boardId, columnId, name, createdBy }))
+  },
+    [dispatch]
+  );
+
+  const handleTaskOpen = useCallback((taskId: string): void => {
+    setCurrentTaskId(taskId);
+  }, []
+  );
+
+  const handleTaskClose = useCallback((): void => {
+    setCurrentTaskId(null);
+  }, []
+  );
 
   const handleDragEnd = useCallback(async ({ source, destination, draggableId }: DropResult): Promise<void> => {
     try {
@@ -96,95 +196,6 @@ const Page = ({ boards }: PageProps) => {
   },
     [dispatch]
   );
-
-  const handleColumnAdd = useCallback(async (boardId: string, name: string) => {
-    const trimmedColumn = name?.trim(); // Corrected typo to 'trimmedColumn'
-    const columnId = createResourceId()
-    if (!name || trimmedColumn === "") {  // Check for empty or whitespace-only names
-      toast.error('Naziv kolone je obavezan!');
-    } else {
-      try {
-        await dispatch(thunks.createColumn({ _id: columnId, boardId: boardId, name: name, taskIds: [] })); // Dispatch thunk to create column
-      } catch (err: any) {
-        toast.error('Greška prilikom dodavanja kolone!');
-      }
-    }
-  }, [dispatch]
-  );
-
-  const handleColumnDelete = useCallback(async (selectedBoardId: string, columnId: string): Promise<void> => {
-
-    sweetalert2.fire({
-      title: 'Upozorenje!',
-      text: "Da li stvarno želite da obrišete kolonu?",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Da!',
-      cancelButtonText: 'Ne!',
-    }).then(async (result: any) => {
-      if (result.isConfirmed) {
-        try {
-          await dispatch(thunks.deleteColumn({ boardId: selectedBoardId!, columnId: columnId }));
-          toast.success('Kolona izbrisana!')
-        } catch (err) {
-          toast.error('Došlo je do greške!');
-        }
-      }
-    })
-
-  },
-    [dispatch]
-  );
-
-  const handleColumnClear = useCallback(async (columnId: string): Promise<void> => {
-    try {
-      await dispatch(
-        thunks.clearColumn({
-          columnId,
-        })
-      );
-      toast.success('Column cleared');
-    } catch (err) {
-      console.error(err);
-      toast.error('Something went wrong!');
-    }
-  },
-    [dispatch]
-  );
-
-  const handleColumnRename = useCallback(async (boardId: string, columnId: string, name: string): Promise<void> => {
-    await dispatch(thunks.updateColumn({
-      columnId,
-      boardId,
-      name,
-    })
-    );
-  },
-    [dispatch]
-  );
-
-  const handleTaskAdd = useCallback(async (boardId: string, columnId: string, name: string, createdBy: string): Promise<void> => {
-    await dispatch(thunks.createTask({ boardId, columnId, name, createdBy }))
-  },
-    [dispatch]
-  );
-
-  const handleTaskOpen = useCallback((taskId: string): void => {
-    setCurrentTaskId(taskId);
-  }, []
-  );
-
-  const handleTaskClose = useCallback((): void => {
-    setCurrentTaskId(null);
-  }, []
-  );
-
-  const [openModal, setOpenModal] = useState(false);
-  const [boardName, setBoardName] = useState('');
-  const [error, setError] = useState('');
-  const isScreentoMedium = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'));
-  const handleOpenModal = () => setOpenModal(true);
-  const handleCloseModal = () => setOpenModal(false);
 
   const handleSubmit = async () => {
     if (!boardName) {
@@ -228,34 +239,6 @@ const Page = ({ boards }: PageProps) => {
     }
   };
 
-  const handleDelete = async (boardId: string) => {
-    const result = await sweetalert2.fire({
-      title: 'Are you sure?',
-      text: "Do you really want to delete this board? This process cannot be undone.",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Yes, delete it!',
-      cancelButtonText: 'No, keep it',
-    });
-
-    if (result.isConfirmed) {
-      try {
-        const res = await fetch(`/api/kanban/boards/${boardId}`, {
-          method: 'DELETE',
-        });
-
-        if (!res.ok) {
-          toast.error('Tablu nije moguće obrisati!');
-        } else {
-          setBoardData(boardData.filter((board) => board._id?.toString() !== boardId));
-          toast.success('Tabla uspešno obrisana!');
-        }
-
-      } catch (error) {
-        toast.error('Tablu nije moguće obrisati!');
-      }
-    }
-  };
 
   return (
     <>
@@ -371,7 +354,7 @@ const Page = ({ boards }: PageProps) => {
                 variant="contained"
                 color="error"
                 size="small"
-                onClick={() => handleDelete(selectedBoardId)}
+                onClick={() => handleDeleteBoard()}
                 style={{ margin: '30px', maxWidth: '200px' }}
               >
                 Obriši tablu

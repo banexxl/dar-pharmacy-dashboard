@@ -78,6 +78,15 @@ const reducers = {
     state.members.allIds = Object.keys(state.members.byId);
     state.isLoaded = true;
   },
+  deleteBoard(state: KanbanState): void {
+    state.columns.byId = {};
+    state.columns.allIds = [];
+    state.tasks.byId = {};
+    state.tasks.allIds = [];
+    state.members.byId = {};
+    state.members.allIds = [];
+    state.isLoaded = false
+  },
   getBoard(state: KanbanState, action: GetBoardAction): void {
     const board = action.payload;
 
@@ -101,7 +110,6 @@ const reducers = {
     // Ensure the new state reference is created for allIds
     state.columns.allIds = [...state.columns.allIds, column._id!];
   },
-
   deleteColumn(state: KanbanState, action: DeleteColumnAction): void {
     const columnId = action.payload;
 

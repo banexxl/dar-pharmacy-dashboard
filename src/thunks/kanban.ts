@@ -15,6 +15,24 @@ const getBoard = (boardId: string): AppThunk => async (dispatch): Promise<void> 
   }
 };
 
+const deleteBoard = (boardId: string): AppThunk => async (dispatch): Promise<void> => {
+  try {
+    const res = await fetch(`/api/kanban/boards/${boardId}`, {
+      method: 'DELETE',
+    });
+    if (!res.ok) {
+      toast.error('Tablu nije moguće obrisati!');
+    } else {
+      dispatch(slice.actions.deleteBoard());
+      toast.success('Tabla uspešno obrisana!');
+    }
+
+  } catch (error) {
+    toast.error('Tablu nije moguće obrisati!');
+  }
+  dispatch(slice.actions.deleteBoard());
+}
+
 type CreateColumnParams = {
   _id?: string;
   taskIds: string[];
@@ -60,6 +78,7 @@ const deleteColumn = (params: DeleteColumnParams): AppThunk =>
       toast.error('Neuspešno brisanje kolone!');
     } else {
       dispatch(slice.actions.deleteColumn(params.columnId));
+      toast.success('Kolona uspešno obrisana!');
     }
   };
 
@@ -80,12 +99,7 @@ const updateColumn = (params: UpdateColumnParams): AppThunk =>
     if (!response.ok) {
       toast.error('Neuspešno ažuriranje kolone!');
     }
-    dispatch(slice.actions.updateColumn({
-      _id: params.columnId,
-      boardId: params.boardId,
-      name: params.name,
-      taskIds: params?.taskIds,
-    }));
+    dispatch(slice.actions.updateColumn({ _id: params.columnId, boardId: params.boardId, name: params.name, taskIds: params?.taskIds }));
     toast.success('Kolona uspešno ažurirana!');
   };
 
@@ -365,6 +379,7 @@ export const thunks = {
   deleteColumn,
   deleteTask,
   getBoard,
+  deleteBoard,
   moveTask,
   updateCheckItem,
   updateChecklist,
