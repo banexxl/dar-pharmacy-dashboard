@@ -120,9 +120,11 @@ const reducers = {
     // Update allIds immutably
     state.columns.allIds = state.columns.allIds.filter((id) => id !== columnId);
   },
-  updateColumn(state: KanbanState, action: UpdateColumnAction): void {
-    const column = action.payload;
-    state.columns.byId[column._id!.toString()] = column;
+  renameColumn(state: KanbanState, action: UpdateColumnAction): void {
+    const updatedColumn = action.payload;
+
+    // Only update the column name while preserving other fields like taskIds
+    state.columns.byId[updatedColumn._id!].name = updatedColumn.name;
   },
   clearColumn(state: KanbanState, action: ClearColumnAction): void {
     const { boardId, columnId } = action.payload;

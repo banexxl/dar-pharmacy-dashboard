@@ -89,7 +89,7 @@ type UpdateColumnParams = {
   taskIds?: string[];
 };
 
-const updateColumn = (params: UpdateColumnParams): AppThunk =>
+const renameColumn = (params: UpdateColumnParams): AppThunk =>
   async (dispatch: any): Promise<void> => {
     const response = await fetch(`/api/kanban/columns/${params.columnId}`, {
       method: 'PUT',
@@ -99,7 +99,7 @@ const updateColumn = (params: UpdateColumnParams): AppThunk =>
     if (!response.ok) {
       toast.error('Neuspešno ažuriranje kolone!');
     }
-    dispatch(slice.actions.updateColumn({ _id: params.columnId, boardId: params.boardId, name: params.name, taskIds: params?.taskIds }));
+    dispatch(slice.actions.renameColumn({ _id: params.columnId, boardId: params.boardId, name: params.name }));
     toast.success('Kolona uspešno ažurirana!');
   };
 
@@ -389,6 +389,6 @@ export const thunks = {
   moveTask,
   updateCheckItem,
   updateChecklist,
-  updateColumn,
+  renameColumn,
   updateTask,
 };

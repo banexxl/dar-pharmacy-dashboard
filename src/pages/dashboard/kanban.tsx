@@ -142,7 +142,7 @@ const Page = ({ boards }: PageProps) => {
   );
 
   const handleColumnRename = useCallback(async (boardId: string, columnId: string, name: string): Promise<void> => {
-    await dispatch(thunks.updateColumn({ columnId, boardId, name, }));
+    await dispatch(thunks.renameColumn({ columnId, boardId, name }));
   },
     [dispatch]
   );
