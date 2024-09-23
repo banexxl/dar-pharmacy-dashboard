@@ -419,10 +419,11 @@ export const KanbanService = () => {
           }
      };
 
-     const moveTask = async (boardId: string, taskId: string, position: number, columnId?: string): Promise<boolean> => {
+     const moveTask = async (boardId: string, columnId: string | null, taskId: string, position: number): Promise<boolean> => {
           const client = new MongoClient(process.env.MONGODB_URI!);
           const db = client.db('KANBAN_DB');
           const boardCollection = db.collection('Boards');
+          console.log('usao u servis sa', boardId, columnId, taskId, position);
 
           try {
                await client.connect();
@@ -461,6 +462,7 @@ export const KanbanService = () => {
                await client.close();
           }
      };
+
 
      const deleteTask = async (boardId: string, taskId: string): Promise<boolean> => {
 

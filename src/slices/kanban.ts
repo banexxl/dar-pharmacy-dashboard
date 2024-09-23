@@ -35,7 +35,7 @@ type CreateTaskAction = PayloadAction<Task>;
 
 type UpdateTaskAction = PayloadAction<Task>;
 
-type MoveTaskAction = PayloadAction<{ taskId: string; position: number; columnId?: string }>;
+type MoveTaskAction = PayloadAction<{ boardId: string, taskId: string; position: number; columnId?: string }>;
 
 type DeleteTaskAction = PayloadAction<string>;
 
@@ -157,7 +157,7 @@ const reducers = {
     Object.assign(state.tasks.byId[task._id!.toString()], task);
   },
   moveTask(state: KanbanState, action: MoveTaskAction): void {
-    const { taskId, position, columnId } = action.payload;
+    const { boardId, taskId, position, columnId } = action.payload;
     const sourceColumnId = state.tasks.byId[taskId].columnId;
 
     // Remove task from source column

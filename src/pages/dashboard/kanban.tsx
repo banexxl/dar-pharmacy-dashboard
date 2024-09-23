@@ -164,6 +164,11 @@ const Page = ({ boards }: PageProps) => {
   );
 
   const handleDragEnd = useCallback(async ({ source, destination, draggableId }: DropResult): Promise<void> => {
+    console.log('source', source);
+    console.log('destination', destination);
+    console.log('draggableId', draggableId);
+
+
     try {
       if (!destination) {
         return;
@@ -176,6 +181,7 @@ const Page = ({ boards }: PageProps) => {
       if (source.droppableId === destination.droppableId) {
         await dispatch(
           thunks.moveTask({
+            boardId: selectedBoardId!,
             taskId: draggableId,
             position: destination.index,
           })
@@ -183,6 +189,7 @@ const Page = ({ boards }: PageProps) => {
       } else {
         await dispatch(
           thunks.moveTask({
+            boardId: selectedBoardId!,
             taskId: draggableId,
             position: destination.index,
             columnId: destination.droppableId,
@@ -194,7 +201,7 @@ const Page = ({ boards }: PageProps) => {
       toast.error('Something went wrong!');
     }
   },
-    [dispatch]
+    [dispatch, selectedBoardId]
   );
 
   const handleSubmit = async () => {

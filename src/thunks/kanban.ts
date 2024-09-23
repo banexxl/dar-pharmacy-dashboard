@@ -198,7 +198,7 @@ type UpdateTaskParams = {
 
 const updateTask = (params: UpdateTaskParams): AppThunk =>
   async (dispatch: any): Promise<void> => {
-    const response = await fetch(`/api/kanban/tasks/${params.taskId}`, {
+    const response = await fetch(`/api/kanban/tasks/`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(params.update),
@@ -209,6 +209,7 @@ const updateTask = (params: UpdateTaskParams): AppThunk =>
   };
 
 type MoveTaskParams = {
+  boardId: string;
   taskId: string;
   position: number;
   columnId?: string;
@@ -216,7 +217,7 @@ type MoveTaskParams = {
 
 const moveTask = (params: MoveTaskParams): AppThunk =>
   async (dispatch: any): Promise<void> => {
-    await fetch(`/api/kanban/tasks/${params.taskId}/move`, {
+    await fetch(`/api/kanban/tasks/${params.taskId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(params),
