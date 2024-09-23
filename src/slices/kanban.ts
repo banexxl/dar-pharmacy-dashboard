@@ -27,7 +27,7 @@ type CreateColumnAction = PayloadAction<Column>;
 
 type UpdateColumnAction = PayloadAction<Column>;
 
-type ClearColumnAction = PayloadAction<string>;
+type ClearColumnAction = PayloadAction<{ boardId: string; columnId: string }>;
 
 type DeleteColumnAction = PayloadAction<string>;
 
@@ -125,7 +125,7 @@ const reducers = {
     state.columns.byId[column._id!.toString()] = column;
   },
   clearColumn(state: KanbanState, action: ClearColumnAction): void {
-    const columnId = action.payload;
+    const { boardId, columnId } = action.payload;
 
     // taskIds to be removed
     const { taskIds } = state.columns.byId[columnId];

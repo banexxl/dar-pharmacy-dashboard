@@ -84,7 +84,7 @@ const Page = ({ boards }: PageProps) => {
         setBoardData((prev) => {
           const newBoardData = prev.filter((board) => board._id !== selectedBoardId);
           if (newBoardData.length > 0) {
-            setSelectedBoardId(newBoardData[0]._id);
+            setSelectedBoardId(newBoardData[0]._id)
           } else {
             setSelectedBoardId(null);
           }
@@ -134,11 +134,11 @@ const Page = ({ boards }: PageProps) => {
       cancelButtonText: 'Ne!',
     }).then(async (result: any) => {
       if (result.isConfirmed) {
-        await dispatch(thunks.clearColumn({ columnId }))
+        await dispatch(thunks.clearColumn({ boardId: selectedBoardId!, columnId }));
       }
     })
   },
-    [dispatch]
+    [dispatch, selectedBoardId]
   );
 
   const handleColumnRename = useCallback(async (boardId: string, columnId: string, name: string): Promise<void> => {

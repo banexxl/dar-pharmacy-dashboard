@@ -1,4 +1,3 @@
-// pages/api/columns/index.ts
 import { KanbanService } from '@/services/kanban-services';
 import { NextApiRequest, NextApiResponse } from 'next';
 
@@ -15,6 +14,15 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                     const { boardId, columnId, update } = req.body;
                     const updatedColumn = await KanbanService().updateColumn(boardId, columnId, update);
                     return res.status(200).json(updatedColumn);
+               }
+               case 'DELETE': { // Delete a specific column
+                    const body = JSON.parse(req.body)
+                    const clearColumnDBResponse = await KanbanService().clearColumn(body.boardId, body.columnId);
+                    if (!clearColumnDBResponse) {
+                         return res.status(400).end(`Bad request!`);
+                    } else {
+                         return res.status(200).end();
+                    }
                }
                default:
                     res.setHeader('Allow', ['POST']);

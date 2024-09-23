@@ -214,6 +214,8 @@ export const KanbanService = () => {
      };
 
      const clearColumn = async (boardId: string, columnId: string): Promise<boolean> => {
+          console.log('usao u servis sa', boardId, columnId);
+
           const client = new MongoClient(process.env.MONGODB_URI!);
           const db = client.db('KANBAN_DB');
           const boardCollection = db.collection('Boards');
@@ -229,14 +231,14 @@ export const KanbanService = () => {
                const column = board.columns.find((c: Column) => c._id!.toString() === columnId);
                if (!column) throw new Error('Column not found');
 
-               // Remove all tasks associated with the column
-               await db.collection('Tasks').deleteMany({ columnId });
-
                // Update the board to clear tasks in the column
                const updateResult = await boardCollection.updateOne(
                     { _id: new ObjectId(boardId), 'columns._id': columnId },
                     { $set: { 'columns.$.tasks': [] } } // Clear tasks in the column
                );
+
+               console.log('Column cleared:', updateResult.modifiedCount);
+
 
                return true;
           } catch (err) {

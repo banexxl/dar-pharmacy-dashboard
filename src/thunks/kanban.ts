@@ -104,16 +104,22 @@ const updateColumn = (params: UpdateColumnParams): AppThunk =>
   };
 
 type ClearColumnParams = {
+  boardId: string;
   columnId: string;
 };
 
 const clearColumn = (params: ClearColumnParams): AppThunk =>
   async (dispatch: any): Promise<void> => {
-    await fetch(`/api/kanban/columns/${params.columnId}/clear`, {
-      method: 'POST',
+    const clearColumnResponse = await fetch(`/api/kanban/columns/`, {
+      method: 'DELETE',
+      body: JSON.stringify({ boardId: params.boardId, columnId: params.columnId }),
     });
-
-    dispatch(slice.actions.clearColumn(params.columnId));
+    if (!clearColumnResponse.ok) {
+      toast.error('Neuspešno čišćenje kolone!');
+    } else {
+      dispatch(slice.actions.clearColumn({ boardId: params.boardId, columnId: params.columnId }));
+      toast.success('Kolona uspešno očišćena!');
+    }
   };
 
 type CreateTaskParams = {

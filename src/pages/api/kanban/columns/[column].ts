@@ -1,4 +1,3 @@
-// pages/api/columns/[columnId].ts
 import { KanbanService } from '@/services/kanban-services';
 import { NextApiRequest, NextApiResponse } from 'next';
 
@@ -12,8 +11,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                     return res.status(200).json(updatedColumn);
                }
                case 'DELETE': { // Delete a specific column
-                    console.log('req.body', req.body);
-
                     const deleteColumnDBResponse = await KanbanService().deleteColumn(req.body);
                     if (!deleteColumnDBResponse) {
                          return res.status(404).end(`Column with id ${req.query.column as string} not found`);
