@@ -41,8 +41,8 @@ export const ColumnCard: FC<ColumnCardProps> = (props) => {
         display: 'flex',
         flexDirection: 'column',
         maxHeight: '100%',
-        overflowX: 'hidden',
-        overflowY: 'hidden',
+        overflowX: 'auto',
+        overflowY: 'auto',
         width: {
           xs: 300,
           sm: 380,

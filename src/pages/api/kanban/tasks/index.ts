@@ -8,8 +8,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           switch (req.method) {
                case 'POST': { // Create a new task
                     try {
-                         const { boardId, columnId, name, createdBy } = req.body;
-                         const newTask = await KanbanService().createTask(boardId, columnId, name, createdBy);
+                         const { boardId, columnId, name, createdByEmail } = req.body;
+                         const newTask = await KanbanService().createTask(boardId, columnId, name, createdByEmail);
                          return res.status(201).json(newTask);
                     } catch (error: any) {
                          return res.status(400).json({ error: error.message });
@@ -20,8 +20,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                     return res.status(200).json(task);
                }
                case 'PUT': { // Update a specific task
-                    const { update } = req.body;
-                    const updatedTask = await KanbanService().updateTask('boardId as string', 'taskId as string', update);
+                    const updatedTask = await KanbanService().updateTask(req.body.boardId, req.body.taskId, req.body.update);
                     return res.status(200).json(updatedTask);
                }
                case 'DELETE': { // Delete a specific task

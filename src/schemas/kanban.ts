@@ -28,7 +28,7 @@ export interface Comment {
 
 export interface Task {
   _id?: string;
-  createdBy: string;
+  createdBy: Member;
   assignedTo: Member[];
   attachments: Attachment[];
   checklists: Checklist[];

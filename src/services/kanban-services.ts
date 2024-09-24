@@ -73,13 +73,29 @@ export const KanbanService = () => {
 
      const addBoard = async (title: string) => {
           const client = new MongoClient(process.env.MONGODB_URI!);
-          const db = client.db('KANBAN_DB');
 
           try {
                await client.connect();
-               const result = await db.collection('Boards').insertOne({
+
+               const kanbanDb = client.db('KANBAN_DB');
+               const accountsDb = client.db('ACCOUNTS_DB');
+
+               // Fetch members from the Accounts collection
+               const members = await accountsDb.collection('Accounts').find().toArray();
+
+               // Convert members to the desired format if needed
+               const boardMembers = members.map((member) => ({
+                    _id: member._id,
+                    name: member.name,
+                    email: member.email,
+                    role: member.role, // Customize as per your member schema
+                    avatar: member.avatar,
+               }));
+
+               // Insert a new board into the Boards collection with members
+               const result = await kanbanDb.collection('Boards').insertOne({
                     title,
-                    members: [], // Empty members array on board creation
+                    members: boardMembers, // Add fetched members to the board
                     columns: [], // Empty columns array on board creation
                });
 
@@ -91,6 +107,7 @@ export const KanbanService = () => {
                await client.close();
           }
      };
+
 
      const deleteBoard = async (boardId: string) => {
           const client = new MongoClient(process.env.MONGODB_URI!);
@@ -349,10 +366,15 @@ export const KanbanService = () => {
           }
      }
 
-     const createTask = async (boardId: string, columnId: string, name: string, createdBy: string): Promise<any> => {
+     const createTask = async (boardId: string, columnId: string, name: string, createdByEmail: string): Promise<any> => {
           const client = new MongoClient(process.env.MONGODB_URI!);
           const db = client.db('KANBAN_DB');
           const boardCollection = db.collection('Boards');
+
+          const dbAccounts = client.db('ACCOUNTS_DB');
+          const accountsCollection = dbAccounts.collection('Accounts');
+
+          const createdByObject = await accountsCollection.findOne({ email: createdByEmail });
 
           try {
                await client.connect();
@@ -370,7 +392,7 @@ export const KanbanService = () => {
                     _id: createResourceId(),
                     assignedTo: [],
                     attachments: [],
-                    createdBy: createdBy,
+                    createdBy: createdByObject as unknown as Member,
                     checklists: [],
                     columnId,
                     comments: [],
@@ -401,19 +423,42 @@ export const KanbanService = () => {
           const client = new MongoClient(process.env.MONGODB_URI!);
           const db = client.db('KANBAN_DB');
           const boardCollection = db.collection('Boards');
+          console.log('usao u servis sa', boardId, taskId, update);
 
           try {
                await client.connect();
 
+               // Prepare the update object based on the properties present in the update argument
+               const taskUpdate: any = {};
+
+               if (update.name !== undefined) taskUpdate['tasks.$.name'] = update.name;
+               if (update.assignedTo !== undefined) taskUpdate['tasks.$.assignedTo'] = update.assignedTo;
+               if (update.attachments !== undefined) taskUpdate['tasks.$.attachments'] = update.attachments;
+               if (update.checklists !== undefined) taskUpdate['tasks.$.checklists'] = update.checklists;
+               if (update.columnId !== undefined) taskUpdate['tasks.$.columnId'] = update.columnId;
+               if (update.comments !== undefined) taskUpdate['tasks.$.comments'] = update.comments;
+               if (update.description !== undefined) taskUpdate['tasks.$.description'] = update.description;
+               if (update.due !== undefined) taskUpdate['tasks.$.due'] = update.due;
+               if (update.isSubscribed !== undefined) taskUpdate['tasks.$.isSubscribed'] = update.isSubscribed;
+               if (update.labels !== undefined) taskUpdate['tasks.$.labels'] = update.labels;
+
+               // Ensure that at least one property is being updated
+               if (Object.keys(taskUpdate).length === 0) {
+                    throw new Error('No valid fields to update');
+               }
+
                // Find and update the task within the board's tasks array
                const result = await boardCollection.findOneAndUpdate(
                     { _id: new ObjectId(boardId), 'tasks._id': taskId },
-                    { $set: { 'tasks.$': update } }, // Update the task with the provided values
+                    { $set: taskUpdate }, // Update only the provided fields
                     { returnDocument: 'after' }
                );
+               console.log('result', result);
 
-               if (!result!.value) throw new Error('Task not found');
-               return result!.value.tasks.find((t: Task) => t._id!.toString() === taskId); // Return the updated task
+               if (!result) throw new Error('Task not found');
+
+               // Return the updated task
+               return result!.tasks.find((t: Task) => t._id!.toString() === taskId);
           } finally {
                await client.close();
           }
@@ -462,7 +507,6 @@ export const KanbanService = () => {
                await client.close();
           }
      };
-
 
      const deleteTask = async (boardId: string, taskId: string): Promise<boolean> => {
 

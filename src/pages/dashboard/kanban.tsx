@@ -147,8 +147,8 @@ const Page = ({ boards }: PageProps) => {
     [dispatch]
   );
 
-  const handleTaskAdd = useCallback(async (boardId: string, columnId: string, name: string, createdBy: string): Promise<void> => {
-    await dispatch(thunks.createTask({ boardId, columnId, name, createdBy }))
+  const handleTaskAdd = useCallback(async (boardId: string, columnId: string, name: string, createdByEmail: string): Promise<void> => {
+    await dispatch(thunks.createTask({ boardId, columnId, name, createdByEmail }))
   },
     [dispatch]
   );
@@ -164,11 +164,6 @@ const Page = ({ boards }: PageProps) => {
   );
 
   const handleDragEnd = useCallback(async ({ source, destination, draggableId }: DropResult): Promise<void> => {
-    console.log('source', source);
-    console.log('destination', destination);
-    console.log('draggableId', draggableId);
-
-
     try {
       if (!destination) {
         return;
@@ -315,6 +310,11 @@ const Page = ({ boards }: PageProps) => {
                 error={!!error}
                 helperText={error}
                 sx={{ mb: 3 }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleSubmit();
+                  }
+                }}
               />
               <Button variant="contained" onClick={handleSubmit}>
                 Kreiraj
@@ -334,8 +334,6 @@ const Page = ({ boards }: PageProps) => {
                   display: 'flex',
                   flexGrow: 1,
                   flexShrink: 1,
-                  overflowX: 'auto',
-                  overflowY: 'hidden',
                   px: 3,
                   py: 3,
                 }}
@@ -350,7 +348,7 @@ const Page = ({ boards }: PageProps) => {
                         onClear={() => handleColumnClear(columnId)}
                         onDelete={() => handleColumnDelete(selectedBoardId, columnId)}
                         onRename={(name) => handleColumnRename(selectedBoardId, columnId, name)}
-                        onTaskAdd={(name) => handleTaskAdd(selectedBoardId, columnId, name!, session.data!.user!.name!)}
+                        onTaskAdd={(name) => handleTaskAdd(selectedBoardId, columnId, name!, session.data!.user!.email!)}
                         onTaskOpen={handleTaskOpen}
                       />
                     ))}
@@ -384,25 +382,34 @@ const Page = ({ boards }: PageProps) => {
 Page.getLayout = (page: any) => <DashboardLayout>{page}</DashboardLayout>;
 
 export default Page;
-
 export const getServerSideProps = async () => {
-
   const boards = await KanbanService().getAllBoards();
-
-  // const columnIdsByBoards = boards.map((board: Board) => board.columns.map((column: Column) => column?._id!.toString()));
-
-  // const taskIdsFromBoardByColumn = boards.map((board: Board) => board.columns.map((column: Column) => column?.taskIds!.map((taskId: string) => taskId.toString())));
 
   const serializedBoards = boards.map((board: Board) => ({
     ...board,
-    _id: board._id!.toString(),  // Convert ObjectId to string
+    _id: board._id!.toString(),  // Convert board _id to string
+    members: board.members.map((member: Member) => ({
+      ...member,
+      _id: member._id!.toString(),  // Convert member _id to string
+    })),
+    columns: board.columns.map((column: Column) => ({
+      ...column,
+      _id: column._id?.toString(),  // Convert column _id to string
+      taskIds: column.taskIds?.map(taskId => taskId.toString()),  // Convert taskIds to strings
+    })),
+    tasks: board.tasks.map((task: Task) => ({
+      ...task,
+      _id: task._id?.toString(),  // Convert task _id to string
+      createdBy: {
+        ...task.createdBy,
+        _id: task.createdBy._id!.toString(),  // Convert createdBy._id to string
+      },
+    })),
   }));
 
   return {
     props: {
       boards: serializedBoards || [],
-      // columnIds: columnIdsByBoards || [],
-      // taskIds: taskIdsFromBoardByColumn[0] && taskIdsFromBoardByColumn[0].length > 0 ? taskIdsFromBoardByColumn[0][0] : [],
     },
   };
 };

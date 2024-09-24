@@ -70,17 +70,16 @@ const useColumn = (columnId?: string): Column | null => {
   });
 };
 
-const useAuthor = (authorId?: string): Member | null => {
-  return useSelector((state: RootState) => {
-    const { members } = state.kanban;
+// const useAuthor = (authorId?: string): Member | null => {
 
-    if (!authorId) {
-      return null;
-    }
-
-    return members.byId[authorId] || null;
-  });
-};
+//   return useSelector((state: RootState) => {
+//     const { members } = state.kanban;
+//     if (!authorId) {
+//       return null;
+//     }
+//     return members.byId[authorId] || null;
+//   });
+// };
 
 const useAssignees = (assigneesIds?: string[]): Member[] => {
   return useSelector((state: RootState) => {
@@ -108,8 +107,9 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
   const dispatch = useDispatch();
   const columns = useColumns();
   const task = useTask(taskId);
+
   const column = useColumn(task?.columnId);
-  const author = useAuthor(task?.createdBy!.toString());
+
   const assignedTo = useAssignees(task?.assignedTo.map((assignee) => assignee._id!.toString()) || []);
   const mdUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
   const [currentTab, setCurrentTab] = useState<string>('overview');
@@ -151,6 +151,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
       try {
         await dispatch(
           thunks.moveTask({
+            boardId: boardId!.toString(),
             taskId: task!._id!.toString(),
             position: 0,
             columnId,
@@ -185,6 +186,8 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
       try {
         await dispatch(
           thunks.updateTask({
+            boardId: boardId!.toString(),
+
             taskId: task!._id!.toString(),
             update: {
               name,
@@ -233,6 +236,8 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
         try {
           await dispatch(
             thunks.updateTask({
+              boardId: boardId!.toString(),
+
               taskId: task!._id!.toString(),
               update: {
                 description,
@@ -258,6 +263,8 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
     try {
       await dispatch(
         thunks.updateTask({
+          boardId: boardId!.toString(),
+
           taskId: task!._id!.toString(),
           update: { isSubscribed: true },
         })
@@ -272,6 +279,8 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
     try {
       await dispatch(
         thunks.updateTask({
+          boardId: boardId!.toString(),
+
           taskId: task!._id!.toString(),
           update: { isSubscribed: false },
         })
@@ -287,6 +296,8 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
       try {
         await dispatch(
           thunks.updateTask({
+            boardId: boardId!.toString(),
+
             taskId: task!._id!.toString(),
             update: {
               labels,
@@ -597,7 +608,9 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
                 xs={12}
                 sm={8}
               >
-                {author && <Avatar src={author.avatar || undefined} />}
+                <Typography color="text.secondary" variant="caption">
+                  {task.createdBy.name}
+                </Typography>
               </Grid>
               <Grid
                 xs={12}

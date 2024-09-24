@@ -126,7 +126,7 @@ type CreateTaskParams = {
   boardId: string;
   columnId: string;
   name: string;
-  createdBy: string;
+  createdByEmail: string;
 };
 
 const createTask = (params: CreateTaskParams): AppThunk =>
@@ -137,7 +137,7 @@ const createTask = (params: CreateTaskParams): AppThunk =>
         boardId: params.boardId,
         columnId: params.columnId,
         name: params.name,
-        createdBy: params.createdBy, // Authenticated user's ID from NextAuth session
+        createdByEmail: params.createdByEmail, // Authenticated user's ID from NextAuth session
       };
 
       const response = await fetch(`/api/kanban/tasks`, {
@@ -187,9 +187,12 @@ const deleteTask = (params: DeleteTaskParams): AppThunk =>
   };
 
 type UpdateTaskParams = {
+  boardId: string;
   taskId: string;
   update: {
     name?: string;
+    assignedTo?: string;
+    attachments?: string[];
     description?: string;
     isSubscribed?: boolean;
     labels?: string[];
@@ -198,12 +201,15 @@ type UpdateTaskParams = {
 
 const updateTask = (params: UpdateTaskParams): AppThunk =>
   async (dispatch: any): Promise<void> => {
+    console.log('params', params);
+
     const response = await fetch(`/api/kanban/tasks/`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(params.update),
+      body: JSON.stringify(params),
     });
     const data = await response.json();
+    console.log('data', data);
 
     dispatch(slice.actions.updateTask(data));
   };
