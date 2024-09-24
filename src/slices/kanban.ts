@@ -35,7 +35,7 @@ type CreateTaskAction = PayloadAction<Task>;
 
 type UpdateTaskAction = PayloadAction<Task>;
 
-type MoveTaskAction = PayloadAction<{ boardId: string, taskId: string; position: number; columnId?: string }>;
+type MoveTaskAction = PayloadAction<{ boardId: string, sourceColumnId: string, destinationColumnId: string, taskId: string; position: number }>;
 
 type DeleteTaskAction = PayloadAction<string>;
 
@@ -153,28 +153,20 @@ const reducers = {
   },
   updateTask(state: KanbanState, action: UpdateTaskAction): void {
     const task = action.payload;
-
     Object.assign(state.tasks.byId[task._id!.toString()], task);
   },
+  // Modified moveTask reducer to handle both source and destination columns
   moveTask(state: KanbanState, action: MoveTaskAction): void {
-    const { boardId, taskId, position, columnId } = action.payload;
-    const sourceColumnId = state.tasks.byId[taskId].columnId;
+    const { taskId, sourceColumnId, destinationColumnId, position, boardId } = action.payload;
 
-    // Remove task from source column
+    // Remove task from the source column
     state.columns.byId[sourceColumnId].taskIds = state.columns.byId[sourceColumnId].taskIds!.filter(
       (_taskId) => _taskId !== taskId
     );
 
-    // If columnId exists, it means that we have to add the task to the new column
-    if (columnId) {
-      // Change task's columnId reference
-      state.tasks.byId[taskId].columnId = columnId;
-      // Push the taskId to the specified position
-      state.columns.byId[columnId].taskIds!.splice(position, 0, taskId);
-    } else {
-      // Push the taskId to the specified position
-      state.columns.byId[sourceColumnId].taskIds.splice(position, 0, taskId);
-    }
+    // Add task to the destination column at the specified position
+    state.tasks.byId[taskId].columnId = destinationColumnId; // Update the task's column reference
+    state.columns.byId[destinationColumnId].taskIds!.splice(position, 0, taskId);
   },
   deleteTask(state: KanbanState, action: DeleteTaskAction): void {
     const taskId = action.payload;

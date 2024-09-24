@@ -464,11 +464,16 @@ export const KanbanService = () => {
           }
      };
 
-     const moveTask = async (boardId: string, columnId: string | null, taskId: string, position: number): Promise<boolean> => {
+     const moveTask = async (
+          boardId: string,
+          sourceColumnId: string,
+          destinationColumnId: string | null,
+          taskId: string,
+          position: number
+     ): Promise<boolean> => {
           const client = new MongoClient(process.env.MONGODB_URI!);
           const db = client.db('KANBAN_DB');
           const boardCollection = db.collection('Boards');
-          console.log('usao u servis sa', boardId, columnId, taskId, position);
 
           try {
                await client.connect();
@@ -478,29 +483,36 @@ export const KanbanService = () => {
                if (!board) throw new Error('Board not found');
 
                // Find the task to move
-               const task = board.tasks.find((t: Task) => t._id!.toString() === taskId);
+               const task = board.tasks.find((t: Task) => t._id === taskId);
                if (!task) throw new Error('Task not found');
 
                // Find the source column
-               const sourceColumn = board.columns.find((c: Column) => c._id === task.columnId);
+               const sourceColumn = board.columns.find((c: Column) => c._id === sourceColumnId);
                if (!sourceColumn) throw new Error('Source column not found');
 
                // Remove task ID from the source column's task list
-               sourceColumn.taskIds = sourceColumn.taskIds.filter((_id: any) => _id !== taskId);
+               sourceColumn.taskIds = sourceColumn.taskIds.filter((_id: string) => _id !== taskId);
 
-               if (columnId) {
-                    // Move task to the new column
-                    const destinationColumn = board.columns.find((c: Column) => c._id!.toString() === columnId);
+               if (destinationColumnId) {
+                    // Moving to a different column
+                    const destinationColumn = board.columns.find((c: Column) => c._id === destinationColumnId);
                     if (!destinationColumn) throw new Error('Destination column not found');
-                    destinationColumn.taskIds.splice(position, 0, task._id); // Insert task at new position
-                    task.columnId = columnId; // Update task's column ID
+
+                    // Insert task ID into the destination column at the new position
+                    destinationColumn.taskIds.splice(position, 0, taskId);
+
+                    // Update the task's column ID
+                    task.columnId = destinationColumnId;
                } else {
-                    // Reposition within the same column
-                    sourceColumn.taskIds.splice(position, 0, task._id);
+                    // Repositioning within the same column
+                    sourceColumn.taskIds.splice(position, 0, taskId);
                }
 
                // Update the board in the database
-               await boardCollection.updateOne({ _id: new ObjectId(boardId) }, { $set: board });
+               await boardCollection.updateOne(
+                    { _id: new ObjectId(boardId) },
+                    { $set: { columns: board.columns, tasks: board.tasks } }
+               );
 
                return true;
           } finally {

@@ -1,6 +1,6 @@
 import toast from 'react-hot-toast';
 import { slice } from 'src/slices/kanban';
-import type { AppThunk } from 'src/store';
+import type { AppThunk, RootState } from 'src/store';
 
 
 const getBoard = (boardId: string): AppThunk => async (dispatch): Promise<void> => {
@@ -218,19 +218,51 @@ type MoveTaskParams = {
   boardId: string;
   taskId: string;
   position: number;
-  columnId?: string;
+  sourceColumnId: string;
+  destinationColumnId: string;
 };
 
-const moveTask = (params: MoveTaskParams): AppThunk =>
-  async (dispatch: any): Promise<void> => {
-    await fetch(`/api/kanban/tasks/${params.taskId}`, {
+const moveTask = (params: MoveTaskParams): AppThunk => async (dispatch: any, getState: () => RootState) => {
+  const { boardId, taskId, sourceColumnId, destinationColumnId, position } = params;
+
+  // Step 1: Optimistically update the state first
+  dispatch(slice.actions.moveTask(params));
+
+  try {
+    // Step 2: Perform the API call to persist the task movement
+    const response = await fetch(`/api/kanban/tasks/${taskId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(params),
     });
 
-    dispatch(slice.actions.moveTask(params));
-  };
+    // Handle unsuccessful response
+    if (!response.ok) {
+      throw new Error('Failed to update task position on the server.');
+    }
+  } catch (error) {
+    // Step 3: Handle the error (e.g., revert state changes, show an error message)
+    console.error('API Error:', error);
+
+    // Revert the task movement using the original column information
+    const originalPosition = getState().kanban.columns.byId[sourceColumnId].taskIds!.indexOf(taskId);
+
+    // Revert state change by swapping source and destination
+    dispatch(
+      slice.actions.moveTask({
+        boardId: params.boardId,
+        taskId,
+        sourceColumnId: destinationColumnId, // Swap back to the original state
+        destinationColumnId: sourceColumnId, // Swap back to the original state
+        position: originalPosition, // Restore to original position
+      })
+    );
+
+    // Show error notification
+    alert('Failed to move the task. Please try again.');
+  }
+};
+
 
 type AddCommentParams = {
   taskId: string;

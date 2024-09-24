@@ -179,6 +179,8 @@ const Page = ({ boards }: PageProps) => {
             boardId: selectedBoardId!,
             taskId: draggableId,
             position: destination.index,
+            sourceColumnId: source.droppableId,
+            destinationColumnId: destination.droppableId,
           })
         );
       } else {
@@ -187,7 +189,8 @@ const Page = ({ boards }: PageProps) => {
             boardId: selectedBoardId!,
             taskId: draggableId,
             position: destination.index,
-            columnId: destination.droppableId,
+            sourceColumnId: source.droppableId,
+            destinationColumnId: destination.droppableId,
           })
         );
       }
