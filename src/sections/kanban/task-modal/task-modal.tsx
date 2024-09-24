@@ -154,7 +154,8 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
             boardId: boardId!.toString(),
             taskId: task!._id!.toString(),
             position: 0,
-            columnId,
+            sourceColumnId: task!.columnId!.toString(),
+            destinationColumnId: columnId,
           })
         );
         onClose?.();
