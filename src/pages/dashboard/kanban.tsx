@@ -411,7 +411,7 @@ export const getServerSideProps = async () => {
         ...task.createdBy,
         _id: task.createdBy._id!.toString(),  // Convert createdBy._id to string
       },
-      due: task.due,
+      due: task.due?.toISOString(),  // Convert due date to ISO string
     })),
   }));
 
