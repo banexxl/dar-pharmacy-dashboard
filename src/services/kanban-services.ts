@@ -436,7 +436,10 @@ export const KanbanService = () => {
                if (update.columnId !== undefined) taskUpdate['tasks.$.columnId'] = update.columnId;
                if (update.comments !== undefined) taskUpdate['tasks.$.comments'] = update.comments;
                if (update.description !== undefined) taskUpdate['tasks.$.description'] = update.description;
-               if (update.due !== undefined) taskUpdate['tasks.$.due'] = new Date(update?.due);
+               if (update.due !== undefined) {
+                    // Check if due is not null before converting it to Date
+                    taskUpdate['tasks.$.due'] = update.due ? new Date(update.due) : null;
+               }
                if (update.isSubscribed !== undefined) taskUpdate['tasks.$.isSubscribed'] = update.isSubscribed;
                if (update.labels !== undefined) taskUpdate['tasks.$.labels'] = update.labels;
 
