@@ -1,5 +1,5 @@
 import type { ChangeEvent, FC, KeyboardEvent } from 'react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
@@ -30,13 +30,14 @@ import type { RootState } from 'src/store';
 import { useDispatch, useSelector } from 'src/store';
 import { thunks } from 'src/thunks/kanban';
 import type { Column, Member, Task } from 'src/schemas/kanban';
-
 import { TaskChecklist } from './task-checklist';
 import { TaskComment } from './task-comment';
 import { TaskCommentAdd } from './task-comment-add';
 import { TaskLabels } from './task-labels';
 import { TaskStatus } from './task-status';
 import { Autocomplete, FormControl, TextField } from '@mui/material';
+import sweetalert2 from 'sweetalert2';
+import { DatePicker } from '@mui/x-date-pickers';
 
 const useColumns = (): Column[] => {
   return useSelector((state) => {
@@ -110,12 +111,26 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
   const task = useTask(taskId);
   const column = useColumn(task?.columnId);
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
-
+  const chipRef = useRef(null);
   const assignedTo = useAssignees(task?.assignedTo.map((assignee) => assignee._id!.toString()) || []);
   const mdUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
   const [currentTab, setCurrentTab] = useState<string>('overview');
   const [nameCopy, setNameCopy] = useState<string>(task?.name || '');
   const debounceMs = 500;
+  const [openDatePicker, setOpenDatePicker] = useState(false);
+
+  const handleDateChange = (newDate: Date) => {
+    dispatch(
+      thunks.updateTask({
+        boardId: boardId!.toString(),
+        taskId: task!._id!.toString(),
+        update: {
+          due: new Date(newDate),
+        },
+      })
+    );
+    toast.success('Datum uspešno ažuriran!');
+  };
 
   const handleTabsReset = useCallback(() => {
     setCurrentTab('overview');
@@ -169,19 +184,31 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
   );
 
   const handleDelete = useCallback(async (): Promise<void> => {
-    try {
-      await dispatch(
-        thunks.deleteTask({
-          boardId: boardId!.toString(),
-          taskId: task!._id!.toString(),
-        })
-      );
-      onClose?.();
-    } catch (err) {
-      console.error(err);
-      toast.error('Something went wrong!');
-    }
-  }, [dispatch, task, onClose]);
+    onClose?.();
+    sweetalert2.fire({
+      title: 'Da li zaista želite da obrišete zadatak?',
+      text: 'Ova akcija je nepovratna!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Da, obriši!',
+      cancelButtonText: 'Odustani!',
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await dispatch(
+            thunks.deleteTask({
+              boardId: boardId!.toString(),
+              taskId: task!._id!.toString(),
+            })
+          );
+          onClose?.();
+        } catch (err) {
+          console.error(err);
+          toast.error('Something went wrong!');
+        }
+      }
+    })
+  }, [dispatch, task, onClose])
 
   const handleNameUpdate = useCallback(
     async (name: string) => {
@@ -195,9 +222,10 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
             },
           })
         );
+        toast.success('Uspešno ažuriranje zadatka!');
       } catch (err) {
         console.error(err);
-        toast.error('Something went wrong!');
+        toast.error('Ne uspešno ažuriranje zadatka!');
       }
     },
     [dispatch, task]
@@ -258,6 +286,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
         assignedTo: task!.assignedTo.filter((assignee) => assignee._id !== member._id) // Remove the selected member from the task's assigned members list
       }
     }));
+    toast.success('Član uspešno uklonjen!'); // Show success message
   }
 
   const handleDescriptionUpdate = useMemo(
@@ -326,8 +355,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
       try {
         await dispatch(
           thunks.updateTask({
-            boardId: boardId!.toString(),
-
+            boardId: boardId!.toString(), // Add the boardId to the updateTask thunk
             taskId: task!._id!.toString(),
             update: {
               labels,
@@ -765,10 +793,25 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
                 sm={8}
               >
                 {task.due && (
-                  <Chip
-                    size="small"
-                    label={format(task.due, 'MMM dd, yyyy')}
-                  />
+                  <>
+                    <Chip
+                      size="small"
+                      label={task.due ? format(new Date(task.due), 'MMM dd, yyyy') : 'No Due Date'}
+                      onClick={() => setOpenDatePicker(true)} // Open the date picker when clicked  
+                      ref={chipRef}
+                    />
+                    <DatePicker
+                      open={openDatePicker}
+                      value={task?.due}
+                      onChange={(newValue: any) => handleDateChange(newValue)}
+                      onClose={() => setOpenDatePicker(false)} // Close the picker when clicked outside
+                      PopperProps={{
+                        anchorEl: chipRef.current, // Position the calendar relative to the chip
+                        placement: 'bottom-start', // Opens below the chip
+                      }}
+                      renderInput={(params) => <div style={{ display: 'none' }} />} // Hides the default input
+                    />
+                  </>
                 )}
               </Grid>
               {/* Labels */}

@@ -10,8 +10,9 @@ import Stack from '@mui/material/Stack';
 import SvgIcon from '@mui/material/SvgIcon';
 
 import { usePopover } from 'src/hooks/use-popover';
+import { Typography } from '@mui/material';
 
-const options: string[] = ['Business', 'Planning', 'Frontend', 'Design'];
+const options: string[] = ['Apoteka', 'Inventar', 'Održavanje', 'Ponuda', 'Sastanak', 'Servis', 'Skladište', 'Telefon', 'Zadatak'];
 
 interface TaskLabelsProps {
   labels?: string[];
@@ -99,7 +100,9 @@ export const TaskLabels: FC<TaskLabelsProps> = (props) => {
             key={option}
             onClick={() => handleToggle(option)}
           >
-            {option}
+            <Typography color="text.secondary" variant="caption">
+              {option}
+            </Typography>
           </MenuItem>
         ))}
       </Menu>

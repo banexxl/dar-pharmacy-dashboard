@@ -396,7 +396,7 @@ export const KanbanService = () => {
                     columnId,
                     comments: [],
                     description: null,
-                    due: null,
+                    due: new Date(),
                     isSubscribed: false,
                     labels: [],
                     name,
@@ -422,7 +422,6 @@ export const KanbanService = () => {
           const client = new MongoClient(process.env.MONGODB_URI!);
           const db = client.db('KANBAN_DB');
           const boardCollection = db.collection('Boards');
-          console.log('usao u update task servis sa', boardId, taskId, update);
 
           try {
                await client.connect();
@@ -437,7 +436,7 @@ export const KanbanService = () => {
                if (update.columnId !== undefined) taskUpdate['tasks.$.columnId'] = update.columnId;
                if (update.comments !== undefined) taskUpdate['tasks.$.comments'] = update.comments;
                if (update.description !== undefined) taskUpdate['tasks.$.description'] = update.description;
-               if (update.due !== undefined) taskUpdate['tasks.$.due'] = update.due;
+               if (update.due !== undefined) taskUpdate['tasks.$.due'] = new Date(update?.due);
                if (update.isSubscribed !== undefined) taskUpdate['tasks.$.isSubscribed'] = update.isSubscribed;
                if (update.labels !== undefined) taskUpdate['tasks.$.labels'] = update.labels;
 

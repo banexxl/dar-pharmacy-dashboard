@@ -197,6 +197,7 @@ type UpdateTaskParams = {
     description?: string;
     isSubscribed?: boolean;
     labels?: string[];
+    due?: Date | null;
   };
 };
 
