@@ -1,3 +1,4 @@
+import { Member } from '@/schemas/kanban';
 import toast from 'react-hot-toast';
 import { slice } from 'src/slices/kanban';
 import type { AppThunk, RootState } from 'src/store';
@@ -191,7 +192,7 @@ type UpdateTaskParams = {
   taskId: string;
   update: {
     name?: string;
-    assignedTo?: string;
+    assignedTo?: Member[];
     attachments?: string[];
     description?: string;
     isSubscribed?: boolean;
@@ -201,16 +202,12 @@ type UpdateTaskParams = {
 
 const updateTask = (params: UpdateTaskParams): AppThunk =>
   async (dispatch: any): Promise<void> => {
-    console.log('params', params);
-
     const response = await fetch(`/api/kanban/tasks/`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(params),
     });
     const data = await response.json();
-    console.log('data', data);
-
     dispatch(slice.actions.updateTask(data));
   };
 

@@ -10,14 +10,13 @@ import EyeOffIcon from '@untitled-ui/icons-react/build/esm/EyeOff';
 import PlusIcon from '@untitled-ui/icons-react/build/esm/Plus';
 import XIcon from '@untitled-ui/icons-react/build/esm/X';
 import Avatar from '@mui/material/Avatar';
-import AvatarGroup from '@mui/material/AvatarGroup';
+import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
 import Divider from '@mui/material/Divider';
 import Drawer from '@mui/material/Drawer';
 import Grid from '@mui/material/Unstable_Grid2';
-import IconButton from '@mui/material/IconButton';
 import Input from '@mui/material/Input';
 import Stack from '@mui/material/Stack';
 import SvgIcon from '@mui/material/SvgIcon';
@@ -26,7 +25,7 @@ import Tabs from '@mui/material/Tabs';
 import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import type { Theme } from '@mui/material/styles/createTheme';
-
+import { IconButton, MenuItem } from '@mui/material';
 import type { RootState } from 'src/store';
 import { useDispatch, useSelector } from 'src/store';
 import { thunks } from 'src/thunks/kanban';
@@ -37,6 +36,7 @@ import { TaskComment } from './task-comment';
 import { TaskCommentAdd } from './task-comment-add';
 import { TaskLabels } from './task-labels';
 import { TaskStatus } from './task-status';
+import { Autocomplete, FormControl, TextField } from '@mui/material';
 
 const useColumns = (): Column[] => {
   return useSelector((state) => {
@@ -100,15 +100,16 @@ interface TaskModalProps {
   open?: boolean;
   taskId?: string;
   boardId?: string;
+  members?: Member[];
 }
 
 export const TaskModal: FC<TaskModalProps> = (props) => {
-  const { taskId, onClose, open = false, boardId, ...other } = props;
+  const { taskId, onClose, open = false, boardId, members, ...other } = props;
   const dispatch = useDispatch();
   const columns = useColumns();
   const task = useTask(taskId);
-
   const column = useColumn(task?.columnId);
+  const [selectedMember, setSelectedMember] = useState<Member | null>(null);
 
   const assignedTo = useAssignees(task?.assignedTo.map((assignee) => assignee._id!.toString()) || []);
   const mdUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
@@ -188,7 +189,6 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
         await dispatch(
           thunks.updateTask({
             boardId: boardId!.toString(),
-
             taskId: task!._id!.toString(),
             update: {
               name,
@@ -230,6 +230,35 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
     },
     [task, nameCopy, handleNameUpdate]
   );
+
+  const handleAssignMember = (selectedMember: Member) => {
+    if (!selectedMember) return;
+    if (task!.assignedTo.some((member) => member._id === selectedMember._id)) {
+      setSelectedMember(null); // Clear the selected member
+      toast.error('Član je već dodat!'); // Show error message if the member is already assigned
+      return; // Do nothing if the member is already assigned
+    }
+
+    dispatch(thunks.updateTask({
+      boardId: boardId!.toString(),
+      taskId: task!._id!.toString(),
+      update: {
+        assignedTo: [...task!.assignedTo, selectedMember] // Add selected member to the task's assigned members list
+      }
+
+    }));
+    setSelectedMember(null); // Clear the selected member
+  };
+
+  const handleRemoveMember = (member: Member) => {
+    dispatch(thunks.updateTask({
+      boardId: boardId!.toString(),
+      taskId: task!._id!.toString(),
+      update: {
+        assignedTo: task!.assignedTo.filter((assignee) => assignee._id !== member._id) // Remove the selected member from the task's assigned members list
+      }
+    }));
+  }
 
   const handleDescriptionUpdate = useMemo(
     () =>
@@ -594,6 +623,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
               container
               spacing={3}
             >
+              {/* Created */}
               <Grid
                 xs={12}
                 sm={4}
@@ -613,6 +643,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
                   {task.createdBy.name}
                 </Typography>
               </Grid>
+              {/* Assigned to */}
               <Grid
                 xs={12}
                 sm={4}
@@ -624,31 +655,60 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
                   Assigned to
                 </Typography>
               </Grid>
-              <Grid
-                xs={12}
-                sm={8}
-              >
-                <Stack
-                  alignItems="center"
-                  direction="row"
-                  flexWrap="wrap"
-                  spacing={1}
-                >
-                  <AvatarGroup max={5}>
-                    {assignedTo.map((assignee) => (
-                      <Avatar
-                        key={assignee._id!.toString()}
-                        src={assignee.avatar || undefined}
-                      />
-                    ))}
-                  </AvatarGroup>
-                  <IconButton disabled>
+              <Grid xs={12} sm={8}>
+                <Stack alignItems="center" direction="row" spacing={1}>
+                  <FormControl fullWidth>
+                    <Autocomplete
+                      value={selectedMember} // Track the selected member
+                      onChange={(event, newValue) => setSelectedMember(newValue)} // Handle member selection
+                      options={members || []}
+                      getOptionLabel={(member: Member) => member.name}
+                      renderOption={(props, member: Member) => (
+                        <MenuItem {...props}>
+                          <Typography color="text.secondary" variant="caption">
+                            {member.name}
+                          </Typography>
+                        </MenuItem>
+                      )}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label="Select Member"
+                          size="small"
+                        />
+                      )}
+                    />
+                  </FormControl>
+                  <IconButton
+                    onClick={() => handleAssignMember(selectedMember!)} // Call the function when clicked
+                    sx={{ ml: 1 }}
+                    disabled={!selectedMember} // Disable if no member selected
+                  >
                     <SvgIcon fontSize="small">
                       <PlusIcon />
                     </SvgIcon>
                   </IconButton>
                 </Stack>
+                <Box mt={2}>
+                  <Stack direction="column" spacing={1} flexWrap="wrap">
+                    {assignedTo.map((member: Member) => (
+                      <Stack key={member._id} sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' }}>
+                        <Avatar src={member.avatar || ''} alt={member.name} />
+                        <Typography color="text.secondary" variant="caption">{member.name}</Typography>
+                        <IconButton
+                          size="small"
+                          onClick={() => handleRemoveMember(member)} // Function to remove member
+                        >
+                          <SvgIcon fontSize="small">
+                            <PersonRemoveIcon /> {/* Use an appropriate remove icon */}
+                          </SvgIcon>
+                        </IconButton>
+                      </Stack>
+                    ))}
+                  </Stack>
+                </Box>
               </Grid>
+              {/* Attachments */}
               <Grid
                 xs={12}
                 sm={4}
@@ -688,6 +748,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
                   </IconButton>
                 </Stack>
               </Grid>
+              {/* Due Date */}
               <Grid
                 xs={12}
                 sm={4}
@@ -710,6 +771,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
                   />
                 )}
               </Grid>
+              {/* Labels */}
               <Grid
                 xs={12}
                 sm={4}
@@ -730,6 +792,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
                   onChange={handleLabelsChange}
                 />
               </Grid>
+              {/* Description */}
               <Grid
                 xs={12}
                 sm={4}
@@ -840,4 +903,5 @@ TaskModal.propTypes = {
   open: PropTypes.bool,
   taskId: PropTypes.string,
   boardId: PropTypes.string,
+  members: PropTypes.array,
 };

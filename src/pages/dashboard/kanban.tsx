@@ -62,8 +62,11 @@ const Page = ({ boards }: PageProps) => {
   const isScreentoMedium = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'));
   const handleOpenModal = () => setOpenModal(true);
   const handleCloseModal = () => setOpenModal(false);
-  // Fetch board data whenever the selected board changes
+
   useBoard(selectedBoardId);
+  //Get memeber from the selected boardId
+  const selectedBoard = boards.find((board) => board._id === selectedBoardId);
+  const members = selectedBoard?.members || [];
 
   const handleBoardChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setSelectedBoardId(event.target.value as string);
@@ -376,6 +379,7 @@ const Page = ({ boards }: PageProps) => {
         open={!!currentTaskId}
         boardId={selectedBoardId || undefined}
         taskId={currentTaskId || undefined}
+        members={members}
       />
       <Toaster />
     </>

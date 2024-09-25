@@ -108,7 +108,6 @@ export const KanbanService = () => {
           }
      };
 
-
      const deleteBoard = async (boardId: string) => {
           const client = new MongoClient(process.env.MONGODB_URI!);
           const db = client.db('KANBAN_DB');
@@ -423,7 +422,7 @@ export const KanbanService = () => {
           const client = new MongoClient(process.env.MONGODB_URI!);
           const db = client.db('KANBAN_DB');
           const boardCollection = db.collection('Boards');
-          console.log('usao u servis sa', boardId, taskId, update);
+          console.log('usao u update task servis sa', boardId, taskId, update);
 
           try {
                await client.connect();
