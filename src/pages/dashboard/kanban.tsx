@@ -256,7 +256,7 @@ const Page = ({ boards }: PageProps) => {
           display: 'flex',
           flexDirection: 'column',
           flexGrow: 1,
-          overflow: 'hidden',
+          overflow: 'scroll',
           pt: 8,
         }}
       >
