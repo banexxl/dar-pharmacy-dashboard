@@ -67,7 +67,9 @@ const Page = (props: any) => {
                                    lg={3}
                               >
                                    <OverviewTotalCustomers
-                                        difference={(props.usersActiveThisWeek.length - props.usersActiveLastWeek.length) / props.usersActiveLastWeek.length * 100}
+                                        difference={
+                                             (props.usersActiveThisWeek.length - props.usersActiveLastWeek.length) <= 0 ? 0 : (props.usersActiveThisWeek.length - props.usersActiveLastWeek.length) / props.usersActiveLastWeek.length * 100
+                                        }
                                         positive={props.usersActiveThisWeek.length > props.usersActiveLastWeek.length}
                                         sx={{ height: '100%' }}
                                         value={props.usersActiveThisWeek.length}

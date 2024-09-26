@@ -39,7 +39,7 @@ export const OverviewTotalCustomers = (props) => {
             </SvgIcon>
           </Avatar>
         </Stack>
-        {difference && (
+        {difference >= 0 && (
           <Stack
             alignItems="center"
             direction="row"
