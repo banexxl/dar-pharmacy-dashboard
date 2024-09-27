@@ -414,28 +414,18 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
   );
 
   const handleChecklistDelete = useCallback(async (taskId: string): Promise<void> => {
-    onClose?.();
-    sweetalert2.fire({
-      title: 'Da li zaista želite da obrišete listu?',
-      text: 'Ova akcija je nepovratna!',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Da, obriši!',
-      cancelButtonText: 'Odustani!',
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          await dispatch(
-            thunks.deleteChecklist({
-              taskId: task!._id!.toString(),
-            })
-          );
-        } catch (err) {
-          console.error(err);
-          toast.error('Something went wrong!');
-        }
-      }
-    })
+
+    try {
+      await dispatch(
+        thunks.deleteChecklist({
+          taskId: task!._id!.toString(),
+        })
+      );
+    } catch (err) {
+      console.error(err);
+      toast.error('Something went wrong!');
+    }
+
   },
     [dispatch, task]
   );
