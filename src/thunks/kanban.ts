@@ -1,4 +1,4 @@
-import { Member } from '@/schemas/kanban';
+import { CheckItem, Checklist, Member } from '@/schemas/kanban';
 import toast from 'react-hot-toast';
 import { slice } from 'src/slices/kanban';
 import type { AppThunk, RootState } from 'src/store';
@@ -261,7 +261,6 @@ const moveTask = (params: MoveTaskParams): AppThunk => async (dispatch: any, get
   }
 };
 
-
 type AddCommentParams = {
   taskId: string;
   message: string;
@@ -284,63 +283,79 @@ const addComment = (params: AddCommentParams): AppThunk =>
     );
   };
 
-type AddCheckListParams = {
-  taskId: string;
-  name: string;
-};
+// type AddCheckListParams = {
+//   boardId: string;
+//   taskId: string;
+//   checklist: Checklist;
+// };
 
-const addChecklist = (params: AddCheckListParams): AppThunk =>
-  async (dispatch: any): Promise<void> => {
-    const response = await fetch(`/api/kanban/checklists`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(params),
-    });
-    const data = await response.json();
+// const addChecklist = (params: AddCheckListParams): AppThunk =>
+//   async (dispatch: any): Promise<void> => {
+//     // const response = await fetch(`/api/kanban/checklists`, {
+//     //   method: 'POST',
+//     //   headers: { 'Content-Type': 'application/json' },
+//     //   body: JSON.stringify(params),
+//     // });
+//     // const data = await response.json();
+//     console.log('params', params);
 
-    dispatch(
-      slice.actions.addChecklist({
-        taskId: params.taskId,
-        checklist: data,
-      })
-    );
-  };
+//     dispatch(
+//       slice.actions.addChecklist({
+//         boardId: params.boardId,
+//         taskId: params.taskId,
+//         checklist: params.checklist,
+//       })
+//     );
+//   };
 
 type UpdateChecklistParams = {
   taskId: string;
-  checklistId: string;
-  update: { name: string };
+  update: {
+    name?: string,
+    checkItems?: CheckItem[]
+  };
 };
 
 const updateChecklist = (params: UpdateChecklistParams): AppThunk =>
   async (dispatch: any): Promise<void> => {
-    const response = await fetch(`/api/kanban/checklists/${params.checklistId}`, {
+    const response = await fetch(`/api/kanban/checklist/`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(params.update),
+      body: JSON.stringify(params),
     });
     const data = await response.json();
-
+    if (data.message == 'Checklist updated successfully') {
+      toast.success('Checklist uspešno ažurirana!');
+    } else if (data.message == 'Checklist created successfully') {
+      toast.success('Checklist uspešno kreirana!');
+    }
     dispatch(
       slice.actions.updateChecklist({
         taskId: params.taskId,
-        checklist: data,
+        checklist: params.update,
       })
     );
   };
 
 type DeleteChecklistParams = {
   taskId: string;
-  checklistId: string;
 };
 
 const deleteChecklist = (params: DeleteChecklistParams): AppThunk =>
   async (dispatch: any): Promise<void> => {
-    await fetch(`/api/kanban/checklists/${params.checklistId}`, {
+    const response = await fetch(`/api/kanban/checklist/`, {
       method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params),
     });
 
-    dispatch(slice.actions.deleteChecklist(params));
+    if (!response.ok) {
+      toast.error('Neuspešno brisanje liste!');
+    } else {
+      dispatch(slice.actions.deleteChecklist(params));
+      toast.success('Lista uspešno obrisana!');
+    }
+
   };
 
 type AddCheckItemParams = {
@@ -412,7 +427,7 @@ const deleteCheckItem = (params: DeleteCheckItemParams): AppThunk =>
 
 export const thunks = {
   addCheckItem,
-  addChecklist,
+  // addChecklist,
   addComment,
   clearColumn,
   createColumn,

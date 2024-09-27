@@ -12,15 +12,14 @@ import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgr
 import Stack from '@mui/material/Stack';
 import SvgIcon from '@mui/material/SvgIcon';
 import Typography from '@mui/material/Typography';
-
 import type { CheckItem, Checklist } from 'src/schemas/kanban';
 
 import { TaskCheckItem } from './task-check-item';
 import { TaskCheckItemAdd } from './task-check-item-add';
 
 const calculateProgress = (checkItems: CheckItem[]): number => {
-  const totalCheckItems = checkItems.length;
-  const completedCheckItems = checkItems.filter(
+  const totalCheckItems = checkItems?.length;
+  const completedCheckItems = checkItems?.filter(
     (checkItem) => checkItem.state === 'complete'
   ).length;
   const progress = totalCheckItems === 0 ? 100 : (completedCheckItems / totalCheckItems) * 100;
@@ -51,13 +50,14 @@ export const TaskChecklist: FC<TaskChecklistProps> = (props) => {
     onRename,
     ...other
   } = props;
-  const [nameCopy, setNameCopy] = useState<string>(checklist.name);
+
+  const [nameCopy, setNameCopy] = useState<string>(checklist?.name);
   const [isRenaming, setIsRenaming] = useState<boolean>(false);
   // The current check item that is being renamed
   const [checkItemId, setCheckItemId] = useState<string | null>(null);
 
   const handleNameReset = useCallback(() => {
-    setNameCopy(checklist.name);
+    setNameCopy(checklist?.name);
   }, [checklist]);
 
   useEffect(
@@ -78,13 +78,13 @@ export const TaskChecklist: FC<TaskChecklistProps> = (props) => {
 
   const handleRenameCancel = useCallback((): void => {
     setIsRenaming(false);
-    setNameCopy(checklist.name);
+    setNameCopy(checklist?.name);
   }, [checklist]);
 
   const handleRenameComplete = useCallback(async (): Promise<void> => {
-    if (!nameCopy || nameCopy === checklist.name) {
+    if (!nameCopy || nameCopy === checklist?.name) {
       setIsRenaming(false);
-      setNameCopy(checklist.name);
+      setNameCopy(checklist?.name);
       return;
     }
 
@@ -109,8 +109,8 @@ export const TaskChecklist: FC<TaskChecklistProps> = (props) => {
   );
 
   // Maybe use memo to calculate the progress
-  const progress = calculateProgress(checklist.checkItems);
-  const hasCheckItems = checklist.checkItems.length > 0;
+  const progress = calculateProgress(checklist?.checkItems);
+  const hasCheckItems = checklist?.checkItems?.length > 0;
 
   return (
     <Card
@@ -191,14 +191,14 @@ export const TaskChecklist: FC<TaskChecklistProps> = (props) => {
               borderRadius: 'inherit',
             },
           }}
-          value={progress}
+          value={progress ? progress : 0}
           variant="determinate"
         />
         <Typography
           color="text.secondary"
           variant="body2"
         >
-          {progress}%
+          {progress ? progress : 0}%
         </Typography>
       </Stack>
       <Divider />
@@ -208,7 +208,7 @@ export const TaskChecklist: FC<TaskChecklistProps> = (props) => {
             divider={<Divider />}
             spacing={1}
           >
-            {checklist.checkItems.map((checkItem) => {
+            {checklist?.checkItems.map((checkItem) => {
               const isRenaming = checkItemId === checkItem._id!.toString();
 
               return (

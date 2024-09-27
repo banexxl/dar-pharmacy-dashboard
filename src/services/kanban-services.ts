@@ -325,7 +325,7 @@ export const KanbanService = () => {
                     createdBy: result.author, // Assuming these fields exist in the DB
                     assignedTo: result.assignedTo,
                     attachments: result.attachments,
-                    checklists: result.checklists,
+                    checklist: result.checklist,
                     columnId: result.columnId,
                     comments: result.comments,
                     description: result.description || null,
@@ -392,7 +392,7 @@ export const KanbanService = () => {
                     assignedTo: [],
                     attachments: [],
                     createdBy: createdByObject as unknown as Member,
-                    checklists: [],
+                    checklist: {} as Checklist,
                     columnId,
                     comments: [],
                     description: null,
@@ -432,7 +432,7 @@ export const KanbanService = () => {
                if (update.name !== undefined) taskUpdate['tasks.$.name'] = update.name;
                if (update.assignedTo !== undefined) taskUpdate['tasks.$.assignedTo'] = update.assignedTo;
                if (update.attachments !== undefined) taskUpdate['tasks.$.attachments'] = update.attachments;
-               if (update.checklists !== undefined) taskUpdate['tasks.$.checklists'] = update.checklists;
+               if (update.checklist !== undefined) taskUpdate['tasks.$.checklist'] = update.checklist;
                if (update.columnId !== undefined) taskUpdate['tasks.$.columnId'] = update.columnId;
                if (update.comments !== undefined) taskUpdate['tasks.$.comments'] = update.comments;
                if (update.description !== undefined) taskUpdate['tasks.$.description'] = update.description;
@@ -656,82 +656,100 @@ export const KanbanService = () => {
           await client.close(); // Close connection
      };
 
-     const addChecklist = async (boardId: string, taskId: string, name: string): Promise<Checklist> => {
+     const updateOrCreateChecklist = async (taskId: string, update: Partial<Checklist>): Promise<{ message: string; updated: boolean }> => {
+
           const client = new MongoClient(process.env.MONGODB_URI!);
+          await client.connect(); // Ensure connection to MongoDB
+
           const db = client.db('KANBAN_DB');
           const boardCollection = db.collection('Boards');
 
-          try {
-               await client.connect();
+          // Find the board that contains the task
+          const board = await boardCollection.findOne({ "tasks._id": taskId });
+          if (!board) throw new Error('Board not found');
 
-               // Find the board by ID
-               const board = await boardCollection.findOne({ _id: new ObjectId(boardId) });
-               if (!board) throw new Error('Board not found');
+          // Find the task that contains the checklist
+          const task = board.tasks.find((t: Task) => t._id!.toString() === taskId);
+          if (!task) throw new Error('Task not found');
 
-               // Find the task within the board
-               const task = board.tasks.find((t: Task) => t._id === taskId);
-               if (!task) throw new Error('Task not found');
+          let checklist = task.checklist;
 
-               // Create a new checklist object
-               const checklist: Checklist = {
-                    _id: createResourceId(),  // Let MongoDB generate the id for the checklist
-                    name,
-                    checkItems: [],       // Empty checklist by default
+          let response: { message: string; updated: boolean };
+
+          if (Object.keys(checklist) && Object.keys(checklist).length > 0) {
+               // Checklist found, selectively update the checklist based on the provided update fields
+               if (update.name) {
+                    task.checklist.name = update.name; // Update only the name if it's provided
+               }
+
+               if (update.checkItems) {
+                    task.checklist.checkItems = update.checkItems; // Update only the checkItems if they're provided
+               }
+
+               response = {
+                    message: 'Checklist updated successfully',
+                    updated: true
                };
+          } else {
+               // Checklist not found, create a new checklist
+               checklist = { _id: createResourceId(), checkItems: [], name: update.name }; // Default name if none provided
+               if (update.checkItems) {
+                    checklist.checkItems = update.checkItems; // Add checkItems if provided
+               }
 
-               // Push the checklist to the task
-               task.checklists.push(checklist);
+               task.checklist = checklist; // Assign new checklist to task
 
-               // Update the board to add the checklist to the task
-               await boardCollection.updateOne(
-                    { _id: new ObjectId(boardId), "tasks._id": new ObjectId(taskId) },
-                    { $push: { "tasks.$.checklists": checklist } as any } // Add checklist to the task
-               );
-
-               return checklist;
-          } finally {
-               await client.close(); // Ensure the client connection is closed
+               response = {
+                    message: 'New checklist created successfully',
+                    updated: false
+               };
           }
+
+
+          // Update the board with the modified task (whether checklist was updated or newly created)
+          await boardCollection.updateOne(
+               { _id: new ObjectId(board._id), "tasks._id": taskId },
+               { $set: { "tasks.$.checklist": task.checklist } }
+          );
+
+          await client.close(); // Close the MongoDB connection
+
+          return response; // Return the message, updated flag, and checklist
      };
 
-     const updateChecklist = async (boardId: string, taskId: string, checklistId: string, update: Partial<Checklist>): Promise<Checklist> => {
-          const client = new MongoClient(process.env.MONGODB_URI!)
+     const deleteChecklist = async (taskId: string): Promise<boolean> => {
+
+          const client = new MongoClient(process.env.MONGODB_URI!);
           await client.connect(); // Ensure connection to MongoDB
 
-          const board = await boardCollection.findOne({ _id: new ObjectId(boardId) });
+          const db = client.db('KANBAN_DB');
+          const boardCollection = db.collection('Boards');
+
+          // Find the board that contains the task
+          const board = await boardCollection.findOne({ "tasks._id": taskId });
           if (!board) throw new Error('Board not found');
 
+          // Find the task that contains the checklist
           const task = board.tasks.find((t: Task) => t._id!.toString() === taskId);
           if (!task) throw new Error('Task not found');
 
-          const checklist = task.checklists.find((c: Checklist) => c._id!.toString() === checklistId);
-          if (!checklist) throw new Error('Checklist not found');
+          const emptyChecklist = task.checklist = {
+               _id: task.checklist._id,
+               name: '',
+               checkItems: []
+          }
 
-          Object.assign(checklist, update);
+          // Update the board in MongoDB with the modified task (without the deleted checklist)
+          await boardCollection.updateOne(
+               { _id: new ObjectId(board._id), "tasks._id": taskId },
+               { $set: { "tasks.$.checklist": emptyChecklist } }
+          );
 
-          await boardCollection.updateOne({ _id: new ObjectId(boardId) }, { $set: board });
-          await client.close(); // Close connection
+          await client.close(); // Close the MongoDB connection
 
-          return checklist;
+          return true; // Return true to indicate successful deletion
      };
 
-     const deleteChecklist = async (boardId: string, taskId: string, checklistId: string): Promise<boolean> => {
-          const client = new MongoClient(process.env.MONGODB_URI!)
-          await client.connect(); // Ensure connection to MongoDB
-
-          const board = await boardCollection.findOne({ _id: new ObjectId(boardId) });
-          if (!board) throw new Error('Board not found');
-
-          const task = board.tasks.find((t: Task) => t._id!.toString() === taskId);
-          if (!task) throw new Error('Task not found');
-
-          task.checklists = task.checklists.filter((c: Checklist) => c._id!.toString() !== checklistId);
-
-          await boardCollection.updateOne({ _id: new ObjectId(boardId) }, { $set: board });
-          await client.close(); // Close connection
-
-          return true;
-     };
 
      const addCheckItem = async (boardId: string, taskId: string, checklistId: string, name: string): Promise<CheckItem> => {
           const client = new MongoClient(process.env.MONGODB_URI!);
@@ -750,7 +768,7 @@ export const KanbanService = () => {
                if (!task) throw new Error('Task not found');
 
                // Find the checklist within the task
-               const checklist = task.checklists.find((c: Checklist) => c._id!.toString() === checklistId);
+               const checklist = task.checklist.find((c: Checklist) => c._id!.toString() === checklistId);
                if (!checklist) throw new Error('Checklist not found');
 
                // Create the new check item
@@ -762,8 +780,8 @@ export const KanbanService = () => {
 
                // Push the check item directly to the checklist's checkItems array
                await boardCollection.updateOne(
-                    { _id: new ObjectId(boardId), "tasks._id": new ObjectId(taskId), "tasks.checklists._id": new ObjectId(checklistId) },
-                    { $push: { "tasks.$[task].checklists.$[checklist].checkItems": checkItem } as any },
+                    { _id: new ObjectId(boardId), "tasks._id": new ObjectId(taskId), "tasks.checklist._id": new ObjectId(checklistId) },
+                    { $push: { "tasks.$[task].checklist.$[checklist].checkItems": checkItem } as any },
                     {
                          arrayFilters: [
                               { "task._id": new ObjectId(taskId) },
@@ -789,7 +807,7 @@ export const KanbanService = () => {
           const task = board.tasks.find((t: Task) => t._id!.toString() === taskId);
           if (!task) throw new Error('Task not found');
 
-          const checklist = task.checklists.find((c: Checklist) => c._id!.toString() === checklistId);
+          const checklist = task.checklist.find((c: Checklist) => c._id!.toString() === checklistId);
           if (!checklist) throw new Error('Checklist not found');
 
           const checkItem = checklist.checkItems.find((ci: CheckItem) => ci._id!.toString() === checkItemId);
@@ -813,7 +831,7 @@ export const KanbanService = () => {
           const task = board.tasks.find((t: Task) => t._id!.toString() === taskId);
           if (!task) throw new Error('Task not found');
 
-          const checklist = task.checklists.find((c: Checklist) => c._id!.toString() === checklistId);
+          const checklist = task.checklist.find((c: Checklist) => c._id!.toString() === checklistId);
           if (!checklist) throw new Error('Checklist not found');
 
           checklist.checkItems = checklist.checkItems.filter((ci: CheckItem) => ci._id!.toString() !== checkItemId);
@@ -844,8 +862,7 @@ export const KanbanService = () => {
           getCommentsByTask,
           updateComment,
           deleteComment,
-          addChecklist,
-          updateChecklist,
+          updateOrCreateChecklist,
           deleteChecklist,
           addCheckItem,
           updateCheckItem,

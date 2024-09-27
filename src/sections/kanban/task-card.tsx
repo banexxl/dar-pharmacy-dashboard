@@ -54,11 +54,11 @@ export const TaskCard = forwardRef<HTMLDivElement, TaskCardProps>(function TaskC
     return null;
   }
 
-  const hasAssignees = task.assignedTo.length > 0;
-  const hasAttachments = task.attachments.length > 0;
-  const hasChecklists = task.checklists.length > 0;
-  const hasComments = task.comments.length > 0;
-  const hasLabels = task.labels.length > 0;
+  const hasAssignees = task.assignedTo?.length > 0;
+  const hasAttachments = task.attachments?.length > 0;
+  const hasChecklists = task.checklist?.length > 0;
+  const hasComments = task.comments?.length > 0;
+  const hasLabels = task.labels?.length > 0;
 
   return (
     <Card

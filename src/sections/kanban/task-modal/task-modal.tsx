@@ -116,7 +116,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
   const mdUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
   const [currentTab, setCurrentTab] = useState<string>('overview');
   const [nameCopy, setNameCopy] = useState<string>(task?.name || '');
-  const debounceMs = 500;
+  const debounceMs = 1000;
   const [openDatePicker, setOpenDatePicker] = useState(false);
 
   const handleDateChange = (newDate: Date) => {
@@ -370,27 +370,39 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
     [dispatch, task]
   );
 
-  const handleChecklistAdd = useCallback(async (): Promise<void> => {
-    try {
-      await dispatch(
-        thunks.addChecklist({
-          taskId: task!._id!.toString(),
-          name: 'Untitled Checklist',
-        })
-      );
-    } catch (err) {
-      console.error(err);
-      toast.error('Something went wrong!');
-    }
-  }, [dispatch, task]);
+  // const handleChecklistAdd = useCallback(async (): Promise<void> => {
+  //   try {
+  //     await dispatch(
+  //       thunks.addChecklist({
+  //         boardId: boardId!.toString(),
+  //         taskId: task!._id!.toString(),
+  //         checklist: {
+  //           name: 'Lista zadataka',
+  //           checkItems: [],
+  //         }
+  //       })
+  //     );
+  //   } catch (err) {
+  //     console.error(err);
+  //     toast.error('Kreiranje liste nije uspelo!');
+  //   }
+  // }, [dispatch, task]);
 
   const handleChecklistRename = useCallback(async (checklistId: string, name: string): Promise<void> => {
+    console.log('checklistId', checklistId);
+    console.log('name', name);
+
+    if (!name || name.trim() === '') {
+      toast.error('Ime liste ne može biti prazno!');
+      return;
+    }
     try {
       await dispatch(
         thunks.updateChecklist({
-          taskId: task!._id!.toString(),
-          checklistId,
-          update: { name },
+          taskId: task!._id!,
+          update: {
+            name: name,
+          },
         })
       );
     } catch (err) {
@@ -401,20 +413,30 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
     [dispatch, task]
   );
 
-  const handleChecklistDelete = useCallback(
-    async (checklistId: string): Promise<void> => {
-      try {
-        await dispatch(
-          thunks.deleteChecklist({
-            taskId: task!._id!.toString(),
-            checklistId,
-          })
-        );
-      } catch (err) {
-        console.error(err);
-        toast.error('Something went wrong!');
+  const handleChecklistDelete = useCallback(async (taskId: string): Promise<void> => {
+    onClose?.();
+    sweetalert2.fire({
+      title: 'Da li zaista želite da obrišete listu?',
+      text: 'Ova akcija je nepovratna!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Da, obriši!',
+      cancelButtonText: 'Odustani!',
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await dispatch(
+            thunks.deleteChecklist({
+              taskId: task!._id!.toString(),
+            })
+          );
+        } catch (err) {
+          console.error(err);
+          toast.error('Something went wrong!');
+        }
       }
-    },
+    })
+  },
     [dispatch, task]
   );
 
@@ -636,8 +658,8 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
             label="Overview"
           />
           <Tab
-            value="checklists"
-            label="Checklists"
+            value="checklist"
+            label="Checklist"
           />
           <Tab
             value="comments"
@@ -870,40 +892,43 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
               </Grid>
             </Grid>
           )}
-          {currentTab === 'checklists' && (
+          {currentTab === 'checklist' && (
             <Stack spacing={2}>
-              {task.checklists.map((checklist) => (
-                <TaskChecklist
-                  key={checklist._id!.toString()}
-                  checklist={checklist}
-                  onCheckItemAdd={(name) => handleCheckItemAdd(checklist._id!.toString(), name)}
-                  onCheckItemDelete={(checkItemId) =>
-                    handleCheckItemDelete(checklist._id!.toString(), checkItemId)
-                  }
-                  onCheckItemCheck={(checkItemId) =>
-                    handleCheckItemCheck(checklist._id!.toString(), checkItemId)
-                  }
-                  onCheckItemUncheck={(checkItemId) =>
-                    handleCheckItemUncheck(checklist._id!.toString(), checkItemId)
-                  }
-                  onCheckItemRename={(checkItemId, name) =>
-                    handleCheckItemRename(checklist._id!.toString(), checkItemId, name)
-                  }
-                  onDelete={() => handleChecklistDelete(checklist._id!.toString())}
-                  onRename={(name) => handleChecklistRename(checklist._id!.toString(), name)}
-                />
-              ))}
-              <Button
-                startIcon={
-                  <SvgIcon>
-                    <PlusIcon />
-                  </SvgIcon>
+              <TaskChecklist
+                key={task.checklist?._id?.toString()}
+                checklist={task.checklist}
+                onCheckItemAdd={(name) => handleCheckItemAdd(task.checklist?._id!.toString(), name)}
+                onCheckItemDelete={(checkItemId) =>
+                  handleCheckItemDelete(task.checklist?._id!.toString(), checkItemId)
                 }
-                onClick={handleChecklistAdd}
-                variant="contained"
-              >
-                Add
-              </Button>
+                onCheckItemCheck={(checkItemId) =>
+                  handleCheckItemCheck(task.checklist?._id!.toString(), checkItemId)
+                }
+                onCheckItemUncheck={(checkItemId) =>
+                  handleCheckItemUncheck(task.checklist?._id!.toString(), checkItemId)
+                }
+                onCheckItemRename={(checkItemId, name) =>
+                  handleCheckItemRename(task.checklist?._id!.toString(), checkItemId, name)
+                }
+                onDelete={() => handleChecklistDelete(task.checklist?._id!.toString())}
+                onRename={(name) => handleChecklistRename(task.checklist?._id?.toString() ? task.checklist?._id!.toString() : '', name)}
+              />
+              {/* {
+                !!task?.checklist?._id && (
+                  <Button
+                    startIcon={
+                      <SvgIcon>
+                        <PlusIcon />
+                      </SvgIcon>
+                    }
+                    onClick={handleChecklistAdd}
+                    variant="contained"
+                  >
+                    Add
+                  </Button>
+                )
+              } */}
+
             </Stack>
           )}
           {currentTab === 'comments' && (

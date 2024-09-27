@@ -41,11 +41,11 @@ type DeleteTaskAction = PayloadAction<string>;
 
 type AddCommentAction = PayloadAction<{ taskId: string; comment: Comment }>;
 
-type AddChecklistAction = PayloadAction<{ taskId: string; checklist: Checklist }>;
+type AddChecklistAction = PayloadAction<{ boardId: string, taskId: string; checklist: Checklist }>;
 
-type UpdateChecklistAction = PayloadAction<{ taskId: string; checklist: Checklist }>;
+type UpdateChecklistAction = PayloadAction<{ taskId: string; checklist: { name?: string, checkItems?: CheckItem[] } }>;
 
-type DeleteChecklistAction = PayloadAction<{ taskId: string; checklistId: string }>;
+type DeleteChecklistAction = PayloadAction<{ taskId: string }>;
 
 type AddCheckItemAction = PayloadAction<{ taskId: string; checklistId: string; checkItem: CheckItem; }>;
 
@@ -155,7 +155,6 @@ const reducers = {
     const task = action.payload;
     Object.assign(state.tasks.byId[task._id!.toString()], task);
   },
-  // Modified moveTask reducer to handle both source and destination columns
   moveTask(state: KanbanState, action: MoveTaskAction): void {
     const { taskId, sourceColumnId, destinationColumnId, position, boardId } = action.payload;
 
@@ -184,71 +183,91 @@ const reducers = {
 
     task.comments.push(comment);
   },
-  addChecklist(state: KanbanState, action: AddChecklistAction): void {
-    const { taskId, checklist } = action.payload;
-    const task = state.tasks.byId[taskId];
+  // // Add Checklist
+  // addChecklist(state: KanbanState, action: AddChecklistAction): void {
+  //   const { taskId, checklist } = action.payload;
+  //   const task = state.tasks.byId[taskId];
 
-    task.checklists.push(checklist);
-  },
+  //   // If the task already has a checklist, prevent adding another one
+  //   if (task.checklist && task.checklist._id) {
+  //     console.error('A checklist already exists for this task.');
+  //     return;
+  //   }
+
+  //   // Update the task's checklist fields directly
+  //   task.checklist = {
+  //     ...task.checklist,
+  //     _id: checklist._id,
+  //     name: checklist.name,
+  //     checkItems: checklist.checkItems,
+  //   };
+  // },
+
+  // Update Checklist
   updateChecklist(state: KanbanState, action: UpdateChecklistAction): void {
     const { taskId, checklist } = action.payload;
     const task = state.tasks.byId[taskId];
 
-    task.checklists = task.checklists.map((_checklist) => {
-      if (_checklist._id === checklist._id) {
-        return checklist;
-      }
+    // Update the checklist name if provided
+    if (checklist.name) {
+      task.checklist.name = checklist.name;
+    }
 
-      return _checklist;
-    });
+    // Update the checkItems if provided
+    if (checklist.checkItems) {
+      task.checklist.checkItems = checklist.checkItems;
+    }
   },
+
+  // Delete Checklist
   deleteChecklist(state: KanbanState, action: DeleteChecklistAction): void {
-    const { taskId, checklistId } = action.payload;
+    const { taskId } = action.payload;
     const task = state.tasks.byId[taskId];
 
-    task.checklists = task.checklists.filter((checklist) => checklist._id!.toString() !== checklistId);
+    task.checklist = { _id: task._id, name: '', checkItems: [] }; // Reset the checklist to an empty state
+
   },
+
+  // Add Check Item
   addCheckItem(state: KanbanState, action: AddCheckItemAction): void {
     const { taskId, checklistId, checkItem } = action.payload;
     const task = state.tasks.byId[taskId];
-    const checklist = task.checklists.find((checklist) => checklist._id!.toString() === checklistId);
+    const checklist = task.checklist;
 
-    if (!checklist) {
-      return;
+    // Ensure we're working with the correct checklist
+    if (checklist._id === checklistId) {
+      checklist.checkItems.push(checkItem);
     }
-
-    checklist.checkItems.push(checkItem);
   },
+
+  // Update Check Item
   updateCheckItem(state: KanbanState, action: UpdateCheckItemAction): void {
     const { taskId, checklistId, checkItem } = action.payload;
     const task = state.tasks.byId[taskId];
-    const checklist = task.checklists.find((checklist) => checklist._id!.toString() === checklistId);
+    const checklist = task.checklist;
 
-    if (!checklist) {
-      return;
+    // Ensure we're working with the correct checklist and update the check item
+    if (checklist._id === checklistId) {
+      checklist.checkItems = checklist.checkItems.map((_checkItem) =>
+        _checkItem._id === checkItem._id ? checkItem : _checkItem
+      );
     }
-
-    checklist.checkItems = checklist.checkItems.map((_checkItem) => {
-      if (_checkItem._id === checkItem._id) {
-        return checkItem;
-      }
-
-      return _checkItem;
-    });
   },
+
+  // Delete Check Item
   deleteCheckItem(state: KanbanState, action: DeleteCheckItemAction): void {
     const { taskId, checklistId, checkItemId } = action.payload;
     const task = state.tasks.byId[taskId];
-    const checklist = task.checklists.find((_checklist) => _checklist._id!.toString() === checklistId);
+    const checklist = task.checklist;
 
-    if (!checklist) {
-      return;
+    // Ensure we're working with the correct checklist and filter out the check item
+    if (checklist._id === checklistId) {
+      checklist.checkItems = checklist.checkItems.filter(
+        (checkItem) => checkItem._id !== checkItemId
+      );
     }
-
-    checklist.checkItems = checklist.checkItems.filter((checkItem) => checkItem._id!.toString() !== checkItemId);
   },
-};
-
+}
 export const slice = createSlice({
   name: 'kanban',
   initialState,

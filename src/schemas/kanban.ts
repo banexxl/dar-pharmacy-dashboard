@@ -1,5 +1,3 @@
-import { ObjectId } from "mongodb";
-
 export interface Attachment {
   _id?: string;
   uploadedDateTime: Date;
@@ -31,7 +29,7 @@ export interface Task {
   createdBy: Member;
   assignedTo: Member[];
   attachments: Attachment[];
-  checklists: Checklist[];
+  checklist: Checklist;
   columnId: string;
   comments: Comment[];
   description: string | null;
