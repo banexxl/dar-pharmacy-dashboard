@@ -451,6 +451,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
       if ((await addCheckItemResponse).status === 200) {
         await dispatch(
           thunks.addCheckItem({
+            boardId: boardId,
             taskId: taskId,
             checkItem: checkItem
           })
@@ -485,12 +486,12 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
   );
 
   const handleCheckItemCheck = useCallback(
-    async (checklistId: string, checkItemId: string): Promise<void> => {
+    async (boardId: string, taskId: string, checkItemId: string): Promise<void> => {
       try {
         await dispatch(
           thunks.updateCheckItem({
-            taskId: task!._id!.toString(),
-            checklistId,
+            boardId: boardId,
+            taskId: taskId,
             checkItemId,
             update: {
               state: 'complete',
@@ -506,12 +507,12 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
   );
 
   const handleCheckItemUncheck = useCallback(
-    async (checklistId: string, checkItemId: string): Promise<void> => {
+    async (taskId: string, checkItemId: string): Promise<void> => {
       try {
         await dispatch(
           thunks.updateCheckItem({
-            taskId: task!._id!.toString(),
-            checklistId,
+            boardId: boardId,
+            taskId: taskId,
             checkItemId,
             update: {
               state: 'incomplete',
@@ -527,12 +528,12 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
   );
 
   const handleCheckItemRename = useCallback(
-    async (checklistId: string, checkItemId: string, name: string): Promise<void> => {
+    async (taskId: string, checkItemId: string, name: string): Promise<void> => {
       try {
         await dispatch(
           thunks.updateCheckItem({
-            taskId: task!._id!.toString(),
-            checklistId,
+            boardId: boardId,
+            taskId: taskId,
             checkItemId,
             update: {
               name,
@@ -907,9 +908,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
                 checklist={task.checklist}
                 onCheckItemAdd={(name) => handleCheckItemAdd(boardId, task._id!.toString(), name)}
                 onCheckItemDelete={(checkItemId) => handleCheckItemDelete(boardId, task._id!.toString(), checkItemId)}
-                onCheckItemCheck={(checkItemId) =>
-                  handleCheckItemCheck(task._id!.toString(), checkItemId)
-                }
+                onCheckItemCheck={(checkItemId) => handleCheckItemCheck(boardId, task._id!.toString(), checkItemId)}
                 onCheckItemUncheck={(checkItemId) =>
                   handleCheckItemUncheck(task._id!.toString(), checkItemId)
                 }

@@ -783,6 +783,7 @@ export const KanbanService = () => {
      const updateCheckItem = async (boardId: string, taskId: string, checkItemId: string, update: Partial<CheckItem>): Promise<CheckItem> => {
           const client = new MongoClient(process.env.MONGODB_URI!);
           await client.connect(); // Ensure connection to MongoDB
+          console.log('usao u servis', boardId, taskId, checkItemId, update);
 
           const board = await boardCollection.findOne({ _id: new ObjectId(boardId) });
           if (!board) throw new Error('Board not found');
@@ -798,7 +799,7 @@ export const KanbanService = () => {
 
           // Update the board in the database
           await boardCollection.updateOne(
-               { _id: new ObjectId(boardId), "tasks._id": new ObjectId(taskId) },
+               { _id: new ObjectId(boardId), "tasks._id": taskId },
                { $set: { "tasks.$.checklist.checkItems": task.checklist.checkItems } }
           );
 

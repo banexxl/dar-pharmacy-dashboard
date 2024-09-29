@@ -360,6 +360,7 @@ const deleteChecklist = (params: DeleteChecklistParams): AppThunk =>
   };
 
 type AddCheckItemParams = {
+  boardId: string;
   taskId: string;
   checkItem: CheckItem;
 };
@@ -368,6 +369,7 @@ const addCheckItem = (params: AddCheckItemParams): AppThunk =>
   async (dispatch: any): Promise<void> => {
     dispatch(
       slice.actions.addCheckItem({
+        boardId: params.boardId,
         taskId: params.taskId,
         checkItem: params.checkItem,
       })
@@ -375,8 +377,8 @@ const addCheckItem = (params: AddCheckItemParams): AppThunk =>
   };
 
 type UpdateCheckItemParams = {
+  boardId: string;
   taskId: string;
-  checklistId: string;
   checkItemId: string;
   update: {
     name?: string;
@@ -386,18 +388,18 @@ type UpdateCheckItemParams = {
 
 const updateCheckItem = (params: UpdateCheckItemParams): AppThunk =>
   async (dispatch: any): Promise<void> => {
-    const response = await fetch(`/api/kanban/checkitems/${params.checkItemId}`, {
+    const response = await fetch(`/api/kanban/checklist/check-items/`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(params.update),
+      body: JSON.stringify(params),
     });
     const data = await response.json();
 
     dispatch(
       slice.actions.updateCheckItem({
+        boardId: params.boardId,
         taskId: params.taskId,
-        checklistId: params.checklistId,
-        checkItem: data,
+        checkItem: data.data,
       })
     );
   };
