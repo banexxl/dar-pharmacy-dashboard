@@ -29,7 +29,7 @@ import { IconButton, MenuItem } from '@mui/material';
 import type { RootState } from 'src/store';
 import { useDispatch, useSelector } from 'src/store';
 import { thunks } from 'src/thunks/kanban';
-import type { Column, Member, Task } from 'src/schemas/kanban';
+import type { CheckItem, Column, Member, Task } from 'src/schemas/kanban';
 import { TaskChecklist } from './task-checklist';
 import { TaskComment } from './task-comment';
 import { TaskCommentAdd } from './task-comment-add';
@@ -38,6 +38,7 @@ import { TaskStatus } from './task-status';
 import { Autocomplete, FormControl, TextField } from '@mui/material';
 import sweetalert2 from 'sweetalert2';
 import { DatePicker } from '@mui/x-date-pickers';
+import { createResourceId } from '@/utils/create-resource-id';
 
 const useColumns = (): Column[] => {
   return useSelector((state) => {
@@ -100,7 +101,7 @@ interface TaskModalProps {
   onClose?: () => void;
   open?: boolean;
   taskId?: string;
-  boardId?: string;
+  boardId: string;
   members?: Member[];
 }
 
@@ -430,21 +431,32 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
     [dispatch, task]
   );
 
-  const handleCheckItemAdd = useCallback(
-    async (checklistId: string, name: string): Promise<void> => {
-      try {
-        await dispatch(
-          thunks.addCheckItem({
-            taskId: task!._id!.toString(),
-            checklistId,
-            name,
-          })
-        );
-      } catch (err) {
-        console.error(err);
-        toast.error('Something went wrong!');
-      }
-    },
+  const handleCheckItemAdd = useCallback(async (boardId: string, taskId: string, name: string): Promise<void> => {
+    const checkItemID = createResourceId()
+    const checkItem: CheckItem = {
+      _id: checkItemID,
+      name: name,
+      state: 'incomplete',
+    }
+    try {
+      await dispatch(
+        thunks.addCheckItem({
+          taskId: taskId,
+          checkItem: checkItem
+        })
+      );
+      fetch('/api/kanban/checklist/check-items', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ boardId: boardId, taskId: taskId, checkItem: checkItem }),
+      })
+    } catch (err) {
+      console.error(err);
+      toast.error('Something went wrong!');
+    }
+  },
     [dispatch, task]
   );
 
@@ -887,7 +899,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
               <TaskChecklist
                 key={task.checklist?._id?.toString()}
                 checklist={task.checklist}
-                onCheckItemAdd={(name) => handleCheckItemAdd(task.checklist?._id!.toString(), name)}
+                onCheckItemAdd={(name) => handleCheckItemAdd(boardId, task._id!.toString(), name)}
                 onCheckItemDelete={(checkItemId) =>
                   handleCheckItemDelete(task.checklist?._id!.toString(), checkItemId)
                 }
@@ -960,6 +972,6 @@ TaskModal.propTypes = {
   onClose: PropTypes.func,
   open: PropTypes.bool,
   taskId: PropTypes.string,
-  boardId: PropTypes.string,
+  boardId: PropTypes.string.isRequired,
   members: PropTypes.array,
 };

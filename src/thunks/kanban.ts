@@ -1,4 +1,5 @@
 import { CheckItem, Checklist, Member } from '@/schemas/kanban';
+import { createResourceId } from '@/utils/create-resource-id';
 import toast from 'react-hot-toast';
 import { slice } from 'src/slices/kanban';
 import type { AppThunk, RootState } from 'src/store';
@@ -360,24 +361,15 @@ const deleteChecklist = (params: DeleteChecklistParams): AppThunk =>
 
 type AddCheckItemParams = {
   taskId: string;
-  checklistId: string;
-  name: string;
+  checkItem: CheckItem;
 };
 
 const addCheckItem = (params: AddCheckItemParams): AppThunk =>
   async (dispatch: any): Promise<void> => {
-    const response = await fetch(`/api/kanban/checkitems`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(params),
-    });
-    const data = await response.json();
-
     dispatch(
       slice.actions.addCheckItem({
         taskId: params.taskId,
-        checklistId: params.checklistId,
-        checkItem: data,
+        checkItem: params.checkItem,
       })
     );
   };

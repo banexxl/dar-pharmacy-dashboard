@@ -110,6 +110,7 @@ export const TaskChecklist: FC<TaskChecklistProps> = (props) => {
 
   // Maybe use memo to calculate the progress
   const progress = calculateProgress(checklist?.checkItems);
+
   const hasCheckItems = checklist?.checkItems?.length > 0;
 
   return (

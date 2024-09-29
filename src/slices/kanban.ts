@@ -47,7 +47,7 @@ type UpdateChecklistAction = PayloadAction<{ taskId: string; checklist: { name?:
 
 type DeleteChecklistAction = PayloadAction<{ taskId: string }>;
 
-type AddCheckItemAction = PayloadAction<{ taskId: string; checklistId: string; checkItem: CheckItem; }>;
+type AddCheckItemAction = PayloadAction<{ taskId: string; checkItem: CheckItem; }>;
 
 type UpdateCheckItemAction = PayloadAction<{ taskId: string; checklistId: string; checkItem: CheckItem; }>;
 
@@ -230,14 +230,10 @@ const reducers = {
 
   // Add Check Item
   addCheckItem(state: KanbanState, action: AddCheckItemAction): void {
-    const { taskId, checklistId, checkItem } = action.payload;
+    const { taskId, checkItem } = action.payload;
     const task = state.tasks.byId[taskId];
     const checklist = task.checklist;
-
-    // Ensure we're working with the correct checklist
-    if (checklist._id === checklistId) {
-      checklist.checkItems.push(checkItem);
-    }
+    checklist.checkItems.push(checkItem);
   },
 
   // Update Check Item

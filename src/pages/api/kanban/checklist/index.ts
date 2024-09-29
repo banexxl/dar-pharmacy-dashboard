@@ -7,7 +7,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
      try {
           switch (req.method) {
                case 'PUT': { // Update a specific checkist
-                    const { taskId, checklistId, update } = req.body;
+                    const { taskId, update } = req.body;
                     const checkListUpdateResponse = await KanbanService().updateOrCreateChecklist(taskId, update);
                     if (checkListUpdateResponse.updated) {
                          return res.status(201).json({ message: 'Checklist updated successfully' });

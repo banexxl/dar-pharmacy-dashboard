@@ -53,7 +53,7 @@ const Page = ({ boards }: PageProps) => {
   const dispatch = useDispatch();
   const columnIds = useColumnsIds();
   const [currentTaskId, setCurrentTaskId] = useState<string | null>(null);
-  const [selectedBoardId, setSelectedBoardId] = useState<string | null>();
+  const [selectedBoardId, setSelectedBoardId] = useState<string | null>('');
   const [boardData, setBoardData] = useState<Board[]>(boards);
   const session = useSession();
   const [openModal, setOpenModal] = useState(false);
@@ -87,7 +87,7 @@ const Page = ({ boards }: PageProps) => {
         setBoardData((prev) => {
           const newBoardData = prev.filter((board) => board._id !== selectedBoardId);
           if (newBoardData.length > 0) {
-            setSelectedBoardId(newBoardData[0]._id)
+            setSelectedBoardId(newBoardData ? newBoardData[0]._id! : null);
           } else {
             setSelectedBoardId(null);
           }
@@ -377,7 +377,7 @@ const Page = ({ boards }: PageProps) => {
       <TaskModal
         onClose={handleTaskClose}
         open={!!currentTaskId}
-        boardId={selectedBoardId || undefined}
+        boardId={selectedBoardId!}
         taskId={currentTaskId || undefined}
         members={members}
       />
