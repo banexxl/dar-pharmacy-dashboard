@@ -439,42 +439,48 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
       state: 'incomplete',
     }
     try {
-      await dispatch(
-        thunks.addCheckItem({
-          taskId: taskId,
-          checkItem: checkItem
-        })
-      );
-      fetch('/api/kanban/checklist/check-items', {
+
+      const addCheckItemResponse = fetch('/api/kanban/checklist/check-items', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ boardId: boardId, taskId: taskId, checkItem: checkItem }),
       })
+
+      if ((await addCheckItemResponse).status === 200) {
+        await dispatch(
+          thunks.addCheckItem({
+            taskId: taskId,
+            checkItem: checkItem
+          })
+        );
+        toast.success('Stavka za listu uspešno dodata!');
+      } else {
+        toast.error('Dodavanje stavke za listu nije uspelo!');
+      }
     } catch (err) {
       console.error(err);
-      toast.error('Something went wrong!');
+      toast.error('Dodavanje stavke za listu nije uspelo!');
     }
   },
     [dispatch, task]
   );
 
-  const handleCheckItemDelete = useCallback(
-    async (checklistId: string, checkItemId: string): Promise<void> => {
-      try {
-        await dispatch(
-          thunks.deleteCheckItem({
-            taskId: task!._id!.toString(),
-            checklistId,
-            checkItemId,
-          })
-        );
-      } catch (err) {
-        console.error(err);
-        toast.error('Something went wrong!');
-      }
-    },
+  const handleCheckItemDelete = useCallback(async (boardId: string, taskId: string, checkItemId: string): Promise<void> => {
+    try {
+      await dispatch(
+        thunks.deleteCheckItem({
+          boardId,
+          taskId,
+          checkItemId,
+        })
+      );
+    } catch (err) {
+      console.error(err);
+      toast.error('Something went wrong!');
+    }
+  },
     [dispatch, task]
   );
 
@@ -900,17 +906,15 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
                 key={task.checklist?._id?.toString()}
                 checklist={task.checklist}
                 onCheckItemAdd={(name) => handleCheckItemAdd(boardId, task._id!.toString(), name)}
-                onCheckItemDelete={(checkItemId) =>
-                  handleCheckItemDelete(task.checklist?._id!.toString(), checkItemId)
-                }
+                onCheckItemDelete={(checkItemId) => handleCheckItemDelete(boardId, task._id!.toString(), checkItemId)}
                 onCheckItemCheck={(checkItemId) =>
-                  handleCheckItemCheck(task.checklist?._id!.toString(), checkItemId)
+                  handleCheckItemCheck(task._id!.toString(), checkItemId)
                 }
                 onCheckItemUncheck={(checkItemId) =>
-                  handleCheckItemUncheck(task.checklist?._id!.toString(), checkItemId)
+                  handleCheckItemUncheck(task._id!.toString(), checkItemId)
                 }
                 onCheckItemRename={(checkItemId, name) =>
-                  handleCheckItemRename(task.checklist?._id!.toString(), checkItemId, name)
+                  handleCheckItemRename(task._id!.toString(), checkItemId, name)
                 }
                 onDelete={() => handleChecklistDelete(task.checklist?._id!.toString())}
                 onRename={(name) => handleChecklistRename(task.checklist?._id?.toString() ? task.checklist?._id!.toString() : '', name)}

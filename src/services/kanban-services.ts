@@ -773,7 +773,6 @@ export const KanbanService = () => {
                          arrayFilters: [{ "task._id": taskId }]
                     }
                );
-               console.log('response', response);
 
                return response;
           } finally {
@@ -825,7 +824,6 @@ export const KanbanService = () => {
 
           // Check if the length of the checklist items changed, indicating that an item was deleted
           const itemDeleted = task.checklist.checkItems.length < initialLength;
-
           if (itemDeleted) {
                // Save the updated task in the database
                await boardCollection.updateOne(

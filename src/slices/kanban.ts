@@ -51,7 +51,7 @@ type AddCheckItemAction = PayloadAction<{ taskId: string; checkItem: CheckItem; 
 
 type UpdateCheckItemAction = PayloadAction<{ taskId: string; checklistId: string; checkItem: CheckItem; }>;
 
-type DeleteCheckItemAction = PayloadAction<{ taskId: string; checklistId: string; checkItemId: string; }>;
+type DeleteCheckItemAction = PayloadAction<{ taskId: string; checkItemId: string; }>;
 
 const initialState: KanbanState = {
   isLoaded: false,
@@ -252,16 +252,13 @@ const reducers = {
 
   // Delete Check Item
   deleteCheckItem(state: KanbanState, action: DeleteCheckItemAction): void {
-    const { taskId, checklistId, checkItemId } = action.payload;
+    const { taskId, checkItemId } = action.payload;
     const task = state.tasks.byId[taskId];
     const checklist = task.checklist;
 
-    // Ensure we're working with the correct checklist and filter out the check item
-    if (checklist._id === checklistId) {
-      checklist.checkItems = checklist.checkItems.filter(
-        (checkItem) => checkItem._id !== checkItemId
-      );
-    }
+    checklist.checkItems = checklist.checkItems.filter(
+      (checkItem) => checkItem._id !== checkItemId
+    );
   },
 }
 export const slice = createSlice({

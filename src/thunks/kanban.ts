@@ -403,18 +403,22 @@ const updateCheckItem = (params: UpdateCheckItemParams): AppThunk =>
   };
 
 type DeleteCheckItemParams = {
+  boardId: string;
   taskId: string;
-  checklistId: string;
   checkItemId: string;
 };
 
 const deleteCheckItem = (params: DeleteCheckItemParams): AppThunk =>
   async (dispatch: any): Promise<void> => {
-    await fetch(`/api/kanban/checkitems/${params.checkItemId}`, {
+    const isDeleted = await fetch(`/api/kanban/checklist/check-items/`, {
       method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params),
     });
-
-    dispatch(slice.actions.deleteCheckItem(params));
+    if (isDeleted) {
+      dispatch(slice.actions.deleteCheckItem(params));
+      toast.success('Stavka sa liste uspešno obrisana!');
+    }
   };
 
 export const thunks = {
