@@ -47,9 +47,10 @@ const useBoard = (boardId: string | null | undefined): void => {
 
 type PageProps = {
   boards: Board[];
+  members: Member[];
 };
 
-const Page = ({ boards }: PageProps) => {
+const Page = ({ boards, members }: PageProps) => {
   const dispatch = useDispatch();
   const columnIds = useColumnsIds();
   const [currentTaskId, setCurrentTaskId] = useState<string | null>(null);
@@ -66,7 +67,6 @@ const Page = ({ boards }: PageProps) => {
   useBoard(selectedBoardId);
   //Get memeber from the selected boardId
   const selectedBoard = boards.find((board) => board._id === selectedBoardId);
-  const members = selectedBoard?.members || [];
 
   const handleBoardChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setSelectedBoardId(event.target.value as string);
@@ -150,8 +150,8 @@ const Page = ({ boards }: PageProps) => {
     [dispatch]
   );
 
-  const handleTaskAdd = useCallback(async (boardId: string, columnId: string, name: string, createdByEmail: string): Promise<void> => {
-    await dispatch(thunks.createTask({ boardId, columnId, name, createdByEmail }))
+  const handleTaskAdd = useCallback(async (boardId: string, columnId: string, members: Member[], name: string, createdByEmail: string): Promise<void> => {
+    await dispatch(thunks.createTask({ boardId, columnId, members, name, createdByEmail }))
   },
     [dispatch]
   );
@@ -198,7 +198,6 @@ const Page = ({ boards }: PageProps) => {
         );
       }
     } catch (err) {
-      console.error(err);
       toast.error('Something went wrong!');
     }
   },
@@ -354,7 +353,7 @@ const Page = ({ boards }: PageProps) => {
                         onClear={() => handleColumnClear(columnId)}
                         onDelete={() => handleColumnDelete(selectedBoardId, columnId)}
                         onRename={(name) => handleColumnRename(selectedBoardId, columnId, name)}
-                        onTaskAdd={(name) => handleTaskAdd(selectedBoardId, columnId, name!, session.data!.user!.email!)}
+                        onTaskAdd={(name) => handleTaskAdd(selectedBoardId, columnId, members, name!, session.data!.user!.email!)}
                         onTaskOpen={handleTaskOpen}
                       />
                     ))}
@@ -389,8 +388,11 @@ const Page = ({ boards }: PageProps) => {
 Page.getLayout = (page: any) => <DashboardLayout>{page}</DashboardLayout>;
 
 export default Page;
+
 export const getServerSideProps = async () => {
+
   const boards = await KanbanService().getAllBoards();
+  const members = await KanbanService().getAllMembers();
 
   const serializedBoards = boards.map((board: Board) => ({
     ...board,
@@ -418,6 +420,7 @@ export const getServerSideProps = async () => {
   return {
     props: {
       boards: serializedBoards || [],
+      members: members || [],
     },
   };
 };

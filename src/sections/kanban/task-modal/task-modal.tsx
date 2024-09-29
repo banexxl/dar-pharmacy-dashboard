@@ -107,6 +107,7 @@ interface TaskModalProps {
 
 export const TaskModal: FC<TaskModalProps> = (props) => {
   const { taskId, onClose, open = false, boardId, members, ...other } = props;
+
   const dispatch = useDispatch();
   const columns = useColumns();
   const task = useTask(taskId);
@@ -390,8 +391,6 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
   // }, [dispatch, task]);
 
   const handleChecklistRename = useCallback(async (checklistId: string, name: string): Promise<void> => {
-    console.log('checklistId', checklistId);
-    console.log('name', name);
 
     if (!name || name.trim() === '') {
       toast.error('Ime liste ne može biti prazno!');

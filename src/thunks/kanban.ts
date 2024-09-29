@@ -127,6 +127,7 @@ const clearColumn = (params: ClearColumnParams): AppThunk =>
 type CreateTaskParams = {
   boardId: string;
   columnId: string;
+  members: Member[];
   name: string;
   createdByEmail: string;
 };
@@ -138,6 +139,7 @@ const createTask = (params: CreateTaskParams): AppThunk =>
       const requestBody = {
         boardId: params.boardId,
         columnId: params.columnId,
+        members: params.members,
         name: params.name,
         createdByEmail: params.createdByEmail, // Authenticated user's ID from NextAuth session
       };
@@ -152,6 +154,7 @@ const createTask = (params: CreateTaskParams): AppThunk =>
         toast.error('Neuspešno kreiranje taska!');
       }
       const data = await response.json();
+
       // Dispatch the createTask action to update Redux store
       dispatch(slice.actions.createTask(data));
 

@@ -144,6 +144,34 @@ export const KanbanService = () => {
           }
      };
 
+     const getAllMembers = async (): Promise<Member[]> => {
+          const client = new MongoClient(process.env.MONGODB_URI!);
+
+          try {
+               await client.connect();
+
+               const db = client.db('ACCOUNTS_DB');
+               const members = await db.collection('Accounts').find().toArray();
+
+               // Map the documents to match the Member interface
+               const mappedMembers: Member[] = members.map((member: any) => ({
+                    _id: member._id.toString(), // Convert ObjectId to string
+                    avatar: member.avatar || null, // Set default avatar value if missing
+                    email: member.email,
+                    role: member.role, // Assuming role is 'admin' | 'user'
+                    name: member.name
+               }));
+
+               return mappedMembers;
+          } catch (err) {
+               console.error('Error fetching members:', err);
+               return [];
+          } finally {
+               await client.close();
+          }
+     };
+
+
      const getColumnsByBoards = async (boardId: string): Promise<Column[]> => {
           const client = new MongoClient(process.env.MONGODB_URI!);
           const db = client.db('KANBAN_DB');
@@ -230,8 +258,6 @@ export const KanbanService = () => {
      };
 
      const clearColumn = async (boardId: string, columnId: string): Promise<boolean> => {
-          console.log('usao u servis sa', boardId, columnId);
-
           const client = new MongoClient(process.env.MONGODB_URI!);
           const db = client.db('KANBAN_DB');
           const boardCollection = db.collection('Boards');
@@ -252,10 +278,6 @@ export const KanbanService = () => {
                     { _id: new ObjectId(boardId), 'columns._id': columnId },
                     { $set: { 'columns.$.tasks': [] } } // Clear tasks in the column
                );
-
-               console.log('Column cleared:', updateResult.modifiedCount);
-
-
                return true;
           } catch (err) {
                console.error('Error clearing column:', err);
@@ -454,8 +476,6 @@ export const KanbanService = () => {
                     { $set: taskUpdate }, // Update only the provided fields
                     { returnDocument: 'after' }
                );
-               console.log('result', result);
-
                if (!result) throw new Error('Task not found');
 
                // Return the updated task
@@ -783,8 +803,6 @@ export const KanbanService = () => {
      const updateCheckItem = async (boardId: string, taskId: string, checkItemId: string, update: Partial<CheckItem>): Promise<CheckItem> => {
           const client = new MongoClient(process.env.MONGODB_URI!);
           await client.connect(); // Ensure connection to MongoDB
-          console.log('usao u servis', boardId, taskId, checkItemId, update);
-
           const board = await boardCollection.findOne({ _id: new ObjectId(boardId) });
           if (!board) throw new Error('Board not found');
 
@@ -845,6 +863,7 @@ export const KanbanService = () => {
           addBoard,
           deleteBoard,
           getColumnsByBoards,
+          getAllMembers,
           createColumn,
           updateColumn,
           clearColumn,
