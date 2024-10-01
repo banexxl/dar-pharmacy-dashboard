@@ -1,4 +1,4 @@
-import { CheckItem, Checklist, Member } from '@/schemas/kanban';
+import { CheckItem, Checklist, Comment, Member } from '@/schemas/kanban';
 import { createResourceId } from '@/utils/create-resource-id';
 import toast from 'react-hot-toast';
 import { slice } from 'src/slices/kanban';
@@ -266,23 +266,18 @@ const moveTask = (params: MoveTaskParams): AppThunk => async (dispatch: any, get
 };
 
 type AddCommentParams = {
+  boardId: string;
   taskId: string;
-  message: string;
+  comment: Comment;
 };
 
 const addComment = (params: AddCommentParams): AppThunk =>
   async (dispatch: any): Promise<void> => {
-    const response = await fetch(`/api/kanban/comments`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(params),
-    });
-    const data = await response.json();
-
     dispatch(
       slice.actions.addComment({
+        boardId: params.taskId,
         taskId: params.taskId,
-        comment: data,
+        comment: params.comment,
       })
     );
   };

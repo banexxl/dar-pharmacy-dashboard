@@ -599,7 +599,7 @@ export const KanbanService = () => {
           return comments;
      };
 
-     const addComment = async (boardId: string, taskId: string, message: string, userId: string): Promise<Comment | null> => {
+     const addComment = async (boardId: string, taskId: string, message: string, userName: string): Promise<Comment | null> => {
           const client = new MongoClient(process.env.MONGODB_URI!);
           const db = client.db('KANBAN_DB');
 
@@ -616,7 +616,8 @@ export const KanbanService = () => {
 
                // Create a new comment (without manually adding an id)
                const comment: Comment = {
-                    authorId: userId,
+                    _id: createResourceId(),
+                    authorId: userName,
                     createdAt: new Date(),
                     message,
                };
@@ -626,7 +627,7 @@ export const KanbanService = () => {
 
                // Update the board with the new comment
                await db.collection('Boards').updateOne(
-                    { _id: new ObjectId(boardId), "tasks._id": new ObjectId(taskId) },
+                    { _id: new ObjectId(boardId), "tasks._id": taskId },
                     { $push: { "tasks.$.comments": comment } as any }
                );
 

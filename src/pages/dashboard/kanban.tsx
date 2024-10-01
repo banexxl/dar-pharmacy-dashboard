@@ -18,7 +18,7 @@ import { Board, Column, Member, Task } from '@/schemas/kanban';
 import { Button, Divider, Modal, TextField, Theme, useMediaQuery } from '@mui/material';
 import { indigo } from '@/theme/colors';
 import sweetalert2 from 'sweetalert2';
-import { useSession } from 'next-auth/react';
+import { useSession, UseSessionOptions } from 'next-auth/react';
 import { createResourceId } from '@/utils/create-resource-id';
 
 
@@ -63,7 +63,6 @@ const Page = ({ boards, members }: PageProps) => {
   const isScreentoMedium = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'));
   const handleOpenModal = () => setOpenModal(true);
   const handleCloseModal = () => setOpenModal(false);
-
   useBoard(selectedBoardId);
   //Get memeber from the selected boardId
   const selectedBoard = boards.find((board) => board._id === selectedBoardId);
@@ -198,6 +197,7 @@ const Page = ({ boards, members }: PageProps) => {
         );
       }
     } catch (err) {
+      console.error(err);
       toast.error('Something went wrong!');
     }
   },
@@ -379,6 +379,7 @@ const Page = ({ boards, members }: PageProps) => {
         boardId={selectedBoardId!}
         taskId={currentTaskId || undefined}
         members={members}
+        userLoggedIn={session.data!}
       />
       <Toaster />
     </>
@@ -392,35 +393,40 @@ export default Page;
 export const getServerSideProps = async () => {
 
   const boards = await KanbanService().getAllBoards();
-  const members = await KanbanService().getAllMembers();
+  // const members = await KanbanService().getAllMembers();
 
   const serializedBoards = boards.map((board: Board) => ({
     ...board,
-    _id: board._id!.toString(),  // Convert board _id to string
+    _id: board._id!.toString(), // Convert board _id to string
     members: board.members.map((member: Member) => ({
       ...member,
-      _id: member._id!.toString(),  // Convert member _id to string
+      _id: member._id!.toString(), // Convert member _id to string
     })),
     columns: board.columns.map((column: Column) => ({
       ...column,
-      _id: column._id?.toString(),  // Convert column _id to string
-      taskIds: column.taskIds?.map(taskId => taskId.toString()),  // Convert taskIds to strings
+      _id: column._id?.toString(), // Convert column _id to string
+      taskIds: column.taskIds?.map((taskId) => taskId.toString()), // Convert taskIds to strings
     })),
     tasks: board.tasks.map((task: Task) => ({
       ...task,
-      _id: task._id?.toString(),  // Convert task _id to string
+      _id: task._id?.toString(), // Convert task _id to string
       createdBy: {
         ...task.createdBy,
-        _id: task.createdBy._id!.toString(),  // Convert createdBy._id to string
+        _id: task.createdBy._id!.toString(), // Convert createdBy._id to string
       },
-      due: task.due?.toISOString(),  // Convert due date to ISO string
+      due: task.due?.toISOString(), // Convert due date to ISO string
+      comments: task.comments?.map((comment) => ({
+        ...comment,
+        _id: comment._id!.toString(), // Convert comment _id to string
+        createdAt: comment.createdAt.toISOString(), // Convert createdAt to ISO string
+      })),
     })),
   }));
+
 
   return {
     props: {
       boards: serializedBoards || [],
-      members: members || [],
     },
   };
 };

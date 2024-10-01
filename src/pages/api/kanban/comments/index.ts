@@ -15,12 +15,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                     return res.status(200).json(comments);
                }
                case 'POST': { // Create a new comment
-                    const { boardId, taskId, comment, userId } = req.body; // Assume we need taskId to associate the comment
-                    if (!taskId || !comment) {
-                         return res.status(400).json({ error: 'Task ID and comment are required' });
+                    const { boardId, taskId, message, userLoggedIn } = req.body; // Assume we need taskId to associate the comment
+                    console.log(boardId, taskId, message, userLoggedIn);
+
+                    if (!taskId || !message || !userLoggedIn || !boardId) {
+                         return res.status(400).json({ error: 'TaskId and Comment and UserName and BoardId are required' });
                     }
-                    const newComment = await KanbanService().addComment(boardId, taskId, comment, userId);
-                    return res.status(201).json(newComment);
+                    await KanbanService().addComment(boardId, taskId, message, userLoggedIn);
+                    return res.status(200).json('Comment added successfully');
                }
                default:
                     res.setHeader('Allow', ['GET', 'POST']);

@@ -39,7 +39,7 @@ type MoveTaskAction = PayloadAction<{ boardId: string, sourceColumnId: string, d
 
 type DeleteTaskAction = PayloadAction<string>;
 
-type AddCommentAction = PayloadAction<{ taskId: string; comment: Comment }>;
+type AddCommentAction = PayloadAction<{ boardId: string, taskId: string; comment: Comment }>;
 
 type AddChecklistAction = PayloadAction<{ boardId: string, taskId: string; checklist: Checklist }>;
 
@@ -180,7 +180,6 @@ const reducers = {
   addComment(state: KanbanState, action: AddCommentAction): void {
     const { taskId, comment } = action.payload;
     const task = state.tasks.byId[taskId];
-
     task.comments.push(comment);
   },
   // // Add Checklist

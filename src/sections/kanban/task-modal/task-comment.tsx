@@ -26,7 +26,12 @@ export const TaskComment: FC<TaskCommentProps> = (props) => {
   const author = useAuthor(comment.authorId);
 
   const avatar = author?.avatar || undefined;
-  const createdAt = format(comment.createdAt, "MMM dd, yyyy 'at' hh:mm a");
+  const createdAtDate = new Date(comment.createdAt);
+  if (isNaN(createdAtDate.getTime())) {
+    throw new Error('Invalid date');
+  }
+
+  const formattedDate = format(createdAtDate, "MMM dd, yyyy 'at' hh:mm a");
 
   return (
     <Stack
@@ -56,7 +61,7 @@ export const TaskComment: FC<TaskCommentProps> = (props) => {
           component="p"
           variant="caption"
         >
-          {createdAt}
+          {formattedDate}
         </Typography>
       </Stack>
     </Stack>

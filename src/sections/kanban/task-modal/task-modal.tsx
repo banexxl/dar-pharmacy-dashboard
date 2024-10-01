@@ -39,6 +39,7 @@ import { Autocomplete, FormControl, TextField } from '@mui/material';
 import sweetalert2 from 'sweetalert2';
 import { DatePicker } from '@mui/x-date-pickers';
 import { createResourceId } from '@/utils/create-resource-id';
+import { Session } from 'next-auth';
 
 const useColumns = (): Column[] => {
   return useSelector((state) => {
@@ -103,10 +104,11 @@ interface TaskModalProps {
   taskId?: string;
   boardId: string;
   members?: Member[];
+  userLoggedIn: Session
 }
 
 export const TaskModal: FC<TaskModalProps> = (props) => {
-  const { taskId, onClose, open = false, boardId, members, ...other } = props;
+  const { taskId, onClose, open = false, boardId, members, userLoggedIn, ...other } = props;
 
   const dispatch = useDispatch();
   const columns = useColumns();
@@ -550,12 +552,28 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
   const handleCommentAdd = useCallback(
     async (message: string): Promise<void> => {
       try {
-        await dispatch(
-          thunks.addComment({
-            taskId: task!._id!.toString(),
-            message,
-          })
-        );
+        const res = await fetch('/api/kanban/comments', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ boardId: boardId, taskId: taskId, message: message, userLoggedIn: userLoggedIn.user?.name }),
+        })
+
+        if (res.status === 200) {
+          await dispatch(
+            thunks.addComment({
+              boardId: boardId,
+              taskId: task!._id!.toString(),
+              comment: {
+                message: message,
+                authorId: userLoggedIn.user?.email!,
+                createdAt: new Date(),
+              },
+            })
+          );
+        }
+
       } catch (err) {
         console.error(err);
         toast.error('Something went wrong!');
@@ -937,9 +955,9 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
           )}
           {currentTab === 'comments' && (
             <Stack spacing={2}>
-              {task.comments.map((comment) => (
+              {task.comments.length > 0 && task.comments.map((comment) => (
                 <TaskComment
-                  key={comment._id!.toString()}
+                  key={comment?.authorId!.toString()}
                   comment={comment}
                 />
               ))}
@@ -976,4 +994,12 @@ TaskModal.propTypes = {
   taskId: PropTypes.string,
   boardId: PropTypes.string.isRequired,
   members: PropTypes.array,
+  userLoggedIn: PropTypes.shape({
+    user: PropTypes.shape({
+      email: PropTypes.string.isRequired,
+      image: PropTypes.string,
+      name: PropTypes.string.isRequired
+    }).isRequired,
+    expires: PropTypes.string.isRequired
+  }).isRequired
 };
