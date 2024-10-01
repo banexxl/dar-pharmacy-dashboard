@@ -50,6 +50,7 @@ export const TaskChecklist: FC<TaskChecklistProps> = (props) => {
     onRename,
     ...other
   } = props;
+  console.log('aaaaaaaaaa', checklist?._id);
 
   const [nameCopy, setNameCopy] = useState<string>(checklist?.name);
   const [isRenaming, setIsRenaming] = useState<boolean>(false);
@@ -230,9 +231,12 @@ export const TaskChecklist: FC<TaskChecklistProps> = (props) => {
           <Divider />
         </>
       )}
+
       <Box sx={{ p: 1 }}>
         <TaskCheckItemAdd onAdd={onCheckItemAdd} />
       </Box>
+
+
     </Card>
   );
 };

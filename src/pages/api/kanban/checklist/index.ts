@@ -19,7 +19,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                     const { taskId } = req.body;
                     const deleted = await KanbanService().deleteChecklist(taskId);
                     if (!deleted) {
-                         return res.status(404).json({ error: 'Checklist not found' });
+                         return res.status(400).json({ error: 'Bad request' });
                     }
                     return res.status(200).json({ message: 'Checklist deleted successfully' });
                }

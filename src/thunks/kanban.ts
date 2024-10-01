@@ -365,6 +365,8 @@ type AddCheckItemParams = {
 
 const addCheckItem = (params: AddCheckItemParams): AppThunk =>
   async (dispatch: any): Promise<void> => {
+    console.log('params', params);
+
     dispatch(
       slice.actions.addCheckItem({
         boardId: params.boardId,

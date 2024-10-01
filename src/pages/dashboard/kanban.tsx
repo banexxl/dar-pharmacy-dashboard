@@ -393,7 +393,7 @@ export default Page;
 export const getServerSideProps = async () => {
 
   const boards = await KanbanService().getAllBoards();
-  // const members = await KanbanService().getAllMembers();
+  const members = await KanbanService().getAllMembers();
 
   const serializedBoards = boards.map((board: Board) => ({
     ...board,
@@ -427,6 +427,7 @@ export const getServerSideProps = async () => {
   return {
     props: {
       boards: serializedBoards || [],
+      members: members || [],
     },
   };
 };

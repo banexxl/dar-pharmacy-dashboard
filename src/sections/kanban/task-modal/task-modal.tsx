@@ -420,7 +420,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
     try {
       await dispatch(
         thunks.deleteChecklist({
-          taskId: task!._id!.toString(),
+          taskId: taskId
         })
       );
     } catch (err) {
@@ -450,6 +450,8 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
       })
 
       if ((await addCheckItemResponse).status === 200) {
+        console.log(boardId, taskId, checkItem);
+
         await dispatch(
           thunks.addCheckItem({
             boardId: boardId,
@@ -926,13 +928,9 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
                 onCheckItemAdd={(name) => handleCheckItemAdd(boardId, task._id!.toString(), name)}
                 onCheckItemDelete={(checkItemId) => handleCheckItemDelete(boardId, task._id!.toString(), checkItemId)}
                 onCheckItemCheck={(checkItemId) => handleCheckItemCheck(boardId, task._id!.toString(), checkItemId)}
-                onCheckItemUncheck={(checkItemId) =>
-                  handleCheckItemUncheck(task._id!.toString(), checkItemId)
-                }
-                onCheckItemRename={(checkItemId, name) =>
-                  handleCheckItemRename(task._id!.toString(), checkItemId, name)
-                }
-                onDelete={() => handleChecklistDelete(task.checklist?._id!.toString())}
+                onCheckItemUncheck={(checkItemId) => handleCheckItemUncheck(task._id!.toString(), checkItemId)}
+                onCheckItemRename={(checkItemId, name) => handleCheckItemRename(task._id!.toString(), checkItemId, name)}
+                onDelete={() => handleChecklistDelete(task._id!.toString())}
                 onRename={(name) => handleChecklistRename(task.checklist?._id?.toString() ? task.checklist?._id!.toString() : '', name)}
               />
               {/* {

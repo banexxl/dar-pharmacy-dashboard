@@ -41,7 +41,7 @@ type DeleteTaskAction = PayloadAction<string>;
 
 type AddCommentAction = PayloadAction<{ boardId: string, taskId: string; comment: Comment }>;
 
-type AddChecklistAction = PayloadAction<{ boardId: string, taskId: string; checklist: Checklist }>;
+// type AddChecklistAction = PayloadAction<{ boardId: string, taskId: string; checklist: Checklist }>;
 
 type UpdateChecklistAction = PayloadAction<{ taskId: string; checklist: { name?: string, checkItems?: CheckItem[] } }>;
 
@@ -232,6 +232,12 @@ const reducers = {
     const { taskId, checkItem } = action.payload;
     const task = state.tasks.byId[taskId];
     const checklist = task.checklist;
+    console.log('aaaaaa', checklist);
+    console.log(checkItem);
+    console.log(taskId);
+
+
+
     checklist.checkItems.push(checkItem);
   },
 

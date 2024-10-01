@@ -739,7 +739,6 @@ export const KanbanService = () => {
      };
 
      const deleteChecklist = async (taskId: string): Promise<boolean> => {
-
           const client = new MongoClient(process.env.MONGODB_URI!);
           await client.connect(); // Ensure connection to MongoDB
 
@@ -755,7 +754,7 @@ export const KanbanService = () => {
           if (!task) throw new Error('Task not found');
 
           const emptyChecklist = task.checklist = {
-               _id: task.checklist._id,
+               _id: '',
                name: '',
                checkItems: []
           }
