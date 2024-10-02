@@ -122,7 +122,24 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
   const [nameCopy, setNameCopy] = useState<string>(task?.name || '');
   const debounceMs = 1000;
   const [openDatePicker, setOpenDatePicker] = useState(false);
+  // Create a ref to the file input
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
+  // Handle the file input click event
+  const handleFileSelect = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click(); // Trigger the file input click
+    }
+  };
+
+  // Handle the file input change event (when files are selected)
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      console.log('Selected file:', files[0]);
+      // Handle the file selection logic here
+    }
+  };
   const handleDateChange = (newDate: Date) => {
     dispatch(
       thunks.updateTask({
@@ -817,11 +834,18 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
                       variant="rounded"
                     />
                   ))}
-                  <IconButton disabled>
-                    <SvgIcon fontSize="small">
+                  <IconButton onClick={handleFileSelect}>
+                    <SvgIcon fontSize="small" >
                       <PlusIcon />
                     </SvgIcon>
                   </IconButton>
+                  {/* Hidden file input */}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    style={{ display: 'none' }} // Hide the file input
+                    onChange={handleFileChange} // Handle file selection
+                  />
                 </Stack>
               </Grid>
               {/* Due Date */}
