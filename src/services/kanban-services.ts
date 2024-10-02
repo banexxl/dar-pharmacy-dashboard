@@ -754,7 +754,7 @@ export const KanbanService = () => {
           if (!task) throw new Error('Task not found');
 
           const emptyChecklist = task.checklist = {
-               _id: '',
+               _id: task.checklist._id,
                name: '',
                checkItems: []
           }

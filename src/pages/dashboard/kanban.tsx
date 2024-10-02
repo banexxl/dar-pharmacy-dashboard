@@ -64,8 +64,6 @@ const Page = ({ boards, members }: PageProps) => {
   const handleOpenModal = () => setOpenModal(true);
   const handleCloseModal = () => setOpenModal(false);
   useBoard(selectedBoardId);
-  //Get memeber from the selected boardId
-  const selectedBoard = boards.find((board) => board._id === selectedBoardId);
 
   const handleBoardChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setSelectedBoardId(event.target.value as string);

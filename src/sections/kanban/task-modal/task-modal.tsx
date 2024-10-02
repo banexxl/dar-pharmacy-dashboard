@@ -392,8 +392,8 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
   //   }
   // }, [dispatch, task]);
 
-  const handleChecklistRename = useCallback(async (checklistId: string, name: string): Promise<void> => {
-
+  const handleChecklistRename = useCallback(async (taskId: string, name: string): Promise<void> => {
+    console.log('taskID', taskId);
     if (!name || name.trim() === '') {
       toast.error('Ime liste ne može biti prazno!');
       return;
@@ -401,7 +401,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
     try {
       await dispatch(
         thunks.updateChecklist({
-          taskId: task!._id!,
+          taskId: taskId,
           update: {
             name: name,
           },
@@ -931,7 +931,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
                 onCheckItemUncheck={(checkItemId) => handleCheckItemUncheck(task._id!.toString(), checkItemId)}
                 onCheckItemRename={(checkItemId, name) => handleCheckItemRename(task._id!.toString(), checkItemId, name)}
                 onDelete={() => handleChecklistDelete(task._id!.toString())}
-                onRename={(name) => handleChecklistRename(task.checklist?._id?.toString() ? task.checklist?._id!.toString() : '', name)}
+                onRename={(name) => handleChecklistRename(task._id!.toString(), name)}
               />
               {/* {
                 !!task?.checklist?._id && (
