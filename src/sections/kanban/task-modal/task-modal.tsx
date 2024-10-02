@@ -958,7 +958,9 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
                 />
               ))}
               <TaskCommentAdd
-                avatar={userLoggedIn.user?.image || ''}
+                avatar={
+                  members?.find((member) => member.email === userLoggedIn.user?.email)?.avatar!
+                }
                 onAdd={handleCommentAdd}
               />
             </Stack>
