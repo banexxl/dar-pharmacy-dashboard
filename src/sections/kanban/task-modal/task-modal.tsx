@@ -931,22 +931,6 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
                 onDelete={() => handleChecklistDelete(task._id!.toString())}
                 onRename={(name) => handleChecklistRename(task._id!.toString(), name)}
               />
-              {/* {
-                !!task?.checklist?._id && (
-                  <Button
-                    startIcon={
-                      <SvgIcon>
-                        <PlusIcon />
-                      </SvgIcon>
-                    }
-                    onClick={handleChecklistAdd}
-                    variant="contained"
-                  >
-                    Add
-                  </Button>
-                )
-              } */}
-
             </Stack>
           )}
           {currentTab === 'comments' && (

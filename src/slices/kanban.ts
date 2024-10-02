@@ -237,9 +237,19 @@ const reducers = {
 
   // Add Check Item
   addCheckItem(state: KanbanState, action: AddCheckItemAction): void {
-    const { taskId, checkItem } = action.payload;
+    const { boardId, taskId, checkItem } = action.payload;
     const task = state.tasks.byId[taskId];
+
+    // Ensure task and checklist are defined
+    if (!task) {
+      console.error('Task not found');
+      return;
+    }
     const checklist = task.checklist;
+    if (!checklist.checkItems) {
+      checklist.checkItems = [];
+    }
+
     checklist.checkItems.push(checkItem);
   },
 

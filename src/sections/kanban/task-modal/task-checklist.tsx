@@ -51,7 +51,7 @@ export const TaskChecklist: FC<TaskChecklistProps> = (props) => {
     ...other
   } = props;
 
-  const [nameCopy, setNameCopy] = useState<string>(checklist?.name);
+  const [nameCopy, setNameCopy] = useState<string>(checklist?.name || '');
   const [isRenaming, setIsRenaming] = useState<boolean>(false);
   // The current check item that is being renamed
   const [checkItemId, setCheckItemId] = useState<string | null>(null);
@@ -145,7 +145,7 @@ export const TaskChecklist: FC<TaskChecklistProps> = (props) => {
               },
             },
           }}
-          value={nameCopy}
+          value={nameCopy || ''}
         />
         {isRenaming ? (
           <>
