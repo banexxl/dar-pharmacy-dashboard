@@ -16,6 +16,7 @@ interface KanbanState {
   members: {
     byId: Record<string, Member>;
     allIds: string[];
+    byEmail: Record<string, Member>;
   };
 }
 
@@ -66,6 +67,7 @@ const initialState: KanbanState = {
   members: {
     byId: {},
     allIds: [],
+    byEmail: {}
   },
 };
 
@@ -96,6 +98,7 @@ const reducers = {
     state.tasks.allIds = Object.keys(state.tasks.byId);
     state.members.byId = objFromArray(board.members);
     state.members.allIds = Object.keys(state.members.byId);
+    state.members.byEmail = objFromArray(board.members);
     state.isLoaded = true;
   },
   createColumn(state: KanbanState, action: CreateColumnAction): void {
@@ -178,7 +181,12 @@ const reducers = {
     );
   },
   addComment(state: KanbanState, action: AddCommentAction): void {
-    const { taskId, comment } = action.payload;
+    const { boardId, taskId, comment } = action.payload;
+
+    // Deserialize `createdAt` to a Date object
+    comment.createdAt = new Date(comment.createdAt);
+
+    // Assuming you are storing comments in tasks
     const task = state.tasks.byId[taskId];
     task.comments.push(comment);
   },
@@ -232,12 +240,6 @@ const reducers = {
     const { taskId, checkItem } = action.payload;
     const task = state.tasks.byId[taskId];
     const checklist = task.checklist;
-    console.log('aaaaaa', checklist);
-    console.log(checkItem);
-    console.log(taskId);
-
-
-
     checklist.checkItems.push(checkItem);
   },
 

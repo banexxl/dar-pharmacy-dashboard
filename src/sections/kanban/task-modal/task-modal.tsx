@@ -393,7 +393,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
   // }, [dispatch, task]);
 
   const handleChecklistRename = useCallback(async (taskId: string, name: string): Promise<void> => {
-    console.log('taskID', taskId);
+
     if (!name || name.trim() === '') {
       toast.error('Ime liste ne može biti prazno!');
       return;
@@ -450,8 +450,6 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
       })
 
       if ((await addCheckItemResponse).status === 200) {
-        console.log(boardId, taskId, checkItem);
-
         await dispatch(
           thunks.addCheckItem({
             boardId: boardId,
@@ -559,7 +557,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ boardId: boardId, taskId: taskId, message: message, userLoggedIn: userLoggedIn.user?.name }),
+          body: JSON.stringify({ boardId: boardId, taskId: taskId, message: message, userLoggedIn: userLoggedIn.user?.email }),
         })
 
         if (res.status === 200) {
@@ -955,12 +953,12 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
             <Stack spacing={2}>
               {task.comments.length > 0 && task.comments.map((comment) => (
                 <TaskComment
-                  key={comment?.authorId!.toString()}
+                  key={comment?._id?.toString()}
                   comment={comment}
                 />
               ))}
               <TaskCommentAdd
-                // avatar={user.avatar}
+                avatar={userLoggedIn.user?.image || ''}
                 onAdd={handleCommentAdd}
               />
             </Stack>

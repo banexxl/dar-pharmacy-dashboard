@@ -16,8 +16,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                }
                case 'POST': { // Create a new comment
                     const { boardId, taskId, message, userLoggedIn } = req.body; // Assume we need taskId to associate the comment
-                    console.log(boardId, taskId, message, userLoggedIn);
-
                     if (!taskId || !message || !userLoggedIn || !boardId) {
                          return res.status(400).json({ error: 'TaskId and Comment and UserName and BoardId are required' });
                     }

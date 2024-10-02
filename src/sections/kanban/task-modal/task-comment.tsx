@@ -12,8 +12,10 @@ import type { Comment, Member } from 'src/schemas/kanban';
 const useAuthor = (authorId: string): Member | null => {
   return useSelector((state) => {
     const { members } = state.kanban;
-
-    return members.byId[authorId] || null;
+    const member = Object.values(members.byId).find(
+      (member: Member) => member.email === authorId
+    );
+    return member || null;
   });
 };
 
@@ -24,7 +26,6 @@ interface TaskCommentProps {
 export const TaskComment: FC<TaskCommentProps> = (props) => {
   const { comment, ...other } = props;
   const author = useAuthor(comment.authorId);
-
   const avatar = author?.avatar || undefined;
   const createdAtDate = new Date(comment.createdAt);
   if (isNaN(createdAtDate.getTime())) {

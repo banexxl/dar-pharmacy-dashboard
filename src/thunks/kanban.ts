@@ -273,11 +273,16 @@ type AddCommentParams = {
 
 const addComment = (params: AddCommentParams): AppThunk =>
   async (dispatch: any): Promise<void> => {
+    const serializedComment = {
+      ...params.comment,
+      createdAt: params.comment.createdAt.toISOString(), // Serialize the date
+    };
+
     dispatch(
       slice.actions.addComment({
-        boardId: params.taskId,
+        boardId: params.boardId,
         taskId: params.taskId,
-        comment: params.comment,
+        comment: serializedComment as unknown as Comment, // Type assertion for payload compatibility
       })
     );
   };
@@ -365,8 +370,6 @@ type AddCheckItemParams = {
 
 const addCheckItem = (params: AddCheckItemParams): AppThunk =>
   async (dispatch: any): Promise<void> => {
-    console.log('params', params);
-
     dispatch(
       slice.actions.addCheckItem({
         boardId: params.boardId,
