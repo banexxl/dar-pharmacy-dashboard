@@ -985,6 +985,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
                             fontSize: 64,
                             color: 'primary.main', // You can style the icon as needed
                           }}
+                          onClick={() => onFileClick(attachment.url)}
                         />
                       );
                     })}
