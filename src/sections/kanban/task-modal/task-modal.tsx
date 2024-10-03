@@ -20,6 +20,7 @@ import Grid from '@mui/material/Unstable_Grid2';
 import Input from '@mui/material/Input';
 import Stack from '@mui/material/Stack';
 import SvgIcon from '@mui/material/SvgIcon';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import Typography from '@mui/material/Typography';
@@ -29,7 +30,7 @@ import { IconButton, MenuItem } from '@mui/material';
 import type { RootState } from 'src/store';
 import { useDispatch, useSelector } from 'src/store';
 import { thunks } from 'src/thunks/kanban';
-import type { CheckItem, Column, Member, Task } from 'src/schemas/kanban';
+import type { Attachment, CheckItem, Column, Member, Task } from 'src/schemas/kanban';
 import { TaskChecklist } from './task-checklist';
 import { TaskComment } from './task-comment';
 import { TaskCommentAdd } from './task-comment-add';
@@ -40,6 +41,7 @@ import sweetalert2 from 'sweetalert2';
 import { DatePicker } from '@mui/x-date-pickers';
 import { createResourceId } from '@/utils/create-resource-id';
 import { Session } from 'next-auth';
+import { indigo } from '@/theme/colors';
 
 const useColumns = (): Column[] => {
   return useSelector((state) => {
@@ -122,24 +124,140 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
   const [nameCopy, setNameCopy] = useState<string>(task?.name || '');
   const debounceMs = 1000;
   const [openDatePicker, setOpenDatePicker] = useState(false);
-  // Create a ref to the file input
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  // Handle the file input click event
-  const handleFileSelect = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click(); // Trigger the file input click
+  const handleFileChange = async (event: any) => {
+    const selectedFile = event.target.files[0];
+
+    if (!selectedFile) {
+      return;
+    }
+
+    // Validate file type
+    const validExtensions = ['pdf', 'docx', 'doc', 'jpg', 'jpeg', 'png', 'gif'];
+    const fileExtension = selectedFile.name.split('.').pop().toLowerCase();
+
+    if (!validExtensions.includes(fileExtension)) {
+      toast.error('Nedozvoljen tip fajla! Dozvoljeni tipovi su: pdf, docx, doc, jpg, jpeg, png, gif');
+      return;
+    }
+
+    setLoading(true);
+    const apiUrl = '/api/aws/aws-s3';
+
+    try {
+      const reader = new FileReader();
+
+      reader.readAsDataURL(selectedFile);
+      reader.onloadend = async () => {
+        const base64Data = reader.result;
+        const data = {
+          file: base64Data,
+          extension: fileExtension,
+          fileName: selectedFile.name,
+        };
+
+        const response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+          toast.error('Došlo je do greške prilikom uploada fajla!');
+        } else {
+          const result = await response.json();
+          const attachment: Attachment = {
+            _id: createResourceId(),
+            uploadedDateTime: new Date(),
+            type: validExtensions.includes(fileExtension) ? 'image' : 'file',
+            url: result.imageUrl,
+          };
+
+          // Dispatch updateTask thunk with the new attachment
+          dispatch(
+            thunks.updateTask({
+              boardId: boardId.toString(),
+              taskId: task!._id!.toString(),
+              update: {
+                attachments: [...task!.attachments, attachment],
+              },
+            })
+          );
+
+          toast.success('Uspešno uploadovan fajl!');
+        }
+      };
+    } catch (error) {
+      toast.error('Došlo je do greške prilikom uploada fajla!');
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Handle the file input change event (when files are selected)
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files && files.length > 0) {
-      console.log('Selected file:', files[0]);
-      // Handle the file selection logic here
+  const handleDeleteFile = async (fileURL: string) => {
+    if (!fileURL) {
+      return;
+    }
+
+    setLoading(true);
+    const apiUrl = '/api/aws/aws-s3';
+
+    try {
+      const response = await fetch(apiUrl, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ url: fileURL }),
+      });
+
+      if (!response.ok) {
+        toast.error('Došlo je do greške prilikom brisanja fajla!');
+      } else {
+        const updatedAttachments = task!.attachments.filter((attachment) => attachment.url !== fileURL);
+
+        // Dispatch updateTask thunk to update the attachments
+        dispatch(
+          thunks.updateTask({
+            boardId: boardId!.toString(),
+            taskId: task!._id!.toString(),
+            update: {
+              attachments: updatedAttachments,
+            },
+          })
+        );
+
+        toast.success('Uspešno obrisan fajl!');
+      }
+    } catch (error) {
+      toast.error('Došlo je do greške prilikom brisanja fajla!');
+    } finally {
+      setLoading(false);
     }
   };
+
+  const onFileClick = (fileURL: string) => {
+    sweetalert2.fire({
+      title: 'Da li ste sigurni da želite da obrišete publikaciju?',
+      text: "Možete obrisati samo publikaciju koju ste uploadovali!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Da, obriši!',
+      cancelButtonText: 'Odustani!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        handleDeleteFile(fileURL)
+      } else {
+        // handleProjectClose()
+      }
+    })
+  }
+
   const handleDateChange = (newDate: Date) => {
     dispatch(
       thunks.updateTask({
@@ -834,18 +952,33 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
                       variant="rounded"
                     />
                   ))}
-                  <IconButton onClick={handleFileSelect}>
-                    <SvgIcon fontSize="small" >
-                      <PlusIcon />
-                    </SvgIcon>
-                  </IconButton>
+                  <Button component="label"
+                    variant="contained"
+                    startIcon={<CloudUploadIcon sx={{ fontWeight: 'bold', color: indigo.lightest }} />}
+                    style={{ maxWidth: '250px', marginTop: '40px', color: indigo.main, textDecoration: 'none' }}
+                  >
+                    <Typography variant="body2" sx={{ fontWeight: 'bold', color: indigo.lightest }}>
+                      Učitaj dokument
+                    </Typography>
+                    <Input
+                      type="file"
+                      inputProps={{ accept: '.pdf, .docx, .doc, .gif, .jpg, .jpeg, .jfif' }}
+                      sx={{
+                        clip: 'rect(0 0 0 0)',
+                        clipPath: 'inset(50%)',
+                        height: 1,
+                        overflow: 'hidden',
+                        position: 'absolute',
+                        bottom: 0,
+                        left: 0,
+                        whiteSpace: 'nowrap',
+                        width: 1,
+                      }}
+                      onChange={(e: any) => handleFileChange(e)}
+                    />
+                  </Button>
                   {/* Hidden file input */}
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    style={{ display: 'none' }} // Hide the file input
-                    onChange={handleFileChange} // Handle file selection
-                  />
+
                 </Stack>
               </Grid>
               {/* Due Date */}

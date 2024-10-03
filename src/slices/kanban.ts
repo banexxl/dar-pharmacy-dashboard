@@ -1,6 +1,6 @@
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
-import type { Board, CheckItem, Checklist, Column, Comment, Member, Task } from 'src/schemas/kanban';
+import type { Attachment, Board, CheckItem, Checklist, Column, Comment, Member, Task } from 'src/schemas/kanban';
 import { objFromArray } from 'src/utils/obj-from-array';
 
 interface KanbanState {
@@ -190,27 +190,6 @@ const reducers = {
     const task = state.tasks.byId[taskId];
     task.comments.push(comment);
   },
-  // // Add Checklist
-  // addChecklist(state: KanbanState, action: AddChecklistAction): void {
-  //   const { taskId, checklist } = action.payload;
-  //   const task = state.tasks.byId[taskId];
-
-  //   // If the task already has a checklist, prevent adding another one
-  //   if (task.checklist && task.checklist._id) {
-  //     console.error('A checklist already exists for this task.');
-  //     return;
-  //   }
-
-  //   // Update the task's checklist fields directly
-  //   task.checklist = {
-  //     ...task.checklist,
-  //     _id: checklist._id,
-  //     name: checklist.name,
-  //     checkItems: checklist.checkItems,
-  //   };
-  // },
-
-  // Update Checklist
   updateChecklist(state: KanbanState, action: UpdateChecklistAction): void {
     const { taskId, checklist } = action.payload;
     const task = state.tasks.byId[taskId];
@@ -225,8 +204,6 @@ const reducers = {
       task.checklist.checkItems = checklist.checkItems;
     }
   },
-
-  // Delete Checklist
   deleteChecklist(state: KanbanState, action: DeleteChecklistAction): void {
     const { taskId } = action.payload;
     const task = state.tasks.byId[taskId];
@@ -234,13 +211,9 @@ const reducers = {
     task.checklist = { _id: task._id, name: '', checkItems: [] }; // Reset the checklist to an empty state
 
   },
-
-  // Add Check Item
   addCheckItem(state: KanbanState, action: AddCheckItemAction): void {
     const { boardId, taskId, checkItem } = action.payload;
     const task = state.tasks.byId[taskId];
-
-    // Ensure task and checklist are defined
     if (!task) {
       console.error('Task not found');
       return;
@@ -252,8 +225,6 @@ const reducers = {
 
     checklist.checkItems.push(checkItem);
   },
-
-  // Update Check Item
   updateCheckItem(state: KanbanState, action: UpdateCheckItemAction): void {
     const { taskId, checkItem } = action.payload;
     const task = state.tasks.byId[taskId];
@@ -266,8 +237,6 @@ const reducers = {
     );
 
   },
-
-  // Delete Check Item
   deleteCheckItem(state: KanbanState, action: DeleteCheckItemAction): void {
     const { taskId, checkItemId } = action.payload;
     const task = state.tasks.byId[taskId];
@@ -276,6 +245,16 @@ const reducers = {
     checklist.checkItems = checklist.checkItems.filter(
       (checkItem) => checkItem._id !== checkItemId
     );
+  },
+  addAttachment(state: KanbanState, action: PayloadAction<{ boardId: string, taskId: string; attachment: Attachment }>): void {
+    const { boardId, taskId, attachment } = action.payload;
+    const task = state.tasks.byId[taskId];
+    task.attachments.push(attachment);
+  },
+  deleteAttachment(state: KanbanState, action: PayloadAction<{ taskId: string; attachmentId: string }>): void {
+    const { taskId, attachmentId } = action.payload;
+    const task = state.tasks.byId[taskId];
+    task.attachments = task.attachments.filter((attachment) => attachment._id !== attachmentId);
   },
 }
 export const slice = createSlice({

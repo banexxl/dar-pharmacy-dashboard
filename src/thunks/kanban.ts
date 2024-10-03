@@ -1,4 +1,4 @@
-import { CheckItem, Checklist, Comment, Member } from '@/schemas/kanban';
+import { Attachment, CheckItem, Checklist, Comment, Member } from '@/schemas/kanban';
 import { createResourceId } from '@/utils/create-resource-id';
 import toast from 'react-hot-toast';
 import { slice } from 'src/slices/kanban';
@@ -197,7 +197,7 @@ type UpdateTaskParams = {
   update: {
     name?: string;
     assignedTo?: Member[];
-    attachments?: string[];
+    attachments?: Attachment[];
     description?: string;
     isSubscribed?: boolean;
     labels?: string[];
