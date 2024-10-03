@@ -8,6 +8,9 @@ import ArchiveIcon from '@untitled-ui/icons-react/build/esm/Archive';
 import EyeIcon from '@untitled-ui/icons-react/build/esm/Eye';
 import EyeOffIcon from '@untitled-ui/icons-react/build/esm/EyeOff';
 import PlusIcon from '@untitled-ui/icons-react/build/esm/Plus';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import ImageIcon from '@mui/icons-material/Image';
+import ArticleIcon from '@mui/icons-material/Article';
 import XIcon from '@untitled-ui/icons-react/build/esm/X';
 import Avatar from '@mui/material/Avatar';
 import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
@@ -936,28 +939,62 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
                 sm={8}
               >
                 <Stack
-                  alignItems="center"
-                  direction="row"
-                  flexWrap="wrap"
+                  sx={{
+                    alignItems: 'center',
+                    flexWrap: 'wrap',
+                    display: 'flex',
+                  }}
                   spacing={1}
                 >
-                  {task.attachments.map((attachment) => (
-                    <Avatar
-                      key={attachment._id!.toString().toString()}
-                      src={attachment.url || undefined}
-                      sx={{
-                        height: 64,
-                        width: 64,
-                      }}
-                      variant="rounded"
-                    />
-                  ))}
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      gap: 1,
+                    }}
+                  >
+                    {task.attachments.map((attachment: any) => {
+                      const fileExtension = attachment?.url?.split('.').pop().toLowerCase();
+
+                      let IconComponent;
+
+                      // Determine the icon based on the file extension
+                      switch (fileExtension) {
+                        case 'pdf':
+                          IconComponent = PictureAsPdfIcon;
+                          break;
+                        case 'jpg':
+                        case 'jpeg':
+                        case 'png':
+                        case 'gif':
+                          IconComponent = ImageIcon;
+                          break;
+                        case 'doc':
+                        case 'docx':
+                          IconComponent = ArticleIcon; // You can customize this with a Word-specific icon if needed
+                          break;
+                        default:
+                          IconComponent = ArticleIcon; // Default icon for other file types
+                          break;
+                      }
+
+                      return (
+                        <IconComponent
+                          key={attachment._id!.toString()}
+                          sx={{
+                            fontSize: 64,
+                            color: 'primary.main', // You can style the icon as needed
+                          }}
+                        />
+                      );
+                    })}
+                  </Box>
                   <Button component="label"
                     variant="contained"
                     startIcon={<CloudUploadIcon sx={{ fontWeight: 'bold', color: indigo.lightest }} />}
-                    style={{ maxWidth: '250px', marginTop: '40px', color: indigo.main, textDecoration: 'none' }}
+                    style={{ maxWidth: '150px', marginTop: '40px', color: indigo.main, textDecoration: 'none' }}
                   >
-                    <Typography variant="body2" sx={{ fontWeight: 'bold', color: indigo.lightest }}>
+                    <Typography variant="caption" sx={{ fontWeight: 'bold', color: indigo.lightest, fontSize: '.5rem' }}>
                       Učitaj dokument
                     </Typography>
                     <Input
