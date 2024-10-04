@@ -90,9 +90,6 @@ export const TaskCard = forwardRef<HTMLDivElement, TaskCardProps>(function TaskC
         (() => {
           // Filter for the first image attachment
           const imageAttachment = task.attachments.find((attachment) => attachment.type === 'image');
-          console.log('imageAttachment', imageAttachment);
-          console.log('task attac', task.attachments);
-
           // Only render CardMedia if there is a valid image attachment
           if (imageAttachment && imageAttachment.url) {
             return (
