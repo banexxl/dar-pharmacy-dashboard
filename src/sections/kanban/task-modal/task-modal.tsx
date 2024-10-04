@@ -214,7 +214,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ url: fileURL }),
+        body: JSON.stringify(fileURL),
       });
 
       if (!response.ok) {
@@ -243,6 +243,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
   };
 
   const onFileClick = (fileURL: string) => {
+    onClose?.();
     sweetalert2.fire({
       title: 'Da li ste sigurni da želite da obrišete publikaciju?',
       text: "Možete obrisati samo publikaciju koju ste uploadovali!",

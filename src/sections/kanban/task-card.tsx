@@ -13,7 +13,9 @@ import Chip from '@mui/material/Chip';
 import Stack from '@mui/material/Stack';
 import SvgIcon from '@mui/material/SvgIcon';
 import Typography from '@mui/material/Typography';
-
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import ImageIcon from '@mui/icons-material/Image';
+import ArticleIcon from '@mui/icons-material/Article';
 import type { RootState } from 'src/store';
 import { useSelector } from 'src/store';
 import type { Member, Task } from 'src/schemas/kanban';
@@ -49,6 +51,7 @@ export const TaskCard = forwardRef<HTMLDivElement, TaskCardProps>(function TaskC
   const { taskId, dragging = false, onOpen, ...other } = props;
   const task = useTask(taskId);
   const assignedTo = useAssignees(task?.assignedTo);
+  console.log('attached', task!.attachments);
 
   if (!task) {
     return null;
@@ -85,15 +88,50 @@ export const TaskCard = forwardRef<HTMLDivElement, TaskCardProps>(function TaskC
       {...other}
     >
       {hasAttachments && (
-        <CardMedia
-          image={task.attachments[0].url}
-          sx={{
-            borderRadius: 1.5,
-            height: 120,
-            mb: 1,
-          }}
-        />
+        task.attachments.map((attachment) => {
+          if (attachment.type === 'image') {
+            // Display image if the file type is an image
+            return (
+              <CardMedia
+                key={attachment._id!.toString()}
+                image={attachment.url}
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  borderRadius: 1.5,
+                  height: 80,
+                  mb: 1,
+                }}
+              />
+            );
+          } else {
+            // Determine the file extension
+            const fileExtension = attachment.url.split('.').pop()?.toLowerCase();
+
+            let IconComponent;
+            if (fileExtension === 'pdf') {
+              IconComponent = PictureAsPdfIcon; // MUI icon for PDF
+            } else if (fileExtension === 'doc' || fileExtension === 'docx') {
+              IconComponent = ArticleIcon; // MUI icon for DOC/DOCX
+            } else {
+              IconComponent = ArticleIcon; // Fallback for other file types
+            }
+
+            // Display appropriate icon for non-image attachments
+            return (
+              <IconComponent
+                key={attachment._id!.toString()}
+                sx={{
+                  fontSize: 44,
+                  color: 'primary.main',
+                  mb: 1,
+                }}
+              />
+            );
+          }
+        })
       )}
+
       <Typography variant="subtitle1">{task.name}</Typography>
       {hasLabels && (
         <Box
