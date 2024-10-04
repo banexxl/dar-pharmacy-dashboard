@@ -51,7 +51,6 @@ export const TaskCard = forwardRef<HTMLDivElement, TaskCardProps>(function TaskC
   const { taskId, dragging = false, onOpen, ...other } = props;
   const task = useTask(taskId);
   const assignedTo = useAssignees(task?.assignedTo);
-  console.log('attached', task!.attachments);
 
   if (!task) {
     return null;
@@ -88,50 +87,31 @@ export const TaskCard = forwardRef<HTMLDivElement, TaskCardProps>(function TaskC
       {...other}
     >
       {hasAttachments && (
-        task.attachments.map((attachment) => {
-          if (attachment.type === 'image') {
-            // Display image if the file type is an image
+        (() => {
+          // Filter for the first image attachment
+          const imageAttachment = task.attachments.find((attachment) => attachment.type === 'image');
+          console.log('imageAttachment', imageAttachment);
+          console.log('task attac', task.attachments);
+
+          // Only render CardMedia if there is a valid image attachment
+          if (imageAttachment && imageAttachment.url) {
             return (
               <CardMedia
-                key={attachment._id!.toString()}
-                image={attachment.url}
+                key={imageAttachment._id!.toString()}
+                image={imageAttachment.url}
                 sx={{
-                  display: 'flex',
-                  flexDirection: 'row',
                   borderRadius: 1.5,
-                  height: 80,
-                  mb: 1,
-                }}
-              />
-            );
-          } else {
-            // Determine the file extension
-            const fileExtension = attachment.url.split('.').pop()?.toLowerCase();
-
-            let IconComponent;
-            if (fileExtension === 'pdf') {
-              IconComponent = PictureAsPdfIcon; // MUI icon for PDF
-            } else if (fileExtension === 'doc' || fileExtension === 'docx') {
-              IconComponent = ArticleIcon; // MUI icon for DOC/DOCX
-            } else {
-              IconComponent = ArticleIcon; // Fallback for other file types
-            }
-
-            // Display appropriate icon for non-image attachments
-            return (
-              <IconComponent
-                key={attachment._id!.toString()}
-                sx={{
-                  fontSize: 44,
-                  color: 'primary.main',
+                  height: imageAttachment ? '150px' : '0px', // Ensure height is only applied when an image is present
                   mb: 1,
                 }}
               />
             );
           }
-        })
-      )}
 
+          // If there is no image, return null (nothing will be rendered)
+          return null;
+        })()
+      )}
       <Typography variant="subtitle1">{task.name}</Typography>
       {hasLabels && (
         <Box

@@ -136,8 +136,10 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
       return;
     }
 
-    // Validate file type
-    const validExtensions = ['pdf', 'docx', 'doc', 'jpg', 'jpeg', 'png', 'gif'];
+    // Validate file types
+    const validImageExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+    const validFileExtensions = ['pdf', 'docx', 'doc'];
+    const validExtensions = [...validImageExtensions, ...validFileExtensions];
     const fileExtension = selectedFile.name.split('.').pop().toLowerCase();
 
     if (!validExtensions.includes(fileExtension)) {
@@ -175,7 +177,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
           const attachment: Attachment = {
             _id: createResourceId(),
             uploadedDateTime: new Date(),
-            type: validExtensions.includes(fileExtension) ? 'image' : 'file',
+            type: validImageExtensions.includes(fileExtension) ? 'image' : 'file',
             url: result.imageUrl,
           };
 
