@@ -7,8 +7,9 @@ import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import UserIcon from '@heroicons/react/24/solid/UserIcon';
 import UserPlusIcon from '@heroicons/react/24/solid/UserPlusIcon';
 import UsersIcon from '@heroicons/react/24/solid/UsersIcon';
-import XCircleIcon from '@heroicons/react/24/solid/XCircleIcon';
+import StorageIcon from '@mui/icons-material/Storage';
 import { SvgIcon } from '@mui/material';
+import path from 'path';
 
 export const items = [
      {
@@ -57,6 +58,15 @@ export const items = [
           icon: (
                <SvgIcon fontSize="small">
                     <AssignmentTurnedInIcon />
+               </SvgIcon>
+          ),
+     },
+     {
+          title: 'Datoteke',
+          path: '/dashboard/datoteke',
+          icon: (
+               <SvgIcon fontSize="small">
+                    <StorageIcon />
                </SvgIcon>
           ),
      }
