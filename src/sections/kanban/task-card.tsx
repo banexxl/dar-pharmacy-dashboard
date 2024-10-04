@@ -56,7 +56,7 @@ export const TaskCard = forwardRef<HTMLDivElement, TaskCardProps>(function TaskC
 
   const hasAssignees = task.assignedTo?.length > 0;
   const hasAttachments = task.attachments?.length > 0;
-  const hasChecklists = Object.keys(task.checklist._id || {}).length > 0;
+  const hasChecklists = Object.keys(task.checklist?._id || {}).length > 0;
   const hasComments = task.comments?.length > 0;
   const hasLabels = task.labels?.length > 0;
 
