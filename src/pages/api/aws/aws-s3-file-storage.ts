@@ -1,3 +1,4 @@
+import { Item } from '@/schemas/file-manager';
 import aws from 'aws-sdk';
 
 const s3 = new aws.S3({
@@ -12,6 +13,27 @@ export const config = {
                sizeLimit: '5mb', // Adjust as needed
           },
      },
+};
+
+const mapS3ObjectToItem = (s3Object: aws.S3.Object): Item => {
+     const isFolder = s3Object.Key?.endsWith('/');
+     return {
+          id: s3Object.Key!,
+          name: isFolder ? s3Object.Key!.split('/').slice(-2, -1)[0] : s3Object.Key!.split('/').pop()!,
+          createdAt: s3Object.LastModified ? new Date(s3Object.LastModified).getTime() : null,
+          updatedAt: s3Object.LastModified ? new Date(s3Object.LastModified).getTime() : null,
+          size: s3Object.Size ?? 0,
+          type: isFolder ? 'folder' : 'file', // Assuming you have an 'ItemType' that includes 'folder' and 'file'
+          extension: !isFolder ? s3Object.Key!.split('.').pop() : undefined,
+          // Custom logic required for other fields
+          author: undefined,
+          isFavorite: undefined,
+          isPublic: undefined,
+          tags: undefined,
+          shared: undefined,
+          items: undefined,
+          itemsCount: undefined,
+     };
 };
 
 // Helper function to extract S3 key from the URL
@@ -95,34 +117,30 @@ export default async (req: any, res: any) => {
           }
 
      } else if (req.method === 'GET') {
-          // Listing root files or folders if no query, otherwise list items within the given folder
           try {
-               const { folderName } = req.query;
-
-               // Define the base parameters for listing objects
                const params: aws.S3.ListObjectsV2Request = {
                     Bucket: process.env.AWS_S3_BUCKET_NAME!,
-                    Prefix: folderName || '', // If no folderName is provided, list root objects
-                    Delimiter: '/', // Helps separate folders
+                    Prefix: req.query.prefix || '', // Get objects from a specific folder if prefix provided
+                    Delimiter: '/',
                };
 
                const data = await s3.listObjectsV2(params).promise();
-               console.log('aaaaaa', data);
+               const items: Item[] = data.Contents?.map(mapS3ObjectToItem) || [];
+               // You can also handle the common prefixes (folders) like this:
+               const folders: Item[] = (data.CommonPrefixes || []).map((prefix) => ({
+                    id: prefix.Prefix!,
+                    name: prefix.Prefix!.split('/').slice(-2, -1)[0],
+                    type: 'folder',
+                    size: 0,
+               }));
+               console.log('items:', items);
 
-               // Files in the folder or root
-               const items = data.Contents?.map((item) => ({
-                    key: item.Key,
-                    size: item.Size,
-                    lastModified: item.LastModified,
-               })) || [];
+               console.log('folders:', folders);
 
-               // Subfolders within the folder or root
-               const folders = data.CommonPrefixes?.map((prefix) => prefix.Prefix) || [];
-
-               return res.status(200).json({ items, folders });
+               return res.status(200).json({ folders: [...folders], items: [items] });
           } catch (error) {
-               console.error('Error fetching files/folders:', error);
-               return res.status(500).json({ error: 'Failed to list files/folders from S3' });
+               console.error('Error retrieving items from S3:', error);
+               return res.status(500).json({ error: 'Failed to retrieve items from S3' });
           }
      } else {
           res.status(405).end(); // Method Not Allowed

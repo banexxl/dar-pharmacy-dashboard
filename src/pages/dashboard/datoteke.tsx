@@ -106,6 +106,7 @@ const useItemsStore = (searchState: ItemsSearchState) => {
     try {
       const response = await fetch('/api/aws/aws-s3-file-storage');
       const s3Data = await response.json();
+      console.log('useItemsStore -> s3Data', s3Data);
 
       if (isMounted()) {
         // Separate folders and files
@@ -175,7 +176,7 @@ const useCurrentItem = (items: Item[], itemId?: string): Item | undefined => {
   }, [items, itemId]);
 };
 
-const Page = (props: any) => {
+const Page = () => {
   // const settings = useSettings();
   const itemsSearch = useItemsSearch();
   const itemsStore = useItemsStore(itemsSearch.state);
@@ -229,13 +230,9 @@ const Page = (props: any) => {
         body: JSON.stringify({ fileName: fullFolderPath }), // Send the full folder path
       });
       if (!response.ok) {
-        console.log('nije uspeo');
-
         toast.error('Greška prilikom kreiranja foldera!');
         throw new Error('Greška prilikom kreiranja foldera!');
       } else if (response.ok) {
-        console.log('uspeo');
-
         toast.success('Folder uspešno kreiran!');
       }
     } catch (error) {
@@ -394,62 +391,3 @@ Page.getLayout = (page: any) => <DashboardLayout>{page}</DashboardLayout>;
 
 export default Page;
 
-// export const getServerSideProps = async (context: any) => {
-//   console.log('getServerSideProps -> context.query', context.query);
-
-//   const s3 = new aws.S3({
-//     accessKeyId: process.env.AWS_S3_ACCESS_KEY,
-//     secretAccessKey: process.env.AWS_S3_SECRET_KEY,
-//     region: process.env.AWS_REGION,
-//   });
-
-//   // Extract the folder from the query parameter
-//   const folderQuery = context.query.folder || ''; // Default to empty string if no folder is provided
-
-//   // Construct the S3 prefix based on the folder query
-//   const prefixPath = folderQuery ? `datoteke/${folderQuery}/` : 'datoteke/'; // Adjusted prefix for the current folder level
-
-//   // First request to get folders (with delimiter to separate subfolders)
-//   const paramsS3Folders = {
-//     Bucket: process.env.AWS_S3_BUCKET_NAME!,
-//     Prefix: prefixPath,
-//     Delimiter: '/datoteke',  // Separate folders and objects
-//     MaxKeys: 1000,
-//   };
-
-//   const folderData = await s3.listObjectsV2(paramsS3Folders).promise();
-
-//   // Second request to get objects (without delimiter to list all objects under the prefix)
-//   const paramsS3Objects = {
-//     Bucket: process.env.AWS_S3_BUCKET_NAME!,
-//     Prefix: prefixPath,
-//     MaxKeys: 1000,    // Remove the Delimiter to fetch objects within the current folder
-//   };
-
-//   const objectData = await s3.listObjectsV2(paramsS3Objects).promise();
-
-//   // // Map over the folders (CommonPrefixes)
-//   // const folders = folderData.CommonPrefixes?.map((prefix: any) => ({
-//   //   id: prefix.Prefix,
-//   //   name: prefix.Prefix.split('/').slice(-2, -1)[0], // Get the folder name
-//   // })) || [];
-
-//   // Map over the objects (Contents)
-//   const objects = objectData.Contents?.filter((content: any) => content.Key !== prefixPath) // Exclude the folder itself
-//     .map((content: any) => ({
-//       id: content.Key, // Object path
-//       name: content.Key.split('/').slice(-1)[0], // Extracting the file name
-//       size: content.Size,
-//       lastModified: content.LastModified.toISOString(), // Convert Date to ISO string
-//     })) || [];
-
-//   // console.log('getServerSideProps -> folders', folders);
-//   console.log('getServerSideProps -> objects', objects);
-
-//   return {
-//     props: {
-//       // folders,
-//       objects,
-//     },
-//   };
-// };
