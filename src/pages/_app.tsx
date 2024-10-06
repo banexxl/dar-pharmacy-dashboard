@@ -11,6 +11,7 @@ import 'simplebar-react/dist/simplebar.min.css';
 import { Provider } from 'react-redux'
 import { SessionProvider } from 'next-auth/react';
 import { store } from '@/store';
+import { Toaster } from 'react-hot-toast';
 
 const clientSideEmotionCache = createEmotionCache();
 
@@ -46,6 +47,7 @@ const App = (props: any) => {
                                    }
                               </ThemeProvider>
                          </LocalizationProvider>
+                         <Toaster />
                     </CacheProvider>
                </Provider>
           </SessionProvider>

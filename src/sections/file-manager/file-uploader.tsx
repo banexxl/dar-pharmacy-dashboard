@@ -57,7 +57,7 @@ export const FileUploader: FC<FileUploaderProps> = (props) => {
           py: 2,
         }}
       >
-        <Typography variant="h6">Upload Files</Typography>
+        <Typography variant="h6">Odabir datoteka</Typography>
         <IconButton
           color="inherit"
           onClick={onClose}
@@ -70,7 +70,7 @@ export const FileUploader: FC<FileUploaderProps> = (props) => {
       <DialogContent>
         <FileDropzone
           accept={{ '*/*': [] }}
-          caption="Max file size is 3 MB"
+          caption="Maksimalna veličina datoteke je 5MB"
           files={files}
           onDrop={handleDrop}
           onRemove={handleRemove}

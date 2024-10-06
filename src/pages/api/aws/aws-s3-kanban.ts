@@ -44,7 +44,7 @@ export default async (req: any, res: any) => {
                const decodedFile = Buffer.from(file.replace(/^data:image\/\w+;base64,/, ""), 'base64');
 
                // Adjust key to desired structure
-               const key = `${year}/${month}/${day}/${fileName.split('.')[0]}.${extension}`;
+               const key = `kanban/${year}/${month}/${day}/${fileName.split('.')[0]}.${extension}`;
 
                const params: aws.S3.PutObjectRequest = {
                     Bucket: process.env.AWS_S3_BUCKET_NAME!,

@@ -87,7 +87,7 @@ export const FileDropzone: FC<FileDropzoneProps> = (props) => {
               }}
               variant="h6"
             >
-              <span>Click to upload</span> or drag and drop
+              <span>Klikni da učitaš</span> ili prevuci datoteke ovde!
             </Typography>
             {caption && (
               <Typography

@@ -1,6 +1,5 @@
 import type { ChangeEvent, MouseEvent } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import type { NextPage } from 'next';
 import Upload01Icon from '@untitled-ui/icons-react/build/esm/Upload01';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -9,7 +8,7 @@ import Grid from '@mui/material/Unstable_Grid2';
 import Stack from '@mui/material/Stack';
 import SvgIcon from '@mui/material/SvgIcon';
 import Typography from '@mui/material/Typography';
-
+import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
 // import { fileManagerApi } from 'src/api/file-manager';
 import { useDialog } from 'src/hooks/use-dialog';
 import { useMounted } from 'src/hooks/use-mounted';
@@ -21,6 +20,8 @@ import { StorageStats } from '@/sections/file-manager/storage-stats';
 import { ItemDrawer } from '@/sections/file-manager/item-drawer';
 import { FileUploader } from '@/sections/file-manager/file-uploader';
 import { Item } from '@/schemas/file-manager';
+import { Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material';
+import toast from 'react-hot-toast';
 
 type View = 'grid' | 'list';
 
@@ -103,29 +104,34 @@ const useItemsStore = (searchState: ItemsSearchState) => {
 
   const handleItemsGet = useCallback(async () => {
     try {
-      // const response = await fileManagerApi.getItems(searchState);
+      const response = await fetch('/api/aws/aws-s3-file-storage');
+      const s3Data = await response.json();
 
-      // if (isMounted()) {
-      //   setState({
-      //     items: response.data,
-      //     itemsCount: response.count,
-      //   });
-      // }
+      if (isMounted()) {
+        // Separate folders and files
+        const folders = s3Data.folders;
+        const files = s3Data.items;
+
+        // Directly slice the items based on pagination
+        setState({
+          items: [...folders, ...files].slice(
+            searchState.page * searchState.rowsPerPage,
+            (searchState.page + 1) * searchState.rowsPerPage
+          ),
+          itemsCount: [...folders, ...files].length,
+        });
+      }
     } catch (err) {
       console.error(err);
     }
   }, [searchState, isMounted]);
 
-  useEffect(
-    () => {
-      handleItemsGet();
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [searchState]
-  );
+
+  useEffect(() => {
+    handleItemsGet();
+  }, [handleItemsGet]);
 
   const handleDelete = useCallback((itemId: string): void => {
-    // api call should be made here, then get the list again
     setState((prevState) => {
       return {
         ...prevState,
@@ -169,14 +175,76 @@ const useCurrentItem = (items: Item[], itemId?: string): Item | undefined => {
   }, [items, itemId]);
 };
 
-const Page = () => {
+const Page = (props: any) => {
   // const settings = useSettings();
   const itemsSearch = useItemsSearch();
   const itemsStore = useItemsStore(itemsSearch.state);
+  console.log('Page -> itemsStore', itemsStore);
+
   const [view, setView] = useState<View>('grid');
   const uploadDialog = useDialog();
   const detailsDialog = useDialog();
   const currentItem = useCurrentItem(itemsStore.items, detailsDialog.data);
+  const [openCreateFileModal, setOpenCreateFileModal] = useState(false);
+  const [folderName, setFolderName] = useState('');
+
+  // Handle opening the modal
+  const handleOpenCreateFileModal = () => {
+    setOpenCreateFileModal(true);
+  };
+
+  // Handle closing the modal
+  const handleCloseCreateFileModal = () => {
+    setOpenCreateFileModal(false);
+    setFolderName(''); // Reset the field when closing
+  };
+
+  // Handle form submission
+  const handleSubmit = async () => {
+    if (!folderName) {
+      toast.error('Naziv foldera je obavezan!');
+      return;
+    }
+
+    try {
+      // Get the current URL path
+      const currentPath = window.location.pathname;
+
+      // Extract the folder structure after '/dashboard/datoteke'
+      const rootPath = '/dashboard/datoteke';
+      const folderStructure = currentPath.startsWith(rootPath)
+        ? currentPath.replace(rootPath, '').trim() // Remove the root path and trim any spaces
+        : '';
+
+      // Construct the full folder path for AWS
+      const fullFolderPath = folderStructure
+        ? `${folderStructure}/${folderName}` // Add the folder name to the existing structure
+        : folderName; // If there's no folder structure, just use the folder name
+
+      const response = await fetch('/api/aws/aws-s3-file-storage', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ fileName: fullFolderPath }), // Send the full folder path
+      });
+      if (!response.ok) {
+        console.log('nije uspeo');
+
+        toast.error('Greška prilikom kreiranja foldera!');
+        throw new Error('Greška prilikom kreiranja foldera!');
+      } else if (response.ok) {
+        console.log('uspeo');
+
+        toast.success('Folder uspešno kreiran!');
+      }
+    } catch (error) {
+      toast.error('Greška prilikom kreiranja foldera!');
+    } finally {
+      handleCloseCreateFileModal(); // Close modal after submission
+    }
+  };
+
 
   const handleDelete = useCallback(
     (itemId: string): void => {
@@ -229,7 +297,18 @@ const Page = () => {
                     }
                     variant="contained"
                   >
-                    Upload
+                    Učitaj datoteku
+                  </Button>
+                  <Button
+                    onClick={handleOpenCreateFileModal}
+                    startIcon={
+                      <SvgIcon>
+                        <CreateNewFolderIcon />
+                      </SvgIcon>
+                    }
+                    variant="contained"
+                  >
+                    Novi folder
                   </Button>
                 </Stack>
               </Stack>
@@ -286,6 +365,27 @@ const Page = () => {
         onClose={uploadDialog.handleClose}
         open={uploadDialog.open}
       />
+      <Dialog open={openCreateFileModal} onClose={handleCloseCreateFileModal} sx={{ height: '300px' }}>
+        <DialogTitle>Dodavanje datoteke</DialogTitle>
+        <DialogContent>
+          <TextField
+            label="Naziv datoteke"
+            fullWidth
+            value={folderName}
+            onChange={(e) => setFolderName(e.target.value)} // Update state on input change
+            autoFocus
+            sx={{ mt: '5px' }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseCreateFileModal} color="primary">
+            Odustani
+          </Button>
+          <Button onClick={handleSubmit} variant="contained" color="primary">
+            OK
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };
@@ -293,3 +393,63 @@ const Page = () => {
 Page.getLayout = (page: any) => <DashboardLayout>{page}</DashboardLayout>;
 
 export default Page;
+
+// export const getServerSideProps = async (context: any) => {
+//   console.log('getServerSideProps -> context.query', context.query);
+
+//   const s3 = new aws.S3({
+//     accessKeyId: process.env.AWS_S3_ACCESS_KEY,
+//     secretAccessKey: process.env.AWS_S3_SECRET_KEY,
+//     region: process.env.AWS_REGION,
+//   });
+
+//   // Extract the folder from the query parameter
+//   const folderQuery = context.query.folder || ''; // Default to empty string if no folder is provided
+
+//   // Construct the S3 prefix based on the folder query
+//   const prefixPath = folderQuery ? `datoteke/${folderQuery}/` : 'datoteke/'; // Adjusted prefix for the current folder level
+
+//   // First request to get folders (with delimiter to separate subfolders)
+//   const paramsS3Folders = {
+//     Bucket: process.env.AWS_S3_BUCKET_NAME!,
+//     Prefix: prefixPath,
+//     Delimiter: '/datoteke',  // Separate folders and objects
+//     MaxKeys: 1000,
+//   };
+
+//   const folderData = await s3.listObjectsV2(paramsS3Folders).promise();
+
+//   // Second request to get objects (without delimiter to list all objects under the prefix)
+//   const paramsS3Objects = {
+//     Bucket: process.env.AWS_S3_BUCKET_NAME!,
+//     Prefix: prefixPath,
+//     MaxKeys: 1000,    // Remove the Delimiter to fetch objects within the current folder
+//   };
+
+//   const objectData = await s3.listObjectsV2(paramsS3Objects).promise();
+
+//   // // Map over the folders (CommonPrefixes)
+//   // const folders = folderData.CommonPrefixes?.map((prefix: any) => ({
+//   //   id: prefix.Prefix,
+//   //   name: prefix.Prefix.split('/').slice(-2, -1)[0], // Get the folder name
+//   // })) || [];
+
+//   // Map over the objects (Contents)
+//   const objects = objectData.Contents?.filter((content: any) => content.Key !== prefixPath) // Exclude the folder itself
+//     .map((content: any) => ({
+//       id: content.Key, // Object path
+//       name: content.Key.split('/').slice(-1)[0], // Extracting the file name
+//       size: content.Size,
+//       lastModified: content.LastModified.toISOString(), // Convert Date to ISO string
+//     })) || [];
+
+//   // console.log('getServerSideProps -> folders', folders);
+//   console.log('getServerSideProps -> objects', objects);
+
+//   return {
+//     props: {
+//       // folders,
+//       objects,
+//     },
+//   };
+// };

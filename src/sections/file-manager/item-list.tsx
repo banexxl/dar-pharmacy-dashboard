@@ -19,6 +19,7 @@ interface ItemListProps {
   onDelete?: (itemId: string) => void;
   onFavorite?: (itemId: string, value: boolean) => void;
   onOpen?: (itemId: string) => void;
+  onOpenFolder?: (folderId: string) => void;
   onPageChange?: (event: MouseEvent<HTMLButtonElement> | null, newPage: number) => void;
   onRowsPerPageChange?: (event: ChangeEvent<HTMLInputElement>) => void;
   page?: number;
@@ -115,6 +116,7 @@ ItemList.propTypes = {
   onDelete: PropTypes.func,
   onFavorite: PropTypes.func,
   onOpen: PropTypes.func,
+  onOpenFolder: PropTypes.func,
   onPageChange: PropTypes.func,
   onRowsPerPageChange: PropTypes.func,
   page: PropTypes.number,

@@ -148,7 +148,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
     }
 
     setLoading(true);
-    const apiUrl = '/api/aws/aws-s3';
+    const apiUrl = '/api/aws/aws-s3-kanban';
 
     try {
       const reader = new FileReader();
@@ -208,7 +208,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
     }
 
     setLoading(true);
-    const apiUrl = '/api/aws/aws-s3';
+    const apiUrl = '/api/aws/aws-s3-kanban';
 
     try {
       const response = await fetch(apiUrl, {

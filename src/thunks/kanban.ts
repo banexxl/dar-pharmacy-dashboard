@@ -1,5 +1,4 @@
-import { Attachment, CheckItem, Checklist, Comment, Member } from '@/schemas/kanban';
-import { createResourceId } from '@/utils/create-resource-id';
+import { Attachment, CheckItem, Comment, Member } from '@/schemas/kanban';
 import toast from 'react-hot-toast';
 import { slice } from 'src/slices/kanban';
 import type { AppThunk, RootState } from 'src/store';
