@@ -31,7 +31,7 @@ interface ItemListRowProps {
 }
 
 export const ItemListRow: FC<ItemListRowProps> = (props) => {
-  const { item, onDelete, onFavorite, onOpen } = props;
+  const { item, onDelete, onOpen } = props;
   const popover = usePopover();
 
   const handleDelete = useCallback((): void => {
@@ -45,8 +45,7 @@ export const ItemListRow: FC<ItemListRowProps> = (props) => {
     size += `• ${item.itemsCount} items`;
   }
 
-  const createdAt = item.createdAt && format(item.createdAt, 'MMM dd, yyyy');
-  const showShared = !item.isPublic && (item.shared || []).length > 0;
+  const updatedAt = item.updatedAt && format(item.updatedAt, 'MMM dd, yyyy');
 
   return (
     <>
@@ -128,17 +127,17 @@ export const ItemListRow: FC<ItemListRowProps> = (props) => {
             noWrap
             variant="subtitle2"
           >
-            Created at
+            Updated at
           </Typography>
           <Typography
             color="text.secondary"
             noWrap
             variant="body2"
           >
-            {createdAt}
+            {updatedAt}
           </Typography>
         </TableCell>
-        <TableCell>
+        {/* <TableCell>
           <Box sx={{ display: 'flex' }}>
             {item.isPublic && (
               <Tooltip title="Public">
@@ -169,8 +168,8 @@ export const ItemListRow: FC<ItemListRowProps> = (props) => {
               </AvatarGroup>
             )}
           </Box>
-        </TableCell>
-        <TableCell align="right">
+        </TableCell> */}
+        {/* <TableCell align="right">
           <IconButton onClick={() => onFavorite?.(item.id, !item.isFavorite)}>
             <SvgIcon
               fontSize="small"
@@ -179,7 +178,7 @@ export const ItemListRow: FC<ItemListRowProps> = (props) => {
               <Star01Icon />
             </SvgIcon>
           </IconButton>
-        </TableCell>
+        </TableCell> */}
         <TableCell align="right">
           <IconButton
             onClick={popover.handleOpen}

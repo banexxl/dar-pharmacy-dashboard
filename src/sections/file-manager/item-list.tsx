@@ -19,7 +19,7 @@ interface ItemListProps {
   onDelete?: (itemId: string) => void;
   onFavorite?: (itemId: string, value: boolean) => void;
   onOpen?: (itemId: string) => void;
-  onOpenFolder?: (folderId: string) => void;
+  onOpenFolder?: (folderName: string) => void;
   onPageChange?: (event: MouseEvent<HTMLButtonElement> | null, newPage: number) => void;
   onRowsPerPageChange?: (event: ChangeEvent<HTMLInputElement>) => void;
   page?: number;
@@ -34,6 +34,7 @@ export const ItemList: FC<ItemListProps> = (props) => {
     onDelete,
     onFavorite,
     onOpen,
+    onOpenFolder,
     onPageChange = () => { },
     onRowsPerPageChange,
     page = 0,
@@ -57,7 +58,8 @@ export const ItemList: FC<ItemListProps> = (props) => {
             key={item.id}
             item={item}
             onDelete={onDelete}
-            onFavorite={onFavorite}
+            onOpenFolder={onOpenFolder}
+            // onFavorite={onFavorite}
             onOpen={onOpen}
           />
         ))}

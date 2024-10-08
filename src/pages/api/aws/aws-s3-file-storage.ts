@@ -1,4 +1,4 @@
-import { Item } from '@/schemas/file-manager';
+import { Item, ItemType } from '@/schemas/file-manager';
 import aws from 'aws-sdk';
 
 const s3 = new aws.S3({
@@ -19,26 +19,28 @@ const mapS3ObjectToItem = (s3Object: aws.S3.Object): Item => {
      const isFolder = s3Object.Key?.endsWith('/');
      return {
           id: s3Object.Key!,
-          name: isFolder ? s3Object.Key!.split('/').slice(-2, -1)[0] : s3Object.Key!.split('/').pop()!,
-          createdAt: s3Object.LastModified ? new Date(s3Object.LastModified).getTime() : null,
-          updatedAt: s3Object.LastModified ? new Date(s3Object.LastModified).getTime() : null,
+          name: isFolder
+               ? s3Object.Key!.split('/').slice(-2, -1)[0] // Extract folder name
+               : s3Object.Key!.split('/').pop()!, // Extract file name
+          updatedAt: s3Object.LastModified
+               ? new Date(s3Object.LastModified).getTime()
+               : null,
           size: s3Object.Size ?? 0,
-          type: isFolder ? 'folder' : 'file', // Assuming you have an 'ItemType' that includes 'folder' and 'file'
-          extension: !isFolder ? s3Object.Key!.split('.').pop() : undefined,
-          // Custom logic required for other fields
-          author: undefined,
-          isFavorite: undefined,
-          isPublic: undefined,
-          tags: undefined,
-          shared: undefined,
+          type: isFolder ? 'folder' : 'file', // Assign 'folder' or 'file' correctly
+          extension: !isFolder ? s3Object.Key!.split('.').pop() : undefined, // Set extension for files only
           items: undefined,
           itemsCount: undefined,
      };
 };
 
+
 // Helper function to extract S3 key from the URL
 export const extractInfoFromUrl = (url: string) => {
+     console.log('url:', url);
+
      let splitUrl = url.split('.com/')[1].split('?')[0];
+     console.log('splitUrl:', splitUrl);
+
      let key = splitUrl.replace(/%20/g, ' ');
      return key;
 };
@@ -97,6 +99,8 @@ export default async (req: any, res: any) => {
           // Deleting a folder or file
           try {
                const { fileURL } = req.body;
+               console.log('fileURL:', fileURL);
+
                if (!fileURL) {
                     return res.status(400).json({ error: 'Missing file URL' });
                }
@@ -118,26 +122,36 @@ export default async (req: any, res: any) => {
 
      } else if (req.method === 'GET') {
           try {
+               const { putanja } = req.query;
+
                const params: aws.S3.ListObjectsV2Request = {
                     Bucket: process.env.AWS_S3_BUCKET_NAME!,
-                    Prefix: req.query.prefix || '', // Get objects from a specific folder if prefix provided
-                    Delimiter: '/',
+                    Prefix: putanja ? `${putanja}/` : '', // Set prefix based on the current folder path
+                    Delimiter: '/', // Ensures that we separate folders
                };
 
                const data = await s3.listObjectsV2(params).promise();
-               const items: Item[] = data.Contents?.map(mapS3ObjectToItem) || [];
-               // You can also handle the common prefixes (folders) like this:
-               const folders: Item[] = (data.CommonPrefixes || []).map((prefix) => ({
-                    id: prefix.Prefix!,
-                    name: prefix.Prefix!.split('/').slice(-2, -1)[0],
-                    type: 'folder',
-                    size: 0,
-               }));
-               console.log('items:', items);
 
-               console.log('folders:', folders);
+               // Map files from S3
+               const items: Item[] = (data.Contents || [])
+                    .map(mapS3ObjectToItem)
+                    .filter((item) => item.type !== 'folder'); // Exclude folders from the items array
 
-               return res.status(200).json({ folders: [...folders], items: [items] });
+               // Map folders from S3, filtering out the current folder itself
+               const folders: Item[] = (data.CommonPrefixes || [])
+                    .map((prefix) => ({
+                         id: prefix.Prefix!,
+                         name: prefix.Prefix!.split('/').slice(-2, -1)[0], // Extract folder name from prefix
+                         type: 'folder' as ItemType,
+                         size: 0,
+                    }))
+                    .filter((folder) => folder.name !== putanja); // Exclude the current folder itself
+
+               // Return both folders and files based on the current folder path
+               return res.status(200).json({
+                    folders,
+                    items,
+               });
           } catch (error) {
                console.error('Error retrieving items from S3:', error);
                return res.status(500).json({ error: 'Failed to retrieve items from S3' });

@@ -22,6 +22,7 @@ import { FileUploader } from '@/sections/file-manager/file-uploader';
 import { Item } from '@/schemas/file-manager';
 import { Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material';
 import toast from 'react-hot-toast';
+import { Router, useRouter } from 'next/router';
 
 type View = 'grid' | 'list';
 
@@ -97,16 +98,18 @@ interface ItemsStoreState {
 
 const useItemsStore = (searchState: ItemsSearchState) => {
   const isMounted = useMounted();
+  const router = useRouter();
   const [state, setState] = useState<ItemsStoreState>({
     items: [],
     itemsCount: 0,
   });
 
   const handleItemsGet = useCallback(async () => {
+    const { putanja } = router.query; // Access the 'putanja' query parameter
+
     try {
-      const response = await fetch('/api/aws/aws-s3-file-storage');
+      const response = await fetch(`/api/aws/aws-s3-file-storage?putanja=${putanja || ''}`);
       const s3Data = await response.json();
-      console.log('useItemsStore -> s3Data', s3Data);
 
       if (isMounted()) {
         // Separate folders and files
@@ -123,40 +126,59 @@ const useItemsStore = (searchState: ItemsSearchState) => {
         });
       }
     } catch (err) {
-      console.error(err);
+      console.error('Error fetching items:', err);
+      toast.error('Failed to load items');
     }
-  }, [searchState, isMounted]);
-
+  }, [searchState, isMounted, router.query]);
 
   useEffect(() => {
     handleItemsGet();
   }, [handleItemsGet]);
 
-  const handleDelete = useCallback((itemId: string): void => {
-    setState((prevState) => {
-      return {
+  const handleDelete = useCallback(async (itemId: string) => {
+    try {
+      // Call the API to delete the item
+      const deleteItemResponse = await fetch('/api/aws/aws-s3-file-storage', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ fileURL: itemId }),
+      });
+
+      if (!deleteItemResponse.ok) {
+        throw new Error('Failed to delete item');
+      }
+
+      // Update state after successful deletion
+      setState((prevState) => ({
         ...prevState,
         items: prevState.items.filter((item) => item.id !== itemId),
-      };
-    });
+      }));
+
+      // Success toast notification
+      toast.success('Item deleted successfully');
+
+    } catch (error) {
+      // Error toast notification
+      console.error('Error deleting item:', error);
+      toast.error('Failed to delete item');
+    }
   }, []);
 
   const handleFavorite = useCallback((itemId: string, value: boolean): void => {
-    setState((prevState) => {
-      return {
-        ...prevState,
-        items: prevState.items.map((item) => {
-          if (item.id === itemId) {
-            return {
-              ...item,
-              isFavorite: value,
-            };
-          }
-
-          return item;
-        }),
-      };
-    });
+    setState((prevState) => ({
+      ...prevState,
+      items: prevState.items.map((item) => {
+        if (item.id === itemId) {
+          return {
+            ...item,
+            isFavorite: value,
+          };
+        }
+        return item;
+      }),
+    }));
   }, []);
 
   return {
@@ -165,6 +187,7 @@ const useItemsStore = (searchState: ItemsSearchState) => {
     ...state,
   };
 };
+
 
 const useCurrentItem = (items: Item[], itemId?: string): Item | undefined => {
   return useMemo((): Item | undefined => {
@@ -180,7 +203,7 @@ const Page = () => {
   // const settings = useSettings();
   const itemsSearch = useItemsSearch();
   const itemsStore = useItemsStore(itemsSearch.state);
-  console.log('Page -> itemsStore', itemsStore);
+  const router = useRouter();
 
   const [view, setView] = useState<View>('grid');
   const uploadDialog = useDialog();
@@ -243,14 +266,17 @@ const Page = () => {
   };
 
 
-  const handleDelete = useCallback(
-    (itemId: string): void => {
-      // This can be triggered from multiple places, ensure drawer is closed.
-      detailsDialog.handleClose();
-      itemsStore.handleDelete(itemId);
-    },
+  const handleDelete = useCallback(async (itemId: string) => {
+    // This can be triggered from multiple places, ensure drawer is closed.
+    detailsDialog.handleClose();
+    itemsStore.handleDelete(itemId);
+  },
     [detailsDialog, itemsStore]
   );
+
+  function onOpenFolder(folderName: string): void {
+    router.push(`/dashboard/datoteke?putanja=${folderName}`);
+  }
 
   return (
     <>
@@ -334,6 +360,7 @@ const Page = () => {
                   onDelete={handleDelete}
                   onFavorite={itemsStore.handleFavorite}
                   onOpen={detailsDialog.handleOpen}
+                  onOpenFolder={onOpenFolder}
                   onPageChange={itemsSearch.handlePageChange}
                   onRowsPerPageChange={itemsSearch.handleRowsPerPageChange}
                   page={itemsSearch.state.page}

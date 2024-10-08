@@ -22,16 +22,18 @@ import { ItemIcon } from './item-icon';
 import { ItemMenu } from './item-menu';
 import { Item } from '@/schemas/file-manager';
 import { bytesToSize } from '@/utils/bytes-to-size';
+import { useRouter } from 'next/router';
 
 interface ItemListCardProps {
   item: Item;
   onDelete?: (itemId: string) => void;
-  onFavorite?: (itemId: string, value: boolean) => void;
+  // onFavorite?: (itemId: string, value: boolean) => void;
+  onOpenFolder?: (folderId: string) => void;
   onOpen?: (itemId: string) => void;
 }
 
 export const ItemListCard: FC<ItemListCardProps> = (props) => {
-  const { item, onDelete, onFavorite, onOpen } = props;
+  const { item, onDelete, onOpenFolder, onOpen } = props;
   const popover = usePopover();
 
   const handleDelete = useCallback((): void => {
@@ -45,8 +47,25 @@ export const ItemListCard: FC<ItemListCardProps> = (props) => {
     size += `• ${item.itemsCount} items`;
   }
 
-  const createdAt = item.createdAt && format(item.createdAt, 'MMM dd, yyyy');
-  const showShared = !item.isPublic && (item.shared || []).length > 0;
+  const router = useRouter();
+
+  const handleDoubleClick = (item: any) => {
+    if (item.type === 'folder') {
+      // Get the current 'putanja' query parameter
+      const currentPath = router.query.putanja || '';
+      const newPath = currentPath ? `${currentPath}/${item.name}` : item.name; // Append the folder name
+
+      // Navigate to the new path with the updated query
+      router.push({
+        pathname: router.pathname, // Keep the same path
+        query: { ...router.query, putanja: newPath }, // Update the query parameter
+      });
+    } else {
+      onOpen?.(item.id); // Open the file
+    }
+  };
+
+  const updatedAt = item.updatedAt && format(item.updatedAt, 'MMM dd, yyyy');
 
   return (
     <>
@@ -66,8 +85,9 @@ export const ItemListCard: FC<ItemListCardProps> = (props) => {
           },
         }}
         variant="outlined"
+        onDoubleClick={() => handleDoubleClick(item)}
       >
-        <Stack
+        {/* <Stack
           alignItems="center"
           direction="row"
           justifyContent="space-between"
@@ -93,7 +113,7 @@ export const ItemListCard: FC<ItemListCardProps> = (props) => {
               <DotsVerticalIcon />
             </SvgIcon>
           </IconButton>
-        </Stack>
+        </Stack> */}
         <Box sx={{ p: 2 }}>
           <Box
             sx={{
@@ -136,7 +156,7 @@ export const ItemListCard: FC<ItemListCardProps> = (props) => {
                 {size}
               </Typography>
             </div>
-            <div>
+            {/* <div>
               {item.isPublic && (
                 <Tooltip title="Public">
                   <Avatar
@@ -165,13 +185,13 @@ export const ItemListCard: FC<ItemListCardProps> = (props) => {
                   ))}
                 </AvatarGroup>
               )}
-            </div>
+            </div> */}
           </Stack>
           <Typography
             color="text.secondary"
             variant="caption"
           >
-            Created at {createdAt}
+            Updated at {updatedAt}
           </Typography>
         </Box>
       </Card>
@@ -191,4 +211,5 @@ ItemListCard.propTypes = {
   onDelete: PropTypes.func,
   onFavorite: PropTypes.func,
   onOpen: PropTypes.func,
+  onOpenFolder: PropTypes.func,
 };
