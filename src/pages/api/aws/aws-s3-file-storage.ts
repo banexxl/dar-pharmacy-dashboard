@@ -147,6 +147,12 @@ export default async (req: any, res: any) => {
                     }))
                     .filter((folder) => folder.name !== putanja); // Exclude the current folder itself
 
+
+               // Check if no folders and no items are returned
+               if (folders.length === 0 && items.length === 0) {
+                    return res.redirect('/dashboard/datoteke'); // Redirect to the desired path
+               }
+
                // Return both folders and files based on the current folder path
                return res.status(200).json({
                     folders,

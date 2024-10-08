@@ -109,12 +109,24 @@ const useItemsStore = (searchState: ItemsSearchState) => {
 
     try {
       const response = await fetch(`/api/aws/aws-s3-file-storage?putanja=${putanja || ''}`);
+      console.log('response:', response);
+
       const s3Data = await response.json();
+      console.log('s3Data:', s3Data);
 
       if (isMounted()) {
         // Separate folders and files
         const folders = s3Data.folders;
         const files = s3Data.items;
+        console.log('folders:', folders);
+        console.log('files:', files);
+
+        // If no folders and files are returned, trigger a redirect
+        if (folders.length === 0 && files.length === 0) {
+          toast.error('No items found, redirecting...');
+          router.push('/dashboard/datoteke'); // Redirect to base folder
+          return;
+        }
 
         // Directly slice the items based on pagination
         setState({
@@ -129,7 +141,7 @@ const useItemsStore = (searchState: ItemsSearchState) => {
       console.error('Error fetching items:', err);
       toast.error('Failed to load items');
     }
-  }, [searchState, isMounted, router.query]);
+  }, [searchState, isMounted, router.query, router]);
 
   useEffect(() => {
     handleItemsGet();
@@ -354,6 +366,15 @@ const Page = () => {
                   sortDir={itemsSearch.state.sortDir}
                   view={view}
                 />
+
+                <Button
+                  onClick={() => router.back()}
+                  sx={{ maxWidth: '100px' }}
+                  variant="contained"
+                >
+                  Nazad
+                </Button>
+
                 <ItemList
                   count={itemsStore.itemsCount}
                   items={itemsStore.items}
@@ -377,7 +398,7 @@ const Page = () => {
             </Grid>
           </Grid>
         </Container>
-      </Box>
+      </Box >
       <ItemDrawer
         item={currentItem}
         onClose={detailsDialog.handleClose}

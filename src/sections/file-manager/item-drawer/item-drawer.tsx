@@ -37,7 +37,6 @@ export const ItemDrawer: FC<ItemDrawerProps> = (props) => {
 
   if (item) {
     const size = bytesToSize(item.size);
-    const createdAt = item.createdAt && format(item.createdAt, 'MMM dd, yyyy HH:mm');
     const updatedAt = item.updatedAt && format(item.updatedAt, 'MMM dd, yyyy HH:mm');
 
     content = (
@@ -49,14 +48,14 @@ export const ItemDrawer: FC<ItemDrawerProps> = (props) => {
           spacing={2}
           sx={{ p: 3 }}
         >
-          <IconButton onClick={() => onFavorite?.(item.id, !item.isFavorite)}>
+          {/* <IconButton onClick={() => onFavorite?.(item.id, !item.isFavorite)}>
             <SvgIcon
               fontSize="small"
               sx={{ color: item.isFavorite ? 'warning.main' : 'action.active' }}
             >
               <Star01Icon />
             </SvgIcon>
-          </IconButton>
+          </IconButton> */}
           <IconButton onClick={onClose}>
             <SvgIcon fontSize="small">
               <XIcon />
@@ -119,12 +118,12 @@ export const ItemDrawer: FC<ItemDrawerProps> = (props) => {
                 Created by
               </Typography>
             </Grid>
-            <Grid
+            {/* <Grid
               xs={12}
               sm={8}
             >
               {item.author && <Avatar src={item.author.avatar || undefined} />}
-            </Grid>
+            </Grid> */}
             <Grid
               xs={12}
               sm={4}
@@ -157,7 +156,7 @@ export const ItemDrawer: FC<ItemDrawerProps> = (props) => {
               xs={12}
               sm={8}
             >
-              <Typography variant="body2">{createdAt}</Typography>
+              <Typography variant="body2">{updatedAt}</Typography>
             </Grid>
             <Grid
               xs={12}
@@ -187,7 +186,7 @@ export const ItemDrawer: FC<ItemDrawerProps> = (props) => {
                 Tags
               </Typography>
             </Grid>
-            <Grid
+            {/* <Grid
               xs={12}
               sm={8}
             >
@@ -195,7 +194,7 @@ export const ItemDrawer: FC<ItemDrawerProps> = (props) => {
                 tags={item.tags}
                 onChange={(tags: string[]) => onTagsChange?.(item.id, tags)}
               />
-            </Grid>
+            </Grid> */}
             <Grid
               xs={12}
               sm={4}
@@ -207,7 +206,7 @@ export const ItemDrawer: FC<ItemDrawerProps> = (props) => {
                 Shared with
               </Typography>
             </Grid>
-            <Grid
+            {/* <Grid
               xs={12}
               sm={8}
             >
@@ -215,7 +214,7 @@ export const ItemDrawer: FC<ItemDrawerProps> = (props) => {
                 isPublic={item.isPublic}
                 shared={item.shared}
               />
-            </Grid>
+            </Grid> */}
             <Grid
               xs={12}
               sm={4}
