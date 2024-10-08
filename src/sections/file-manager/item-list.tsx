@@ -10,6 +10,7 @@ import { Scrollbar } from 'src/components/scrollbar';
 import { ItemListCard } from './item-list-card';
 import { ItemListRow } from './item-list-row';
 import { Item } from '@/schemas/file-manager';
+import { TableCell, TableRow, Typography } from '@mui/material';
 
 type View = 'grid' | 'list';
 
@@ -41,6 +42,7 @@ export const ItemList: FC<ItemListProps> = (props) => {
     rowsPerPage = 0,
     view = 'grid',
   } = props;
+  console.log('items:', items);
 
   let content: JSX.Element;
 
@@ -79,16 +81,25 @@ export const ItemList: FC<ItemListProps> = (props) => {
               }}
             >
               <TableBody>
-                {items.map((item) => (
-                  <ItemListRow
-                    key={item.id}
-                    item={item}
-                    onDelete={onDelete}
-                    onFavorite={onFavorite}
-                    onOpen={onOpen}
-                  />
-                ))}
+                {items && items.length > 0 ? (
+                  items.map((item) => (
+                    <ItemListRow
+                      key={item.id}
+                      item={item}
+                      onDelete={onDelete}
+                      onFavorite={onFavorite}
+                      onOpen={onOpen}
+                    />
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={6} align="center">
+                      <Typography variant="h4">No items found</Typography>
+                    </TableCell>
+                  </TableRow>
+                )}
               </TableBody>
+
             </Table>
           </Box>
         </Scrollbar>

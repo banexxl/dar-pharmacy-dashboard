@@ -35,6 +35,10 @@ export function createComponents(config: any) {
                     root: {
                          borderRadius: '12px',
                          // textTransform: 'none'
+                         defaultProps: {
+                              // Set aria-hidden to false
+                              'aria-hidden': false,
+                         },
                     },
                     sizeSmall: {
                          padding: '6px 16px'

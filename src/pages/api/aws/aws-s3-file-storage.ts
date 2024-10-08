@@ -47,28 +47,43 @@ export const extractInfoFromUrl = (url: string) => {
 
 export default async (req: any, res: any) => {
      if (req.method === 'POST') {
-          // Creating a folder
+          const { fileName, type, folderPath } = req.body;
+          console.log('req.body:', req.body);
+
           try {
-               const { fileName } = req.body;
+               // Check for required fields based on the type
+               if (type === 'folder') {
+                    if (!fileName || !folderPath) {
+                         return res.status(400).json({ error: 'Folder name or path not provided!' });
+                    }
 
-               if (!fileName) {
-                    return res.status(400).json({ error: 'File name not provided!' });
+                    // Ensure folderPath ends with a slash
+                    const cleanFolderPath = folderPath.endsWith('/') ? folderPath : `${folderPath}/`;
+
+                    // Create folder at the specified path
+                    const params = {
+                         Bucket: process.env.AWS_S3_BUCKET_NAME!,
+                         Key: `${cleanFolderPath}${fileName}/`, // Ensure folder is created at the right path
+                         Body: '', // Empty body for a folder
+                    };
+
+                    const folderCreated = await s3.upload(params).promise();
+                    return res.status(200).json({ folderURL: folderCreated.Location });
+
+               } else if (type === 'file') {
+                    // If you are not handling files, you can skip this block or leave it for future use
+                    return res.status(400).json({ error: 'File handling not implemented.' });
+
+               } else {
+                    // Handle unsupported type
+                    return res.status(400).json({ error: 'Invalid type provided!' });
                }
-
-               const params: aws.S3.PutObjectRequest = {
-                    Bucket: process.env.AWS_S3_BUCKET_NAME!,
-                    Key: `${fileName}/`, // Folder name with a trailing slash
-                    Body: '', // Empty body to represent a folder
-               };
-
-               const folderCreated = await s3.upload(params).promise();
-               return res.status(200).json({ folderURL: folderCreated.Location });
           } catch (error) {
-               console.error('Error creating folder:', error);
-               return res.status(500).json({ error: 'Failed to create folder on AWS S3' });
+               console.error('Error handling S3 upload:', error);
+               return res.status(500).json({ error: 'Failed to handle upload on AWS S3' });
           }
-
-     } else if (req.method === 'PUT') {
+     }
+     else if (req.method === 'PUT') {
           // Uploading a file
           try {
                const { file, fileName, fileType } = req.body;
@@ -132,12 +147,16 @@ export default async (req: any, res: any) => {
 
                const data = await s3.listObjectsV2(params).promise();
 
-               // Map files from S3
-               const items: Item[] = (data.Contents || [])
+               // Check if the folder contains only itself
+               const isEmptyFolder =
+                    data.Contents?.length === 1 &&
+                    data.Contents[0].Size === 0 &&
+                    data.Contents[0].Key === `${putanja}/`;
+
+               const items: Item[] = isEmptyFolder ? [] : data.Contents!
                     .map(mapS3ObjectToItem)
                     .filter((item) => item.type !== 'folder'); // Exclude folders from the items array
 
-               // Map folders from S3, filtering out the current folder itself
                const folders: Item[] = (data.CommonPrefixes || [])
                     .map((prefix) => ({
                          id: prefix.Prefix!,
@@ -147,22 +166,17 @@ export default async (req: any, res: any) => {
                     }))
                     .filter((folder) => folder.name !== putanja); // Exclude the current folder itself
 
-
-               // Check if no folders and no items are returned
-               if (folders.length === 0 && items.length === 0) {
-                    return res.redirect('/dashboard/datoteke'); // Redirect to the desired path
-               }
-
-               // Return both folders and files based on the current folder path
                return res.status(200).json({
                     folders,
                     items,
+                    isEmptyFolder,
                });
           } catch (error) {
                console.error('Error retrieving items from S3:', error);
                return res.status(500).json({ error: 'Failed to retrieve items from S3' });
           }
-     } else {
+     }
+     else {
           res.status(405).end(); // Method Not Allowed
      }
 };

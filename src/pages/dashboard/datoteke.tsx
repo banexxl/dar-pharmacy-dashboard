@@ -99,34 +99,24 @@ interface ItemsStoreState {
 const useItemsStore = (searchState: ItemsSearchState) => {
   const isMounted = useMounted();
   const router = useRouter();
+  const [loading, setLoading] = useState<boolean>(false);
   const [state, setState] = useState<ItemsStoreState>({
     items: [],
     itemsCount: 0,
   });
 
   const handleItemsGet = useCallback(async () => {
+    setLoading(true); // Start loading when fetching begins
     const { putanja } = router.query; // Access the 'putanja' query parameter
 
     try {
       const response = await fetch(`/api/aws/aws-s3-file-storage?putanja=${putanja || ''}`);
-      console.log('response:', response);
-
       const s3Data = await response.json();
-      console.log('s3Data:', s3Data);
 
       if (isMounted()) {
         // Separate folders and files
-        const folders = s3Data.folders;
-        const files = s3Data.items;
-        console.log('folders:', folders);
-        console.log('files:', files);
-
-        // If no folders and files are returned, trigger a redirect
-        if (folders.length === 0 && files.length === 0) {
-          toast.error('No items found, redirecting...');
-          router.push('/dashboard/datoteke'); // Redirect to base folder
-          return;
-        }
+        const folders = s3Data.folders || [];
+        const files = s3Data.items || [];
 
         // Directly slice the items based on pagination
         setState({
@@ -140,8 +130,15 @@ const useItemsStore = (searchState: ItemsSearchState) => {
     } catch (err) {
       console.error('Error fetching items:', err);
       toast.error('Failed to load items');
+    } finally {
+      setLoading(false); // End loading after data is set or error occurs
     }
-  }, [searchState, isMounted, router.query, router]);
+  }, [searchState, isMounted, router.query]);
+
+  useEffect(() => {
+    handleItemsGet();
+  }, [handleItemsGet]);
+
 
   useEffect(() => {
     handleItemsGet();
@@ -194,12 +191,12 @@ const useItemsStore = (searchState: ItemsSearchState) => {
   }, []);
 
   return {
+    handleItemsGet,
     handleDelete,
     handleFavorite,
     ...state,
   };
 };
-
 
 const useCurrentItem = (items: Item[], itemId?: string): Item | undefined => {
   return useMemo((): Item | undefined => {
@@ -236,44 +233,61 @@ const Page = () => {
   };
 
   // Handle form submission
-  const handleSubmit = async () => {
+  const handleAddFolder = async () => {
+    console.log('folderName:', folderName);
+
     if (!folderName) {
       toast.error('Naziv foldera je obavezan!');
       return;
     }
 
     try {
-      // Get the current URL path
+      // Get the current URL path and query parameters
       const currentPath = window.location.pathname;
-
-      // Extract the folder structure after '/dashboard/datoteke'
-      const rootPath = '/dashboard/datoteke';
-      const folderStructure = currentPath.startsWith(rootPath)
-        ? currentPath.replace(rootPath, '').trim() // Remove the root path and trim any spaces
-        : '';
+      const queryParams = new URLSearchParams(window.location.search);
+      const putanja = queryParams.get('putanja'); // Get 'putanja' parameter
 
       // Construct the full folder path for AWS
-      const fullFolderPath = folderStructure
-        ? `${folderStructure}/${folderName}` // Add the folder name to the existing structure
-        : folderName; // If there's no folder structure, just use the folder name
+      const fullFolderPath = putanja
+        ? `${putanja}/${folderName}/` // Combine 'putanja' with new folder name
+        : `${folderName}/`; // Default case if 'putanja' is not present
 
       const response = await fetch('/api/aws/aws-s3-file-storage', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ fileName: fullFolderPath }), // Send the full folder path
+        body: JSON.stringify({
+          fileName: folderName, // Use the folder name only
+          folderPath: fullFolderPath, // Full path including the name
+          type: 'folder', // Specify the type as 'folder'
+        }),
       });
+
+      console.log('response:', response);
+
       if (!response.ok) {
         toast.error('Greška prilikom kreiranja foldera!');
         throw new Error('Greška prilikom kreiranja foldera!');
-      } else if (response.ok) {
+      } else {
         toast.success('Folder uspešno kreiran!');
+        // Reload items after folder creation
+        await itemsStore.handleItemsGet();
       }
     } catch (error) {
       toast.error('Greška prilikom kreiranja foldera!');
     } finally {
-      handleCloseCreateFileModal(); // Close modal after submission
+      handleCloseCreateFileModal();
+    }
+  };
+
+  const handleFileUpload = async () => {
+    try {
+      // Logic for uploading file
+      await itemsStore.handleItemsGet();
+      toast.success('Datoteka uspešno učitana!');
+    } catch (error) {
+      toast.error('Greška prilikom učitavanja datoteke!');
     }
   };
 
@@ -366,14 +380,30 @@ const Page = () => {
                   sortDir={itemsSearch.state.sortDir}
                   view={view}
                 />
-
-                <Button
-                  onClick={() => router.back()}
-                  sx={{ maxWidth: '100px' }}
-                  variant="contained"
+                <Stack
+                  sx={{
+                    alignItems: 'center',
+                    display: 'flex',
+                    flexDirection: 'row',
+                    gap: 2,
+                    justifyContent: 'flex-end',
+                  }}
                 >
-                  Nazad
-                </Button>
+                  <Button
+                    onClick={() => router.back()}
+                    sx={{ maxWidth: '100px' }}
+                    variant="contained"
+                  >
+                    Nazad
+                  </Button>
+                  <Button
+                    onClick={() => router.push('/dashboard/datoteke')}
+                    sx={{ maxWidth: '150px' }}
+                    variant="contained"
+                  >
+                    Na početak
+                  </Button>
+                </Stack>
 
                 <ItemList
                   count={itemsStore.itemsCount}
@@ -426,7 +456,7 @@ const Page = () => {
           <Button onClick={handleCloseCreateFileModal} color="primary">
             Odustani
           </Button>
-          <Button onClick={handleSubmit} variant="contained" color="primary">
+          <Button onClick={handleAddFolder} variant="contained" color="primary">
             OK
           </Button>
         </DialogActions>
