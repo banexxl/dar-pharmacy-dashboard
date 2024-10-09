@@ -72,6 +72,7 @@ export const ItemListCard: FC<ItemListCardProps> = (props) => {
       <Card
         key={item.id}
         sx={{
+          cursor: 'pointer',
           backgroundColor: 'transparent',
           boxShadow: 0,
           transition: (theme) =>

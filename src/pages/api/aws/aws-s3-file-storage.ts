@@ -59,11 +59,12 @@ export default async (req: any, res: any) => {
 
                     // Ensure folderPath ends with a slash
                     const cleanFolderPath = folderPath.endsWith('/') ? folderPath : `${folderPath}/`;
+                    console.log('cleanFolderPath:', cleanFolderPath);
 
                     // Create folder at the specified path
                     const params = {
                          Bucket: process.env.AWS_S3_BUCKET_NAME!,
-                         Key: `${cleanFolderPath}${fileName}/`, // Ensure folder is created at the right path
+                         Key: `${cleanFolderPath}`, // Ensure folder is created at the right path
                          Body: '', // Empty body for a folder
                     };
 
@@ -110,32 +111,33 @@ export default async (req: any, res: any) => {
                return res.status(500).json({ error: 'Failed to upload file to AWS S3' });
           }
 
-     } else if (req.method === 'DELETE') {
+     }
+     else if (req.method === 'DELETE') {
           // Deleting a folder or file
           try {
-               const { fileURL } = req.body;
-               console.log('fileURL:', fileURL);
+               const { itemId } = req.body;
+               console.log('fileURL:', itemId);
 
-               if (!fileURL) {
+               if (!itemId) {
                     return res.status(400).json({ error: 'Missing file URL' });
                }
 
-               const key = extractInfoFromUrl(fileURL);
-
                const params: aws.S3.DeleteObjectRequest = {
                     Bucket: process.env.AWS_S3_BUCKET_NAME!,
-                    Key: key,
+                    Key: itemId,
                };
 
-               await s3.deleteObject(params).promise();
+               const deleteItemResponse = await s3.deleteObject(params).promise();
+               console.log('deleteItemResponse:', deleteItemResponse);
 
                return res.status(200).json({ message: 'Successfully deleted folder/file' });
           } catch (error) {
                console.error('Error deleting folder or file:', error);
                return res.status(500).json({ error: 'Failed to delete folder or file from S3' });
           }
+     }
 
-     } else if (req.method === 'GET') {
+     else if (req.method === 'GET') {
           try {
                const { putanja } = req.query;
 

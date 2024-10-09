@@ -23,6 +23,7 @@ import { Item } from '@/schemas/file-manager';
 import { Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material';
 import toast from 'react-hot-toast';
 import { Router, useRouter } from 'next/router';
+import { items } from '@/layouts/dashboard/config';
 
 type View = 'grid' | 'list';
 
@@ -145,6 +146,7 @@ const useItemsStore = (searchState: ItemsSearchState) => {
   }, [handleItemsGet]);
 
   const handleDelete = useCallback(async (itemId: string) => {
+
     try {
       // Call the API to delete the item
       const deleteItemResponse = await fetch('/api/aws/aws-s3-file-storage', {
@@ -152,28 +154,28 @@ const useItemsStore = (searchState: ItemsSearchState) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ fileURL: itemId }),
+        body: JSON.stringify({ itemId }),
       });
 
       if (!deleteItemResponse.ok) {
         throw new Error('Failed to delete item');
+      } else {
+        // Update state after successful deletion
+        setState((prevState) => ({
+          ...prevState,
+          items: prevState.items.filter((item) => item.id !== itemId),
+        }));
+
+        // Success toast notification
+        toast.success('Item deleted successfully')
       }
-
-      // Update state after successful deletion
-      setState((prevState) => ({
-        ...prevState,
-        items: prevState.items.filter((item) => item.id !== itemId),
-      }));
-
-      // Success toast notification
-      toast.success('Item deleted successfully');
-
     } catch (error) {
       // Error toast notification
       console.error('Error deleting item:', error);
       toast.error('Failed to delete item');
     }
-  }, []);
+  }, [router.query.putanja]);
+
 
   const handleFavorite = useCallback((itemId: string, value: boolean): void => {
     setState((prevState) => ({
@@ -218,6 +220,7 @@ const Page = () => {
   const uploadDialog = useDialog();
   const detailsDialog = useDialog();
   const currentItem = useCurrentItem(itemsStore.items, detailsDialog.data);
+
   const [openCreateFileModal, setOpenCreateFileModal] = useState(false);
   const [folderName, setFolderName] = useState('');
 
@@ -234,19 +237,15 @@ const Page = () => {
 
   // Handle form submission
   const handleAddFolder = async () => {
-    console.log('folderName:', folderName);
-
     if (!folderName) {
       toast.error('Naziv foldera je obavezan!');
       return;
     }
 
     try {
-      // Get the current URL path and query parameters
-      const currentPath = window.location.pathname;
-      const queryParams = new URLSearchParams(window.location.search);
-      const putanja = queryParams.get('putanja'); // Get 'putanja' parameter
 
+      const queryParams = new URLSearchParams(window.location.search)
+      const putanja = queryParams.get('putanja'); // Get 'putanja' parameter
       // Construct the full folder path for AWS
       const fullFolderPath = putanja
         ? `${putanja}/${folderName}/` // Combine 'putanja' with new folder name
@@ -263,8 +262,6 @@ const Page = () => {
           type: 'folder', // Specify the type as 'folder'
         }),
       });
-
-      console.log('response:', response);
 
       if (!response.ok) {
         toast.error('Greška prilikom kreiranja foldera!');
@@ -290,15 +287,6 @@ const Page = () => {
       toast.error('Greška prilikom učitavanja datoteke!');
     }
   };
-
-
-  const handleDelete = useCallback(async (itemId: string) => {
-    // This can be triggered from multiple places, ensure drawer is closed.
-    detailsDialog.handleClose();
-    itemsStore.handleDelete(itemId);
-  },
-    [detailsDialog, itemsStore]
-  );
 
   function onOpenFolder(folderName: string): void {
     router.push(`/dashboard/datoteke?putanja=${folderName}`);
@@ -408,7 +396,7 @@ const Page = () => {
                 <ItemList
                   count={itemsStore.itemsCount}
                   items={itemsStore.items}
-                  onDelete={handleDelete}
+                  onDelete={itemsStore.handleDelete}
                   onFavorite={itemsStore.handleFavorite}
                   onOpen={detailsDialog.handleOpen}
                   onOpenFolder={onOpenFolder}
@@ -432,7 +420,7 @@ const Page = () => {
       <ItemDrawer
         item={currentItem}
         onClose={detailsDialog.handleClose}
-        onDelete={handleDelete}
+        onDelete={itemsStore.handleDelete}
         onFavorite={itemsStore.handleFavorite}
         open={detailsDialog.open}
       />
