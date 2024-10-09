@@ -33,23 +33,9 @@ const mapS3ObjectToItem = (s3Object: aws.S3.Object): Item => {
      };
 };
 
-
-// Helper function to extract S3 key from the URL
-export const extractInfoFromUrl = (url: string) => {
-     console.log('url:', url);
-
-     let splitUrl = url.split('.com/')[1].split('?')[0];
-     console.log('splitUrl:', splitUrl);
-
-     let key = splitUrl.replace(/%20/g, ' ');
-     return key;
-};
-
 export default async (req: any, res: any) => {
      if (req.method === 'POST') {
           const { fileName, type, folderPath } = req.body;
-          console.log('req.body:', req.body);
-
           try {
                // Check for required fields based on the type
                if (type === 'folder') {
@@ -59,7 +45,6 @@ export default async (req: any, res: any) => {
 
                     // Ensure folderPath ends with a slash
                     const cleanFolderPath = folderPath.endsWith('/') ? folderPath : `${folderPath}/`;
-                    console.log('cleanFolderPath:', cleanFolderPath);
 
                     // Create folder at the specified path
                     const params = {
@@ -113,30 +98,58 @@ export default async (req: any, res: any) => {
 
      }
      else if (req.method === 'DELETE') {
-          // Deleting a folder or file
           try {
-               const { itemId } = req.body;
-               console.log('fileURL:', itemId);
+               const { fileURL } = req.body;
+               console.log('fileURL:', fileURL);
 
-               if (!itemId) {
+               if (!fileURL) {
                     return res.status(400).json({ error: 'Missing file URL' });
                }
 
-               const params: aws.S3.DeleteObjectRequest = {
+               // First, list all objects under the folder
+               const listParams = {
                     Bucket: process.env.AWS_S3_BUCKET_NAME!,
-                    Key: itemId,
+                    Prefix: fileURL, // The folder path
                };
 
-               const deleteItemResponse = await s3.deleteObject(params).promise();
-               console.log('deleteItemResponse:', deleteItemResponse);
+               const listedObjects = await s3.listObjectsV2(listParams).promise();
 
-               return res.status(200).json({ message: 'Successfully deleted folder/file' });
+               if (listedObjects.Contents?.length === 0) {
+                    // If no objects are inside, delete the folder
+                    const deleteParams = {
+                         Bucket: process.env.AWS_S3_BUCKET_NAME!,
+                         Key: fileURL,
+                    };
+
+                    await s3.deleteObject(deleteParams).promise();
+                    return res.status(200).json({ message: 'Folder successfully deleted' });
+               }
+
+               // If there are objects, delete them all
+               const deleteParams = {
+                    Bucket: process.env.AWS_S3_BUCKET_NAME!,
+                    Delete: {
+                         Objects: listedObjects.Contents!
+                              .filter((item) => item.Key !== undefined)
+                              .map((item) => ({ Key: item.Key! })),
+                    },
+               };
+
+               await s3.deleteObjects(deleteParams).promise();
+
+               // After deleting all objects, delete the folder itself
+               await s3.deleteObject({
+                    Bucket: process.env.AWS_S3_BUCKET_NAME!,
+                    Key: fileURL,
+               }).promise();
+
+               return res.status(200).json({ message: 'Folder and its contents successfully deleted' });
+
           } catch (error) {
                console.error('Error deleting folder or file:', error);
                return res.status(500).json({ error: 'Failed to delete folder or file from S3' });
           }
      }
-
      else if (req.method === 'GET') {
           try {
                const { putanja } = req.query;

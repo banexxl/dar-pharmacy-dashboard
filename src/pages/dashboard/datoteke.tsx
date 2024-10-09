@@ -140,12 +140,11 @@ const useItemsStore = (searchState: ItemsSearchState) => {
     handleItemsGet();
   }, [handleItemsGet]);
 
-
   useEffect(() => {
     handleItemsGet();
   }, [handleItemsGet]);
 
-  const handleDelete = useCallback(async (itemId: string) => {
+  const handleDelete = useCallback(async (fileURL: string) => {
 
     try {
       // Call the API to delete the item
@@ -154,7 +153,7 @@ const useItemsStore = (searchState: ItemsSearchState) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ itemId }),
+        body: JSON.stringify({ fileURL }),
       });
 
       if (!deleteItemResponse.ok) {
@@ -163,7 +162,7 @@ const useItemsStore = (searchState: ItemsSearchState) => {
         // Update state after successful deletion
         setState((prevState) => ({
           ...prevState,
-          items: prevState.items.filter((item) => item.id !== itemId),
+          items: prevState.items.filter((item) => item.id !== fileURL),
         }));
 
         // Success toast notification
@@ -175,7 +174,6 @@ const useItemsStore = (searchState: ItemsSearchState) => {
       toast.error('Failed to delete item');
     }
   }, [router.query.putanja]);
-
 
   const handleFavorite = useCallback((itemId: string, value: boolean): void => {
     setState((prevState) => ({
