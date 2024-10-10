@@ -23,6 +23,7 @@ import { ItemMenu } from './item-menu';
 import { Item } from '@/schemas/file-manager';
 import { bytesToSize } from '@/utils/bytes-to-size';
 import { useRouter } from 'next/router';
+import { create } from 'lodash';
 
 interface ItemListCardProps {
   item: Item;
@@ -35,7 +36,6 @@ interface ItemListCardProps {
 export const ItemListCard: FC<ItemListCardProps> = (props) => {
   const { item, onDelete, onOpenFolder, onOpen } = props;
   const popover = usePopover();
-  console.log('item', item);
 
   const handleDelete = useCallback((): void => {
     popover.handleClose();
@@ -47,7 +47,6 @@ export const ItemListCard: FC<ItemListCardProps> = (props) => {
   if (item.type === 'folder') {
     size += `• ${item.itemsCount} items`;
   }
-  console.log('aaaaaaaa', size);
 
   const router = useRouter();
 
@@ -67,7 +66,7 @@ export const ItemListCard: FC<ItemListCardProps> = (props) => {
     }
   };
 
-  const updatedAt = item.updatedAt && format(item.updatedAt, 'MMM dd, yyyy');
+  const createdAt = item.createdAt && format(item.createdAt, 'MMM dd, yyyy');
 
   return (
     <>
@@ -194,7 +193,7 @@ export const ItemListCard: FC<ItemListCardProps> = (props) => {
             color="text.secondary"
             variant="caption"
           >
-            Updated at {updatedAt}
+            Created at {createdAt}
           </Typography>
         </Box>
       </Card>

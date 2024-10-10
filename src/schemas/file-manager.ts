@@ -8,5 +8,5 @@ export interface Item {
   name: string;
   size: number;
   type: ItemType;
-  updatedAt?: number | null;
+  createdAt?: number | null;
 }

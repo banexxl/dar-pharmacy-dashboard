@@ -203,8 +203,8 @@ const Page = () => {
   // const settings = useSettings();
   const itemsSearch = useItemsSearch();
   const itemsStore = useItemsStore(itemsSearch.state);
+
   const router = useRouter();
-  const loading = itemsStore.items.length === 0 && itemsStore.itemsCount > 0;
   const [view, setView] = useState<View>('grid');
   const uploadDialog = useDialog();
   const detailsDialog = useDialog();
@@ -283,6 +283,7 @@ const Page = () => {
         <Container
         // maxWidth={settings.stretch ? false : 'xl'}
         >
+
 
           <Grid
             container
@@ -373,19 +374,25 @@ const Page = () => {
                   </Button>
                 </Stack>
 
-                <ItemList
-                  count={itemsStore.itemsCount}
-                  items={itemsStore.items}
-                  onDelete={itemsStore.handleDelete}
-                  onFavorite={itemsStore.handleFavorite}
-                  onOpen={detailsDialog.handleOpen}
-                  onOpenFolder={onOpenFolder}
-                  onPageChange={itemsSearch.handlePageChange}
-                  onRowsPerPageChange={itemsSearch.handleRowsPerPageChange}
-                  page={itemsSearch.state.page}
-                  rowsPerPage={itemsSearch.state.rowsPerPage}
-                  view={view}
-                />
+                {itemsStore.items.length === 0 ? (
+                  <Typography variant="h6">Loading...</Typography>
+                ) : itemsStore.items.length === 0 ? (
+                  <Typography variant="h6">No items found</Typography>
+                ) : (
+                  <ItemList
+                    count={itemsStore.itemsCount}
+                    items={itemsStore.items}
+                    onDelete={itemsStore.handleDelete}
+                    onFavorite={itemsStore.handleFavorite}
+                    onOpen={detailsDialog.handleOpen}
+                    onOpenFolder={onOpenFolder}
+                    onPageChange={itemsSearch.handlePageChange}
+                    onRowsPerPageChange={itemsSearch.handleRowsPerPageChange}
+                    page={itemsSearch.state.page}
+                    rowsPerPage={itemsSearch.state.rowsPerPage}
+                    view={view}
+                  />
+                )}
               </Stack>
             </Grid>
             <Grid

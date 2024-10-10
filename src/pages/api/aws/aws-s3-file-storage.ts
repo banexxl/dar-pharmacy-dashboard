@@ -22,7 +22,7 @@ const mapS3ObjectToItem = (s3Object: aws.S3.Object): Item => {
           name: isFolder
                ? s3Object.Key!.split('/').slice(-2, -1)[0] // Extract folder name
                : s3Object.Key!.split('/').pop()!, // Extract file name
-          updatedAt: s3Object.LastModified
+          createdAt: s3Object.LastModified
                ? new Date(s3Object.LastModified).getTime()
                : null,
           size: s3Object.Size ?? 0,
@@ -183,18 +183,42 @@ export default async (req: any, res: any) => {
                     data.Contents[0].Size === 0 &&
                     data.Contents[0].Key === `${putanja}/`;
 
-               const items: Item[] = isEmptyFolder ? [] : data.Contents!
-                    .map(mapS3ObjectToItem)
-                    .filter((item) => item.type !== 'folder'); // Exclude folders from the items array
+               const items: Item[] = isEmptyFolder
+                    ? []
+                    : data.Contents!.map(mapS3ObjectToItem).filter((item) => item.type !== 'folder'); // Exclude folders from the items array
 
-               const folders: Item[] = (data.CommonPrefixes || [])
-                    .map((prefix) => ({
-                         id: prefix.Prefix!,
-                         name: prefix.Prefix!.split('/').slice(-2, -1)[0], // Extract folder name from prefix
-                         type: 'folder' as ItemType,
-                         size: 0,
-                    }))
-                    .filter((folder) => folder.name !== putanja); // Exclude the current folder itself
+               // Process folders and calculate their size, item count, and creation date
+               const folders: Item[] = await Promise.all(
+                    (data.CommonPrefixes || []).map(async (prefix) => {
+                         const folderPrefix = prefix.Prefix!;
+                         const folderName = folderPrefix.split('/').slice(-2, -1)[0]; // Extract folder name from prefix
+
+                         // Fetch all items (files and subfolders) inside the folder
+                         const folderParams: aws.S3.ListObjectsV2Request = {
+                              Bucket: process.env.AWS_S3_BUCKET_NAME!,
+                              Prefix: folderPrefix, // Get all items inside the folder
+                         };
+                         const folderData = await s3.listObjectsV2(folderParams).promise();
+
+                         // Sum the sizes of items in the folder
+                         const folderSize = folderData.Contents!.reduce((acc, item) => acc + (item.Size || 0), 0);
+
+                         // Count total number of items (files + folders)
+                         const itemCount = folderData.Contents!.length + (folderData.CommonPrefixes?.length || 0);
+
+                         // Get the folder creation date (use the 'LastModified' of the first item in the folder)
+                         const folderCreationDate = folderData.Contents?.[0]?.LastModified || null;
+
+                         return {
+                              id: folderPrefix,
+                              name: folderName,
+                              type: 'folder' as ItemType,
+                              size: folderSize,          // Return the calculated size of the folder
+                              itemsCount: itemCount,     // Return total number of items (files + folders)
+                              createdAt: folderCreationDate ? new Date(folderCreationDate).getTime() : null, // Creation date based on the first file
+                         };
+                    })
+               );
 
                return res.status(200).json({
                     folders,

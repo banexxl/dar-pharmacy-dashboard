@@ -42,6 +42,7 @@ export const ItemList: FC<ItemListProps> = (props) => {
     rowsPerPage = 0,
     view = 'grid',
   } = props;
+  console.log('items', items);
 
   let content: JSX.Element;
 
@@ -120,7 +121,7 @@ export const ItemList: FC<ItemListProps> = (props) => {
         onRowsPerPageChange={onRowsPerPageChange}
         page={page}
         rowsPerPage={rowsPerPage}
-        rowsPerPageOptions={[9, 18]}
+        rowsPerPageOptions={[6, 9, 12, 15, 18]}
       />
     </Stack>
   );
