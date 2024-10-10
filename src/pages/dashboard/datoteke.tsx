@@ -22,8 +22,7 @@ import { FileUploader } from '@/sections/file-manager/file-uploader';
 import { Item } from '@/schemas/file-manager';
 import { Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material';
 import toast from 'react-hot-toast';
-import { Router, useRouter } from 'next/router';
-import { items } from '@/layouts/dashboard/config';
+import { useRouter } from 'next/router';
 
 type View = 'grid' | 'list';
 
@@ -276,16 +275,6 @@ const Page = () => {
     }
   };
 
-  const handleFileUpload = async () => {
-    try {
-      // Logic for uploading file
-      await itemsStore.handleItemsGet();
-      toast.success('Datoteka uspešno učitana!');
-    } catch (error) {
-      toast.error('Greška prilikom učitavanja datoteke!');
-    }
-  };
-
   function onOpenFolder(folderName: string): void {
     router.push(`/dashboard/datoteke?putanja=${folderName}`);
   }
@@ -425,6 +414,7 @@ const Page = () => {
       <FileUploader
         onClose={uploadDialog.handleClose}
         open={uploadDialog.open}
+        refresh={itemsStore.handleItemsGet}
       />
       <Dialog open={openCreateFileModal} onClose={handleCloseCreateFileModal} sx={{ height: '300px' }}>
         <DialogTitle>Dodavanje datoteke</DialogTitle>

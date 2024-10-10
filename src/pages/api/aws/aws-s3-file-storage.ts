@@ -35,7 +35,9 @@ const mapS3ObjectToItem = (s3Object: aws.S3.Object): Item => {
 
 export default async (req: any, res: any) => {
      if (req.method === 'POST') {
-          const { fileName, type, folderPath } = req.body;
+          const { fileName, type, folderPath, fileContent } = req.body;
+          console.log('req.body:', req.body);
+
           try {
                // Check for required fields based on the type
                if (type === 'folder') {
@@ -57,9 +59,24 @@ export default async (req: any, res: any) => {
                     return res.status(200).json({ folderURL: folderCreated.Location });
 
                } else if (type === 'file') {
-                    // If you are not handling files, you can skip this block or leave it for future use
-                    return res.status(400).json({ error: 'File handling not implemented.' });
+                    if (!fileName || !fileContent || !type) {
+                         return res.status(400).json({ error: 'File, file name, or file type not provided!' });
+                    }
 
+                    //Convert file content to binary format
+                    const content = Buffer.from(fileContent)
+
+                    const params: aws.S3.PutObjectRequest = {
+                         Bucket: process.env.AWS_S3_BUCKET_NAME!,
+                         Key: `${folderPath}${fileName}`, // File name including path
+                         Body: content, // The actual file content
+                         ContentType: type,
+                         ACL: 'public-read', // Make uploaded file publicly accessible if needed
+                    };
+
+                    const uploadedFileResponse = await s3.upload(params).promise();
+                    console.log('uploadedFileResponse:', uploadedFileResponse);
+                    return res.status(200).json({ message: 'OK' });
                } else {
                     // Handle unsupported type
                     return res.status(400).json({ error: 'Invalid type provided!' });
