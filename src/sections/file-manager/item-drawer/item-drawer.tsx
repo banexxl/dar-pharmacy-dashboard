@@ -20,6 +20,8 @@ import { ItemTags } from './item-tags';
 import { ItemShared } from './item-shared';
 import { bytesToSize } from '@/utils/bytes-to-size';
 import { Item } from '@/schemas/file-manager';
+import sweetalert2 from 'sweetalert2';
+import toast from 'react-hot-toast';
 
 interface ItemDrawerProps {
   item?: Item;
@@ -34,6 +36,30 @@ export const ItemDrawer: FC<ItemDrawerProps> = (props) => {
   const { item, onClose, onDelete, onFavorite, onTagsChange, open = false } = props;
 
   let content: JSX.Element | null = null;
+
+  const onDeleteClick = (item: Item) => {
+    onClose?.()
+    sweetalert2.fire({
+      title: 'Upozorenje!',
+      text: "Da li stvarno želite da obrišete datoteku?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Da!',
+      cancelButtonText: 'Ne!',
+    }).then(async (result: any) => {
+      if (result.isConfirmed) {
+        try {
+
+          onDelete?.(item.id)
+          toast.success('Datoteka uspešno obrisana!')
+        } catch (error) {
+          console.error('Error deleting file:', error)
+          onClose?.()
+          toast.error('Greška prilikom brisanja datoteke!')
+        }
+      }
+    })
+  }
 
   if (item) {
     const size = bytesToSize(item.size);
@@ -149,7 +175,7 @@ export const ItemDrawer: FC<ItemDrawerProps> = (props) => {
                 color="text.secondary"
                 variant="caption"
               >
-                Created At
+                Updated at
               </Typography>
             </Grid>
             <Grid
@@ -158,7 +184,7 @@ export const ItemDrawer: FC<ItemDrawerProps> = (props) => {
             >
               <Typography variant="body2">{updatedAt}</Typography>
             </Grid>
-            <Grid
+            {/* <Grid
               xs={12}
               sm={4}
             >
@@ -168,14 +194,14 @@ export const ItemDrawer: FC<ItemDrawerProps> = (props) => {
               >
                 Modified At
               </Typography>
-            </Grid>
-            <Grid
+            </Grid> */}
+            {/* <Grid
               xs={12}
               sm={8}
             >
               <Typography variant="body2">{updatedAt}</Typography>
-            </Grid>
-            <Grid
+            </Grid> */}
+            {/* <Grid
               xs={12}
               sm={4}
             >
@@ -186,7 +212,7 @@ export const ItemDrawer: FC<ItemDrawerProps> = (props) => {
                 Tags
               </Typography>
             </Grid>
-            {/* <Grid
+            <Grid
               xs={12}
               sm={8}
             >
@@ -230,7 +256,7 @@ export const ItemDrawer: FC<ItemDrawerProps> = (props) => {
               xs={12}
               sm={8}
             >
-              <IconButton onClick={() => onDelete?.(item.id)}>
+              <IconButton onClick={() => onDeleteClick(item)}>
                 <SvgIcon fontSize="small">
                   <Trash02Icon />
                 </SvgIcon>
@@ -241,6 +267,8 @@ export const ItemDrawer: FC<ItemDrawerProps> = (props) => {
       </div>
     );
   }
+
+
 
   return (
     <Drawer

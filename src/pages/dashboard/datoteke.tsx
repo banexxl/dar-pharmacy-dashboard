@@ -99,14 +99,12 @@ interface ItemsStoreState {
 const useItemsStore = (searchState: ItemsSearchState) => {
   const isMounted = useMounted();
   const router = useRouter();
-  const [loading, setLoading] = useState<boolean>(false);
   const [state, setState] = useState<ItemsStoreState>({
     items: [],
     itemsCount: 0,
   });
 
   const handleItemsGet = useCallback(async () => {
-    setLoading(true); // Start loading when fetching begins
     const { putanja } = router.query; // Access the 'putanja' query parameter
 
     try {
@@ -130,8 +128,6 @@ const useItemsStore = (searchState: ItemsSearchState) => {
     } catch (err) {
       console.error('Error fetching items:', err);
       toast.error('Failed to load items');
-    } finally {
-      setLoading(false); // End loading after data is set or error occurs
     }
   }, [searchState, isMounted, router.query]);
 
@@ -163,14 +159,10 @@ const useItemsStore = (searchState: ItemsSearchState) => {
           ...prevState,
           items: prevState.items.filter((item) => item.id !== fileURL),
         }));
-
-        // Success toast notification
-        toast.success('Item deleted successfully')
       }
     } catch (error) {
       // Error toast notification
       console.error('Error deleting item:', error);
-      toast.error('Failed to delete item');
     }
   }, [router.query.putanja]);
 
@@ -212,7 +204,7 @@ const Page = () => {
   const itemsSearch = useItemsSearch();
   const itemsStore = useItemsStore(itemsSearch.state);
   const router = useRouter();
-
+  const loading = itemsStore.items.length === 0 && itemsStore.itemsCount > 0;
   const [view, setView] = useState<View>('grid');
   const uploadDialog = useDialog();
   const detailsDialog = useDialog();
@@ -291,6 +283,7 @@ const Page = () => {
         <Container
         // maxWidth={settings.stretch ? false : 'xl'}
         >
+
           <Grid
             container
             spacing={{
@@ -402,6 +395,7 @@ const Page = () => {
               <StorageStats />
             </Grid>
           </Grid>
+
         </Container>
       </Box >
       <ItemDrawer

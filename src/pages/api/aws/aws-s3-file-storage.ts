@@ -36,8 +36,6 @@ const mapS3ObjectToItem = (s3Object: aws.S3.Object): Item => {
 export default async (req: any, res: any) => {
      if (req.method === 'POST') {
           const { fileName, type, folderPath, fileContent } = req.body;
-          console.log('req.body:', req.body);
-
           try {
                // Check for required fields based on the type
                if (type === 'folder') {

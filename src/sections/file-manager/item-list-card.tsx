@@ -35,6 +35,7 @@ interface ItemListCardProps {
 export const ItemListCard: FC<ItemListCardProps> = (props) => {
   const { item, onDelete, onOpenFolder, onOpen } = props;
   const popover = usePopover();
+  console.log('item', item);
 
   const handleDelete = useCallback((): void => {
     popover.handleClose();
@@ -46,6 +47,7 @@ export const ItemListCard: FC<ItemListCardProps> = (props) => {
   if (item.type === 'folder') {
     size += `• ${item.itemsCount} items`;
   }
+  console.log('aaaaaaaa', size);
 
   const router = useRouter();
 

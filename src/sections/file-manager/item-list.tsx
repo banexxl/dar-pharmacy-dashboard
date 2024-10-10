@@ -54,16 +54,20 @@ export const ItemList: FC<ItemListProps> = (props) => {
           gridTemplateColumns: 'repeat(3, 1fr)',
         }}
       >
-        {items.map((item) => (
-          <ItemListCard
-            key={item.id}
-            item={item}
-            onDelete={onDelete}
-            onOpenFolder={onOpenFolder}
-            // onFavorite={onFavorite}
-            onOpen={onOpen}
-          />
-        ))}
+        {items && items.length > 0 ? (
+          items.map((item) => (
+            <ItemListCard
+              key={item.id}
+              item={item}
+              onDelete={onDelete}
+              onOpenFolder={onOpenFolder}
+              // onFavorite={onFavorite}
+              onOpen={onOpen}
+            />
+          ))
+        ) : (
+          <Typography variant="caption">Prazan folder...</Typography>
+        )}
       </Box>
     );
   } else {
@@ -93,18 +97,18 @@ export const ItemList: FC<ItemListProps> = (props) => {
                 ) : (
                   <TableRow>
                     <TableCell colSpan={6} align="center">
-                      <Typography variant="h4">No items found</Typography>
+                      <Typography variant="caption">Prazan folder...</Typography>
                     </TableCell>
                   </TableRow>
                 )}
               </TableBody>
-
             </Table>
           </Box>
         </Scrollbar>
       </Box>
     );
   }
+
 
   return (
     <Stack spacing={4}>
