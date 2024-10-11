@@ -66,7 +66,7 @@ export const ItemListCard: FC<ItemListCardProps> = (props) => {
     }
   };
 
-  const createdAt = item.createdAt && format(item.createdAt, 'MMM dd, yyyy');
+  const updatedAt = item.updatedAt && format(item.updatedAt, 'MMM dd, yyyy');
 
   return (
     <>
@@ -193,7 +193,7 @@ export const ItemListCard: FC<ItemListCardProps> = (props) => {
             color="text.secondary"
             variant="caption"
           >
-            Created at {createdAt}
+            Updated at {updatedAt}
           </Typography>
         </Box>
       </Card>

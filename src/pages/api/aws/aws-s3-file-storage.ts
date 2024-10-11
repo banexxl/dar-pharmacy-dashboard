@@ -22,7 +22,7 @@ const mapS3ObjectToItem = (s3Object: aws.S3.Object): Item => {
           name: isFolder
                ? s3Object.Key!.split('/').slice(-2, -1)[0] // Extract folder name
                : s3Object.Key!.split('/').pop()!, // Extract file name
-          createdAt: s3Object.LastModified
+          updatedAt: s3Object.LastModified
                ? new Date(s3Object.LastModified).getTime()
                : null,
           size: s3Object.Size ?? 0,
@@ -215,7 +215,7 @@ export default async (req: any, res: any) => {
                               type: 'folder' as ItemType,
                               size: folderSize,          // Return the calculated size of the folder
                               itemsCount: itemCount,     // Return total number of items (files + folders)
-                              createdAt: folderCreationDate ? new Date(folderCreationDate).getTime() : null, // Creation date based on the first file
+                              updatedAt: folderCreationDate ? new Date(folderCreationDate).getTime() : null, // Creation date based on the first file
                          };
                     })
                );
