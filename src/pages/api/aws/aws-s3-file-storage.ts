@@ -115,8 +115,6 @@ export default async (req: any, res: any) => {
      else if (req.method === 'DELETE') {
           try {
                const { fileURL } = req.body;
-               console.log('fileURL:', fileURL);
-
                if (!fileURL) {
                     return res.status(400).json({ error: 'Missing file URL' });
                }

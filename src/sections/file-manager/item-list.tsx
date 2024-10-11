@@ -42,8 +42,6 @@ export const ItemList: FC<ItemListProps> = (props) => {
     rowsPerPage = 0,
     view = 'grid',
   } = props;
-  console.log('items', items);
-
   let content: JSX.Element;
 
   if (view === 'grid') {
