@@ -23,7 +23,6 @@ import { ItemMenu } from './item-menu';
 import { Item } from '@/schemas/file-manager';
 import { bytesToSize } from '@/utils/bytes-to-size';
 import { useRouter } from 'next/router';
-import { create } from 'lodash';
 
 interface ItemListCardProps {
   item: Item;

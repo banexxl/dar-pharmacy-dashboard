@@ -22,6 +22,8 @@ import { bytesToSize } from '@/utils/bytes-to-size';
 import { Item } from '@/schemas/file-manager';
 import sweetalert2 from 'sweetalert2';
 import toast from 'react-hot-toast';
+import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 interface ItemDrawerProps {
   item?: Item;
@@ -34,8 +36,8 @@ interface ItemDrawerProps {
 
 export const ItemDrawer: FC<ItemDrawerProps> = (props) => {
   const { item, onClose, onDelete, onFavorite, onTagsChange, open = false } = props;
-
   let content: JSX.Element | null = null;
+  console.log('item', item);
 
   const onDeleteClick = (item: Item) => {
     onClose?.()
@@ -74,14 +76,6 @@ export const ItemDrawer: FC<ItemDrawerProps> = (props) => {
           spacing={2}
           sx={{ p: 3 }}
         >
-          {/* <IconButton onClick={() => onFavorite?.(item.id, !item.isFavorite)}>
-            <SvgIcon
-              fontSize="small"
-              sx={{ color: item.isFavorite ? 'warning.main' : 'action.active' }}
-            >
-              <Star01Icon />
-            </SvgIcon>
-          </IconButton> */}
           <IconButton onClick={onClose}>
             <SvgIcon fontSize="small">
               <XIcon />
@@ -89,6 +83,17 @@ export const ItemDrawer: FC<ItemDrawerProps> = (props) => {
           </IconButton>
         </Stack>
         <Divider />
+        <Stack
+          alignItems="center"
+          direction="row"
+          justifyContent="space-between"
+          spacing={2}
+          sx={{ my: 2, px: 3 }}
+        >
+          <Typography variant="h6" sx={{ width: '300px', textAlign: 'center' }}>
+            Kliknite na ikonu da biste preuzeli datoteku
+          </Typography>
+        </Stack>
         <Box
           sx={{
             px: 3,
@@ -110,10 +115,12 @@ export const ItemDrawer: FC<ItemDrawerProps> = (props) => {
               p: 3,
             }}
           >
-            <ItemIcon
-              type={item.type}
-              extension={item.extension}
-            />
+            <Link href={`https://dar-pharmacy.s3.eu-central-1.amazonaws.com/${item.id}`} passHref target="_blank">
+              <ItemIcon
+                type={item.type}
+                extension={item.extension}
+              />
+            </Link>
           </Box>
           <Stack
             alignItems="center"
