@@ -133,23 +133,7 @@ export const ItemDrawer: FC<ItemDrawerProps> = (props) => {
             container
             spacing={3}
           >
-            <Grid
-              xs={12}
-              sm={4}
-            >
-              <Typography
-                color="text.secondary"
-                variant="caption"
-              >
-                Created by
-              </Typography>
-            </Grid>
-            {/* <Grid
-              xs={12}
-              sm={8}
-            >
-              {item.author && <Avatar src={item.author.avatar || undefined} />}
-            </Grid> */}
+
             <Grid
               xs={12}
               sm={4}
@@ -184,63 +168,6 @@ export const ItemDrawer: FC<ItemDrawerProps> = (props) => {
             >
               <Typography variant="body2">{updatedAt}</Typography>
             </Grid>
-            {/* <Grid
-              xs={12}
-              sm={4}
-            >
-              <Typography
-                color="text.secondary"
-                variant="caption"
-              >
-                Modified At
-              </Typography>
-            </Grid> */}
-            {/* <Grid
-              xs={12}
-              sm={8}
-            >
-              <Typography variant="body2">{updatedAt}</Typography>
-            </Grid> */}
-            {/* <Grid
-              xs={12}
-              sm={4}
-            >
-              <Typography
-                color="text.secondary"
-                variant="caption"
-              >
-                Tags
-              </Typography>
-            </Grid>
-            <Grid
-              xs={12}
-              sm={8}
-            >
-              <ItemTags
-                tags={item.tags}
-                onChange={(tags: string[]) => onTagsChange?.(item.id, tags)}
-              />
-            </Grid> */}
-            <Grid
-              xs={12}
-              sm={4}
-            >
-              <Typography
-                color="text.secondary"
-                variant="caption"
-              >
-                Shared with
-              </Typography>
-            </Grid>
-            {/* <Grid
-              xs={12}
-              sm={8}
-            >
-              <ItemShared
-                isPublic={item.isPublic}
-                shared={item.shared}
-              />
-            </Grid> */}
             <Grid
               xs={12}
               sm={4}

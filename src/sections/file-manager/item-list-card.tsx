@@ -89,33 +89,6 @@ export const ItemListCard: FC<ItemListCardProps> = (props) => {
         variant="outlined"
         onDoubleClick={() => handleDoubleClick(item)}
       >
-        {/* <Stack
-          alignItems="center"
-          direction="row"
-          justifyContent="space-between"
-          spacing={3}
-          sx={{
-            pt: 2,
-            px: 2,
-          }}
-        >
-          <IconButton onClick={() => onFavorite?.(item.id, !item.isFavorite)}>
-            <SvgIcon
-              fontSize="small"
-              sx={{ color: item.isFavorite ? 'warning.main' : 'action.active' }}
-            >
-              <Star01Icon />
-            </SvgIcon>
-          </IconButton>
-          <IconButton
-            onClick={popover.handleOpen}
-            ref={popover.anchorRef}
-          >
-            <SvgIcon fontSize="small">
-              <DotsVerticalIcon />
-            </SvgIcon>
-          </IconButton>
-        </Stack> */}
         <Box sx={{ p: 2 }}>
           <Box
             sx={{
@@ -158,36 +131,7 @@ export const ItemListCard: FC<ItemListCardProps> = (props) => {
                 {size}
               </Typography>
             </div>
-            {/* <div>
-              {item.isPublic && (
-                <Tooltip title="Public">
-                  <Avatar
-                    sx={{
-                      height: 32,
-                      width: 32,
-                    }}
-                  >
-                    <SvgIcon fontSize="small">
-                      <Globe01Icon />
-                    </SvgIcon>
-                  </Avatar>
-                </Tooltip>
-              )}
-              {showShared && (
-                <AvatarGroup max={3}>
-                  {item.shared?.map((person) => (
-                    <Avatar
-                      key={person.name}
-                      src={person.avatar}
-                      sx={{
-                        height: 32,
-                        width: 32,
-                      }}
-                    />
-                  ))}
-                </AvatarGroup>
-              )}
-            </div> */}
+
           </Stack>
           <Typography
             color="text.secondary"

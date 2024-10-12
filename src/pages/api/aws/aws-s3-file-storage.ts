@@ -66,7 +66,7 @@ export default async (req: any, res: any) => {
 
                     const params: aws.S3.PutObjectRequest = {
                          Bucket: process.env.AWS_S3_BUCKET_NAME!,
-                         Key: `${folderPath}${fileName}`, // File name including path
+                         Key: `${folderPath}`, // File name
                          Body: content, // The actual file content
                          ContentType: type,
                          ACL: 'public-read', // Make uploaded file publicly accessible if needed

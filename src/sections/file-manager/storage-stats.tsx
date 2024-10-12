@@ -43,7 +43,7 @@ const useChartOptions = (usage: string): ApexOptions => {
         top: 0,
       },
     },
-    labels: [usage],
+    labels: [usage + 'MB'],
     plotOptions: {
       radialBar: {
         dataLabels: {
@@ -129,17 +129,21 @@ const totals: Total[] = [
   },
 ];
 
-export const StorageStats: FC = () => {
-  const currentUsage = '75 GB';
-  const currentUsagePercentage = 75;
-  const chartOptions = useChartOptions(currentUsage);
+type StorageStatsProps = {
+  totalBucketSize: number;
+}
+
+export const StorageStats = (props: StorageStatsProps) => {
+  const currentUsage = (props.totalBucketSize / 1024 / 1024).toFixed(2);
+  const currentUsagePercentage = Math.round((parseFloat(currentUsage) / 1000) * 100);
+  const chartOptions = useChartOptions(currentUsage.toString());
   const chartSeries: ChartSeries = [currentUsagePercentage];
 
   return (
     <Card>
       <CardHeader
-        title="Storage"
-        subheader="Upgrade before reaching it"
+        title="Baza datoteka"
+        subheader="Upravljajte svojim datotekama"
       />
       <CardContent>
         <Stack alignItems="center">
@@ -160,15 +164,15 @@ export const StorageStats: FC = () => {
           </Box>
           <Typography
             variant="h6"
-            sx={{ mb: 1 }}
+            sx={{ mb: 1, textAlign: 'center' }}
           >
-            You’ve almost reached your limit
+            Ograničenje prostora na disku (2GB)
           </Typography>
           <Typography
             color="text.secondary"
             variant="body2"
           >
-            You have used {currentUsagePercentage}% of your available storage.
+            Iskoristili ste {currentUsage}MB od 2GB
           </Typography>
         </Stack>
         <List

@@ -23,6 +23,8 @@ import { Item } from '@/schemas/file-manager';
 import { Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/router';
+import { GetServerSideProps } from 'next';
+import aws from 'aws-sdk';
 
 type View = 'grid' | 'list';
 
@@ -199,7 +201,7 @@ const useCurrentItem = (items: Item[], itemId?: string): Item | undefined => {
   }, [items, itemId]);
 };
 
-const Page = () => {
+const Page = ({ totalBucketSize }: any) => {
   // const settings = useSettings();
   const itemsSearch = useItemsSearch();
   const itemsStore = useItemsStore(itemsSearch.state);
@@ -299,7 +301,7 @@ const Page = () => {
                 spacing={4}
               >
                 <div>
-                  <Typography variant="h4">File Manager</Typography>
+                  <Typography variant="h4">Baza datoteka</Typography>
                 </div>
                 <Stack
                   alignItems="center"
@@ -374,32 +376,33 @@ const Page = () => {
                   </Button>
                 </Stack>
 
-                {itemsStore.items.length === 0 ? (
-                  <Typography variant="h6">Loading...</Typography>
-                ) : itemsStore.items.length === 0 ? (
-                  <Typography variant="h6">No items found</Typography>
-                ) : (
-                  <ItemList
-                    count={itemsStore.itemsCount}
-                    items={itemsStore.items}
-                    onDelete={itemsStore.handleDelete}
-                    onFavorite={itemsStore.handleFavorite}
-                    onOpen={detailsDialog.handleOpen}
-                    onOpenFolder={onOpenFolder}
-                    onPageChange={itemsSearch.handlePageChange}
-                    onRowsPerPageChange={itemsSearch.handleRowsPerPageChange}
-                    page={itemsSearch.state.page}
-                    rowsPerPage={itemsSearch.state.rowsPerPage}
-                    view={view}
-                  />
-                )}
+                {
+                  itemsStore.items.length === 0 ? (
+                    <Typography variant="h6">No items found</Typography>
+                  ) : (
+                    <ItemList
+                      count={itemsStore.itemsCount}
+                      items={itemsStore.items}
+                      onDelete={itemsStore.handleDelete}
+                      onFavorite={itemsStore.handleFavorite}
+                      onOpen={detailsDialog.handleOpen}
+                      onOpenFolder={onOpenFolder}
+                      onPageChange={itemsSearch.handlePageChange}
+                      onRowsPerPageChange={itemsSearch.handleRowsPerPageChange}
+                      page={itemsSearch.state.page}
+                      rowsPerPage={itemsSearch.state.rowsPerPage}
+                      view={view}
+                    />
+                  )}
               </Stack>
             </Grid>
             <Grid
               xs={12}
               md={4}
             >
-              <StorageStats />
+              <StorageStats
+                totalBucketSize={totalBucketSize}
+              />
             </Grid>
           </Grid>
 
@@ -445,4 +448,63 @@ const Page = () => {
 Page.getLayout = (page: any) => <DashboardLayout>{page}</DashboardLayout>;
 
 export default Page;
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const bucketName = process.env.AWS_S3_BUCKET_NAME!;
+
+  aws.config.update({
+    accessKeyId: process.env.AWS_S3_ACCESS_KEY,
+    secretAccessKey: process.env.AWS_S3_SECRET_KEY,
+    region: process.env.AWS_REGION,
+  });
+
+  const s3 = new aws.S3();
+
+  const getTotalBucketSize = async (bucketName: string): Promise<number> => {
+    let totalSize = 0;
+    let continuationToken: string | undefined = undefined;
+
+    try {
+      do {
+        // Prepare the request parameters
+        const params: aws.S3.ListObjectsV2Request = {
+          Bucket: bucketName,
+          ContinuationToken: continuationToken,
+        };
+
+        // Fetch the list of objects
+        const data = await s3.listObjectsV2(params).promise();
+
+        // Sum the size of all objects in the current batch
+        totalSize += data.Contents?.reduce((acc, obj) => acc + (obj.Size || 0), 0) || 0;
+
+        // Check if there are more objects to fetch
+        continuationToken = data.IsTruncated ? data.NextContinuationToken : undefined;
+      } while (continuationToken); // Continue fetching if more pages exist
+    } catch (error) {
+      console.error('Error retrieving total size from S3:', error);
+      throw new Error('Failed to calculate total size from S3 bucket');
+    }
+
+    return totalSize;
+  };
+
+  try {
+    const totalBucketSize = await getTotalBucketSize(bucketName);
+
+    return {
+      props: {
+        totalBucketSize, // Return the total size in bytes to the page component
+      },
+    };
+  } catch (error) {
+    console.error('Error in getServerSideProps:', error);
+
+    return {
+      props: {
+        totalBucketSize: 0, // In case of error, fallback to 0
+      },
+    };
+  }
+};
 
