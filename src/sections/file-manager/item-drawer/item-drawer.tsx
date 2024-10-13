@@ -22,7 +22,6 @@ import { bytesToSize } from '@/utils/bytes-to-size';
 import { Item } from '@/schemas/file-manager';
 import sweetalert2 from 'sweetalert2';
 import toast from 'react-hot-toast';
-import { useRouter } from 'next/router';
 import Link from 'next/link';
 
 interface ItemDrawerProps {

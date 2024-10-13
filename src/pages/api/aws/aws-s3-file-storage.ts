@@ -60,15 +60,23 @@ export default async (req: any, res: any) => {
                     if (!fileName || !fileContent || !type) {
                          return res.status(400).json({ error: 'File, file name, or file type not provided!' });
                     }
+                    const fileExtension = fileName.split('.').pop(); // Extract file extension
+                    console.log('fileExtension:', fileExtension);
 
                     //Convert file content to binary format
-                    const content = Buffer.from(fileContent)
+                    let content
+                    if (fileExtension === 'pdf') {
+                         // Assuming fileContent is base64 encoded
+                         content = Buffer.from(fileContent, 'binary');
+                    } else {
+                         content = Buffer.from(fileContent); // For other files (images, docs)
+                    }
 
                     const params: aws.S3.PutObjectRequest = {
                          Bucket: process.env.AWS_S3_BUCKET_NAME!,
                          Key: `${folderPath}`, // File name
                          Body: content, // The actual file content
-                         ContentType: type,
+                         ContentType: fileExtension === 'pdf' ? 'application/pdf' : 'base64', // Set content type based on the file extension
                          ACL: 'public-read', // Make uploaded file publicly accessible if needed
                     };
 
