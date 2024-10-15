@@ -187,7 +187,7 @@ export const MailItem: FC<MailItemProps> = (props) => {
             sx={{
               alignItems: 'center',
               display: 'flex',
-              maxWidth: 800,
+              maxWidth: 400,
               width: '100%',
             }}
           >
@@ -208,6 +208,14 @@ export const MailItem: FC<MailItemProps> = (props) => {
               color="text.secondary"
               noWrap
               variant="body2"
+              sx={{
+                display: {
+                  xs: 'none',
+                  md: 'block',
+                },
+                minWidth: 100,
+                maxWidth: 350,
+              }}
             >
               {email.text}
             </Typography>
@@ -233,21 +241,40 @@ export const MailItem: FC<MailItemProps> = (props) => {
             </Box>
           )}
         </Box>
-        <Typography
-          color="text.secondary"
-          variant="caption"
+        <Box
           sx={{
-            display: 'block',
-            textAlign: {
-              xs: 'left',
-              md: 'right',
+            flexGrow: 1,
+            ml: {
+              xs: 0,
+              md: 2,
             },
-            whiteSpace: 'nowrap',
-            width: 100,
+            my: {
+              xs: 2,
+              md: 0,
+            },
+            overflow: 'hidden',
+            width: {
+              xs: '100%',
+              md: 'auto',
+            },
           }}
         >
-          {createdAt}
-        </Typography>
+          <Typography
+            color="text.secondary"
+            variant="caption"
+            sx={{
+              display: 'block',
+              textAlign: {
+                xs: 'left',
+                md: 'right',
+              },
+              whiteSpace: 'nowrap',
+              width: 100,
+            }}
+          >
+            {createdAt}
+          </Typography>
+        </Box>
       </Box>
     </Box>
   );

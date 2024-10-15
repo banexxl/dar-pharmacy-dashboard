@@ -120,7 +120,7 @@ export const MailList: FC<MailListProps> = (props) => {
     <Stack
       sx={{
         height: '100%',
-        overflow: 'hidden',
+        overflow: 'scroll',
       }}
       {...other}
     >
