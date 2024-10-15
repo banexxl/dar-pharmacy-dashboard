@@ -36,7 +36,6 @@ interface ItemDrawerProps {
 export const ItemDrawer: FC<ItemDrawerProps> = (props) => {
   const { item, onClose, onDelete, onFavorite, onTagsChange, open = false } = props;
   let content: JSX.Element | null = null;
-  console.log('item', item);
 
   const onDeleteClick = (item: Item) => {
     onClose?.()

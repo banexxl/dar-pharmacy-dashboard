@@ -5,7 +5,7 @@ import ShoppingBagIcon from '@heroicons/react/24/solid/ShoppingBagIcon';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import UserIcon from '@heroicons/react/24/solid/UserIcon';
-import UserPlusIcon from '@heroicons/react/24/solid/UserPlusIcon';
+import EmailIcon from '@mui/icons-material/Email';
 import UsersIcon from '@heroicons/react/24/solid/UsersIcon';
 import StorageIcon from '@mui/icons-material/Storage';
 import { SvgIcon } from '@mui/material';
@@ -67,6 +67,15 @@ export const items = [
           icon: (
                <SvgIcon fontSize="small">
                     <StorageIcon />
+               </SvgIcon>
+          ),
+     },
+     {
+          title: 'Email',
+          path: '/dashboard/email',
+          icon: (
+               <SvgIcon fontSize="small">
+                    <EmailIcon />
                </SvgIcon>
           ),
      }

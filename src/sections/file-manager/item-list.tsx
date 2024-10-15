@@ -43,7 +43,6 @@ export const ItemList: FC<ItemListProps> = (props) => {
     view = 'grid',
   } = props;
   let content: JSX.Element;
-  console.log('items', items);
 
   if (view === 'grid') {
     content = (

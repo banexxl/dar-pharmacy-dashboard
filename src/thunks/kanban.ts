@@ -286,31 +286,6 @@ const addComment = (params: AddCommentParams): AppThunk =>
     );
   };
 
-// type AddCheckListParams = {
-//   boardId: string;
-//   taskId: string;
-//   checklist: Checklist;
-// };
-
-// const addChecklist = (params: AddCheckListParams): AppThunk =>
-//   async (dispatch: any): Promise<void> => {
-//     // const response = await fetch(`/api/kanban/checklists`, {
-//     //   method: 'POST',
-//     //   headers: { 'Content-Type': 'application/json' },
-//     //   body: JSON.stringify(params),
-//     // });
-//     // const data = await response.json();
-//     console.log('params', params);
-
-//     dispatch(
-//       slice.actions.addChecklist({
-//         boardId: params.boardId,
-//         taskId: params.taskId,
-//         checklist: params.checklist,
-//       })
-//     );
-//   };
-
 type UpdateChecklistParams = {
   taskId: string;
   update: {
