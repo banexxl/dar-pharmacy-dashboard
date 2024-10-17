@@ -18,8 +18,7 @@ import Stack from '@mui/material/Stack';
 import SvgIcon from '@mui/material/SvgIcon';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import { QuillEditor } from '@/components/quill-editor';
-
+import { QuillEditor } from 'src/components/quill-editor';
 
 interface MailComposerProps {
   maximize?: boolean;

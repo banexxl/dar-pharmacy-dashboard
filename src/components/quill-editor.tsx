@@ -1,6 +1,7 @@
 import dynamic from 'next/dynamic';
 import type { ReactQuillProps as QuillProps } from 'react-quill';
 import { styled } from '@mui/material/styles';
+import 'react-quill/dist/quill.snow.css';
 
 const Editor = dynamic<QuillProps>(() => import('react-quill'), {
   ssr: false,
