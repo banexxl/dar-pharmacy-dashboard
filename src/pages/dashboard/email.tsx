@@ -15,24 +15,26 @@ import { MailComposer } from '@/sections/mail/mail-composer';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { useSearchParams } from 'next/navigation';
 
-// const useLabels = (): Label[] => {
-//   const dispatch = useDispatch();
-//   const labels = useSelector((state) => state.mail.labels);
+const useLabels = (): Label[] => {
 
-// const handleLabelsGet = useCallback((): void => {
-//   dispatch(thunks.getLabels());
-// }, [dispatch]);
 
-//   useEffect(
-//     () => {
-//       handleLabelsGet();
-//     },
-//     // eslint-disable-next-line react-hooks/exhaustive-deps
-//     []
-//   );
+  const dispatch = useDispatch();
+  const labels = useSelector((state) => state.mail.labels);
 
-//   return labels;
-// };
+  const handleLabelsGet = useCallback((): void => {
+    dispatch(thunks.getLabels());
+  }, [dispatch]);
+
+  useEffect(
+    () => {
+      handleLabelsGet();
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
+
+  return labels;
+};
 
 interface ComposerState {
   isFullScreen: boolean;
@@ -155,7 +157,7 @@ const Page = () => {
   const searchParams = useSearchParams();
   const emailId = searchParams.get('emailId');
   const currentLabelId = searchParams.get('label') || undefined;
-  // const labels = useLabels();
+  const labels = useLabels();
   const composer = useComposer();
   const sidebar = useSidebar();
 
@@ -187,7 +189,7 @@ const Page = () => {
           <MailSidebar
             container={rootRef.current}
             currentLabelId={currentLabelId}
-            labels={[]}
+            labels={labels}
             onClose={sidebar.handleClose}
             onCompose={composer.handleOpen}
             open={sidebar.open}

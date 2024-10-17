@@ -29,16 +29,28 @@ const groupLabels = (labels: Label[]): GroupedLabels => {
     custom: [],
   };
 
-  labels.forEach((label) => {
+  const processLabel = (label: Label) => {
+    // Add label to the appropriate group
     if (label.type === 'system') {
       groups.system.push(label);
     } else {
       groups.custom.push(label);
     }
+
+    // Process children recursively if they exist
+    if (label.children && label.children.length > 0) {
+      label.children.forEach((childLabel) => processLabel(childLabel));
+    }
+  };
+
+  // Start by processing the root level labels
+  labels.forEach((label) => {
+    processLabel(label);
   });
 
   return groups;
 };
+
 
 interface MailSidebarProps {
   container?: HTMLDivElement | null;

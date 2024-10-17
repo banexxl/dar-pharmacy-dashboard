@@ -30,4 +30,5 @@ export interface Label {
   totalCount?: number;
   type: LabelType;
   unreadCount?: number;
+  children?: Label[]; // Allow nested child labels
 }

@@ -96,7 +96,6 @@ interface MailListProps {
 export const MailList: FC<MailListProps> = (props) => {
   const { currentLabelId, onSidebarToggle, ...other } = props;
   const emails = useEmails(currentLabelId);
-  console.log('emails', emails);
 
   const { handleDeselectAll, handleDeselectOne, handleSelectAll, handleSelectOne, selected } =
     useSelectionModel(emails.allIds);
