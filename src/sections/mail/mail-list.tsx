@@ -227,16 +227,13 @@ export const MailList: FC<MailListProps> = (props) => {
             {emails.allIds.map((emailId: string) => {
               const isSelected = selected.includes(emailId);
 
-              const href =
-                currentLabelId && currentLabelId !== 'inbox'
-                  ? paths.dashboard.mail + `?emailId=${emailId}&label=${currentLabelId}`
-                  : paths.dashboard.mail + `?emailId=${emailId}`;
+              const href = paths.dashboard.email + `?emailId=${emailId}`
 
               return (
                 <MailItem
                   email={emails.byId[emailId]}
                   href={href}
-                  key={emailId}
+                  key={Math.random()}
                   onDeselect={(): void => handleDeselectOne(emailId)}
                   onSelect={(): void => handleSelectOne(emailId)}
                   selected={isSelected}

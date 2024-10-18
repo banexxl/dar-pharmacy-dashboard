@@ -13,6 +13,8 @@ const imapConfig: any = {
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+     console.log('Fetching emails...', req.query);
+
      try {
           const imap = new Imap(imapConfig);
 
@@ -58,6 +60,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
                               // Sort emails by date descending (newest first)
                               emails.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
 
                               res.status(200).json({ emails });
                          });

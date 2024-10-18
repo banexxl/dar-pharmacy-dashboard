@@ -9,7 +9,6 @@ import EmailIcon from '@mui/icons-material/Email';
 import UsersIcon from '@heroicons/react/24/solid/UsersIcon';
 import StorageIcon from '@mui/icons-material/Storage';
 import { SvgIcon } from '@mui/material';
-import path from 'path';
 
 export const items = [
      {

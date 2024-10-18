@@ -17,16 +17,22 @@ type GetEmailParams = {
      emailId: string;
 };
 
-// const getEmail = (params: GetEmailParams): AppThunk => async (dispatch): Promise<void> => {
+const getEmail = (params: GetEmailParams): AppThunk => async (dispatch): Promise<void> => {
 
-//      const response = await fetchEmailById(params.emailId);
-
-//      dispatch(slice.actions.getEmail(response));
-// };
-
+     const response = await fetch(`/api/email/fetch-mail-byId-api/?emailId=${encodeURIComponent(params.emailId)}`,
+          {
+               method: 'GET',
+               headers: {
+                    'Content-Type': 'application/json',
+               },
+          }
+     );
+     const data = await response.json();
+     dispatch(slice.actions.getEmail(data));
+};
 
 export const thunks = {
-     // getEmail,
+     getEmail,
      getEmails,
      getLabels,
 };

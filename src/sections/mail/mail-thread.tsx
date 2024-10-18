@@ -19,38 +19,36 @@ const useEmail = (emailId: string): Email => {
   const dispatch = useDispatch();
   const email = useSelector((state) => state.mail.emails.byId[emailId]);
 
-  // useEffect(
-  //   () => {
-  //     dispatch(
-  //       thunks.getEmail({
-  //         emailId,
-  //       })
-  //     );
-  //   },
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  //   [emailId]
-  // );
+  useEffect(
+    () => {
+      dispatch(
+        thunks.getEmail({
+          emailId,
+        })
+      );
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [emailId]
+  );
 
   return email;
 };
 
 interface MailThreadProps {
-  currentLabelId?: string;
   emailId: string;
 }
 
 export const MailThread: FC<MailThreadProps> = (props) => {
-  const { emailId, currentLabelId } = props;
+
+  const { emailId } = props;
   const email = useEmail(emailId);
+  console.log('email', email);
 
   if (!email) {
     return null;
   }
 
-  const backHref =
-    currentLabelId && currentLabelId !== 'inbox'
-      ? paths.dashboard.mail + `?label=${currentLabelId}`
-      : paths.dashboard.mail;
+  const backHref = paths.dashboard.email
 
   const hasMessage = !!email.text;
   const hasAttachments = email.attachments && email.attachments.length > 0;
@@ -91,6 +89,5 @@ export const MailThread: FC<MailThreadProps> = (props) => {
 };
 
 MailThread.propTypes = {
-  emailId: PropTypes.string.isRequired,
-  currentLabelId: PropTypes.string,
+  emailId: PropTypes.string.isRequired
 };

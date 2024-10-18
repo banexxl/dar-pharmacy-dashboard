@@ -38,9 +38,7 @@ const reducers = {
      },
      getEmail(state: MailState, action: GetEmailAction): void {
           const email = action.payload;
-
           state.emails.byId[email.id] = email;
-
           if (!state.emails.allIds.includes(email.id)) {
                state.emails.allIds.push(email.id);
           }

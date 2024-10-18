@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { NextPage } from 'next';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -16,8 +15,6 @@ import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { useSearchParams } from 'next/navigation';
 
 const useLabels = (): Label[] => {
-
-
   const dispatch = useDispatch();
   const labels = useSelector((state) => state.mail.labels);
 
@@ -197,7 +194,6 @@ const Page = () => {
           <MailContainer open={sidebar.open}>
             {view === 'details' && (
               <MailThread
-                currentLabelId={currentLabelId}
                 emailId={emailId!}
               />
             )}

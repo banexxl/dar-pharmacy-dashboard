@@ -9,7 +9,7 @@ export interface Attachment {
 export interface Email {
   id: string;
   attachments?: Attachment[];
-  date: number;
+  date: string;
   folder: string;
   from: string;
   isImportant: boolean;

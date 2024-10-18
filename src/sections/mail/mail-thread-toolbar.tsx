@@ -22,19 +22,36 @@ import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import type { Theme } from '@mui/material/styles/createTheme';
 
-import { getInitials } from 'src/utils/get-initials';
+const formatDate = (createdAt: string | Date | null | undefined) => {
+  if (!createdAt) {
+    return 'Invalid date';
+  }
+
+  try {
+    // Parse string into Date if necessary
+    const date = typeof createdAt === 'string' ? new Date(createdAt) : createdAt;
+
+    // Format the date
+    return format(date, 'MMMM d yyyy, h:mm:ss a');
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return 'Invalid date';
+  }
+};
 
 interface MailThreadToolbarProps {
   backHref: string;
-  createdAt: number;
+  createdAt: string;
   from: string;
   to: string[];
 }
 
 export const MailThreadToolbar: FC<MailThreadToolbarProps> = (props) => {
+  console.log('aaaaaaaaaa', props);
+
   const { backHref, createdAt, from, to } = props;
   const mdUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
-  const formattedCreatedAt = format(createdAt, 'MMMM d yyyy, h:mm:ss a');
+  const formattedCreatedAt = formatDate(createdAt);
 
   return (
     <div>
@@ -188,7 +205,7 @@ export const MailThreadToolbar: FC<MailThreadToolbarProps> = (props) => {
 
 MailThreadToolbar.propTypes = {
   backHref: PropTypes.string.isRequired,
-  createdAt: PropTypes.number.isRequired,
+  createdAt: PropTypes.string.isRequired,
   // @ts-ignore
   from: PropTypes.object.isRequired,
   to: PropTypes.array.isRequired,
