@@ -1,3 +1,4 @@
+import { Email } from '@/schemas/mail';
 import { slice } from 'src/slices/mail';
 import type { AppThunk } from 'src/store';
 
@@ -10,7 +11,10 @@ const getLabels = (): AppThunk => async (dispatch): Promise<void> => {
 const getEmails = (): AppThunk => async (dispatch): Promise<void> => {
      const response = await fetch('/api/email/fetch-mail-api');
      const data = await response.json();
-     dispatch(slice.actions.getEmails(data.emails));
+     // Sort emails by date in descending order before dispatching to store
+     const sortedEmails = data.emails.sort((a: Email, b: Email) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+     dispatch(slice.actions.getEmails(sortedEmails));
 };
 
 type GetEmailParams = {

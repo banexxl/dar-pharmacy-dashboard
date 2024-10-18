@@ -153,7 +153,7 @@ const Page = () => {
   const rootRef = useRef<HTMLDivElement | null>(null);
   const searchParams = useSearchParams();
   const emailId = searchParams.get('emailId');
-  const currentLabelId = searchParams.get('label') || undefined;
+  const currentLabelId = searchParams.get('label') || 'INBOX';
   const labels = useLabels();
   const composer = useComposer();
   const sidebar = useSidebar();

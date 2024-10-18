@@ -28,6 +28,7 @@ import { paths } from 'paths';
 const useEmails = (currentLabelId?: string): { byId: Record<string, Email>; allIds: string[] } => {
   const dispatch = useDispatch();
   const { emails } = useSelector((state) => state.mail);
+  console.log('currentLabelId', currentLabelId);
 
   useEffect(
     () => {
@@ -95,6 +96,7 @@ interface MailListProps {
 
 export const MailList: FC<MailListProps> = (props) => {
   const { currentLabelId, onSidebarToggle, ...other } = props;
+
   const emails = useEmails(currentLabelId);
 
   const { handleDeselectAll, handleDeselectOne, handleSelectAll, handleSelectOne, selected } =
