@@ -124,7 +124,7 @@ export const MailThreadToolbar: FC<MailThreadToolbarProps> = (props) => {
               component="span"
               variant="subtitle2"
             >
-              {from}
+              From:{' '}
             </Typography>{' '}
             <Link
               color="text.secondary"
