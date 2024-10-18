@@ -29,6 +29,7 @@ const getEmail = (params: GetEmailParams): AppThunk => async (dispatch): Promise
      );
      const data = await response.json();
      dispatch(slice.actions.getEmail(data));
+
 };
 
 export const thunks = {

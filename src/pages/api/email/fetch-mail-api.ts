@@ -1,7 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import Imap from 'imap';
 import { simpleParser } from 'mailparser';
-import { at } from 'lodash';
 
 const imapConfig: any = {
      user: process.env.SMTP_USER!,
@@ -55,11 +54,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
                          f.once('end', () => {
                               imap.end();
-
                               // Sort emails by date descending (newest first)
                               emails.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-
-
                               res.status(200).json({ emails });
                          });
                     });
