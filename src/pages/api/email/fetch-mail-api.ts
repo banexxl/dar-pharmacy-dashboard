@@ -13,8 +13,6 @@ const imapConfig: any = {
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-     console.log('Fetching emails...', req.query);
-
      try {
           const imap = new Imap(imapConfig);
 
