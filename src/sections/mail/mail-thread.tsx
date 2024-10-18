@@ -23,7 +23,7 @@ const useEmail = (emailId: string): Email => {
     () => {
       dispatch(
         thunks.getEmail({
-          emailId,
+          emailId
         })
       );
     },
@@ -42,8 +42,6 @@ export const MailThread: FC<MailThreadProps> = (props) => {
 
   const { emailId } = props;
   const email = useEmail(emailId);
-  console.log('email', email);
-
   if (!email) {
     return null;
   }

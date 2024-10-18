@@ -47,8 +47,6 @@ interface MailThreadToolbarProps {
 }
 
 export const MailThreadToolbar: FC<MailThreadToolbarProps> = (props) => {
-  console.log('aaaaaaaaaa', props);
-
   const { backHref, createdAt, from, to } = props;
   const mdUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
   const formattedCreatedAt = formatDate(createdAt);
@@ -140,12 +138,12 @@ export const MailThreadToolbar: FC<MailThreadToolbarProps> = (props) => {
               variant="subtitle2"
             >
               To:{' '}
-              {to.map((person: string) => (
+              {to.map((person: any) => (
                 <Link
                   color="inherit"
-                  key={person}
+                  key={person.text}
                 >
-                  {person}
+                  {person.text}
                 </Link>
               ))}
             </Typography>
@@ -206,7 +204,6 @@ export const MailThreadToolbar: FC<MailThreadToolbarProps> = (props) => {
 MailThreadToolbar.propTypes = {
   backHref: PropTypes.string.isRequired,
   createdAt: PropTypes.string.isRequired,
-  // @ts-ignore
-  from: PropTypes.object.isRequired,
+  from: PropTypes.string.isRequired,
   to: PropTypes.array.isRequired,
 };

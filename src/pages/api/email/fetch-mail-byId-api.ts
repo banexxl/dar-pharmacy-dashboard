@@ -13,8 +13,6 @@ const imapConfig: any = {
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
      const { emailId } = req.query; // Expecting the email ID to be passed as a query parameter
-     console.log('emaiId', emailId);
-
      if (!emailId) {
           return res.status(400).json({ error: 'Email ID is required' });
      }
@@ -64,7 +62,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                          f.once('end', () => {
                               imap.end();
                               if (foundEmail) {
-                                   res.status(200).json({ email: foundEmail });
+                                   res.status(200).json(foundEmail);
                               } else {
                                    res.status(404).json({ error: 'Email not found' });
                               }
