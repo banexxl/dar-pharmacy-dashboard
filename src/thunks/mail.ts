@@ -18,9 +18,9 @@ const getEmails = (currentLabelId: string): AppThunk => async (dispatch): Promis
      });
      const data = await response.json();
      // Sort emails by date in descending order before dispatching to store
-     const sortedEmails = data.emails?.sort((a: Email, b: Email) => new Date(b.date).getTime() - new Date(a.date).getTime());
+     // const sortedEmails = data.emails?.sort((a: Email, b: Email) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
-     dispatch(slice.actions.getEmails(sortedEmails));
+     dispatch(slice.actions.getEmails(data.emails));
 };
 
 type GetEmailParams = {

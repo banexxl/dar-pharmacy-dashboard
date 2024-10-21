@@ -22,11 +22,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           const imap = new Imap(imapConfig);
 
           imap.once('ready', () => {
-               // Prefix "INBOX" to system folders like Sent, Trash, etc.
                const boxName = currentLabelId === 'INBOX' ? 'INBOX' : `INBOX.${currentLabelId}`;
 
                imap.openBox(boxName, true, (err, box) => {
-                    console.log('err', err);
                     if (err) {
                          return res.status(500).json({ error: `Failed to open ${currentLabelId} box.` });
                     }
@@ -36,42 +34,71 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                               return res.status(500).json({ error: 'Failed to search emails.' });
                          }
 
-                         const f = imap.fetch(results, { bodies: '' });
-                         const emails: any[] = [];
+                         const fetchEmails = () => {
+                              return new Promise((resolve, reject) => {
+                                   const emails: any[] = [];
 
-                         f.on('message', (msg, seqno) => {
-                              msg.on('body', (stream, info) => {
-                                   simpleParser(stream, (err, mail) => {
-                                        if (err) {
-                                             return res.status(500).json({ error: 'Failed to parse email.' });
-                                        }
-                                        emails.push({
-                                             id: mail.messageId,
-                                             from: mail.from?.value[0].address,
-                                             name: mail.from?.value[0].name,
-                                             date: mail.date,
-                                             subject: mail.subject,
-                                             text: mail.text,
-                                             attachments: mail.attachments,
-                                             bcc: mail.bcc,
-                                             cc: mail.cc,
-                                             inReplyTo: mail.inReplyTo,
-                                             references: mail.references,
-                                             replyTo: mail.replyTo,
-                                             to: mail.to,
-                                             textAsHtml: mail.textAsHtml,
-                                             headerLines: mail.headerLines,
-                                             headers: mail.headers,
-                                             priority: mail.priority,
+                                   const f = imap.fetch(results, { bodies: '' });
+
+                                   const emailPromises: Promise<any>[] = [];
+
+                                   f.on('message', (msg, seqno) => {
+                                        const emailPromise = new Promise<void>((resolveEmail, rejectEmail) => {
+                                             msg.on('body', (stream, info) => {
+                                                  simpleParser(stream, (err, mail) => {
+                                                       if (err) {
+                                                            return rejectEmail(err);
+                                                       }
+
+                                                       emails.push({
+                                                            id: mail.messageId,
+                                                            from: mail.from?.value[0].address,
+                                                            name: mail.from?.value[0].name,
+                                                            date: mail.date,
+                                                            subject: mail.subject,
+                                                            text: mail.text,
+                                                            attachments: mail.attachments,
+                                                            bcc: mail.bcc,
+                                                            cc: mail.cc,
+                                                            inReplyTo: mail.inReplyTo,
+                                                            references: mail.references,
+                                                            replyTo: mail.replyTo,
+                                                            to: mail.to,
+                                                            textAsHtml: mail.textAsHtml,
+                                                            headerLines: mail.headerLines,
+                                                            headers: mail.headers,
+                                                            priority: mail.priority,
+                                                       });
+
+                                                       resolveEmail(); // Email parsing completed
+                                                  });
+                                             });
                                         });
+
+                                        emailPromises.push(emailPromise); // Add promise to array
+                                   });
+
+                                   f.once('end', () => {
+                                        // Wait for all email parsing promises to complete
+                                        Promise.all(emailPromises)
+                                             .then(() => resolve(emails))
+                                             .catch((err) => reject(err));
                                    });
                               });
-                         });
+                         };
 
-                         f.once('end', () => {
-                              imap.end();
-                              res.status(200).json({ emails });
-                         });
+                         fetchEmails()
+                              .then((emails: any) => {
+                                   // Sort the emails array by date (newest first)
+                                   emails.sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+                                   res.status(200).json({ emails });
+                                   imap.end();
+                              })
+                              .catch((err) => {
+                                   res.status(500).json({ error: err.message });
+                                   imap.end();
+                              });
                     });
                });
           });
