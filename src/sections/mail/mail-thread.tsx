@@ -26,6 +26,7 @@ const useEmail = (emailId: string): Email => {
           emailId
         })
       );
+      dispatch(thunks.getLabels());
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [emailId]

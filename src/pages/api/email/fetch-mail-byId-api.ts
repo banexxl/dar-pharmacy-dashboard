@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import Imap from 'imap';
 import { simpleParser } from 'mailparser';
+import { PassThrough } from 'stream';
 
 const imapConfig: any = {
      user: process.env.SMTP_USER!,
@@ -9,6 +10,16 @@ const imapConfig: any = {
      port: process.env.IMAP_PORT, // Default IMAP port
      tls: true,
      authTimeout: 5000,
+};
+
+// Function to parse mail as a promise
+const parseMail = (stream: PassThrough) => {
+     return new Promise((resolve, reject) => {
+          simpleParser(stream, (err, mail) => {
+               if (err) return reject(err);
+               resolve(mail);
+          });
+     });
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -25,23 +36,30 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           const imap = new Imap(imapConfig);
 
           imap.once('ready', () => {
-               imap.openBox('INBOX', true, (err, box) => {
-                    if (err) throw err;
+               imap.openBox('INBOX', false, (err, box) => {
+                    if (err) {
+                         return res.status(500).json({ error: `Failed to open inbox.` });
+                    }
 
-                    imap.search(['ALL'], (err, results) => {
-                         if (err) throw err;
+                    // Search for all emails
+                    imap.search(['ALL'], async (err, results) => {
+                         if (err) {
+                              return res.status(500).json({ error: 'Failed to search emails.' });
+                         }
 
-
-                         const f = imap.fetch(results, { bodies: '' });
+                         const f = imap.fetch(results, { bodies: '', markSeen: true }); // Set markSeen to true to mark emails as read
                          let foundEmail: any = null;
 
-                         f.on('message', (msg, seqno) => {
-                              msg.on('body', (stream, info) => {
-                                   simpleParser(stream, (err, mail) => {
+                         const messagePromises: Promise<any>[] = [];
 
-                                        if (err) throw err;
+                         f.on('message', (msg, seqno) => {
+                              const messageStream = new PassThrough();
+                              msg.on('body', (stream, info) => {
+                                   // Create a stream for each message and push it to the promises array
+                                   stream.pipe(messageStream);
+                                   const parsedMessagePromise = parseMail(messageStream).then((mail: any) => {
                                         // Check if the current email's messageId matches the requested id
-                                        if (mail.messageId === emailId) {
+                                        if (mail.messageId === decodedEmailId) {
                                              foundEmail = {
                                                   id: mail.messageId,
                                                   from: mail.from?.value[0].address,
@@ -61,11 +79,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                                                   headers: mail.headers,
                                                   priority: mail.priority,
                                              };
+
+                                             // Mark this email as read (\\Seen)
+                                             imap.addFlags(seqno, '\\Seen', (err) => {
+                                                  if (err) {
+                                                       console.error(`Failed to mark email ${mail.messageId} as read: `, err);
+                                                  }
+                                             });
                                         }
                                    });
+                                   messagePromises.push(parsedMessagePromise);
                               });
                          });
-                         f.once('end', () => {
+
+                         f.once('end', async () => {
+                              // Wait for all messages to be processed
+                              await Promise.all(messagePromises);
                               imap.end();
                               if (foundEmail) {
                                    res.status(200).json(foundEmail);
