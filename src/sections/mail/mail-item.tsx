@@ -5,7 +5,6 @@ import { format } from 'date-fns';
 import Attachment01Icon from '@untitled-ui/icons-react/build/esm/Attachment01';
 import BookmarkIcon from '@untitled-ui/icons-react/build/esm/Bookmark';
 import Star01Icon from '@untitled-ui/icons-react/build/esm/Star01';
-import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
 import Checkbox from '@mui/material/Checkbox';
 import Chip from '@mui/material/Chip';
@@ -14,7 +13,6 @@ import SvgIcon from '@mui/material/SvgIcon';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 
-import { getInitials } from 'src/utils/get-initials';
 import Link from 'next/link';
 import { Email } from '@/schemas/mail';
 
@@ -53,20 +51,8 @@ export const MailItem: FC<MailItemProps> = (props) => {
         borderBottomColor: 'divider',
         display: 'flex',
         p: 2,
-        ...(!email.isUnread && {
-          position: 'relative',
-          '&:before': {
-            backgroundColor: 'primary.main',
-            content: '" "',
-            height: '100%',
-            left: 0,
-            position: 'absolute',
-            top: 0,
-            width: 4,
-          },
-          '& $name, & $subject': {
-            fontWeight: 600,
-          },
+        ...(email.isUnread && {
+          fontWeight: 'bold', // Apply bold style for unread emails
         }),
         ...(selected && {
           backgroundColor: 'primary.lightest',
@@ -155,8 +141,8 @@ export const MailItem: FC<MailItemProps> = (props) => {
             sx={{
               width: 120,
               ml: 2,
-              ...(!email.isUnread && {
-                fontWeight: 600,
+              ...(email.isUnread && {
+                fontWeight: 700, // Bold for unread emails
               }),
             }}
             noWrap
@@ -194,7 +180,9 @@ export const MailItem: FC<MailItemProps> = (props) => {
             <Typography
               color="text.primary"
               sx={{
-                fontWeight: 600,
+                ...(email.isUnread && {
+                  fontWeight: 700, // Bold subject for unread emails
+                }),
                 minWidth: 100,
                 maxWidth: 400,
                 mr: 1,
@@ -214,7 +202,7 @@ export const MailItem: FC<MailItemProps> = (props) => {
                   md: 'block',
                 },
                 minWidth: 100,
-                maxWidth: 350,
+                width: 350,
               }}
             >
               {email.text}
@@ -281,7 +269,7 @@ export const MailItem: FC<MailItemProps> = (props) => {
 };
 
 MailItem.propTypes = {
-  // @ts-ignore
+  // @ts-expect-error
   email: PropTypes.object.isRequired,
   href: PropTypes.string.isRequired,
   onDeselect: PropTypes.func,

@@ -26,27 +26,35 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
                imap.openBox(boxName, true, (err, box) => {
                     if (err) {
+                         imap.end(); // Ensure the connection is closed on error
                          return res.status(500).json({ error: `Failed to open ${currentLabelId} box.` });
                     }
 
                     imap.search(['ALL'], (err, results) => {
                          if (err) {
+                              imap.end();
                               return res.status(500).json({ error: 'Failed to search emails.' });
+                         }
+
+                         if (!results || results.length === 0) {
+                              imap.end();
+                              return res.status(400).json({ message: 'No emails found.' });
                          }
 
                          const fetchEmails = () => {
                               return new Promise((resolve, reject) => {
                                    const emails: any[] = [];
+                                   const emailPromises: Promise<any>[] = [];
 
                                    const f = imap.fetch(results, { bodies: '' });
-
-                                   const emailPromises: Promise<any>[] = [];
 
                                    f.on('message', (msg, seqno) => {
                                         const emailPromise = new Promise<void>((resolveEmail, rejectEmail) => {
                                              msg.on('body', (stream, info) => {
                                                   simpleParser(stream, (err, mail) => {
+
                                                        if (err) {
+                                                            res.status(500).json({ error: err.message });
                                                             return rejectEmail(err);
                                                        }
 
@@ -78,11 +86,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                                         emailPromises.push(emailPromise); // Add promise to array
                                    });
 
+                                   f.once('error', (err) => {
+                                        reject(err); // Handle fetch error
+                                        res.status(500).json({ error: err.message });
+                                   });
+
                                    f.once('end', () => {
                                         // Wait for all email parsing promises to complete
                                         Promise.all(emailPromises)
                                              .then(() => resolve(emails))
-                                             .catch((err) => reject(err));
+                                             .catch((err) => reject(err))
+                                             .finally(() => {
+                                                  res.status(200).json({ emails })
+                                             });
                                    });
                               });
                          };
@@ -93,11 +109,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                                    emails.sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
                                    res.status(200).json({ emails });
-                                   imap.end();
+                                   imap.end(); // Ensure the IMAP connection is closed
                               })
                               .catch((err) => {
                                    res.status(500).json({ error: err.message });
-                                   imap.end();
+                                   imap.end(); // Close connection on error
                               });
                     });
                });
@@ -105,10 +121,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
           imap.once('error', (err: any) => {
                res.status(500).json({ error: err.message });
+               imap.end(); // Ensure the connection is closed on error
           });
 
           imap.connect();
      } catch (error) {
-          res.status(500).json({ error: 'Failed to fetch emails' });
+          return res.status(500).json({ error: 'Failed to fetch emails' });
      }
 }

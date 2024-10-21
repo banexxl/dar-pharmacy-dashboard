@@ -270,7 +270,7 @@ export const MailList: FC<MailListProps> = (props) => {
             color="text.secondary"
             variant="h5"
           >
-            There are no emails
+            No emails found in this folder
           </Typography>
         </Stack>
       )}

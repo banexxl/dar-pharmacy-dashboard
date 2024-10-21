@@ -27,14 +27,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           const imap = new Imap(imapConfig);
 
           imap.once('ready', () => {
-               imap.getBoxes((err, mailboxes) => {
+               imap.getBoxes(async (err, mailboxes) => {
                     if (err) {
                          res.status(500).json({ error: 'Failed to fetch email labels' });
+                         imap.end();
                          return;
                     }
 
-                    // Parse mailboxes and their children into Label[]
-                    const labels = parseMailboxes(mailboxes);
+                    // Parse mailboxes and get unread count for each
+                    const labels = await parseMailboxesWithUnread(imap, mailboxes);
 
                     res.status(200).json(labels);
                     imap.end();
@@ -43,6 +44,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
           imap.once('error', (err: any) => {
                res.status(500).json({ error: err.message });
+               imap.end();
           });
 
           imap.connect();
@@ -51,22 +53,45 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
      }
 }
 
-// Helper function to parse mailboxes recursively
-function parseMailboxes(mailboxes: any): Label[] {
+// Helper function to parse mailboxes recursively and fetch unread counts
+async function parseMailboxesWithUnread(imap: any, mailboxes: any): Promise<Label[]> {
      const labels: Label[] = [];
 
-     Object.keys(mailboxes).forEach((mailboxName) => {
+     for (const mailboxName of Object.keys(mailboxes)) {
           const mailbox = mailboxes[mailboxName];
 
+          // Prefix the mailbox name with 'INBOX.' if it's not the INBOX itself
+          const prefixedMailboxName = mailboxName.toUpperCase() === 'INBOX' ? 'INBOX' : `INBOX.${mailboxName}`;
+
+          // Fetch unread count using imap.status for the mailbox
+          const { totalCount, unreadCount } = await getMailboxStatus(imap, prefixedMailboxName);
+
           const label: Label = {
-               id: mailboxName, // Folder name as ID
+               id: prefixedMailboxName, // Folder name as ID
                name: mailboxName,
-               type: mailboxName.toLowerCase() === 'inbox' || mailbox.attribs.includes('\\Sent') ? 'system' : 'user', // Add more conditions as necessary
-               children: mailbox.children ? parseMailboxes(mailbox.children) : [], // Recursively parse child mailboxes
+               type: mailboxName.toLowerCase() === 'inbox' || mailbox.attribs.includes('\\Sent') ? 'system' : 'user',
+               totalCount,
+               unreadCount,
+               children: mailbox.children ? await parseMailboxesWithUnread(imap, mailbox.children) : [], // Recursively parse child mailboxes
           };
 
           labels.push(label);
-     });
+     }
 
      return labels;
+}
+
+// Helper function to get the total and unread message count for a mailbox
+function getMailboxStatus(imap: any, mailboxName: string): Promise<{ totalCount: number, unreadCount: number }> {
+     return new Promise((resolve, reject) => {
+          imap.status(mailboxName, (err: any, mailboxStatus: any) => {
+               if (err) {
+                    return reject(err);
+               }
+
+               const totalCount = mailboxStatus.messages.total || 0;
+               const unreadCount = mailboxStatus.messages.unseen || 0;
+               resolve({ totalCount, unreadCount });
+          });
+     });
 }
