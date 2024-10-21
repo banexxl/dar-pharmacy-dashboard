@@ -14,7 +14,6 @@ const imapConfig: any = {
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
      const { currentLabelId } = req.body; // Dynamically passed from the client
 
-
      if (!currentLabelId) {
           return res.status(400).json({ error: 'Mailbox name is required.' });
      }
@@ -23,7 +22,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           const imap = new Imap(imapConfig);
 
           imap.once('ready', () => {
-               imap.openBox(currentLabelId.toString(), true, (err, box) => { // Dynamic box name
+               // Prefix "INBOX" to system folders like Sent, Trash, etc.
+               const boxName = currentLabelId === 'INBOX' ? 'INBOX' : `INBOX.${currentLabelId}`;
+
+               imap.openBox(boxName, true, (err, box) => {
+                    console.log('err', err);
                     if (err) {
                          return res.status(500).json({ error: `Failed to open ${currentLabelId} box.` });
                     }
