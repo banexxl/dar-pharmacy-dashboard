@@ -32,7 +32,7 @@ const useEmails = (currentLabelId?: string): { byId: Record<string, Email>; allI
 
   useEffect(
     () => {
-      dispatch(thunks.getEmails());
+      dispatch(thunks.getEmails(currentLabelId!));
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [currentLabelId]

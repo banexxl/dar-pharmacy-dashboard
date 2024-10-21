@@ -8,11 +8,17 @@ const getLabels = (): AppThunk => async (dispatch): Promise<void> => {
      dispatch(slice.actions.getLabels(data));
 };
 
-const getEmails = (): AppThunk => async (dispatch): Promise<void> => {
-     const response = await fetch('/api/email/fetch-mail-api');
+const getEmails = (currentLabelId: string): AppThunk => async (dispatch): Promise<void> => {
+     const response = await fetch(`/api/email/fetch-mail-api`, {
+          method: 'POST',
+          headers: {
+               'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ currentLabelId }),
+     });
      const data = await response.json();
      // Sort emails by date in descending order before dispatching to store
-     const sortedEmails = data.emails.sort((a: Email, b: Email) => new Date(b.date).getTime() - new Date(a.date).getTime());
+     const sortedEmails = data.emails?.sort((a: Email, b: Email) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
      dispatch(slice.actions.getEmails(sortedEmails));
 };

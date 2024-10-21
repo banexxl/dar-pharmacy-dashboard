@@ -26,7 +26,7 @@ type GroupedLabels = {
 const groupLabels = (labels: Label[]): GroupedLabels => {
   const groups: GroupedLabels = {
     system: [],
-    custom: [],
+    user: [],
   };
 
   const processLabel = (label: Label) => {
@@ -34,7 +34,7 @@ const groupLabels = (labels: Label[]): GroupedLabels => {
     if (label.type === 'system') {
       groups.system.push(label);
     } else {
-      groups.custom.push(label);
+      groups.user.push(label);
     }
 
     // Process children recursively if they exist
@@ -72,7 +72,7 @@ export const MailSidebar: FC<MailSidebarProps> = (props) => {
         onClose?.();
       }
 
-      const href = paths.dashboard.email
+      const href = paths.dashboard.email + `?label=${label.name}`;
 
       router.push(href);
     },
@@ -130,7 +130,7 @@ export const MailSidebar: FC<MailSidebarProps> = (props) => {
       >
         {(Object.keys(groupedLabels) as LabelType[]).map((type) => (
           <Fragment key={type}>
-            {type === 'custom' && (
+            {type === 'user' && (
               <ListSubheader disableSticky={true}>
                 <Typography
                   color="text.secondary"

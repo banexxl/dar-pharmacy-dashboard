@@ -15,17 +15,18 @@ import ListItem from '@mui/material/ListItem';
 import SvgIcon from '@mui/material/SvgIcon';
 import Typography from '@mui/material/Typography';
 import { Label } from '@/schemas/mail';
+import { indigo } from '@mui/material/colors';
 
 
 const systemLabelIcons: Record<string, JSX.Element> = {
-  all: <Mail01Icon />,
-  inbox: <Inbox01Icon />,
-  sent: <Send01Icon />,
-  trash: <Trash02Icon />,
-  drafts: <Mail04Icon />,
-  spam: <AlertCircleIcon />,
-  starred: <Star01Icon />,
-  important: <BookmarkIcon />,
+  ALL: <Mail01Icon />,
+  INBOX: <Inbox01Icon />,
+  Sent: <Send01Icon />,
+  Trash: <Trash02Icon />,
+  Drafts: <Mail04Icon />,
+  Spam: <AlertCircleIcon />,
+  Starred: <Star01Icon />,
+  Important: <BookmarkIcon />,
 };
 
 const getIcon = (label: Label): JSX.Element => {
@@ -37,8 +38,16 @@ const getIcon = (label: Label): JSX.Element => {
 };
 
 const getColor = (label: Label): string => {
-  if (label.type === 'custom') {
-    return label.color || 'inherit';
+  if (label.type === 'user' && label.name === 'Trash') {
+    return label.color || 'red';
+  } else if (label.type === 'user' && label.name === 'Spam') {
+    return label.color || 'orange';
+  } else if (label.type === 'user' && label.name === 'Drafts') {
+    return label.color || 'blue';
+  } else if (label.type === 'system' && label.name === 'INBOX') {
+    return label.color || indigo[500];
+  } else if (label.type === 'system' && label.name === 'Sent') {
+    return label.color || indigo[100];
   }
 
   return 'inherit';

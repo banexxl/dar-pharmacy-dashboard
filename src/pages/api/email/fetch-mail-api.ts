@@ -1,4 +1,4 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
+import { NextApiRequest, NextApiResponse } from 'next';
 import Imap from 'imap';
 import { simpleParser } from 'mailparser';
 
@@ -12,15 +12,26 @@ const imapConfig: any = {
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+     const { currentLabelId } = req.body; // Dynamically passed from the client
+
+
+     if (!currentLabelId) {
+          return res.status(400).json({ error: 'Mailbox name is required.' });
+     }
+
      try {
           const imap = new Imap(imapConfig);
 
           imap.once('ready', () => {
-               imap.openBox('INBOX', true, (err, box) => {
-                    if (err) throw err;
+               imap.openBox(currentLabelId.toString(), true, (err, box) => { // Dynamic box name
+                    if (err) {
+                         return res.status(500).json({ error: `Failed to open ${currentLabelId} box.` });
+                    }
 
                     imap.search(['ALL'], (err, results) => {
-                         if (err) throw err;
+                         if (err) {
+                              return res.status(500).json({ error: 'Failed to search emails.' });
+                         }
 
                          const f = imap.fetch(results, { bodies: '' });
                          const emails: any[] = [];
@@ -28,7 +39,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                          f.on('message', (msg, seqno) => {
                               msg.on('body', (stream, info) => {
                                    simpleParser(stream, (err, mail) => {
-                                        if (err) throw err;
+                                        if (err) {
+                                             return res.status(500).json({ error: 'Failed to parse email.' });
+                                        }
                                         emails.push({
                                              id: mail.messageId,
                                              from: mail.from?.value[0].address,

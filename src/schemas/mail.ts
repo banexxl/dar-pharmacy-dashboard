@@ -21,7 +21,7 @@ export interface Email {
   to: string;
 }
 
-export type LabelType = 'system' | 'custom';
+export type LabelType = 'system' | 'user';
 
 export interface Label {
   id: string;
