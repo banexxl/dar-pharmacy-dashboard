@@ -88,7 +88,6 @@ function getMailboxStatus(imap: any, mailboxName: string): Promise<{ totalCount:
                if (err) {
                     return reject(err);
                }
-
                const totalCount = mailboxStatus.messages.total || 0;
                const unreadCount = mailboxStatus.messages.unseen || 0;
                resolve({ totalCount, unreadCount });

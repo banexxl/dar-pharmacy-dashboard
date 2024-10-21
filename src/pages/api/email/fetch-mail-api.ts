@@ -52,7 +52,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                                         const emailPromise = new Promise<void>((resolveEmail, rejectEmail) => {
                                              msg.on('body', (stream, info) => {
                                                   simpleParser(stream, (err, mail) => {
-
                                                        if (err) {
                                                             res.status(500).json({ error: err.message });
                                                             return rejectEmail(err);

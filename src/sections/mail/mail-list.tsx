@@ -234,7 +234,7 @@ export const MailList: FC<MailListProps> = (props) => {
             {emails.allIds.map((emailId: string) => {
               const isSelected = selected.includes(emailId);
 
-              const href = paths.dashboard.email + `?emailId=${emailId}`
+              const href = paths.dashboard.email + `?emailId=${encodeURIComponent(emailId)}`
 
               return (
                 <MailItem

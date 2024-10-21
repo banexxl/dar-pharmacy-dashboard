@@ -13,7 +13,11 @@ const imapConfig: any = {
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
      const { emailId } = req.query; // Expecting the email ID to be passed as a query parameter
-     if (!emailId) {
+
+     // Decode the emailId to properly handle special characters like '+'
+     const decodedEmailId = decodeURIComponent(emailId as string);
+
+     if (!decodedEmailId) {
           return res.status(400).json({ error: 'Email ID is required' });
      }
 
@@ -27,12 +31,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     imap.search(['ALL'], (err, results) => {
                          if (err) throw err;
 
+
                          const f = imap.fetch(results, { bodies: '' });
                          let foundEmail: any = null;
 
                          f.on('message', (msg, seqno) => {
                               msg.on('body', (stream, info) => {
                                    simpleParser(stream, (err, mail) => {
+
                                         if (err) throw err;
                                         // Check if the current email's messageId matches the requested id
                                         if (mail.messageId === emailId) {
