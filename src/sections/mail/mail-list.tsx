@@ -189,6 +189,7 @@ export const MailList: FC<MailListProps> = (props) => {
             <IconButton
               onClick={() => {
                 dispatch(thunks.getEmails(currentLabelId!));
+                dispatch(thunks.getLabels());
               }}
             >
               <SvgIcon>

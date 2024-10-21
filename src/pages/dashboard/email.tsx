@@ -20,6 +20,7 @@ const useLabels = (): Label[] => {
 
   const handleLabelsGet = useCallback((): void => {
     dispatch(thunks.getLabels());
+    dispatch(thunks.getEmails('INBOX'));
   }, [dispatch]);
 
   useEffect(
