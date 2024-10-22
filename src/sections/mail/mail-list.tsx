@@ -142,19 +142,39 @@ export const MailList: FC<MailListProps> = (props) => {
   }
 
   const handleDeleteEmailsClick = () => {
-    console.log('selected', selected);
 
     if (selected.length === 0) {
       return toast.error('Morate odabrati bar jedan email za brisanje!');
     }
 
     Swal.fire({
-      title: 'Are you sure?',
-      text: 'You will not be able to recover these emails!',
+      title: 'Da li ste sigurni?',
+      text: 'Ova radnja je nepovratna! Svi odabrani emailovi će biti trajno obrisani.',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: 'Yes, delete them!',
-      cancelButtonText: 'No, keep them',
+      confirmButtonText: 'Da, obriši!',
+      cancelButtonText: 'Ne, odustani!',
+    }).then((result: any) => {
+      if (result.isConfirmed) {
+        dispatch(thunks.deleteEmails(selected));
+      }
+    })
+  }
+
+
+  const handleMoveEmailsToTrashClick = () => {
+
+    if (selected.length === 0) {
+      return toast.error('Morate odabrati bar jedan email za brisanje!');
+    }
+
+    Swal.fire({
+      title: 'Da li ste sigurni?',
+      text: 'Premestanje emailova u korpu za otpatke će ih ukloniti iz trenutne fascikle.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Da, obriši!',
+      cancelButtonText: 'Ne, odustani!',
     }).then((result: any) => {
       if (result.isConfirmed) {
         dispatch(thunks.deleteEmails(selected));
@@ -287,14 +307,28 @@ export const MailList: FC<MailListProps> = (props) => {
                 horizontal: 'center',
               }}
             >
-              <Button sx={{ p: 2 }}
-                onClick={() => {
-                  handleDeleteEmailsClick();
-                  handleMoreOptionsClose()
-                  handleDeselectAll();
-                }}
-              >Delete email(s)</Button>
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                <Button
+                  onClick={() => {
+                    handleDeleteEmailsClick();
+                    handleMoreOptionsClose();
+                    handleDeselectAll();
+                  }}
+                >
+                  Move email(s) to Trash
+                </Button>
+                <Button
+                  onClick={() => {
+                    handleDeleteEmailsClick();
+                    handleMoreOptionsClose();
+                    handleDeselectAll();
+                  }}
+                >
+                  Delete email(s) forever
+                </Button>
+              </Box>
             </Popover>
+
           </Box>
           <div>
             {emails.allIds.map((emailId: string) => {

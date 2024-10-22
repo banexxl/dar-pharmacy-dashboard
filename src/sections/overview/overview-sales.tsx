@@ -84,7 +84,7 @@ const useChartOptions = () => {
         'Jul',
         'Avg',
         'Sep',
-        'Ot',
+        'Okt',
         'Nov',
         'Dec'
       ],
