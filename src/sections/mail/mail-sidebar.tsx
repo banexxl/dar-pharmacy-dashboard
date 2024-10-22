@@ -18,6 +18,7 @@ import { MailLabel } from './mail-label';
 import { Label, LabelType } from '@/schemas/mail';
 import { useRouter } from 'next/router';
 import { paths } from 'paths';
+import { CircularProgress } from '@mui/material';
 
 type GroupedLabels = {
   [key in LabelType]: Label[];
@@ -81,6 +82,14 @@ export const MailSidebar: FC<MailSidebarProps> = (props) => {
 
   // Maybe use memo
   const groupedLabels: GroupedLabels = groupLabels(labels);
+
+  if (!labels || labels.length === 0) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'flex-start', margin: '20px' }}>
+        <CircularProgress size={50} />
+      </Box>
+    );
+  }
 
   const content = (
     <div>

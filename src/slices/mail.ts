@@ -43,6 +43,12 @@ const reducers = {
                state.emails.allIds.push(email.id);
           }
      },
+     deleteEmails(state: MailState, action: PayloadAction<string[]>): void {
+          action.payload.forEach((emailId) => {
+               delete state.emails.byId[emailId];
+               state.emails.allIds = state.emails.allIds.filter((id) => id !== emailId);
+          });
+     }
 };
 
 export const slice = createSlice({

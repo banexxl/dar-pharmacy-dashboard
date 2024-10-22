@@ -42,8 +42,25 @@ const getEmail = (params: GetEmailParams): AppThunk => async (dispatch): Promise
 
 };
 
+
+
+const deleteEmails = (params: string[]): AppThunk => async (dispatch): Promise<void> => {
+     const response = await fetch(`/api/email/move-mail-to-trash-api`, {
+          method: 'DELETE',
+          headers: {
+               'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ emailIds: params }),
+     });
+     const data = await response.json();
+     if (data.success) {
+          dispatch(slice.actions.deleteEmails(params));
+     }
+}
+
 export const thunks = {
      getEmail,
      getEmails,
      getLabels,
+     deleteEmails
 };

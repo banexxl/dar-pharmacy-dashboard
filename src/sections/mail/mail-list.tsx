@@ -24,6 +24,9 @@ import { thunks } from 'src/thunks/mail';
 import { MailItem } from './mail-item';
 import { Email } from '@/schemas/mail';
 import { paths } from 'paths';
+import { Button, CircularProgress, Popover } from '@mui/material';
+import Swal from 'sweetalert2';
+import toast from 'react-hot-toast';
 
 
 const useEmails = (currentLabelId?: string): { byId: Record<string, Email>; allIds: string[] } => {
@@ -116,6 +119,48 @@ export const MailList: FC<MailListProps> = (props) => {
   const selectedAll = selected.length === emails.allIds.length;
   const selectedSome = selected.length > 0 && selected.length < emails.allIds.length;
   const hasEmails = emails.allIds.length > 0;
+
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  const handleMoreOptionsClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMoreOptionsClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+  const id = open ? 'simple-popover' : undefined;
+
+  if (!emails) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'flex-start', margin: '20px' }}>
+        <CircularProgress size={50} />
+      </Box>
+    );
+  }
+
+  const handleDeleteEmailsClick = () => {
+    console.log('selected', selected);
+
+    if (selected.length === 0) {
+      return toast.error('Morate odabrati bar jedan email za brisanje!');
+    }
+
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'You will not be able to recover these emails!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete them!',
+      cancelButtonText: 'No, keep them',
+    }).then((result: any) => {
+      if (result.isConfirmed) {
+        dispatch(thunks.deleteEmails(selected));
+      }
+    })
+  }
 
   return (
     <Stack
@@ -222,13 +267,34 @@ export const MailList: FC<MailListProps> = (props) => {
             />
             <Typography variant="subtitle2">Select all</Typography>
             <Box sx={{ flexGrow: 1 }} />
-            <Tooltip title="More options">
-              <IconButton>
-                <SvgIcon>
-                  <DotsHorizontalIcon />
-                </SvgIcon>
-              </IconButton>
-            </Tooltip>
+            <IconButton aria-describedby={id} onClick={handleMoreOptionsClick}>
+              <SvgIcon>
+                <DotsHorizontalIcon />
+              </SvgIcon>
+            </IconButton>
+
+            <Popover
+              id={id}
+              open={open}
+              anchorEl={anchorEl}
+              onClose={handleMoreOptionsClose}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'center',
+              }}
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'center',
+              }}
+            >
+              <Button sx={{ p: 2 }}
+                onClick={() => {
+                  handleDeleteEmailsClick();
+                  handleMoreOptionsClose()
+                  handleDeselectAll();
+                }}
+              >Delete email(s)</Button>
+            </Popover>
           </Box>
           <div>
             {emails.allIds.map((emailId: string) => {
