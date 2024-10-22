@@ -1,7 +1,9 @@
 import NextLink from 'next/link';
 import PropTypes from 'prop-types';
-import { Box, ButtonBase } from '@mui/material';
-import { ReactNode } from 'react';
+import { Box, ButtonBase, CircularProgress, Typography } from '@mui/material';
+import { ReactNode, useEffect, useState } from 'react';
+import { useSelector } from '@/store';
+import { success } from '@/theme/colors';
 
 interface SideNavItemProps {
      active: boolean;
@@ -14,6 +16,16 @@ interface SideNavItemProps {
 
 export const SideNavItem = (props: SideNavItemProps) => {
      const { active = false, disabled, external, icon, path, title } = props;
+     const labels = useSelector((state) => state.mail.labels);
+     const [loading, setLoading] = useState(true);
+
+     useEffect(() => {
+          if (labels && labels.length > 0) {
+               setLoading(false); // Set loading to false when labels are populated
+          }
+     }, [labels]);
+
+
 
      const linkProps = path
           ? external
@@ -70,6 +82,8 @@ export const SideNavItem = (props: SideNavItemProps) => {
                     <Box
                          component="span"
                          sx={{
+                              display: 'flex',
+                              alignItems: 'center',
                               color: 'neutral.400',
                               flexGrow: 1,
                               fontFamily: (theme) => theme.typography.fontFamily,
@@ -86,9 +100,27 @@ export const SideNavItem = (props: SideNavItemProps) => {
                          }}
                     >
                          {title}
+                         {title === 'Email' && (
+                              loading ? (
+                                   <Typography component="span">
+                                        {'\u00A0\u00A0\u00A0'}
+                                        <CircularProgress size={15} />
+                                   </Typography>
+                              ) : (
+                                   <Typography
+                                        sx={{
+                                             fontSize: '.9rem',
+                                             color: labels[0]?.unreadCount! as number > 0 ? success.light : 'inherit', // Change color if greater than 0
+                                        }}
+                                   >
+                                        {'\u00A0\u00A0\u00A0' + labels[0]?.unreadCount}
+                                   </Typography>
+                              )
+                         )}
+
                     </Box>
                </ButtonBase>
-          </li>
+          </li >
      );
 };
 

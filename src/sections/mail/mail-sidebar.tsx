@@ -143,7 +143,6 @@ export const MailSidebar: FC<MailSidebarProps> = (props) => {
             <List disablePadding>
               {groupedLabels[type].map((label) => {
                 const isActive = currentLabelId === label.id;
-
                 return (
                   <MailLabel
                     active={isActive}
