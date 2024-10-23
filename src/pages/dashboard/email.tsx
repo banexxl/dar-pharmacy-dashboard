@@ -13,6 +13,7 @@ import { MailList } from '@/sections/mail/mail-list';
 import { MailComposer } from '@/sections/mail/mail-composer';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { useSearchParams } from 'next/navigation';
+import { debounce } from 'lodash';
 
 const useLabels = (): Label[] => {
   const dispatch = useDispatch();
@@ -82,26 +83,36 @@ const useComposer = () => {
     }));
   }, []);
 
-  const handleMessageChange = useCallback((message: string): void => {
-    setState((prevState) => ({
-      ...prevState,
-      message,
-    }));
-  }, []);
+  const handleMessageChange = useCallback(
+    debounce((message: string): void => {
+      setState((prevState) => ({
+        ...prevState,
+        message,
+      }));
+    }, 300), // 300ms delay
+    []
+  );
 
-  const handleSubjectChange = useCallback((subject: string): void => {
-    setState((prevState) => ({
-      ...prevState,
-      subject,
-    }));
-  }, []);
+  const handleSubjectChange = useCallback(
+    debounce((subject: string): void => {
 
-  const handleToChange = useCallback((to: string): void => {
-    setState((prevState) => ({
-      ...prevState,
-      to,
-    }));
-  }, []);
+      setState((prevState) => ({
+        ...prevState,
+        subject: subject
+      }));
+    }, 300),
+    []
+  );
+
+  const handleToChange = useCallback(
+    debounce((to: string): void => {
+      setState((prevState) => ({
+        ...prevState,
+        to: to
+      }));
+    }, 300),
+    []
+  );
 
   return {
     ...state,
@@ -214,8 +225,8 @@ const Page = () => {
         onMaximize={composer.handleMaximize}
         onMessageChange={composer.handleMessageChange}
         onMinimize={composer.handleMinimize}
-        onSubjectChange={composer.handleSubjectChange}
-        onToChange={composer.handleToChange}
+        onSubjectChange={(e: any) => composer.handleSubjectChange(e)}
+        onToChange={(e: any) => composer.handleToChange(e)}
         open={composer.isOpen}
         subject={composer.subject}
         to={composer.to}

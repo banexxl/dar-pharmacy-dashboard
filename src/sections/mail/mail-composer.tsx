@@ -67,6 +67,37 @@ export const MailComposer: FC<MailComposerProps> = (props) => {
     return null;
   }
 
+  const handleSendMail = async () => {
+    // Collect the necessary email data
+    const emailData = {
+      to: to,
+      subject: subject,
+      html: message, // Or use html if you have HTML content
+    };
+
+    try {
+      const response = await fetch('/api/email/send-email-api/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(emailData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const result = await response.json();
+      console.log('Email sent successfully:', result);
+      // Handle success (e.g., show a notification, clear the form, etc.)
+    } catch (error) {
+      console.error('Error sending email:', error);
+      // Handle error (e.g., show an error message)
+    }
+  };
+
+
   return (
     <Portal>
       <Backdrop open={maximize} />
@@ -135,7 +166,7 @@ export const MailComposer: FC<MailComposerProps> = (props) => {
             borderBottom: 1,
             borderColor: 'divider',
           }}
-          value={to}
+          defaultValue={to}
         />
         <Input
           disableUnderline
@@ -147,7 +178,7 @@ export const MailComposer: FC<MailComposerProps> = (props) => {
             borderBottom: 1,
             borderColor: 'divider',
           }}
-          value={subject}
+          defaultValue={subject}
         />
         <QuillEditor
           onChange={onMessageChange}
@@ -187,7 +218,11 @@ export const MailComposer: FC<MailComposerProps> = (props) => {
             </Tooltip>
           </Stack>
           <div>
-            <Button variant="contained">Send</Button>
+            <Button variant="contained"
+              onClick={handleSendMail}
+            >
+              Send
+            </Button>
           </div>
         </Stack>
       </Paper>
