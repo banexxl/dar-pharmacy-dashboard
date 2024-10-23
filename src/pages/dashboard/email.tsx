@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -13,6 +13,7 @@ import { MailList } from '@/sections/mail/mail-list';
 import { MailComposer } from '@/sections/mail/mail-composer';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { useSearchParams } from 'next/navigation';
+import { debounce } from 'lodash';
 
 const useLabels = (): Label[] => {
   const dispatch = useDispatch();
@@ -33,7 +34,6 @@ const useLabels = (): Label[] => {
 
   return labels;
 };
-
 interface ComposerState {
   isFullScreen: boolean;
   isOpen: boolean;
@@ -53,55 +53,44 @@ const useComposer = () => {
 
   const [state, setState] = useState<ComposerState>(initialState);
 
-  const handleOpen = useCallback((): void => {
-    setState((prevState) => ({
-      ...prevState,
-      isOpen: true,
-    }));
-  }, []);
-
-  const handleClose = useCallback(
-    (): void => {
-      setState(initialState);
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  const debouncedSetState = useMemo(
+    () => debounce((updates: Partial<ComposerState>) => {
+      setState(prevState => ({ ...prevState, ...updates }));
+    }, 300),
     []
   );
 
+  const handleOpen = useCallback((): void => {
+    setState(prevState => ({ ...prevState, isOpen: true }));
+  }, []);
+
+  const handleClose = useCallback((): void => {
+    setState(initialState);
+  }, []);
+
   const handleMaximize = useCallback((): void => {
-    setState((prevState) => ({
-      ...prevState,
-      isFullScreen: true,
-    }));
+    setState(prevState => ({ ...prevState, isFullScreen: true }));
   }, []);
 
   const handleMinimize = useCallback((): void => {
-    setState((prevState) => ({
-      ...prevState,
-      isFullScreen: false,
-    }));
+    setState(prevState => ({ ...prevState, isFullScreen: false }));
   }, []);
 
   const handleMessageChange = useCallback((message: string): void => {
-    setState((prevState) => ({
-      ...prevState,
-      message,
-    }));
-  }, []);
+    console.log('message', message);
+
+    debouncedSetState({ message });
+  }, [debouncedSetState]);
 
   const handleSubjectChange = useCallback((subject: string): void => {
-    setState((prevState) => ({
-      ...prevState,
-      subject,
-    }));
-  }, []);
+    debouncedSetState({ subject });
+  }, [debouncedSetState]);
 
   const handleToChange = useCallback((to: string): void => {
-    setState((prevState) => ({
-      ...prevState,
-      to,
-    }));
-  }, []);
+    console.log('to', to);
+
+    debouncedSetState({ to });
+  }, [debouncedSetState]);
 
   return {
     ...state,
@@ -114,7 +103,6 @@ const useComposer = () => {
     handleToChange,
   };
 };
-
 const useSidebar = () => {
   const mdUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
   const [open, setOpen] = useState(mdUp);
@@ -160,6 +148,22 @@ const Page = () => {
   const sidebar = useSidebar();
 
   const view = emailId ? 'details' : 'list';
+
+  const memoizedMailComposer = useMemo(() => (
+    <MailComposer
+      maximize={composer.isFullScreen}
+      message={composer.message}
+      onClose={composer.handleClose}
+      onMaximize={composer.handleMaximize}
+      onMessageChange={composer.handleMessageChange}
+      onMinimize={composer.handleMinimize}
+      onSubjectChange={composer.handleSubjectChange}
+      onToChange={composer.handleToChange}
+      open={composer.isOpen}
+      subject={composer.subject}
+      to={composer.to}
+    />
+  ), [composer, composer.handleClose, composer.handleMaximize, composer.handleMessageChange, composer.handleMinimize, composer.handleSubjectChange, composer.handleToChange]);
 
   return (
     <>
@@ -207,7 +211,8 @@ const Page = () => {
           </MailContainer>
         </Box>
       </Box>
-      <MailComposer
+      {memoizedMailComposer}
+      {/* <MailComposer
         maximize={composer.isFullScreen}
         message={composer.message}
         onClose={composer.handleClose}
@@ -219,7 +224,7 @@ const Page = () => {
         open={composer.isOpen}
         subject={composer.subject}
         to={composer.to}
-      />
+      /> */}
     </>
   );
 };

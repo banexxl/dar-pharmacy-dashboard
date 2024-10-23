@@ -16,16 +16,6 @@ interface SideNavItemProps {
 
 export const SideNavItem = (props: SideNavItemProps) => {
      const { active = false, disabled, external, icon, path, title } = props;
-     const labels = useSelector((state) => state.mail.labels);
-     const [loading, setLoading] = useState(true);
-
-     useEffect(() => {
-          if (labels && labels.length > 0) {
-               setLoading(false); // Set loading to false when labels are populated
-          }
-     }, [labels]);
-
-
 
      const linkProps = path
           ? external
@@ -100,7 +90,7 @@ export const SideNavItem = (props: SideNavItemProps) => {
                          }}
                     >
                          {title}
-                         {title === 'Email' && (
+                         {/* {title === 'Email' && (
                               loading ? (
                                    <Typography component="span">
                                         {'\u00A0\u00A0\u00A0'}
@@ -116,7 +106,7 @@ export const SideNavItem = (props: SideNavItemProps) => {
                                         {'\u00A0\u00A0\u00A0' + labels[0]?.unreadCount}
                                    </Typography>
                               )
-                         )}
+                         )} */}
 
                     </Box>
                </ButtonBase>
