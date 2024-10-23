@@ -53,6 +53,7 @@ const deleteEmails = (params: string[]): AppThunk => async (dispatch): Promise<v
      const data = await response.json();
      if (data.success) {
           dispatch(slice.actions.deleteEmails(params));
+          dispatch(thunks.getLabels());
      }
 }
 
@@ -65,8 +66,11 @@ const deleteEmailsForever = (params: string[]): AppThunk => async (dispatch): Pr
           body: JSON.stringify({ emailIds: params }),
      });
      const data = await response.json();
+     console.log(data);
+
      if (data.success) {
           dispatch(slice.actions.deleteEmails(params));
+          dispatch(thunks.getLabels());
      }
 }
 
