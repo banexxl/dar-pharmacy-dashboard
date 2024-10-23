@@ -156,11 +156,10 @@ export const MailList: FC<MailListProps> = (props) => {
       cancelButtonText: 'Ne, odustani!',
     }).then((result: any) => {
       if (result.isConfirmed) {
-        dispatch(thunks.deleteEmails(selected));
+        dispatch(thunks.deleteEmailsForever(selected));
       }
     })
   }
-
 
   const handleMoveEmailsToTrashClick = () => {
 
@@ -170,7 +169,7 @@ export const MailList: FC<MailListProps> = (props) => {
 
     Swal.fire({
       title: 'Da li ste sigurni?',
-      text: 'Premestanje emailova u korpu za otpatke će ih ukloniti iz trenutne fascikle.',
+      text: 'Premeštanje emailova u korpu za otpatke će ih ukloniti iz trenutne fascikle.',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Da, obriši!',
@@ -310,7 +309,7 @@ export const MailList: FC<MailListProps> = (props) => {
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                 <Button
                   onClick={() => {
-                    handleDeleteEmailsClick();
+                    handleMoveEmailsToTrashClick();
                     handleMoreOptionsClose();
                     handleDeselectAll();
                   }}
