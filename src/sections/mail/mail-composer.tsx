@@ -20,6 +20,8 @@ import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { QuillEditor } from 'src/components/quill-editor';
 import toast from 'react-hot-toast';
+import { useDispatch } from '@/store';
+import { text } from 'stream/consumers';
 
 interface MailComposerProps {
   maximize?: boolean;
@@ -36,6 +38,7 @@ interface MailComposerProps {
 }
 
 export const MailComposer: FC<MailComposerProps> = (props) => {
+  const dispatch = useDispatch();
   const {
     maximize = false,
     message = '',
@@ -73,24 +76,24 @@ export const MailComposer: FC<MailComposerProps> = (props) => {
     const emailData = {
       to: to,
       subject: subject,
+      text: message, // Use text if you have plain text content
       html: message, // Or use html if you have HTML content
     };
 
     try {
-      const response = await fetch('/api/email/send-email-api/', {
+      const response = await fetch('/api/email/add-to-sent-emails-api/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(emailData),
-      });
-
+      })
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
-
       const result = await response.json();
       toast.success(result.message);
+
       onClose?.();
     } catch (error) {
       console.error('Error sending email:', error);

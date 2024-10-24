@@ -1,4 +1,3 @@
-import { Email } from '@/schemas/mail';
 import { slice } from 'src/slices/mail';
 import type { AppThunk } from 'src/store';
 

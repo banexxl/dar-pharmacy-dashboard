@@ -141,9 +141,9 @@ export const MailThreadToolbar: FC<MailThreadToolbarProps> = (props) => {
               {to.map((person: any) => (
                 <Link
                   color="inherit"
-                  key={person.text}
+                  key={person?.text}
                 >
-                  {person.text}
+                  {person?.text ? person.text : person}
                 </Link>
               ))}
             </Typography>
