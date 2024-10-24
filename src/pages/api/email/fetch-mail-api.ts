@@ -40,7 +40,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
                          if (!results || results.length === 0) {
                               imap.end();
-                              return res.status(201).json({ message: 'No emails found.' });
+                              return res.status(202).json({ message: 'No emails found.' });
                          }
 
                          const fetchEmails = () => {
