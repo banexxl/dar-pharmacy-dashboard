@@ -406,7 +406,7 @@ export const MailList: FC<MailListProps> = (props) => {
               onRowsPerPageChange={emailSearch.handleRowsPerPageChange}
               page={emailSearch.state.page}
               rowsPerPage={emailSearch.state.rowsPerPage}
-              rowsPerPageOptions={[5, 10, 25, 50, 100, 200]}
+              rowsPerPageOptions={[5, 10, 25, 50]}
               showFirstButton
               showLastButton
               labelRowsPerPage={'Broj po stranici'}
