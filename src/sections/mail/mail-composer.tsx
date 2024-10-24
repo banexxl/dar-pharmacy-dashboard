@@ -19,6 +19,7 @@ import SvgIcon from '@mui/material/SvgIcon';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { QuillEditor } from 'src/components/quill-editor';
+import toast from 'react-hot-toast';
 
 interface MailComposerProps {
   maximize?: boolean;
@@ -89,8 +90,8 @@ export const MailComposer: FC<MailComposerProps> = (props) => {
       }
 
       const result = await response.json();
-      console.log('Email sent successfully:', result);
-      // Handle success (e.g., show a notification, clear the form, etc.)
+      toast.success(result.message);
+      onClose?.();
     } catch (error) {
       console.error('Error sending email:', error);
       // Handle error (e.g., show an error message)
