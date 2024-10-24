@@ -15,11 +15,17 @@ const getEmails = (currentLabelId: string): AppThunk => async (dispatch): Promis
           },
           body: JSON.stringify({ currentLabelId }),
      });
-     const data = await response.json();
-     // Sort emails by date in descending order before dispatching to store
-     // const sortedEmails = data.emails?.sort((a: Email, b: Email) => new Date(b.date).getTime() - new Date(a.date).getTime());
+     console.log(response);
+     if (!response.ok) {
+          throw new Error('Failed to fetch emails');
+     } else {
+          const data = await response.json();
+          console.log(data);
 
-     dispatch(slice.actions.getEmails(data.emails));
+          // Sort emails by date in descending order before dispatching to store
+          // const sortedEmails = data.emails?.sort((a: Email, b: Email) => new Date(b.date).getTime() - new Date(a.date).getTime());
+          dispatch(slice.actions.getEmails(data.emails));
+     }
 };
 
 type GetEmailParams = {

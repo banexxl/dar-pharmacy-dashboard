@@ -31,6 +31,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     }
 
                     imap.search(['ALL'], (err, results) => {
+                         console.log('results', results);
+
                          if (err) {
                               imap.end();
                               return res.status(500).json({ error: 'Failed to search emails.' });
@@ -38,7 +40,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
                          if (!results || results.length === 0) {
                               imap.end();
-                              return res.status(400).json({ message: 'No emails found.' });
+                              return res.status(201).json({ message: 'No emails found.' });
                          }
 
                          const fetchEmails = () => {

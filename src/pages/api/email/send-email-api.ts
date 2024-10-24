@@ -22,8 +22,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           // Step 1: Send the email using Nodemailer
           const transporter = nodemailer.createTransport({
                host: process.env.SMTP_HOST,
-               port: parseInt(process.env.SMTP_PORT || '587', 10),
-               secure: false,
+               port: 465,
+               secure: true,
                auth: {
                     user: process.env.SMTP_USER,
                     pass: process.env.SMTP_PASS,

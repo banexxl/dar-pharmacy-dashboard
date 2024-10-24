@@ -19,6 +19,8 @@ import { Label, LabelType } from '@/schemas/mail';
 import { useRouter } from 'next/router';
 import { paths } from 'paths';
 import { CircularProgress } from '@mui/material';
+import { useDispatch } from '@/store';
+import { thunks } from '@/thunks/mail';
 
 type GroupedLabels = {
   [key in LabelType]: Label[];
@@ -66,17 +68,20 @@ export const MailSidebar: FC<MailSidebarProps> = (props) => {
   const { currentLabelId = 'inbox', container, labels, onClose, onCompose, open, ...other } = props;
   const router = useRouter();
   const mdUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
+  const dispatch = useDispatch();
 
-  const handleLabelSelect = useCallback(
-    (label: Label): void => {
-      if (!mdUp) {
-        onClose?.();
-      }
+  const handleLabelSelect = useCallback((label: Label): void => {
 
-      const href = paths.dashboard.email + `?label=${label.name}`;
+    if (!mdUp) {
+      onClose?.();
+    }
 
-      router.push(href);
-    },
+    const href = paths.dashboard.email + `?label=${label.name}`;
+
+    router.push(href);
+    dispatch(thunks.getEmails(label.name));
+    dispatch(thunks.getLabels());
+  },
     [router, mdUp, onClose]
   );
 
