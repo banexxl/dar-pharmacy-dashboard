@@ -24,7 +24,7 @@ import { thunks } from 'src/thunks/mail';
 import { MailItem } from './mail-item';
 import { Email } from '@/schemas/mail';
 import { paths } from 'paths';
-import { Button, CircularProgress, Popover } from '@mui/material';
+import { Button, CircularProgress, Popover, TablePagination } from '@mui/material';
 import Swal from 'sweetalert2';
 import toast from 'react-hot-toast';
 
@@ -97,10 +97,59 @@ interface MailListProps {
   onSidebarToggle?: () => void;
 }
 
+const useEmailSearch = () => {
+
+  const [state, setState] = useState({
+    query: '',
+    page: 0,
+    rowsPerPage: 5,
+    sortBy: 'createdAt',
+    sortDir: 'desc',
+  });
+
+  const handleQueryChange = useCallback((filters: any) => {
+    setState((prevState) => ({
+      ...prevState,
+      filters,
+    }));
+  }, []);
+
+  const handlePageChange = useCallback((event: any, newPage: number) => {
+    setState((prevState) => ({
+      ...prevState,
+      page: newPage,
+    }));
+  }, []);
+
+  const handleRowsPerPageChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    setState((prevState) => ({
+      ...prevState,
+      page: 0,
+      rowsPerPage: parseInt(event.target.value, 10),
+    }));
+  }, []);
+
+  const handleSortChange = useCallback((sortDir: any) => {
+    setState((prevState) => ({
+      ...prevState,
+      sortDir,
+    }));
+  }, []);
+
+  return {
+    handleQueryChange,
+    handleSortChange,
+    handlePageChange,
+    handleRowsPerPageChange,
+    state,
+  };
+};
+
 export const MailList: FC<MailListProps> = (props) => {
   const { currentLabelId, onSidebarToggle, ...other } = props;
   const dispatch = useDispatch();
   const emails = useEmails(currentLabelId);
+  const emailSearch = useEmailSearch();
 
   const { handleDeselectAll, handleDeselectOne, handleSelectAll, handleSelectOne, selected } =
     useSelectionModel(emails.allIds);
@@ -329,23 +378,39 @@ export const MailList: FC<MailListProps> = (props) => {
             </Popover>
 
           </Box>
+
           <div>
-            {emails.allIds.map((emailId: string) => {
-              const isSelected = selected.includes(emailId);
+            {emails.allIds
+              .slice(emailSearch.state.page * emailSearch.state.rowsPerPage, (emailSearch.state.page + 1) * emailSearch.state.rowsPerPage)
+              .map((emailId: string) => {
+                const isSelected = selected.includes(emailId);
+                const href = paths.dashboard.email + `?emailId=${encodeURIComponent(emailId)}`;
 
-              const href = paths.dashboard.email + `?emailId=${encodeURIComponent(emailId)}`
+                return (
+                  <MailItem
+                    email={emails.byId[emailId]}
+                    href={href}
+                    key={emailId} // Always use a stable key, not Math.random()
+                    onDeselect={(): void => handleDeselectOne(emailId)}
+                    onSelect={(): void => handleSelectOne(emailId)}
+                    selected={isSelected}
+                  />
+                );
+              })
+            }
 
-              return (
-                <MailItem
-                  email={emails.byId[emailId]}
-                  href={href}
-                  key={Math.random()}
-                  onDeselect={(): void => handleDeselectOne(emailId)}
-                  onSelect={(): void => handleSelectOne(emailId)}
-                  selected={isSelected}
-                />
-              );
-            })}
+            <TablePagination
+              component="div"
+              count={emails.allIds.length}
+              onPageChange={emailSearch.handlePageChange}
+              onRowsPerPageChange={emailSearch.handleRowsPerPageChange}
+              page={emailSearch.state.page}
+              rowsPerPage={emailSearch.state.rowsPerPage}
+              rowsPerPageOptions={[5, 10, 25, 50, 100, 200]}
+              showFirstButton
+              showLastButton
+              labelRowsPerPage={'Broj po stranici'}
+            />
           </div>
         </>
       ) : (
@@ -366,10 +431,7 @@ export const MailList: FC<MailListProps> = (props) => {
               maxWidth: 120,
             }}
           />
-          <Typography
-            color="text.secondary"
-            variant="h5"
-          >
+          <Typography color="text.secondary" variant="h5">
             No emails found in this folder
           </Typography>
         </Stack>

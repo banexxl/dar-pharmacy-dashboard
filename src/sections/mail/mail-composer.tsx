@@ -135,7 +135,7 @@ export const MailComposer: FC<MailComposerProps> = (props) => {
             py: 1,
           }}
         >
-          <Typography variant="h6">New Message</Typography>
+          <Typography variant="h6">Nova poruka</Typography>
           <Box sx={{ flexGrow: 1 }} />
           {maximize ? (
             <IconButton onClick={onMinimize}>
