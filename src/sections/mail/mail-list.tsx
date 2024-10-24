@@ -149,6 +149,8 @@ export const MailList: FC<MailListProps> = (props) => {
   const { currentLabelId, onSidebarToggle, ...other } = props;
   const dispatch = useDispatch();
   const emails = useEmails(currentLabelId);
+  console.log('aaaaaaa', emails);
+
   const emailSearch = useEmailSearch();
 
   const { handleDeselectAll, handleDeselectOne, handleSelectAll, handleSelectOne, selected } =

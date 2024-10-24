@@ -81,7 +81,7 @@ export const MailComposer: FC<MailComposerProps> = (props) => {
     };
 
     try {
-      const response = await fetch('/api/email/add-to-sent-emails-api/', {
+      const response = await fetch('/api/email/send-email-api/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
