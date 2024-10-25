@@ -56,8 +56,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     Promise.all(deletePromises)
                          .then((results) => {
                               // Permanently delete marked emails
-                              console.log('results', results);
-
                               imap.expunge((err) => {
                                    if (err) {
                                         return res.status(500).json({ error: `Failed to delete emails: ${err.message}` });

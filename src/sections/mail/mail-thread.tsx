@@ -22,9 +22,7 @@ const useEmail = (emailId: string): Email => {
   useEffect(
     () => {
       dispatch(
-        thunks.getEmail({
-          emailId
-        })
+        thunks.getEmail({ emailId })
       );
       dispatch(thunks.getLabels());
     },

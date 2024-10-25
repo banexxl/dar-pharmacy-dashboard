@@ -84,7 +84,7 @@ ${html}
                               return res.status(500).json({ error: 'Failed to append email to Sent folder' });
                          }
 
-                         res.status(200).json({ message: 'Email sent and saved to Sent folder successfully', messageId: info.messageId });
+                         res.status(200).json({ message: 'Email poslat uspešno!', messageId: info.messageId });
                          imap.end();
                     });
                });

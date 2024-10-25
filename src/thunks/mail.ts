@@ -33,8 +33,9 @@ type GetEmailParams = {
 };
 
 const getEmail = (params: GetEmailParams): AppThunk => async (dispatch): Promise<void> => {
+     console.log('params', params);
 
-     const response = await fetch(`/api/email/fetch-mail-byId-api/?emailId=${encodeURIComponent(params.emailId)}`,
+     const response = await fetch(`/api/email/fetch-mail-byId-api?emailId=${encodeURIComponent(params.emailId)}`,
           {
                method: 'GET',
                headers: {

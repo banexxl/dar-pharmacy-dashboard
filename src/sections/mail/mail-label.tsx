@@ -60,8 +60,6 @@ interface MailLabelProps {
 
 export const MailLabel: FC<MailLabelProps> = (props) => {
   const { active, label, ...other } = props;
-  console.log('MailLabel', label);
-
   const icon = getIcon(label);
   const color = getColor(label);
   const showUnreadCount = !!(label.unreadCount && label.unreadCount > 0);

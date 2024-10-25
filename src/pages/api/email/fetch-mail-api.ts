@@ -31,8 +31,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     }
 
                     imap.search(['ALL'], (err, results) => {
-                         console.log('results', results);
-
                          if (err) {
                               imap.end();
                               return res.status(500).json({ error: 'Failed to search emails.' });
