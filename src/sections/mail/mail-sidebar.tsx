@@ -87,6 +87,7 @@ export const MailSidebar: FC<MailSidebarProps> = (props) => {
 
   // Maybe use memo
   const groupedLabels: GroupedLabels = groupLabels(labels);
+  console.log('groupedLabels', groupedLabels);
 
   if (!labels || labels.length === 0) {
     return (
@@ -133,7 +134,7 @@ export const MailSidebar: FC<MailSidebarProps> = (props) => {
           sx={{ mt: 2 }}
           variant="contained"
         >
-          Compose
+          Nova poruka
         </Button>
       </Box>
       <Box

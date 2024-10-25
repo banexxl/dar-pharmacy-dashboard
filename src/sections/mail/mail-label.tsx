@@ -33,7 +33,6 @@ const getIcon = (label: Label): JSX.Element => {
   if (label.type === 'system') {
     return systemLabelIcons[label.id];
   }
-
   return <Tag01Icon />;
 };
 
@@ -47,9 +46,8 @@ const getColor = (label: Label): string => {
   } else if (label.type === 'system' && label.name === 'INBOX') {
     return label.color || indigo[500];
   } else if (label.type === 'system' && label.name === 'Sent') {
-    return label.color || indigo[100];
+    return label.color || indigo[500];
   }
-
   return 'inherit';
 };
 
@@ -63,6 +61,8 @@ export const MailLabel: FC<MailLabelProps> = (props) => {
   const { active, label, ...other } = props;
 
   const icon = getIcon(label);
+  console.log(icon);
+
   const color = getColor(label);
   const showUnreadCount = !!(label.unreadCount && label.unreadCount > 0);
 

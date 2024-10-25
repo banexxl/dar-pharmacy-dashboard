@@ -107,10 +107,10 @@ const useEmailSearch = () => {
     sortDir: 'desc',
   });
 
-  const handleQueryChange = useCallback((filters: any) => {
+  const handleQueryChange = useCallback((query: any) => {
     setState((prevState) => ({
       ...prevState,
-      filters,
+      query,
     }));
   }, []);
 
@@ -260,7 +260,7 @@ export const MailList: FC<MailListProps> = (props) => {
         >
           <OutlinedInput
             fullWidth
-            placeholder="Search email"
+            placeholder="Pretraga po pošiljaocu"
             size="small"
             startAdornment={
               <InputAdornment position="start">
@@ -269,7 +269,8 @@ export const MailList: FC<MailListProps> = (props) => {
                 </SvgIcon>
               </InputAdornment>
             }
-            sx={{ width: 200 }}
+            sx={{ width: 300 }}
+            onChange={(e) => emailSearch.handleQueryChange(e.target.value)}
           />
           <Typography
             color="text.secondary"
@@ -383,6 +384,7 @@ export const MailList: FC<MailListProps> = (props) => {
           <div>
             {emails.allIds
               .slice(emailSearch.state.page * emailSearch.state.rowsPerPage, (emailSearch.state.page + 1) * emailSearch.state.rowsPerPage)
+              .filter((emailSearch.state.query ? (emailId: string) => emails.byId[emailId].from.toLowerCase().includes(emailSearch.state.query.toLowerCase()) : () => true))
               .map((emailId: string) => {
                 const isSelected = selected.includes(emailId);
                 const href = paths.dashboard.email + `?emailId=${encodeURIComponent(emailId)}`;
