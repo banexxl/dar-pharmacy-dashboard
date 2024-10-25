@@ -31,7 +31,8 @@ const systemLabelIcons: Record<string, JSX.Element> = {
 
 const getIcon = (label: Label): JSX.Element => {
   if (label.type === 'system') {
-    return systemLabelIcons[label.id];
+    // Convert label.id to uppercase to match systemLabelIcons keys
+    return systemLabelIcons[label.id.toUpperCase()] || <Send01Icon />;
   }
   return <Tag01Icon />;
 };
@@ -59,10 +60,9 @@ interface MailLabelProps {
 
 export const MailLabel: FC<MailLabelProps> = (props) => {
   const { active, label, ...other } = props;
+  console.log('MailLabel', label);
 
   const icon = getIcon(label);
-  console.log(icon);
-
   const color = getColor(label);
   const showUnreadCount = !!(label.unreadCount && label.unreadCount > 0);
 
