@@ -28,7 +28,7 @@ export const AccountPopover = (props: any) => {
                }}
                onClose={onClose}
                open={open}
-               PaperProps={{ sx: { width: 200 } }}
+               PaperProps={{ sx: { width: 300 } }}
           >
                <Box
                     sx={{

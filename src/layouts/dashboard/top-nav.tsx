@@ -100,7 +100,7 @@ export const TopNav = (props: any) => {
                               </Tooltip>
                               <Avatar
                                    onClick={accountPopover.handleOpen}
-                                   // ref={accountPopover.anchorRef}
+                                   ref={accountPopover.anchorRef}
                                    sx={{
                                         cursor: 'pointer',
                                         height: 40,
