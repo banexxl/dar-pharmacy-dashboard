@@ -5,6 +5,7 @@ import ShoppingBagIcon from '@heroicons/react/24/solid/ShoppingBagIcon';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import UserIcon from '@heroicons/react/24/solid/UserIcon';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import EmailIcon from '@mui/icons-material/Email';
 import UsersIcon from '@heroicons/react/24/solid/UsersIcon';
 import StorageIcon from '@mui/icons-material/Storage';
@@ -75,6 +76,15 @@ export const items = [
           icon: (
                <SvgIcon fontSize="small">
                     <EmailIcon />
+               </SvgIcon>
+          ),
+     },
+     {
+          title: 'Kalendar',
+          path: '/dashboard/calendar',
+          icon: (
+               <SvgIcon fontSize="small">
+                    <CalendarMonthIcon />
                </SvgIcon>
           ),
      }
