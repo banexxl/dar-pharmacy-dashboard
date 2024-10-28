@@ -87,5 +87,14 @@ export const items = [
                     <CalendarMonthIcon />
                </SvgIcon>
           ),
+     },
+     {
+          title: 'Chat',
+          path: '/dashboard/chat',
+          icon: (
+               <SvgIcon fontSize="small">
+                    <UserIcon />
+               </SvgIcon>
+          )
      }
 ];
