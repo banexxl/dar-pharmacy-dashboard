@@ -8,22 +8,47 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           switch (req.method) {
                case 'GET': { // Get all calendar events
                     const events = await CalendarServices().getCalendarEvents();
-                    return res.status(200).json(events);
+
+                    if (!events) {
+                         return res.status(500).json({ error: 'Failed to fetch events' });
+                    } else {
+                         return res.status(200).json(events);
+                    }
                }
                case 'POST': { // Create a new attachment
                     const { data } = req.body; // Assume we need taskId to add the attachment
                     const newEvent = await CalendarServices().addCalendarEvent(data);
-                    return res.status(201).json(newEvent);
+
+                    if (!newEvent) {
+                         return res.status(500).json({ error: 'Failed to create event' });
+                    } else {
+                         return res.status(201).json(newEvent);
+                    }
                }
                case 'PUT': { // Update a specific calendar event
                     const { eventId, update } = req.body; // Assume we need taskId to find the event
-                    const updatedEvent = await CalendarServices().updateCalendarEvent(eventId, update);
-                    return res.status(200).json(updatedEvent);
+                    const updatedEvent: any = await CalendarServices().updateCalendarEvent(eventId, update);
+
+                    if (!updatedEvent) {
+                         return res.status(404).json({ error: 'Event not found' });
+                    } else if (updatedEvent.acknowledged && updatedEvent.modifiedCount === 1) {
+                         return res.status(200).json(updatedEvent);
+                    } else {
+                         return res.status(500).json({ error: 'Failed to update event' });
+                    }
                }
                case 'DELETE': { // Delete a specific calendar event
                     const { eventId } = req.body; // Assume we need taskId to find the event
-                    await CalendarServices().deleteCalendarEvent(eventId);
-                    return res.status(204).end();
+                    const deletedEvent: any = await CalendarServices().deleteCalendarEvent(eventId);
+                    console.log('deletedEvent', deletedEvent.acknowledged, deletedEvent.deletedCount);
+
+                    if (!deletedEvent) {
+                         return res.status(404).json({ error: 'Event not found' });
+                    } else if (deletedEvent.acknowledged && deletedEvent.deletedCount === 1) {
+                         return res.status(200).json({ success: 'Event deleted successfully' });
+                    } else {
+                         return res.status(500).json({ error: 'Failed to delete event' });
+                    }
                }
                default:
                     res.setHeader('Allow', ['PUT', 'DELETE', 'GET', 'POST']);
