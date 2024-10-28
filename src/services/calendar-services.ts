@@ -26,14 +26,15 @@ export const CalendarServices = () => {
           }
      }
 
-     const updateCalendarEvent = async (id: string, data: CalendarEvent) => {
+     const updateCalendarEvent = async (_id: string, data: CalendarEvent) => {
 
           const client = await MongoClient.connect(process.env.MONGODB_URI!)
 
           try {
                const database = client.db('DAR_DB');
                const collection = database.collection('Calendar');
-               const result = await collection.updateOne({ id }, { $set: data });
+               const result = await collection.updateOne({ _id: new ObjectId(_id) }, { $set: data });
+
                return result
           } catch (error) {
                return { message: error }
