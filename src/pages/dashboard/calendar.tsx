@@ -147,7 +147,7 @@ const Page = () => {
   }, []);
 
   const handleAddClick = useCallback((): void => {
-    createDialog.handleOpen({ range: { start: 0, end: 0 } }); // Default data for CreateDialogData
+    createDialog.handleOpen({ range: { start: new Date(), end: new Date() } }); // Default data for CreateDialogData
   }, [createDialog]);
 
   const handleRangeSelect = useCallback(
