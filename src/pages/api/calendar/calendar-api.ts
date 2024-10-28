@@ -4,10 +4,6 @@ import { NextApiRequest, NextApiResponse } from 'next';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
-     const data: CalendarEvent = req.query.data as unknown as CalendarEvent;
-     console.log('data', data);
-
-
      try {
           switch (req.method) {
                case 'GET': { // Get all calendar events

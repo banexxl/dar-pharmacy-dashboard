@@ -54,10 +54,7 @@ const useEvents = (): CalendarEvent[] => {
   return events;
 };
 
-const useCurrentEvent = (
-  events: CalendarEvent[],
-  dialogData?: UpdateDialogData
-): CalendarEvent | undefined => {
+const useCurrentEvent = (events: CalendarEvent[], dialogData?: UpdateDialogData): CalendarEvent | undefined => {
   return useMemo((): CalendarEvent | undefined => {
     if (!dialogData) {
       return undefined;
@@ -170,12 +167,11 @@ const Page = () => {
     [createDialog]
   );
 
-  const handleEventSelect = useCallback(
-    (arg: EventClickArg): void => {
-      updateDialog.handleOpen({
-        eventId: arg.event.id,
-      });
-    },
+  const handleEventSelect = useCallback((arg: EventClickArg): void => {
+    updateDialog.handleOpen({
+      eventId: arg.event._def.extendedProps._id,
+    });
+  },
     [updateDialog]
   );
 

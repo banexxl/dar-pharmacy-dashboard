@@ -107,6 +107,7 @@ export const CalendarEventDialog: FC<CalendarEventDialogProps> = (props) => {
     open = false,
     range,
   } = props;
+
   const dispatch = useDispatch();
   const initialValues = useInitialValues(event, range);
   const formik = useFormik({

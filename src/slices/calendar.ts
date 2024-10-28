@@ -30,7 +30,7 @@ const reducers = {
           const event = action.payload;
 
           state.events = state.events.map((_event) => {
-               if (_event.id === event.id) {
+               if (_event._id === event._id) {
                     return event;
                }
 
@@ -38,7 +38,7 @@ const reducers = {
           });
      },
      deleteEvent(state: CalendarState, action: DeleteEventAction): void {
-          state.events = state.events.filter((event) => event.id !== action.payload);
+          state.events = state.events.filter((event) => event._id !== action.payload);
      },
 };
 
