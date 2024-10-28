@@ -33,7 +33,13 @@ export const CalendarServices = () => {
           try {
                const database = client.db('DAR_DB');
                const collection = database.collection('Calendar');
-               const result = await collection.updateOne({ _id: new ObjectId(_id) }, { $set: data });
+               const result = await collection.updateOne({ _id: new ObjectId(_id) }, {
+                    $set: {
+                         ...data,
+                         start: new Date(data.start),
+                         end: new Date(data.end)
+                    }
+               });
 
                return result
           } catch (error) {
