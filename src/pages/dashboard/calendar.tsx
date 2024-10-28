@@ -7,7 +7,7 @@ import type { EventResizeDoneArg } from '@fullcalendar/interaction';
 import interactionPlugin from '@fullcalendar/interaction';
 import listPlugin from '@fullcalendar/list';
 import timeGridPlugin from '@fullcalendar/timegrid';
-// import timelinePlugin from '@fullcalendar/timeline';
+import timelinePlugin from '@fullcalendar/resource-timeline';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Container from '@mui/material/Container';
@@ -26,8 +26,8 @@ import { CalendarEventDialog } from '@/sections/calendar/calendar-event-dialog';
 
 interface CreateDialogData {
   range?: {
-    start: number;
-    end: number;
+    start: Date;
+    end: Date;
   };
 }
 
@@ -63,7 +63,7 @@ const useCurrentEvent = (
       return undefined;
     }
 
-    return events.find((event) => event.id === dialogData!.eventId);
+    return events.find((event) => event._id === dialogData!.eventId);
   }, [dialogData, events]);
 };
 
@@ -189,8 +189,8 @@ const Page = () => {
             eventId: event.id,
             update: {
               allDay: event.allDay,
-              start: event.start?.getTime(),
-              end: event.end?.getTime(),
+              start: event.start ? new Date(event.start.getTime()) : undefined,
+              end: event.end ? new Date(event.end.getTime()) : undefined,
             },
           })
         );
@@ -211,8 +211,8 @@ const Page = () => {
             eventId: event.id,
             update: {
               allDay: event.allDay,
-              start: event.start?.getTime(),
-              end: event.end?.getTime(),
+              start: event.start ? new Date(event.start.getTime()) : undefined,
+              end: event.end ? new Date(event.end.getTime()) : undefined,
             },
           })
         );
@@ -265,7 +265,7 @@ const Page = () => {
                     interactionPlugin,
                     listPlugin,
                     timeGridPlugin,
-                    // timelinePlugin,
+                    timelinePlugin,
                   ]}
                   ref={calendarRef}
                   rerenderDelay={10}

@@ -36,7 +36,7 @@ interface Values {
 
 const useInitialValues = (
   event?: CalendarEvent,
-  range?: { start: number; end: number }
+  range?: { start: Date; end: Date }
 ): Values => {
   return useMemo((): Values => {
     if (event) {
@@ -93,7 +93,7 @@ interface CalendarEventDialogProps {
   onDeleteComplete?: () => void;
   onEditComplete?: () => void;
   open?: boolean;
-  range?: { start: number; end: number };
+  range?: { start: Date; end: Date };
 }
 
 export const CalendarEventDialog: FC<CalendarEventDialogProps> = (props) => {
@@ -118,27 +118,29 @@ export const CalendarEventDialog: FC<CalendarEventDialogProps> = (props) => {
         const data = {
           allDay: values.allDay,
           description: values.description,
-          end: values.end.getTime(),
-          start: values.start.getTime(),
+          end: values.end,
+          start: values.start,
           title: values.title,
         };
 
         if (action === 'update') {
           await dispatch(
             thunks.updateEvent({
-              eventId: event!.id,
+              eventId: event!._id,
               update: data,
             })
           );
-          toast.success('Event updated');
-        } else {
+          toast.success('Event updated')
+        } else if (action === 'create') {
           await dispatch(thunks.createEvent(data));
           toast.success('Event added');
         }
 
         if (action === 'update') {
+          dispatch(thunks.getEvents());
           onEditComplete?.();
         } else {
+          dispatch(thunks.getEvents());
           onAddComplete?.();
         }
       } catch (err: any) {
@@ -183,7 +185,7 @@ export const CalendarEventDialog: FC<CalendarEventDialogProps> = (props) => {
     try {
       await dispatch(
         thunks.deleteEvent({
-          eventId: event.id!,
+          eventId: event._id!,
         })
       );
       onDeleteComplete?.();

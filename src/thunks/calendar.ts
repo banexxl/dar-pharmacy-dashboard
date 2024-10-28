@@ -1,61 +1,87 @@
-// import { calendarApi } from 'src/api/calendar';
 import { slice } from 'src/slices/calendar';
 import type { AppThunk } from 'src/store';
 
-const getEvents =
-     (): AppThunk =>
-          async (dispatch): Promise<void> => {
-               // const response = await calendarApi.getEvents();
+const getEvents = (): AppThunk => async (dispatch): Promise<void> => {
+     const response = await fetch('/api/calendar/calendar-api', {
+          method: 'GET',
+          headers: {
+               'Content-Type': 'application/json',
+          },
+     });
 
-               // dispatch(slice.actions.getEvents(response));
-          };
+     if (response.ok) {
+          const data = await response.json();
+          dispatch(slice.actions.getEvents(data));
+     }
+
+};
 
 type CreateEventParams = {
      allDay: boolean;
      description: string;
-     end: number;
-     start: number;
+     end: Date;
+     start: Date;
      title: string;
 };
 
-const createEvent =
-     (params: CreateEventParams): AppThunk =>
-          async (dispatch): Promise<void> => {
-               // const response = await calendarApi.createEvent(params);
+const createEvent = (data: CreateEventParams): AppThunk => async (dispatch): Promise<void> => {
+     const response = await fetch('/api/calendar/calendar-api', {
+          method: 'POST',
+          headers: {
+               'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ data }),
+     });
 
-               // dispatch(slice.actions.createEvent(response));
-          };
+     if (response.ok) {
+          const data = await response.json();
+          dispatch(slice.actions.createEvent(data));
+     }
+};
 
 type UpdateEventParams = {
      eventId: string;
      update: {
           allDay?: boolean;
           description?: string;
-          end?: number;
-          start?: number;
+          end?: Date;
+          start?: Date;
           title?: string;
      };
 };
 
-const updateEvent =
-     (params: UpdateEventParams): AppThunk =>
-          async (dispatch): Promise<void> => {
-               // const response = await calendarApi.updateEvent(params);
+const updateEvent = (params: UpdateEventParams): AppThunk => async (dispatch): Promise<void> => {
+     const response = await fetch('/api/calendar/calendar-api', {
+          method: 'PUT',
+          headers: {
+               'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(params),
+     });
 
-               // dispatch(slice.actions.updateEvent(response));
-          };
+     if (response.ok) {
+          const data = await response.json();
+          dispatch(slice.actions.updateEvent(data));
+     }
+};
 
 type DeleteEventParams = {
      eventId: string;
 };
 
-const deleteEvent =
-     (params: DeleteEventParams): AppThunk =>
-          async (dispatch): Promise<void> => {
-               // await calendarApi.deleteEvent(params);
+const deleteEvent = (params: DeleteEventParams): AppThunk => async (dispatch): Promise<void> => {
+     const response = await fetch('/api/calendar/calendar-api', {
+          method: 'DELETE',
+          headers: {
+               'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(params),
+     });
 
-               // dispatch(slice.actions.deleteEvent(params.eventId));
-          };
+     if (response.ok) {
+          dispatch(slice.actions.deleteEvent(params.eventId));
+     }
+};
 
 export const thunks = {
      createEvent,

@@ -21,6 +21,8 @@
     "@emotion/server": "11.10.0",
     "@emotion/styled": "11.10.6",
     "@fullcalendar/react": "^6.1.15",
+    "@fullcalendar/resource": "^6.1.15",
+    "@fullcalendar/resource-timeline": "^6.1.15",
     "@heroicons/react": "2.0.16",
     "@mui/icons-material": "^5.14.9",
     "@mui/lab": "5.0.0-alpha.120",

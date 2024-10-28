@@ -1,5 +1,5 @@
 export interface CalendarEvent {
-  id: string;
+  _id: string;
   allDay: boolean;
   color?: string;
   description: string;
