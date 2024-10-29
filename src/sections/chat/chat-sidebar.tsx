@@ -13,7 +13,7 @@ import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import type { Theme } from '@mui/material/styles/createTheme';
 
-import { chatApi } from 'src/api/chat';
+import { chatApi, user } from 'src/api/chat';
 import { Scrollbar } from 'src/components/scrollbar';
 
 import { useSelector } from 'src/store';
@@ -26,6 +26,10 @@ import { paths } from 'paths';
 import { useSession } from 'next-auth/react';
 
 const getThreadKey = (thread: Thread, userId: string): string | undefined => {
+  console.log('thread', thread);
+  console.log('userId', userId);
+
+
   let threadKey: string | undefined;
   const session = useSession();
   console.log('session', session);
@@ -44,13 +48,13 @@ const getThreadKey = (thread: Thread, userId: string): string | undefined => {
   return threadKey;
 };
 
-// const useThreads = (): { byId: Record<string, Thread>; allIds: string[] } => {
-//   return useSelector((state: any) => state.chat.threads);
-// };
+const useThreads = (): { byId: Record<string, Thread>; allIds: string[] } => {
+  return useSelector((state: any) => state.chat?.threads);
+};
 
-// const useCurrentThreadId = (): string | undefined => {
-//   return useSelector((state: any) => state.chat.currentThreadId);
-// };
+const useCurrentThreadId = (): string | undefined => {
+  return useSelector((state: any) => state.chat?.currentThreadId);
+};
 
 interface ChatSidebarProps {
   container?: HTMLDivElement | null;
@@ -61,8 +65,10 @@ interface ChatSidebarProps {
 export const ChatSidebar: FC<ChatSidebarProps> = (props) => {
   const { container, onClose, open, ...other } = props;
   const router = useRouter();
-  // const threads = useThreads();
-  // const currentThreadId = useCurrentThreadId();
+  const threads = useThreads();
+  console.log('chat threads', threads);
+
+  const currentThreadId = useCurrentThreadId();
   const [searchFocused, setSearchFocused] = useState(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [searchResults, setSearchResults] = useState<Contact[]>([]);
@@ -118,19 +124,18 @@ export const ChatSidebar: FC<ChatSidebarProps> = (props) => {
     [router]
   );
 
-  // const handleThreadSelect = useCallback(
-  //   (threadId: string): void => {
-  //     const thread = threads.byId[threadId];
-  //     const threadKey = getThreadKey(thread, user.id);
+  const handleThreadSelect = useCallback((threadId: string): void => {
+    const thread = threads.byId[threadId];
+    const threadKey = getThreadKey(thread, user.id);
 
-  //     if (!threadKey) {
-  //       router.push(paths.dashboard.chat);
-  //     } else {
-  //       router.push(paths.dashboard.chat + `?threadKey=${threadKey}`);
-  //     }
-  //   },
-  //   [router, threads, user]
-  // );
+    if (!threadKey) {
+      router.push(paths.dashboard.chat);
+    } else {
+      router.push(paths.dashboard.chat + `?threadKey=${threadKey}`);
+    }
+  },
+    [router, threads, user]
+  );
 
   const content = (
     <div>
@@ -185,14 +190,14 @@ export const ChatSidebar: FC<ChatSidebarProps> = (props) => {
               p: 2,
             }}
           >
-            {/* {threads.allIds.map((threadId) => (
+            {threads.allIds.map((threadId) => (
               <ChatThreadItem
                 active={currentThreadId === threadId}
                 key={threadId}
                 onSelect={(): void => handleThreadSelect(threadId)}
                 thread={threads.byId[threadId]}
               />
-            ))} */}
+            ))}
           </Stack>
         </Scrollbar>
       </Box>

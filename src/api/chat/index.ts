@@ -5,7 +5,7 @@ import { Contact, Message, Participant, Thread } from '@/schemas/chat';
 import { deepCopy } from '@/utils/deep-copy';
 
 // On server get current identity (user) from the request
-const user = {
+export const user = {
   id: '5e86809283e28b96d2d38537',
   avatar: '/assets/avatars/avatar-anika-visser.png',
   name: 'Anika Visser',

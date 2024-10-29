@@ -1,5 +1,4 @@
 import { MongoClient } from "mongodb"
-import { ObjectId } from "mongodb"
 
 type User = {
      _id: any;
