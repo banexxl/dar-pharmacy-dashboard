@@ -49,6 +49,8 @@ const getThreadKey = (thread: Thread, userId: string): string | undefined => {
 };
 
 const useThreads = (): { byId: Record<string, Thread>; allIds: string[] } => {
+  console.log('byid', useSelector((state: any) => state));
+
   return useSelector((state: any) => state.chat?.threads);
 };
 
