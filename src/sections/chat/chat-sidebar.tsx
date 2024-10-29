@@ -12,27 +12,18 @@ import SvgIcon from '@mui/material/SvgIcon';
 import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import type { Theme } from '@mui/material/styles/createTheme';
-
-import { chatApi, user } from 'src/api/chat';
 import { Scrollbar } from 'src/components/scrollbar';
-
 import { useSelector } from 'src/store';
-
 import { ChatSidebarSearch } from './chat-sidebar-search';
 import { ChatThreadItem } from './chat-thread-item';
 import { Contact, Thread } from '@/schemas/chat';
 import { useRouter } from 'next/router';
 import { paths } from 'paths';
-import { useSession } from 'next-auth/react';
+import { Session } from 'next-auth';
+import { ChatService } from '@/services/chat-services';
 
 const getThreadKey = (thread: Thread, userId: string): string | undefined => {
-  console.log('thread', thread);
-  console.log('userId', userId);
-
-
   let threadKey: string | undefined;
-  const session = useSession();
-  console.log('session', session);
 
   if (thread.type === 'GROUP') {
     threadKey = thread.id;
@@ -49,8 +40,6 @@ const getThreadKey = (thread: Thread, userId: string): string | undefined => {
 };
 
 const useThreads = (): { byId: Record<string, Thread>; allIds: string[] } => {
-  console.log('byid', useSelector((state: any) => state));
-
   return useSelector((state: any) => state.chat?.threads);
 };
 
@@ -62,14 +51,14 @@ interface ChatSidebarProps {
   container?: HTMLDivElement | null;
   onClose?: () => void;
   open?: boolean;
+  data: Session;
 }
 
 export const ChatSidebar: FC<ChatSidebarProps> = (props) => {
-  const { container, onClose, open, ...other } = props;
+  const { container, onClose, open, data, ...other } = props;
+
   const router = useRouter();
   const threads = useThreads();
-  console.log('chat threads', threads);
-
   const currentThreadId = useCurrentThreadId();
   const [searchFocused, setSearchFocused] = useState(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -80,25 +69,24 @@ export const ChatSidebar: FC<ChatSidebarProps> = (props) => {
     router.push(paths.dashboard.chat + '?compose=true');
   }, [router]);
 
-  const handleSearchChange = useCallback(
-    async (event: ChangeEvent<HTMLInputElement>): Promise<void> => {
-      const { value } = event.target;
+  const handleSearchChange = useCallback(async (event: ChangeEvent<HTMLInputElement>): Promise<void> => {
+    const { value } = event.target;
 
-      setSearchQuery(value);
+    setSearchQuery(value);
 
-      if (!value) {
-        setSearchResults([]);
-        return;
-      }
+    if (!value) {
+      setSearchResults([]);
+      return;
+    }
 
-      try {
-        const contacts = await chatApi.getContacts({ query: value });
+    try {
+      const contacts = await ChatService().getContacts({ query: value });
 
-        setSearchResults(contacts);
-      } catch (err) {
-        console.error(err);
-      }
-    },
+      setSearchResults(contacts);
+    } catch (err) {
+      console.error(err);
+    }
+  },
     []
   );
 
@@ -255,9 +243,9 @@ export const ChatSidebar: FC<ChatSidebarProps> = (props) => {
     </Drawer>
   );
 };
-
 ChatSidebar.propTypes = {
   container: PropTypes.any,
   onClose: PropTypes.func,
   open: PropTypes.bool,
+  data: PropTypes.any,
 };

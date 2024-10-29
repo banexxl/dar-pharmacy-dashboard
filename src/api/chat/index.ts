@@ -1,312 +1,312 @@
-import { createResourceId } from 'src/utils/create-resource-id';
+// import { createResourceId } from 'src/utils/create-resource-id';
 
-import { contacts, threads } from './data';
-import { Contact, Message, Participant, Thread } from '@/schemas/chat';
-import { deepCopy } from '@/utils/deep-copy';
+// import { contacts, threads } from './data';
+// import { Contact, Message, Participant, Thread } from '@/schemas/chat';
+// import { deepCopy } from '@/utils/deep-copy';
 
-// On server get current identity (user) from the request
-export const user = {
-  id: '5e86809283e28b96d2d38537',
-  avatar: '/assets/avatars/avatar-anika-visser.png',
-  name: 'Anika Visser',
-};
+// // On server get current identity (user) from the request
+// export const user = {
+//   id: '5e86809283e28b96d2d38537',
+//   avatar: '/assets/avatars/avatar-anika-visser.png',
+//   name: 'Anika Visser',
+// };
 
-const findThreadById = (threadId: string): Thread | undefined => {
-  return threads.find((thread) => thread.id === threadId);
-};
+// const findThreadById = (threadId: string): Thread | undefined => {
+//   return threads.find((thread) => thread.id === threadId);
+// };
 
-const findThreadByParticipantIds = (participantIds: string[]): Thread | undefined => {
-  return threads.find((thread) => {
-    if (thread.participantIds.length !== participantIds.length) {
-      return false;
-    }
+// const findThreadByParticipantIds = (participantIds: string[]): Thread | undefined => {
+//   return threads.find((thread) => {
+//     if (thread.participantIds.length !== participantIds.length) {
+//       return false;
+//     }
 
-    const foundParticipantIds = new Set();
+//     const foundParticipantIds = new Set();
 
-    thread.participantIds.forEach((participantId) => {
-      if (participantIds.includes(participantId)) {
-        foundParticipantIds.add(participantId);
-      }
-    });
+//     thread.participantIds.forEach((participantId) => {
+//       if (participantIds.includes(participantId)) {
+//         foundParticipantIds.add(participantId);
+//       }
+//     });
 
-    return foundParticipantIds.size === participantIds.length;
-  });
-};
+//     return foundParticipantIds.size === participantIds.length;
+//   });
+// };
 
-type GetContactsRequest = {
-  query?: string;
-};
+// type GetContactsRequest = {
+//   query?: string;
+// };
 
-type GetContactsResponse = Promise<Contact[]>;
+// type GetContactsResponse = Promise<Contact[]>;
 
-type GetThreadsRequest = object;
+// type GetThreadsRequest = object;
 
-type GetThreadsResponse = Promise<Thread[]>;
+// type GetThreadsResponse = Promise<Thread[]>;
 
-type GetThreadRequest = {
-  threadKey: string;
-};
+// type GetThreadRequest = {
+//   threadKey: string;
+// };
 
-type GetThreadResponse = Promise<Thread | null>;
+// type GetThreadResponse = Promise<Thread | null>;
 
-type MarkThreadAsSeenRequest = {
-  threadId: string;
-};
+// type MarkThreadAsSeenRequest = {
+//   threadId: string;
+// };
 
-type MarkThreadAsSeenResponse = Promise<true>;
+// type MarkThreadAsSeenResponse = Promise<true>;
 
-type GetParticipantsRequest = {
-  threadKey: string;
-};
+// type GetParticipantsRequest = {
+//   threadKey: string;
+// };
 
-type GetParticipantsResponse = Promise<Participant[]>;
+// type GetParticipantsResponse = Promise<Participant[]>;
 
-type AddMessageRequest = {
-  threadId?: string;
-  recipientIds?: string[];
-  body: string;
-};
+// type AddMessageRequest = {
+//   threadId?: string;
+//   recipientIds?: string[];
+//   body: string;
+// };
 
-type AddMessageResponse = Promise<{
-  message: Message;
-  threadId: string;
-}>;
+// type AddMessageResponse = Promise<{
+//   message: Message;
+//   threadId: string;
+// }>;
 
-class ChatApi {
-  getContacts(request: GetContactsRequest = {}): GetContactsResponse {
-    const { query } = request;
+// class ChatApi {
+//   getContacts(request: GetContactsRequest = {}): GetContactsResponse {
+//     const { query } = request;
 
-    return new Promise((resolve, reject) => {
-      try {
-        let foundContacts = contacts;
+//     return new Promise((resolve, reject) => {
+//       try {
+//         let foundContacts = contacts;
 
-        if (query) {
-          const cleanQuery = query.toLowerCase().trim();
-          foundContacts = foundContacts.filter((contact) =>
-            contact.name.toLowerCase().includes(cleanQuery)
-          );
-        }
+//         if (query) {
+//           const cleanQuery = query.toLowerCase().trim();
+//           foundContacts = foundContacts.filter((contact) =>
+//             contact.name.toLowerCase().includes(cleanQuery)
+//           );
+//         }
 
-        resolve(deepCopy(foundContacts));
-      } catch (err) {
-        console.error('[Chat Api]: ', err);
-        reject(new Error('Internal server error'));
-      }
-    });
-  }
+//         resolve(deepCopy(foundContacts));
+//       } catch (err) {
+//         console.error('[Chat Api]: ', err);
+//         reject(new Error('Internal server error'));
+//       }
+//     });
+//   }
 
-  getThreads(request: GetThreadsRequest = {}): GetThreadsResponse {
-    const expandedThreads = threads.map((thread) => {
-      const participants: Participant[] = [user];
+//   getThreads(request: GetThreadsRequest = {}): GetThreadsResponse {
+//     const expandedThreads = threads.map((thread) => {
+//       const participants: Participant[] = [user];
 
-      contacts.forEach((contact) => {
-        if (thread.participantIds.includes(contact.id)) {
-          participants.push({
-            id: contact.id,
-            avatar: contact.avatar,
-            lastActivity: contact.lastActivity,
-            name: contact.name,
-          });
-        }
-      });
+//       contacts.forEach((contact) => {
+//         if (thread.participantIds.includes(contact.id)) {
+//           participants.push({
+//             id: contact.id,
+//             avatar: contact.avatar,
+//             lastActivity: contact.lastActivity,
+//             name: contact.name,
+//           });
+//         }
+//       });
 
-      return {
-        ...thread,
-        participants,
-      };
-    });
+//       return {
+//         ...thread,
+//         participants,
+//       };
+//     });
 
-    return Promise.resolve(deepCopy(expandedThreads));
-  }
+//     return Promise.resolve(deepCopy(expandedThreads));
+//   }
 
-  getThread(request: GetThreadRequest): GetThreadResponse {
-    const { threadKey } = request;
+//   getThread(request: GetThreadRequest): GetThreadResponse {
+//     const { threadKey } = request;
 
-    return new Promise((resolve, reject) => {
-      if (!threadKey) {
-        reject(new Error('Thread key is required'));
-        return;
-      }
+//     return new Promise((resolve, reject) => {
+//       if (!threadKey) {
+//         reject(new Error('Thread key is required'));
+//         return;
+//       }
 
-      try {
-        let thread: Thread | undefined;
+//       try {
+//         let thread: Thread | undefined;
 
-        // Thread key might be a contact ID
-        const contact = contacts.find((contact) => contact.id === threadKey);
+//         // Thread key might be a contact ID
+//         const contact = contacts.find((contact) => contact.id === threadKey);
 
-        if (contact) {
-          thread = findThreadByParticipantIds([user.id, contact.id]);
-        }
+//         if (contact) {
+//           thread = findThreadByParticipantIds([user.id, contact.id]);
+//         }
 
-        // Thread key might be a thread ID
-        if (!thread) {
-          thread = findThreadById(threadKey);
-        }
+//         // Thread key might be a thread ID
+//         if (!thread) {
+//           thread = findThreadById(threadKey);
+//         }
 
-        // If reached this point and thread does not exist this could mean:
-        // b) The thread key is a contact ID, but no thread found
-        // a) The thread key is a thread ID and is invalid
-        if (!thread) {
-          return resolve(null);
-        }
+//         // If reached this point and thread does not exist this could mean:
+//         // b) The thread key is a contact ID, but no thread found
+//         // a) The thread key is a thread ID and is invalid
+//         if (!thread) {
+//           return resolve(null);
+//         }
 
-        const participants: Participant[] = [user];
+//         const participants: Participant[] = [user];
 
-        contacts.forEach((contact) => {
-          if (thread!.participantIds.includes(contact.id)) {
-            participants.push({
-              id: contact.id,
-              avatar: contact.avatar,
-              lastActivity: contact.lastActivity,
-              name: contact.name,
-            });
-          }
-        });
+//         contacts.forEach((contact) => {
+//           if (thread!.participantIds.includes(contact.id)) {
+//             participants.push({
+//               id: contact.id,
+//               avatar: contact.avatar,
+//               lastActivity: contact.lastActivity,
+//               name: contact.name,
+//             });
+//           }
+//         });
 
-        const expandedThread = {
-          ...thread,
-          participants,
-        };
+//         const expandedThread = {
+//           ...thread,
+//           participants,
+//         };
 
-        resolve(deepCopy(expandedThread));
-      } catch (err) {
-        console.error('[Chat Api]: ', err);
-        reject(new Error('Internal server error'));
-      }
-    });
-  }
+//         resolve(deepCopy(expandedThread));
+//       } catch (err) {
+//         console.error('[Chat Api]: ', err);
+//         reject(new Error('Internal server error'));
+//       }
+//     });
+//   }
 
-  markThreadAsSeen(request: MarkThreadAsSeenRequest): MarkThreadAsSeenResponse {
-    const { threadId } = request;
+//   markThreadAsSeen(request: MarkThreadAsSeenRequest): MarkThreadAsSeenResponse {
+//     const { threadId } = request;
 
-    return new Promise((resolve, reject) => {
-      try {
-        const thread = threads.find((thread) => thread.id === threadId);
+//     return new Promise((resolve, reject) => {
+//       try {
+//         const thread = threads.find((thread) => thread.id === threadId);
 
-        if (thread) {
-          thread.unreadCount = 0;
-        }
+//         if (thread) {
+//           thread.unreadCount = 0;
+//         }
 
-        resolve(true);
-      } catch (err) {
-        console.error('[Chat Api]: ', err);
-        reject(new Error('Internal server error'));
-      }
-    });
-  }
+//         resolve(true);
+//       } catch (err) {
+//         console.error('[Chat Api]: ', err);
+//         reject(new Error('Internal server error'));
+//       }
+//     });
+//   }
 
-  getParticipants(request: GetParticipantsRequest): GetParticipantsResponse {
-    const { threadKey } = request;
+//   getParticipants(request: GetParticipantsRequest): GetParticipantsResponse {
+//     const { threadKey } = request;
 
-    return new Promise((resolve, reject) => {
-      try {
-        const participants: Participant[] = [user];
+//     return new Promise((resolve, reject) => {
+//       try {
+//         const participants: Participant[] = [user];
 
-        // Thread key might be a thread ID
-        const thread = findThreadById(threadKey);
+//         // Thread key might be a thread ID
+//         const thread = findThreadById(threadKey);
 
-        if (thread) {
-          contacts.forEach((contact) => {
-            if (thread!.participantIds.includes(contact.id)) {
-              participants.push({
-                id: contact.id,
-                avatar: contact.avatar,
-                lastActivity: contact.lastActivity,
-                name: contact.name,
-              });
-            }
-          });
-        } else {
-          const contact = contacts.find((contact) => contact.id === threadKey);
+//         if (thread) {
+//           contacts.forEach((contact) => {
+//             if (thread!.participantIds.includes(contact.id)) {
+//               participants.push({
+//                 id: contact.id,
+//                 avatar: contact.avatar,
+//                 lastActivity: contact.lastActivity,
+//                 name: contact.name,
+//               });
+//             }
+//           });
+//         } else {
+//           const contact = contacts.find((contact) => contact.id === threadKey);
 
-          // If no contact found, the user is trying a shady route
-          if (!contact) {
-            reject(new Error('Unable to find the contact'));
-            return;
-          }
+//           // If no contact found, the user is trying a shady route
+//           if (!contact) {
+//             reject(new Error('Unable to find the contact'));
+//             return;
+//           }
 
-          participants.push({
-            id: contact.id,
-            avatar: contact.avatar,
-            lastActivity: contact.lastActivity,
-            name: contact.name,
-          });
-        }
+//           participants.push({
+//             id: contact.id,
+//             avatar: contact.avatar,
+//             lastActivity: contact.lastActivity,
+//             name: contact.name,
+//           });
+//         }
 
-        return resolve(participants);
-      } catch (err) {
-        console.error('[Chat Api]: ', err);
-        reject(new Error('Internal server error'));
-      }
-    });
-  }
+//         return resolve(participants);
+//       } catch (err) {
+//         console.error('[Chat Api]: ', err);
+//         reject(new Error('Internal server error'));
+//       }
+//     });
+//   }
 
-  addMessage(request: AddMessageRequest): AddMessageResponse {
-    const { threadId, recipientIds, body } = request;
+//   addMessage(request: AddMessageRequest): AddMessageResponse {
+//     const { threadId, recipientIds, body } = request;
 
-    return new Promise((resolve, reject) => {
-      try {
-        if (!(threadId || recipientIds)) {
-          reject(new Error('Thread ID or recipient IDs has to be provided'));
-          return;
-        }
+//     return new Promise((resolve, reject) => {
+//       try {
+//         if (!(threadId || recipientIds)) {
+//           reject(new Error('Thread ID or recipient IDs has to be provided'));
+//           return;
+//         }
 
-        let thread: Thread | undefined;
+//         let thread: Thread | undefined;
 
-        // Try to find the thread
-        if (threadId) {
-          thread = findThreadById(threadId);
+//         // Try to find the thread
+//         if (threadId) {
+//           thread = findThreadById(threadId);
 
-          // If thread ID provided the thread has to exist.
+//           // If thread ID provided the thread has to exist.
 
-          if (!thread) {
-            reject(new Error('Invalid thread id'));
-            return;
-          }
-        } else {
-          const participantIds = [user.id, ...(recipientIds || [])];
-          thread = findThreadByParticipantIds(participantIds);
-        }
+//           if (!thread) {
+//             reject(new Error('Invalid thread id'));
+//             return;
+//           }
+//         } else {
+//           const participantIds = [user.id, ...(recipientIds || [])];
+//           thread = findThreadByParticipantIds(participantIds);
+//         }
 
-        // If reached this point, thread will exist if thread ID provided
-        // For recipient Ids it may or may not exist. If it doesn't, create a new one.
+//         // If reached this point, thread will exist if thread ID provided
+//         // For recipient Ids it may or may not exist. If it doesn't, create a new one.
 
-        if (!thread) {
-          const participantIds = [user.id, ...(recipientIds || [])];
+//         if (!thread) {
+//           const participantIds = [user.id, ...(recipientIds || [])];
 
-          thread = {
-            id: createResourceId(),
-            messages: [],
-            participantIds,
-            type: participantIds.length === 2 ? 'ONE_TO_ONE' : 'GROUP',
-            unreadCount: 0,
-          };
+//           thread = {
+//             id: createResourceId(),
+//             messages: [],
+//             participantIds,
+//             type: participantIds.length === 2 ? 'ONE_TO_ONE' : 'GROUP',
+//             unreadCount: 0,
+//           };
 
-          // Add the new thread to the DB
-          threads.push(thread);
-        }
+//           // Add the new thread to the DB
+//           threads.push(thread);
+//         }
 
-        const message: Message = {
-          id: createResourceId(),
-          attachments: [],
-          body,
-          contentType: 'text',
-          createdAt: new Date().getTime(),
-          authorId: user.id,
-        };
+//         const message: Message = {
+//           id: createResourceId(),
+//           attachments: [],
+//           body,
+//           contentType: 'text',
+//           createdAt: new Date().getTime(),
+//           authorId: user.id,
+//         };
 
-        thread.messages.push(message);
+//         thread.messages.push(message);
 
-        resolve({
-          threadId: thread.id!,
-          message,
-        });
-      } catch (err) {
-        console.error('[Chat Api]: ', err);
-        reject(new Error('Internal server error'));
-      }
-    });
-  }
-}
+//         resolve({
+//           threadId: thread.id!,
+//           message,
+//         });
+//       } catch (err) {
+//         console.error('[Chat Api]: ', err);
+//         reject(new Error('Internal server error'));
+//       }
+//     });
+//   }
+// }
 
-export const chatApi = new ChatApi();
+// export const chatApi = new ChatApi();

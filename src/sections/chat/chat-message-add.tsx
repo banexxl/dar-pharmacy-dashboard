@@ -1,5 +1,5 @@
 import type { ChangeEvent, FC, KeyboardEvent } from 'react';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useRef, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Attachment01Icon from '@untitled-ui/icons-react/build/esm/Attachment01';
 import Camera01Icon from '@untitled-ui/icons-react/build/esm/Camera01';
@@ -12,7 +12,9 @@ import Stack from '@mui/material/Stack';
 import SvgIcon from '@mui/material/SvgIcon';
 import Tooltip from '@mui/material/Tooltip';
 import { useMockedUser } from '@/hooks/use-mocked-user';
+import { io } from 'socket.io-client';
 
+const socket = io('http://localhost:3000'); // Adjust the URL as needed
 
 interface ChatMessageAddProps {
   disabled?: boolean;
@@ -20,10 +22,31 @@ interface ChatMessageAddProps {
 }
 
 export const ChatMessageAdd: FC<ChatMessageAddProps> = (props) => {
-  const { disabled = false, onSend, ...other } = props;
+  const { disabled = false, ...other } = props;
   const user = useMockedUser();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [body, setBody] = useState<string>('');
+  const [typing, setTyping] = useState<boolean>(false);
+
+  // Emit typing event
+  const handleTyping = () => {
+    if (!typing) {
+      setTyping(true);
+      socket.emit('typing', { sender: user.id }); // Replace with actual user ID
+    }
+    debounceStopTyping();
+  };
+
+  const debounceStopTyping = (() => {
+    let timeout: NodeJS.Timeout;
+    return () => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        setTyping(false);
+        socket.emit('stopTyping');
+      }, 1000);
+    };
+  })();
 
   const handleAttach = useCallback((): void => {
     fileInputRef.current?.click();
@@ -31,6 +54,7 @@ export const ChatMessageAdd: FC<ChatMessageAddProps> = (props) => {
 
   const handleChange = useCallback((event: ChangeEvent<HTMLInputElement>): void => {
     setBody(event.target.value);
+    handleTyping(); // Call to emit typing event
   }, []);
 
   const handleSend = useCallback((): void => {
@@ -38,9 +62,9 @@ export const ChatMessageAdd: FC<ChatMessageAddProps> = (props) => {
       return;
     }
 
-    onSend?.(body);
+    socket.emit('message', { content: body, sender: user.id }); // Emit message to server
     setBody('');
-  }, [body, onSend]);
+  }, [body, user.id]);
 
   const handleKeyUp = useCallback(
     (event: KeyboardEvent<HTMLInputElement>): void => {
