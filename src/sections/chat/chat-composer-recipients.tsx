@@ -18,9 +18,9 @@ import Stack from '@mui/material/Stack';
 import SvgIcon from '@mui/material/SvgIcon';
 import Typography from '@mui/material/Typography';
 
-import { chatApi } from 'src/api/chat';
 import { Scrollbar } from 'src/components/scrollbar';
 import { Contact } from '@/schemas/chat';
+import { ChatService } from '@/services/chat-services';
 
 interface ChatComposerRecipientsProps {
   onRecipientAdd?: (contact: Contact) => void;
@@ -50,7 +50,7 @@ export const ChatComposerRecipients: FC<ChatComposerRecipientsProps> = (props) =
       }
 
       try {
-        const contacts = await chatApi.getContacts({ query });
+        const contacts = await ChatService().getContacts(query);
 
         // Filter already picked recipients
 

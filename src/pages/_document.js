@@ -63,8 +63,8 @@ class CustomDocument extends Document {
           <Fonts />
         </Head>
         <body>
-        <Main />
-        <NextScript />
+          <Main />
+          <NextScript />
         </body>
       </Html>
     );
@@ -78,10 +78,12 @@ CustomDocument.getInitialProps = async (ctx) => {
 
   ctx.renderPage = () => originalRenderPage({
     enhanceApp: (App) => (props) => (
-      <App
-        emotionCache={cache}
-        {...props}
-      />
+      <React.StrictMode>
+        <App
+          emotionCache={cache}
+          {...props}
+        />
+      </React.StrictMode>
     )
   });
 
@@ -89,7 +91,7 @@ CustomDocument.getInitialProps = async (ctx) => {
   const emotionStyles = extractCriticalToChunks(initialProps.html);
   const emotionStyleTags = emotionStyles.styles.map((style) => (
     <style
-      data-emotion={`${style.key} ${style.ids.join(' ')}`}
+      data-emotion={`${ style.key } ${ style.ids.join(' ') }`}
       key={style.key}
       // eslint-disable-next-line react/no-danger
       dangerouslySetInnerHTML={{ __html: style.css }}

@@ -12,9 +12,6 @@ import Stack from '@mui/material/Stack';
 import SvgIcon from '@mui/material/SvgIcon';
 import Tooltip from '@mui/material/Tooltip';
 import { useMockedUser } from '@/hooks/use-mocked-user';
-import { io } from 'socket.io-client';
-
-const socket = io('http://localhost:3000'); // Adjust the URL as needed
 
 interface ChatMessageAddProps {
   disabled?: boolean;
@@ -32,7 +29,7 @@ export const ChatMessageAdd: FC<ChatMessageAddProps> = (props) => {
   const handleTyping = () => {
     if (!typing) {
       setTyping(true);
-      socket.emit('typing', { sender: user.id }); // Replace with actual user ID
+      // socket.emit('typing', { sender: user.id }); // Replace with actual user ID
     }
     debounceStopTyping();
   };
@@ -43,7 +40,7 @@ export const ChatMessageAdd: FC<ChatMessageAddProps> = (props) => {
       clearTimeout(timeout);
       timeout = setTimeout(() => {
         setTyping(false);
-        socket.emit('stopTyping');
+        // socket.emit('stopTyping');
       }, 1000);
     };
   })();
@@ -62,7 +59,7 @@ export const ChatMessageAdd: FC<ChatMessageAddProps> = (props) => {
       return;
     }
 
-    socket.emit('message', { content: body, sender: user.id }); // Emit message to server
+    // socket.emit('message', { content: body, sender: user.id }); // Emit message to server
     setBody('');
   }, [body, user.id]);
 

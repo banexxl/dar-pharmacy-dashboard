@@ -2,10 +2,10 @@ import type { FC } from 'react';
 import PropTypes from 'prop-types';
 import Stack from '@mui/material/Stack';
 import { ChatMessage } from './chat-message';
-import { Message, Participant } from '@/schemas/chat';
+import { Message, Contact } from '@/schemas/chat';
 import { useMockedUser } from '@/hooks/use-mocked-user';
 
-const getAuthor = (message: Message, participants: Participant[], user: Participant) => {
+const getAuthor = (message: Message, participants: Contact[], user: Contact) => {
   const participant = participants.find((participant) => participant.id === message.authorId);
 
   // This should never happen
@@ -36,7 +36,7 @@ const getAuthor = (message: Message, participants: Participant[], user: Particip
 
 interface ChatMessagesProps {
   messages?: Message[];
-  participants?: Participant[];
+  participants?: Contact[];
 }
 
 export const ChatMessages: FC<ChatMessagesProps> = (props) => {

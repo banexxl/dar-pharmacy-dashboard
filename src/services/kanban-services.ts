@@ -1,6 +1,7 @@
 import type { Board, CheckItem, Checklist, Column, Comment, Member, Task } from 'src/schemas/kanban';
 import { MongoClient, ObjectId, UpdateResult } from 'mongodb';
 import { createResourceId } from '@/utils/create-resource-id';
+
 // Initialize MongoDB client
 const client = new MongoClient(process.env.MONGODB_URI!);
 const db = client.db('KANBAN_DB');

@@ -6,7 +6,6 @@ import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Stack from '@mui/material/Stack';
 
-import { chatApi } from 'src/api/chat';
 import { Scrollbar } from 'src/components/scrollbar';
 import { useDispatch, useSelector } from 'src/store';
 import { thunks } from 'src/thunks/chat';
@@ -14,18 +13,19 @@ import { thunks } from 'src/thunks/chat';
 import { ChatMessageAdd } from './chat-message-add';
 import { ChatMessages } from './chat-messages';
 import { ChatThreadToolbar } from './chat-thread-toolbar';
-import { Participant, Thread } from '@/schemas/chat';
+import { Contact, Thread } from '@/schemas/chat';
 import { useRouter } from 'next/router';
 import { paths } from 'paths';
 import { useMockedUser } from '@/hooks/use-mocked-user';
+import { ChatService } from '@/services/chat-services';
 
-const useParticipants = (threadKey: string): Participant[] => {
+const useParticipants = (threadKey: string): Contact[] => {
   const router = useRouter();
-  const [participants, setParticipants] = useState<Participant[]>([]);
+  const [participants, setParticipants] = useState<Contact[]>([]);
 
   const handleParticipantsGet = useCallback(async (): Promise<void> => {
     try {
-      const participants = await chatApi.getParticipants({ threadKey });
+      const participants = await ChatService().getParticipants(threadKey);
       setParticipants(participants);
     } catch (err) {
       console.error(err);

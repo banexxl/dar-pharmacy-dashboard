@@ -16,7 +16,6 @@ import { ChatComposer } from '@/sections/chat/chat-composer';
 import { ChatBlank } from '@/sections/chat/chat-blank';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { useSession } from 'next-auth/react';
-import { Session } from 'next-auth';
 
 /**
  * NOTE:

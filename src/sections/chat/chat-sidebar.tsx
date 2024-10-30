@@ -20,7 +20,7 @@ import { Contact, Thread } from '@/schemas/chat';
 import { useRouter } from 'next/router';
 import { paths } from 'paths';
 import { Session } from 'next-auth';
-import { ChatService } from '@/services/chat-services';
+// import { useSession } from 'next-auth/react';
 
 const getThreadKey = (thread: Thread, userId: string): string | undefined => {
   let threadKey: string | undefined;
@@ -80,7 +80,15 @@ export const ChatSidebar: FC<ChatSidebarProps> = (props) => {
     }
 
     try {
-      const contacts = await ChatService().getContacts({ query: value });
+      const contacts = await fetch('/api/chat/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ query: value }),
+      })
+        .then((response) => response.json())
+        .then((response) => response.contacts);
 
       setSearchResults(contacts);
     } catch (err) {
@@ -114,18 +122,22 @@ export const ChatSidebar: FC<ChatSidebarProps> = (props) => {
     [router]
   );
 
-  const handleThreadSelect = useCallback((threadId: string): void => {
-    const thread = threads.byId[threadId];
-    const threadKey = getThreadKey(thread, user.id);
+  // const { data: session } = useSession();
+  // const user = session?.user;
 
-    if (!threadKey) {
-      router.push(paths.dashboard.chat);
-    } else {
-      router.push(paths.dashboard.chat + `?threadKey=${threadKey}`);
-    }
-  },
-    [router, threads, user]
-  );
+  // const handleThreadSelect = useCallback((threadId: string): void => {
+  //   const thread = threads.byId[threadId];
+  //   const threadKey = getThreadKey(thread, user?.email || '');
+
+  //   if (!threadKey) {
+  //     router.push(paths.dashboard.chat);
+  //   } else {
+  //     router.push(paths.dashboard.chat + `?threadKey=${threadKey}`);
+  //   }
+  // },
+  //   [router, threads, user]
+  // );
+
 
   const content = (
     <div>
@@ -184,7 +196,11 @@ export const ChatSidebar: FC<ChatSidebarProps> = (props) => {
               <ChatThreadItem
                 active={currentThreadId === threadId}
                 key={threadId}
-                onSelect={(): void => handleThreadSelect(threadId)}
+                onSelect={(): void =>
+                  console.log('aaa')
+
+                  // handleThreadSelect(threadId)
+                }
                 thread={threads.byId[threadId]}
               />
             ))}

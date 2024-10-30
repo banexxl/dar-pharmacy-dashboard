@@ -8,7 +8,7 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
 import { customLocale } from '@/utils/date-locale';
-import { Message, Participant, Thread } from '@/schemas/chat';
+import { Message, Contact, Thread } from '@/schemas/chat';
 import { useMockedUser } from '@/hooks/use-mocked-user';
 
 
@@ -16,11 +16,11 @@ const getLastMessage = (thread: Thread): Message | undefined => {
   return thread.messages?.[thread.messages.length - 1];
 };
 
-const getRecipients = (participants: Participant[], userId: string): Participant[] => {
+const getRecipients = (participants: Contact[], userId: string): Contact[] => {
   return participants.filter((participant) => participant.id !== userId);
 };
 
-const getDisplayName = (recipients: Participant[]): string => {
+const getDisplayName = (recipients: Contact[]): string => {
   return recipients.map((participant) => participant.name).join(', ');
 };
 

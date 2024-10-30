@@ -1,7 +1,7 @@
 // import { createResourceId } from 'src/utils/create-resource-id';
 
 // import { contacts, threads } from './data';
-// import { Contact, Message, Participant, Thread } from '@/schemas/chat';
+// import { Contact, Message, Contact, Thread } from '@/schemas/chat';
 // import { deepCopy } from '@/utils/deep-copy';
 
 // // On server get current identity (user) from the request
@@ -59,7 +59,7 @@
 //   threadKey: string;
 // };
 
-// type GetParticipantsResponse = Promise<Participant[]>;
+// type GetParticipantsResponse = Promise<Contact[]>;
 
 // type AddMessageRequest = {
 //   threadId?: string;
@@ -97,7 +97,7 @@
 
 //   getThreads(request: GetThreadsRequest = {}): GetThreadsResponse {
 //     const expandedThreads = threads.map((thread) => {
-//       const participants: Participant[] = [user];
+//       const participants: Contact[] = [user];
 
 //       contacts.forEach((contact) => {
 //         if (thread.participantIds.includes(contact.id)) {
@@ -150,7 +150,7 @@
 //           return resolve(null);
 //         }
 
-//         const participants: Participant[] = [user];
+//         const participants: Contact[] = [user];
 
 //         contacts.forEach((contact) => {
 //           if (thread!.participantIds.includes(contact.id)) {
@@ -200,7 +200,7 @@
 
 //     return new Promise((resolve, reject) => {
 //       try {
-//         const participants: Participant[] = [user];
+//         const participants: Contact[] = [user];
 
 //         // Thread key might be a thread ID
 //         const thread = findThreadById(threadKey);

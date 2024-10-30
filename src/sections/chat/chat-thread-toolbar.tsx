@@ -22,17 +22,17 @@ import Typography from '@mui/material/Typography';
 
 import { usePopover } from 'src/hooks/use-popover';
 import { useMockedUser } from '@/hooks/use-mocked-user';
-import { Participant } from '@/schemas/chat';
+import { Contact } from '@/schemas/chat';
 
-const getRecipients = (participants: Participant[], userId: string): Participant[] => {
+const getRecipients = (participants: Contact[], userId: string): Contact[] => {
   return participants.filter((participant) => participant.id !== userId);
 };
 
-const getDisplayName = (recipients: Participant[]): string => {
+const getDisplayName = (recipients: Contact[]): string => {
   return recipients.map((participant) => participant.name).join(', ');
 };
 
-const getLastActive = (recipients: Participant[]): string | null => {
+const getLastActive = (recipients: Contact[]): string | null => {
   const hasLastActive = recipients.length === 1 && recipients[0].lastActivity;
 
   if (hasLastActive) {
@@ -43,7 +43,7 @@ const getLastActive = (recipients: Participant[]): string | null => {
 };
 
 interface ChatThreadToolbarProps {
-  participants?: Participant[];
+  participants?: Contact[];
 }
 
 export const ChatThreadToolbar: FC<ChatThreadToolbarProps> = (props) => {

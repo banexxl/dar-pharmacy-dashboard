@@ -1,9 +1,10 @@
 export interface Contact {
   id: string;
   avatar: string;
-  isActive: boolean;
   lastActivity?: number;
   name: string;
+  isActive: boolean;
+  email?: string;
 }
 
 interface Attachment {
@@ -20,19 +21,11 @@ export interface Message {
   authorId: string;
 }
 
-export interface Participant {
-  id: string;
-  avatar: string | null;
-  lastActivity?: number;
-  name: string;
-  email?: string;
-}
-
 export interface Thread {
   id?: string;
   messages: Message[];
   participantIds: string[];
-  participants?: Participant[];
+  participants?: Contact[];
   type: 'ONE_TO_ONE' | 'GROUP';
   unreadCount?: number;
 }
