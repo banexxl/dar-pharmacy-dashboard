@@ -20,7 +20,6 @@ import Typography from '@mui/material/Typography';
 
 import { Scrollbar } from 'src/components/scrollbar';
 import { Contact } from '@/schemas/chat';
-import { ChatService } from '@/services/chat-services';
 
 interface ChatComposerRecipientsProps {
   onRecipientAdd?: (contact: Contact) => void;
@@ -50,7 +49,13 @@ export const ChatComposerRecipients: FC<ChatComposerRecipientsProps> = (props) =
       }
 
       try {
-        const contacts = await ChatService().getContacts(query);
+        const contacts = await fetch('/api/chat/constacts-api', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ query }),
+        }).then((response) => response.json());
 
         // Filter already picked recipients
 

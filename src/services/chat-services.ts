@@ -1,10 +1,10 @@
-import { Contact } from '@/schemas/chat';
+import { Contact, Thread } from '@/schemas/chat';
 import { MongoClient, ObjectId } from 'mongodb';
 
 export const ChatService = () => {
-     const client = new MongoClient(process.env.MONGODB_URI!);
+     const getContact = async (searchQuery: string): Promise<Contact[]> => {
 
-     const getContacts = async (searchQuery: string): Promise<Contact[]> => {
+          const client = await MongoClient.connect(process.env.MONGODB_URI!)
           const database = client.db('ACCOUNTS_DB');
           const accountsCollection = database.collection('Accounts');
           const searchFilter = searchQuery ? { name: { $regex: searchQuery, $options: 'i' } } : {};
@@ -16,29 +16,57 @@ export const ChatService = () => {
                lastActivity: contact.lastActivity,
                name: contact.name,
           })) as Contact[];
+
      };
 
+     const getAllContacts = async (): Promise<Contact[]> => {
 
-     const getThreads = async () => {
+          const client = await MongoClient.connect(process.env.MONGODB_URI!)
+          const database = client.db('ACCOUNTS_DB');
+          const accountsCollection = database.collection('Accounts');
+          const contactList = await accountsCollection.find().toArray();
+          return contactList.map((contact) => ({
+               id: contact._id.toString(),
+               avatar: contact.avatar,
+               isActive: contact.isActive,
+               lastActivity: contact.lastActivity,
+               name: contact.name,
+          })) as Contact[];
+     };
+
+     const getThreads = async (): Promise<Thread[]> => {
+          const client = await MongoClient.connect(process.env.MONGODB_URI!)
           const db = client.db('DAR_DB'); // Use your actual chat database name
           const collection = db.collection('Threads');
-          return await collection.find({}).toArray();
-     };
+          const threads = await collection.find().toArray();
+          return threads.map((thread: any) => ({
+               _id: thread._id.toString(),
+               messages: thread.messages,
+               participantIds: thread.participantIds,
+               participants: thread.participants,
+               unreadCount: thread.unreadCount,
+               type: thread.type
+          }))
+     }
 
      const getThreadById = async (threadId: string) => {
+          const client = await MongoClient.connect(process.env.MONGODB_URI!)
           const db = client.db('DAR_DB');
           const collection = db.collection('Threads');
           return await collection.findOne({ _id: new ObjectId(threadId) });
      };
 
      const markThreadAsSeen = async (threadId: string) => {
+          const client = await MongoClient.connect(process.env.MONGODB_URI!)
           const db = client.db('DAR_DB');
           const collection = db.collection('Threads');
-          await collection.updateOne({ _id: new ObjectId(threadId) }, { $set: { unreadCount: 0 } });
+          const response = await collection.updateOne({ _id: new ObjectId(threadId) }, { $set: { unreadCount: 0 } });
+          if (response.modifiedCount === 0) return false;
           return true;
      };
 
      const addMessage = async (threadId: string | undefined, recipientIds: string[] | undefined, body: string) => {
+          const client = await MongoClient.connect(process.env.MONGODB_URI!)
           const db = client.db('DAR_DB');
           const threadsCollection = db.collection('Threads');
           let thread;
@@ -78,6 +106,7 @@ export const ChatService = () => {
      };
 
      const getParticipants = async (threadId: string) => {
+          const client = await MongoClient.connect(process.env.MONGODB_URI!)
           const db = client.db('DAR_DB');
           const threadsCollection = db.collection('Threads');
           const thread = await threadsCollection.findOne({ _id: new ObjectId(threadId) });
@@ -86,11 +115,12 @@ export const ChatService = () => {
      };
 
      return {
-          getContacts,
+          getContact,
           getThreads,
           getThreadById,
           markThreadAsSeen,
           addMessage,
-          getParticipants
+          getParticipants,
+          getAllContacts
      };
 };

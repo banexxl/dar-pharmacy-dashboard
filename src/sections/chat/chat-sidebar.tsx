@@ -19,7 +19,7 @@ import { ChatThreadItem } from './chat-thread-item';
 import { Contact, Thread } from '@/schemas/chat';
 import { useRouter } from 'next/router';
 import { paths } from 'paths';
-import { Session } from 'next-auth';
+// import { Session } from 'next-auth';
 // import { useSession } from 'next-auth/react';
 
 const getThreadKey = (thread: Thread, userId: string): string | undefined => {
@@ -51,11 +51,11 @@ interface ChatSidebarProps {
   container?: HTMLDivElement | null;
   onClose?: () => void;
   open?: boolean;
-  data: Session;
+  // data: Session;
 }
 
 export const ChatSidebar: FC<ChatSidebarProps> = (props) => {
-  const { container, onClose, open, data, ...other } = props;
+  const { container, onClose, open, ...other } = props;
 
   const router = useRouter();
   const threads = useThreads();
@@ -263,5 +263,5 @@ ChatSidebar.propTypes = {
   container: PropTypes.any,
   onClose: PropTypes.func,
   open: PropTypes.bool,
-  data: PropTypes.any,
+  // data: PropTypes.any,
 };

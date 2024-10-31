@@ -1,4 +1,3 @@
-import { CalendarEvent } from '@/schemas/calendar';
 import { CalendarServices } from '@/services/calendar-services';
 import { NextApiRequest, NextApiResponse } from 'next';
 

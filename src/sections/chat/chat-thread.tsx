@@ -17,7 +17,6 @@ import { Contact, Thread } from '@/schemas/chat';
 import { useRouter } from 'next/router';
 import { paths } from 'paths';
 import { useMockedUser } from '@/hooks/use-mocked-user';
-import { ChatService } from '@/services/chat-services';
 
 const useParticipants = (threadKey: string): Contact[] => {
   const router = useRouter();
@@ -25,7 +24,13 @@ const useParticipants = (threadKey: string): Contact[] => {
 
   const handleParticipantsGet = useCallback(async (): Promise<void> => {
     try {
-      const participants = await ChatService().getParticipants(threadKey);
+      const participants = await fetch('/api/chat/threads-api', {
+        method: 'POST',
+        body: JSON.stringify({
+          threadKey,
+        })
+      }).then((res) => res.json());
+
       setParticipants(participants);
     } catch (err) {
       console.error(err);

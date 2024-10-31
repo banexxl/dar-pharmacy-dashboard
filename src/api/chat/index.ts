@@ -1,40 +1,40 @@
 // import { createResourceId } from 'src/utils/create-resource-id';
 
 // import { contacts, threads } from './data';
-// import { Contact, Message, Contact, Thread } from '@/schemas/chat';
+// import { Contact, Message, Thread } from '@/schemas/chat';
 // import { deepCopy } from '@/utils/deep-copy';
 
 // // On server get current identity (user) from the request
 // export const user = {
-//   id: '5e86809283e28b96d2d38537',
-//   avatar: '/assets/avatars/avatar-anika-visser.png',
-//   name: 'Anika Visser',
+//      id: '5e86809283e28b96d2d38537',
+//      avatar: '/assets/avatars/avatar-anika-visser.png',
+//      name: 'Anika Visser',
 // };
 
 // const findThreadById = (threadId: string): Thread | undefined => {
-//   return threads.find((thread) => thread.id === threadId);
+//      return threads.find((thread) => thread.id === threadId);
 // };
 
 // const findThreadByParticipantIds = (participantIds: string[]): Thread | undefined => {
-//   return threads.find((thread) => {
-//     if (thread.participantIds.length !== participantIds.length) {
-//       return false;
-//     }
+//      return threads.find((thread) => {
+//           if (thread.participantIds.length !== participantIds.length) {
+//                return false;
+//           }
 
-//     const foundParticipantIds = new Set();
+//           const foundParticipantIds = new Set();
 
-//     thread.participantIds.forEach((participantId) => {
-//       if (participantIds.includes(participantId)) {
-//         foundParticipantIds.add(participantId);
-//       }
-//     });
+//           thread.participantIds.forEach((participantId) => {
+//                if (participantIds.includes(participantId)) {
+//                     foundParticipantIds.add(participantId);
+//                }
+//           });
 
-//     return foundParticipantIds.size === participantIds.length;
-//   });
+//           return foundParticipantIds.size === participantIds.length;
+//      });
 // };
 
 // type GetContactsRequest = {
-//   query?: string;
+//      query?: string;
 // };
 
 // type GetContactsResponse = Promise<Contact[]>;
@@ -44,269 +44,269 @@
 // type GetThreadsResponse = Promise<Thread[]>;
 
 // type GetThreadRequest = {
-//   threadKey: string;
+//      threadKey: string;
 // };
 
 // type GetThreadResponse = Promise<Thread | null>;
 
 // type MarkThreadAsSeenRequest = {
-//   threadId: string;
+//      threadId: string;
 // };
 
 // type MarkThreadAsSeenResponse = Promise<true>;
 
 // type GetParticipantsRequest = {
-//   threadKey: string;
+//      threadKey: string;
 // };
 
 // type GetParticipantsResponse = Promise<Contact[]>;
 
 // type AddMessageRequest = {
-//   threadId?: string;
-//   recipientIds?: string[];
-//   body: string;
+//      threadId?: string;
+//      recipientIds?: string[];
+//      body: string;
 // };
 
 // type AddMessageResponse = Promise<{
-//   message: Message;
-//   threadId: string;
+//      message: Message;
+//      threadId: string;
 // }>;
 
 // class ChatApi {
-//   getContacts(request: GetContactsRequest = {}): GetContactsResponse {
-//     const { query } = request;
+//      getContacts(request: GetContactsRequest = {}): GetContactsResponse {
+//           const { query } = request;
 
-//     return new Promise((resolve, reject) => {
-//       try {
-//         let foundContacts = contacts;
+//           return new Promise((resolve, reject) => {
+//                try {
+//                     let foundContacts = contacts;
 
-//         if (query) {
-//           const cleanQuery = query.toLowerCase().trim();
-//           foundContacts = foundContacts.filter((contact) =>
-//             contact.name.toLowerCase().includes(cleanQuery)
-//           );
-//         }
+//                     if (query) {
+//                          const cleanQuery = query.toLowerCase().trim();
+//                          foundContacts = foundContacts.filter((contact) =>
+//                               contact.name.toLowerCase().includes(cleanQuery)
+//                          );
+//                     }
 
-//         resolve(deepCopy(foundContacts));
-//       } catch (err) {
-//         console.error('[Chat Api]: ', err);
-//         reject(new Error('Internal server error'));
-//       }
-//     });
-//   }
-
-//   getThreads(request: GetThreadsRequest = {}): GetThreadsResponse {
-//     const expandedThreads = threads.map((thread) => {
-//       const participants: Contact[] = [user];
-
-//       contacts.forEach((contact) => {
-//         if (thread.participantIds.includes(contact.id)) {
-//           participants.push({
-//             id: contact.id,
-//             avatar: contact.avatar,
-//             lastActivity: contact.lastActivity,
-//             name: contact.name,
+//                     resolve(deepCopy(foundContacts));
+//                } catch (err) {
+//                     console.error('[Chat Api]: ', err);
+//                     reject(new Error('Internal server error'));
+//                }
 //           });
-//         }
-//       });
+//      }
 
-//       return {
-//         ...thread,
-//         participants,
-//       };
-//     });
+//      getThreads(request: GetThreadsRequest = {}): GetThreadsResponse {
+//           const expandedThreads = threads.map((thread) => {
+//                const participants: Contact[] = [user];
 
-//     return Promise.resolve(deepCopy(expandedThreads));
-//   }
+//                contacts.forEach((contact) => {
+//                     if (thread.participantIds.includes(contact.id)) {
+//                          participants.push({
+//                               id: contact.id,
+//                               avatar: contact.avatar,
+//                               lastActivity: contact.lastActivity,
+//                               name: contact.name,
+//                          });
+//                     }
+//                });
 
-//   getThread(request: GetThreadRequest): GetThreadResponse {
-//     const { threadKey } = request;
-
-//     return new Promise((resolve, reject) => {
-//       if (!threadKey) {
-//         reject(new Error('Thread key is required'));
-//         return;
-//       }
-
-//       try {
-//         let thread: Thread | undefined;
-
-//         // Thread key might be a contact ID
-//         const contact = contacts.find((contact) => contact.id === threadKey);
-
-//         if (contact) {
-//           thread = findThreadByParticipantIds([user.id, contact.id]);
-//         }
-
-//         // Thread key might be a thread ID
-//         if (!thread) {
-//           thread = findThreadById(threadKey);
-//         }
-
-//         // If reached this point and thread does not exist this could mean:
-//         // b) The thread key is a contact ID, but no thread found
-//         // a) The thread key is a thread ID and is invalid
-//         if (!thread) {
-//           return resolve(null);
-//         }
-
-//         const participants: Contact[] = [user];
-
-//         contacts.forEach((contact) => {
-//           if (thread!.participantIds.includes(contact.id)) {
-//             participants.push({
-//               id: contact.id,
-//               avatar: contact.avatar,
-//               lastActivity: contact.lastActivity,
-//               name: contact.name,
-//             });
-//           }
-//         });
-
-//         const expandedThread = {
-//           ...thread,
-//           participants,
-//         };
-
-//         resolve(deepCopy(expandedThread));
-//       } catch (err) {
-//         console.error('[Chat Api]: ', err);
-//         reject(new Error('Internal server error'));
-//       }
-//     });
-//   }
-
-//   markThreadAsSeen(request: MarkThreadAsSeenRequest): MarkThreadAsSeenResponse {
-//     const { threadId } = request;
-
-//     return new Promise((resolve, reject) => {
-//       try {
-//         const thread = threads.find((thread) => thread.id === threadId);
-
-//         if (thread) {
-//           thread.unreadCount = 0;
-//         }
-
-//         resolve(true);
-//       } catch (err) {
-//         console.error('[Chat Api]: ', err);
-//         reject(new Error('Internal server error'));
-//       }
-//     });
-//   }
-
-//   getParticipants(request: GetParticipantsRequest): GetParticipantsResponse {
-//     const { threadKey } = request;
-
-//     return new Promise((resolve, reject) => {
-//       try {
-//         const participants: Contact[] = [user];
-
-//         // Thread key might be a thread ID
-//         const thread = findThreadById(threadKey);
-
-//         if (thread) {
-//           contacts.forEach((contact) => {
-//             if (thread!.participantIds.includes(contact.id)) {
-//               participants.push({
-//                 id: contact.id,
-//                 avatar: contact.avatar,
-//                 lastActivity: contact.lastActivity,
-//                 name: contact.name,
-//               });
-//             }
+//                return {
+//                     ...thread,
+//                     participants,
+//                };
 //           });
-//         } else {
-//           const contact = contacts.find((contact) => contact.id === threadKey);
 
-//           // If no contact found, the user is trying a shady route
-//           if (!contact) {
-//             reject(new Error('Unable to find the contact'));
-//             return;
-//           }
+//           return Promise.resolve(deepCopy(expandedThreads));
+//      }
 
-//           participants.push({
-//             id: contact.id,
-//             avatar: contact.avatar,
-//             lastActivity: contact.lastActivity,
-//             name: contact.name,
+//      getThread(request: GetThreadRequest): GetThreadResponse {
+//           const { threadKey } = request;
+
+//           return new Promise((resolve, reject) => {
+//                if (!threadKey) {
+//                     reject(new Error('Thread key is required'));
+//                     return;
+//                }
+
+//                try {
+//                     let thread: Thread | undefined;
+
+//                     // Thread key might be a contact ID
+//                     const contact = contacts.find((contact) => contact.id === threadKey);
+
+//                     if (contact) {
+//                          thread = findThreadByParticipantIds([user.id, contact.id]);
+//                     }
+
+//                     // Thread key might be a thread ID
+//                     if (!thread) {
+//                          thread = findThreadById(threadKey);
+//                     }
+
+//                     // If reached this point and thread does not exist this could mean:
+//                     // b) The thread key is a contact ID, but no thread found
+//                     // a) The thread key is a thread ID and is invalid
+//                     if (!thread) {
+//                          return resolve(null);
+//                     }
+
+//                     const participants: Contact[] = [user];
+
+//                     contacts.forEach((contact) => {
+//                          if (thread!.participantIds.includes(contact.id)) {
+//                               participants.push({
+//                                    id: contact.id,
+//                                    avatar: contact.avatar,
+//                                    lastActivity: contact.lastActivity,
+//                                    name: contact.name,
+//                               });
+//                          }
+//                     });
+
+//                     const expandedThread = {
+//                          ...thread,
+//                          participants,
+//                     };
+
+//                     resolve(deepCopy(expandedThread));
+//                } catch (err) {
+//                     console.error('[Chat Api]: ', err);
+//                     reject(new Error('Internal server error'));
+//                }
 //           });
-//         }
+//      }
 
-//         return resolve(participants);
-//       } catch (err) {
-//         console.error('[Chat Api]: ', err);
-//         reject(new Error('Internal server error'));
-//       }
-//     });
-//   }
+//      markThreadAsSeen(request: MarkThreadAsSeenRequest): MarkThreadAsSeenResponse {
+//           const { threadId } = request;
 
-//   addMessage(request: AddMessageRequest): AddMessageResponse {
-//     const { threadId, recipientIds, body } = request;
+//           return new Promise((resolve, reject) => {
+//                try {
+//                     const thread = threads.find((thread) => thread.id === threadId);
 
-//     return new Promise((resolve, reject) => {
-//       try {
-//         if (!(threadId || recipientIds)) {
-//           reject(new Error('Thread ID or recipient IDs has to be provided'));
-//           return;
-//         }
+//                     if (thread) {
+//                          thread.unreadCount = 0;
+//                     }
 
-//         let thread: Thread | undefined;
+//                     resolve(true);
+//                } catch (err) {
+//                     console.error('[Chat Api]: ', err);
+//                     reject(new Error('Internal server error'));
+//                }
+//           });
+//      }
 
-//         // Try to find the thread
-//         if (threadId) {
-//           thread = findThreadById(threadId);
+//      getParticipants(request: GetParticipantsRequest): GetParticipantsResponse {
+//           const { threadKey } = request;
 
-//           // If thread ID provided the thread has to exist.
+//           return new Promise((resolve, reject) => {
+//                try {
+//                     const participants: Contact[] = [user];
 
-//           if (!thread) {
-//             reject(new Error('Invalid thread id'));
-//             return;
-//           }
-//         } else {
-//           const participantIds = [user.id, ...(recipientIds || [])];
-//           thread = findThreadByParticipantIds(participantIds);
-//         }
+//                     // Thread key might be a thread ID
+//                     const thread = findThreadById(threadKey);
 
-//         // If reached this point, thread will exist if thread ID provided
-//         // For recipient Ids it may or may not exist. If it doesn't, create a new one.
+//                     if (thread) {
+//                          contacts.forEach((contact) => {
+//                               if (thread!.participantIds.includes(contact.id)) {
+//                                    participants.push({
+//                                         id: contact.id,
+//                                         avatar: contact.avatar,
+//                                         lastActivity: contact.lastActivity,
+//                                         name: contact.name,
+//                                    });
+//                               }
+//                          });
+//                     } else {
+//                          const contact = contacts.find((contact) => contact.id === threadKey);
 
-//         if (!thread) {
-//           const participantIds = [user.id, ...(recipientIds || [])];
+//                          // If no contact found, the user is trying a shady route
+//                          if (!contact) {
+//                               reject(new Error('Unable to find the contact'));
+//                               return;
+//                          }
 
-//           thread = {
-//             id: createResourceId(),
-//             messages: [],
-//             participantIds,
-//             type: participantIds.length === 2 ? 'ONE_TO_ONE' : 'GROUP',
-//             unreadCount: 0,
-//           };
+//                          participants.push({
+//                               id: contact.id,
+//                               avatar: contact.avatar,
+//                               lastActivity: contact.lastActivity,
+//                               name: contact.name,
+//                          });
+//                     }
 
-//           // Add the new thread to the DB
-//           threads.push(thread);
-//         }
+//                     return resolve(participants);
+//                } catch (err) {
+//                     console.error('[Chat Api]: ', err);
+//                     reject(new Error('Internal server error'));
+//                }
+//           });
+//      }
 
-//         const message: Message = {
-//           id: createResourceId(),
-//           attachments: [],
-//           body,
-//           contentType: 'text',
-//           createdAt: new Date().getTime(),
-//           authorId: user.id,
-//         };
+//      addMessage(request: AddMessageRequest): AddMessageResponse {
+//           const { threadId, recipientIds, body } = request;
 
-//         thread.messages.push(message);
+//           return new Promise((resolve, reject) => {
+//                try {
+//                     if (!(threadId || recipientIds)) {
+//                          reject(new Error('Thread ID or recipient IDs has to be provided'));
+//                          return;
+//                     }
 
-//         resolve({
-//           threadId: thread.id!,
-//           message,
-//         });
-//       } catch (err) {
-//         console.error('[Chat Api]: ', err);
-//         reject(new Error('Internal server error'));
-//       }
-//     });
-//   }
+//                     let thread: Thread | undefined;
+
+//                     // Try to find the thread
+//                     if (threadId) {
+//                          thread = findThreadById(threadId);
+
+//                          // If thread ID provided the thread has to exist.
+
+//                          if (!thread) {
+//                               reject(new Error('Invalid thread id'));
+//                               return;
+//                          }
+//                     } else {
+//                          const participantIds = [user.id, ...(recipientIds || [])];
+//                          thread = findThreadByParticipantIds(participantIds);
+//                     }
+
+//                     // If reached this point, thread will exist if thread ID provided
+//                     // For recipient Ids it may or may not exist. If it doesn't, create a new one.
+
+//                     if (!thread) {
+//                          const participantIds = [user.id, ...(recipientIds || [])];
+
+//                          thread = {
+//                               id: createResourceId(),
+//                               messages: [],
+//                               participantIds,
+//                               type: participantIds.length === 2 ? 'ONE_TO_ONE' : 'GROUP',
+//                               unreadCount: 0,
+//                          };
+
+//                          // Add the new thread to the DB
+//                          threads.push(thread);
+//                     }
+
+//                     const message: Message = {
+//                          id: createResourceId(),
+//                          attachments: [],
+//                          body,
+//                          contentType: 'text',
+//                          createdAt: new Date().getTime(),
+//                          authorId: user.id,
+//                     };
+
+//                     thread.messages.push(message);
+
+//                     resolve({
+//                          threadId: thread.id!,
+//                          message,
+//                     });
+//                } catch (err) {
+//                     console.error('[Chat Api]: ', err);
+//                     reject(new Error('Internal server error'));
+//                }
+//           });
+//      }
 // }
 
 // export const chatApi = new ChatApi();

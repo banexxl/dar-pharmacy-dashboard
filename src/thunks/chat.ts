@@ -1,16 +1,23 @@
 import { slice } from '@/slices/chat';
-import { chatApi } from 'src/api/chat';
 import type { AppThunk } from 'src/store';
 
 const getContacts = (): AppThunk => async (dispatch): Promise<void> => {
-     const response = await chatApi.getContacts({});
-
+     const response = await fetch('/api/chat/constacts-api', {
+          method: 'GET',
+          headers: {
+               'Content-Type': 'application/json',
+          },
+     }).then((response) => response.json());
      dispatch(slice.actions.getContacts(response));
 };
 
 const getThreads = (): AppThunk => async (dispatch): Promise<void> => {
-     const response = await chatApi.getThreads();
-
+     const response = await fetch('/api/chat/threads-api', {
+          method: 'GET',
+          headers: {
+               'Content-Type': 'application/json',
+          },
+     }).then((response) => response.json());
      dispatch(slice.actions.getThreads(response));
 };
 
@@ -19,10 +26,14 @@ type GetThreadParams = {
 };
 
 const getThread = (params: GetThreadParams): AppThunk => async (dispatch): Promise<string | undefined> => {
-     const response = await chatApi.getThread(params);
-
+     const response = await fetch(`/api/chat/threads-api/`, {
+          method: 'POST',
+          headers: {
+               'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(params),
+     }).then((response) => response.json());
      dispatch(slice.actions.getThread(response));
-
      return response?.id;
 };
 
@@ -31,8 +42,7 @@ type MarkThreadAsSeenParams = {
 };
 
 const markThreadAsSeen = (params: MarkThreadAsSeenParams): AppThunk => async (dispatch): Promise<void> => {
-     await chatApi.markThreadAsSeen(params);
-
+     await fetch(`/api/chat/threads-api/${params.threadId}/seen`);
      dispatch(slice.actions.markThreadAsSeen(params.threadId));
 };
 
@@ -51,8 +61,14 @@ type AddMessageParams = {
 };
 
 const addMessage = (params: AddMessageParams): AppThunk => async (dispatch): Promise<string> => {
-     const response = await chatApi.addMessage(params);
-
+     const response = await fetch('/api/chat/messages-api',
+          {
+               method: 'POST',
+               headers: {
+                    'Content-Type': 'application/json',
+               },
+               body: JSON.stringify(params)
+          }).then((response) => response.json());
      dispatch(slice.actions.addMessage(response));
 
      return response.threadId;

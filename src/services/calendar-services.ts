@@ -1,4 +1,3 @@
-
 import { CalendarEvent } from "@/schemas/calendar";
 import { MongoClient, ObjectId } from "mongodb"
 

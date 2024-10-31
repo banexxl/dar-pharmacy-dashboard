@@ -1,5 +1,5 @@
 export const objFromArray = (arr?: any[], key = 'id'): Record<string, any> => {
-  if (!arr) {
+  if (!arr || !arr.length) {
     return {};
   }
   return arr.reduce((acc, item) => {

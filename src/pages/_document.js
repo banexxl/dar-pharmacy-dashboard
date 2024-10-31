@@ -78,12 +78,10 @@ CustomDocument.getInitialProps = async (ctx) => {
 
   ctx.renderPage = () => originalRenderPage({
     enhanceApp: (App) => (props) => (
-      <React.StrictMode>
-        <App
-          emotionCache={cache}
-          {...props}
-        />
-      </React.StrictMode>
+      <App
+        emotionCache={cache}
+        {...props}
+      />
     )
   });
 
