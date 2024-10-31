@@ -19,6 +19,7 @@ import { ChatThreadItem } from './chat-thread-item';
 import { Contact, Thread } from '@/schemas/chat';
 import { useRouter } from 'next/router';
 import { paths } from 'paths';
+import { Session } from 'next-auth';
 // import { Session } from 'next-auth';
 // import { useSession } from 'next-auth/react';
 
@@ -51,7 +52,7 @@ interface ChatSidebarProps {
   container?: HTMLDivElement | null;
   onClose?: () => void;
   open?: boolean;
-  // data: Session;
+  session: Session;
 }
 
 export const ChatSidebar: FC<ChatSidebarProps> = (props) => {
@@ -263,5 +264,5 @@ ChatSidebar.propTypes = {
   container: PropTypes.any,
   onClose: PropTypes.func,
   open: PropTypes.bool,
-  // data: PropTypes.any,
+  session: PropTypes.any,
 };

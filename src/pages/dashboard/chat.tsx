@@ -96,7 +96,7 @@ const Page = () => {
   const threadKey = searchParams.get('threadKey') || undefined;
   const sidebar = useSidebar();
   const session = useSession();
-  console.log(session);
+  console.log('session', session);
 
 
   useThreads();
@@ -130,7 +130,7 @@ const Page = () => {
             container={rootRef.current}
             onClose={sidebar.handleClose}
             open={sidebar.open}
-          // data={session!}
+            session={session.data!}
           />
           <ChatContainer open={sidebar.open}>
             <Box sx={{ p: 2 }}>
