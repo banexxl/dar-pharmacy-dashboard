@@ -2,7 +2,7 @@ import { slice } from '@/slices/chat';
 import type { AppThunk } from 'src/store';
 
 const getContacts = (): AppThunk => async (dispatch): Promise<void> => {
-     const response = await fetch('/api/chat/constacts-api', {
+     const response = await fetch('/api/chat/contacts-api', {
           method: 'GET',
           headers: {
                'Content-Type': 'application/json',

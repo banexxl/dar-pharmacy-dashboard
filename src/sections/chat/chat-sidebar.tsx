@@ -56,7 +56,7 @@ interface ChatSidebarProps {
 }
 
 export const ChatSidebar: FC<ChatSidebarProps> = (props) => {
-  const { container, onClose, open, ...other } = props;
+  const { container, onClose, session, open, ...other } = props;
 
   const router = useRouter();
   const threads = useThreads();
@@ -65,7 +65,7 @@ export const ChatSidebar: FC<ChatSidebarProps> = (props) => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [searchResults, setSearchResults] = useState<Contact[]>([]);
   const mdUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
-
+  const user = session.user;
   const handleCompose = useCallback((): void => {
     router.push(paths.dashboard.chat + '?compose=true');
   }, [router]);
@@ -123,21 +123,18 @@ export const ChatSidebar: FC<ChatSidebarProps> = (props) => {
     [router]
   );
 
-  // const { data: session } = useSession();
-  // const user = session?.user;
+  const handleThreadSelect = useCallback((threadId: string): void => {
+    const thread = threads.byId[threadId];
+    const threadKey = getThreadKey(thread, user?.email || '');
 
-  // const handleThreadSelect = useCallback((threadId: string): void => {
-  //   const thread = threads.byId[threadId];
-  //   const threadKey = getThreadKey(thread, user?.email || '');
-
-  //   if (!threadKey) {
-  //     router.push(paths.dashboard.chat);
-  //   } else {
-  //     router.push(paths.dashboard.chat + `?threadKey=${threadKey}`);
-  //   }
-  // },
-  //   [router, threads, user]
-  // );
+    if (!threadKey) {
+      router.push(paths.dashboard.chat);
+    } else {
+      router.push(paths.dashboard.chat + `?threadKey=${threadKey}`);
+    }
+  },
+    [router, threads, user]
+  );
 
 
   const content = (
@@ -198,9 +195,7 @@ export const ChatSidebar: FC<ChatSidebarProps> = (props) => {
                 active={currentThreadId === threadId}
                 key={threadId}
                 onSelect={(): void =>
-                  console.log('aaa')
-
-                  // handleThreadSelect(threadId)
+                  handleThreadSelect(threadId)
                 }
                 thread={threads.byId[threadId]}
               />

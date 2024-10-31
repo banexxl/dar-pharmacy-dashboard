@@ -15,6 +15,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                res.status(200).json(contacts);
           } if (method === 'POST') {
                const contact = await ChatService().getContact(body.contactId as string);
+               console.log(contact);
+
                if (!contact) {
                     return res.status(404).json({ error: 'Contact not found' });
                }

@@ -49,7 +49,7 @@ export const ChatComposerRecipients: FC<ChatComposerRecipientsProps> = (props) =
       }
 
       try {
-        const contacts = await fetch('/api/chat/constacts-api', {
+        const contacts = await fetch('/api/chat/contacts-api', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

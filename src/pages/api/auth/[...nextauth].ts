@@ -28,7 +28,6 @@ export const authOptions: NextAuthOptions = {
           },
           async session({ session, token }: any) {
                const sessionUser: any = await userServices().getUserByEmailAndRole(session.user.email, 'admin');
-               console.log('aaaaaa', sessionUser);
 
                if (sessionUser) {
                     session.user.email = sessionUser.email;
