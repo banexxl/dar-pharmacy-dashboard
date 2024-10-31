@@ -39,8 +39,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                case 'DELETE': { // Delete a specific calendar event
                     const { eventId } = req.body; // Assume we need taskId to find the event
                     const deletedEvent: any = await CalendarServices().deleteCalendarEvent(eventId);
-                    console.log('deletedEvent', deletedEvent.acknowledged, deletedEvent.deletedCount);
-
                     if (!deletedEvent) {
                          return res.status(404).json({ error: 'Event not found' });
                     } else if (deletedEvent.acknowledged && deletedEvent.deletedCount === 1) {

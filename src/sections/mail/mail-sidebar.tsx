@@ -87,7 +87,6 @@ export const MailSidebar: FC<MailSidebarProps> = (props) => {
 
   // Maybe use memo
   const groupedLabels: GroupedLabels = groupLabels(labels);
-  console.log('groupedLabels', groupedLabels);
 
   if (!labels || labels.length === 0) {
     return (

@@ -3,8 +3,6 @@ import { MongoClient, ObjectId } from 'mongodb';
 
 export const ChatService = () => {
      const getContact = async (searchQuery: string): Promise<Contact[]> => {
-          console.log(searchQuery);
-
           const client = await MongoClient.connect(process.env.MONGODB_URI!)
           const database = client.db('ACCOUNTS_DB');
           const accountsCollection = database.collection('Accounts');

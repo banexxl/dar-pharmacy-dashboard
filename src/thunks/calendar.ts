@@ -51,8 +51,6 @@ type UpdateEventParams = {
 };
 
 const updateEvent = (params: UpdateEventParams): AppThunk => async (dispatch): Promise<void> => {
-     console.log('params', params);
-
      const response = await fetch('/api/calendar/calendar-api', {
           method: 'PUT',
           headers: {
