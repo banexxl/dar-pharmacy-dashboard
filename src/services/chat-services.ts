@@ -10,6 +10,7 @@ export const ChatService = () => {
           const accountsCollection = database.collection('Accounts');
           const searchFilter = searchQuery ? { name: { $regex: searchQuery, $options: 'i' } } : {};
           const contactList = await accountsCollection.find(searchFilter).toArray();
+
           return contactList.map((contact) => ({
                id: contact._id.toString(),
                avatar: contact.avatar,
