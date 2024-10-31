@@ -24,12 +24,11 @@ const useParticipants = (threadKey: string): Contact[] => {
 
   const handleParticipantsGet = useCallback(async (): Promise<void> => {
     try {
-      const participants = await fetch('/api/chat/threads-api', {
-        method: 'POST',
-        body: JSON.stringify({
-          threadKey,
-        })
+      const participants = await fetch('/api/chat/messages-api', {
+        method: 'GET',
+        body: JSON.stringify({ threadKey }),
       }).then((res) => res.json());
+      console.log(participants);
 
       setParticipants(participants);
     } catch (err) {
@@ -167,7 +166,7 @@ export const ChatThread: FC<ChatThreadProps> = (props) => {
         try {
           await dispatch(
             thunks.addMessage({
-              threadId: thread.id,
+              threadId: thread._id,
               body,
             })
           );
@@ -184,8 +183,8 @@ export const ChatThread: FC<ChatThreadProps> = (props) => {
       // Filter the current user to get only the other participants
 
       const recipientIds = participants
-        .filter((participant) => participant.id !== user.id)
-        .map((participant) => participant.id);
+        .filter((participant) => participant._id !== user._id)
+        .map((participant) => participant._id);
 
       // Add the new message
 

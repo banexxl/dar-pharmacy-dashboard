@@ -10,7 +10,7 @@ export const ChatService = () => {
           const contactList = await accountsCollection.find(searchFilter).toArray();
 
           return contactList.map((contact) => ({
-               id: contact._id.toString(),
+               _id: contact._id.toString(),
                avatar: contact.avatar,
                isActive: contact.isActive,
                lastActivity: contact.lastActivity,
@@ -26,7 +26,7 @@ export const ChatService = () => {
           const accountsCollection = database.collection('Accounts');
           const contactList = await accountsCollection.find().toArray();
           return contactList.map((contact) => ({
-               id: contact._id.toString(),
+               _id: contact._id.toString(),
                avatar: contact.avatar,
                isActive: contact.isActive,
                lastActivity: contact.lastActivity,

@@ -27,7 +27,7 @@ const getThreadKey = (thread: Thread, userId: string): string | undefined => {
   let threadKey: string | undefined;
 
   if (thread.type === 'GROUP') {
-    threadKey = thread.id;
+    threadKey = thread._id;
   } else {
     // We hardcode the current user ID because the mocked that is not in sync
     // with the auth provider.
@@ -65,7 +65,9 @@ export const ChatSidebar: FC<ChatSidebarProps> = (props) => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [searchResults, setSearchResults] = useState<Contact[]>([]);
   const mdUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
-  const user = session.user;
+  const user: Contact | undefined = session.user as Contact | undefined;
+  console.log(user);
+
   const handleCompose = useCallback((): void => {
     router.push(paths.dashboard.chat + '?compose=true');
   }, [router]);
@@ -113,7 +115,7 @@ export const ChatSidebar: FC<ChatSidebarProps> = (props) => {
   const handleSearchSelect = useCallback(
     (contact: Contact): void => {
       // We use the contact ID as a thread key
-      const threadKey = contact.id;
+      const threadKey = contact._id;
 
       setSearchFocused(false);
       setSearchQuery('');
@@ -125,7 +127,7 @@ export const ChatSidebar: FC<ChatSidebarProps> = (props) => {
 
   const handleThreadSelect = useCallback((threadId: string): void => {
     const thread = threads.byId[threadId];
-    const threadKey = getThreadKey(thread, user?.email || '');
+    const threadKey = getThreadKey(thread, user?._id || '');
 
     if (!threadKey) {
       router.push(paths.dashboard.chat);

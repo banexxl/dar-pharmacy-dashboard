@@ -101,8 +101,7 @@ const Page = () => {
   //   user: {
   //     name: 'Branislav Damjanovic',
   //       email: 'damjanovic.branislav@gmail.com',
-  //         image:
-  //     'https://lh3.googleusercontent.com/a/ACg8ocKfJBthT1fi0xK07pekgU4tuHkfAxZJwuuI3H7qt91Zj67XnI8=s96-c',
+  //         image: 'https://lh3.googleusercontent.com/a/ACg8ocKfJBthT1fi0xK07pekgU4tuHkfAxZJwuuI3H7qt91Zj67XnI8=s96-c',
   //       role: 'admin',
   //         _id: '66df4fe5612e1db1f4965bae'
   //   },

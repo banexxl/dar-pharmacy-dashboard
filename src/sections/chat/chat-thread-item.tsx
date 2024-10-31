@@ -17,7 +17,7 @@ const getLastMessage = (thread: Thread): Message | undefined => {
 };
 
 const getRecipients = (participants: Contact[], userId: string): Contact[] => {
-  return participants.filter((participant) => participant.id !== userId);
+  return participants.filter((participant) => participant._id !== userId);
 };
 
 const getDisplayName = (recipients: Contact[]): string => {
@@ -40,7 +40,9 @@ const getLastActivity = (lastMessage?: Message): string | null => {
     return null;
   }
 
-  return formatDistanceStrict(lastMessage.createdAt, new Date(), {
+  const createdAt = new Date(lastMessage.createdAt);
+
+  return formatDistanceStrict(createdAt, new Date(), {
     addSuffix: false,
     locale: customLocale,
   });
@@ -56,11 +58,11 @@ export const ChatThreadItem: FC<ChatThreadItemProps> = (props) => {
   const { active = false, thread, onSelect, ...other } = props;
   const user = useMockedUser();
 
-  const recipients = getRecipients(thread.participants || [], user.id);
+  const recipients = getRecipients(thread.participants || [], user._id);
   const lastMessage = getLastMessage(thread);
   const lastActivity = getLastActivity(lastMessage);
   const displayName = getDisplayName(recipients);
-  const displayContent = getDisplayContent(user.id, lastMessage);
+  const displayContent = getDisplayContent(user._id, lastMessage);
   const groupThread = recipients.length > 1;
   const isUnread = !!(thread.unreadCount && thread.unreadCount > 0);
 
@@ -104,7 +106,7 @@ export const ChatThreadItem: FC<ChatThreadItemProps> = (props) => {
         >
           {recipients.map((recipient) => (
             <Avatar
-              key={recipient.id}
+              key={recipient._id}
               src={recipient.avatar || undefined}
             />
           ))}

@@ -25,7 +25,7 @@ import { useMockedUser } from '@/hooks/use-mocked-user';
 import { Contact } from '@/schemas/chat';
 
 const getRecipients = (participants: Contact[], userId: string): Contact[] => {
-  return participants.filter((participant) => participant.id !== userId);
+  return participants.filter((participant) => participant._id !== userId);
 };
 
 const getDisplayName = (recipients: Contact[]): string => {
@@ -53,7 +53,7 @@ export const ChatThreadToolbar: FC<ChatThreadToolbarProps> = (props) => {
 
   // Maybe use memo for these values
 
-  const recipients = getRecipients(participants, user.id);
+  const recipients = getRecipients(participants, user._id);
   const displayName = getDisplayName(recipients);
   const lastActive = getLastActive(recipients);
 
@@ -93,7 +93,7 @@ export const ChatThreadToolbar: FC<ChatThreadToolbarProps> = (props) => {
           >
             {recipients.map((recipient) => (
               <Avatar
-                key={recipient.id}
+                key={recipient._id}
                 src={recipient.avatar || undefined}
               />
             ))}

@@ -57,10 +57,10 @@ const reducers = {
           const thread = action.payload;
 
           if (thread) {
-               state.threads.byId[thread.id!] = thread;
+               state.threads.byId[thread._id!] = thread;
 
-               if (!state.threads.allIds.includes(thread.id!)) {
-                    state.threads.allIds.unshift(thread.id!);
+               if (!state.threads.allIds.includes(thread._id!)) {
+                    state.threads.allIds.unshift(thread._id!);
                }
           }
      },

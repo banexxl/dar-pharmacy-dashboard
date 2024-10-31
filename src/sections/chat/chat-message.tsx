@@ -21,7 +21,8 @@ interface ChatMessageProps {
 export const ChatMessage: FC<ChatMessageProps> = (props) => {
   const { authorAvatar, authorName, body, contentType, createdAt, position, ...other } = props;
 
-  const ago = formatDistanceToNowStrict(createdAt);
+  const date = new Date(createdAt);
+  const ago = formatDistanceToNowStrict(date, { addSuffix: false });
 
   return (
     <Box
@@ -68,7 +69,7 @@ export const ChatMessage: FC<ChatMessageProps> = (props) => {
             </Box>
             {contentType === 'image' && (
               <CardMedia
-                onClick={(): void => {}}
+                onClick={(): void => { }}
                 image={body}
                 sx={{
                   height: 200,

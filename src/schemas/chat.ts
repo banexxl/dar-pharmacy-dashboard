@@ -1,5 +1,5 @@
 export interface Contact {
-  id: string;
+  _id: string;
   avatar: string;
   lastActivity?: number;
   name: string;
@@ -8,7 +8,7 @@ export interface Contact {
 }
 
 interface Attachment {
-  id: string;
+  _id: string;
   url: string;
 }
 
@@ -22,7 +22,7 @@ export interface Message {
 }
 
 export interface Thread {
-  id?: string;
+  _id?: string;
   messages: Message[];
   participantIds: string[];
   participants?: Contact[];

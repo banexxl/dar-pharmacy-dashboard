@@ -12,6 +12,7 @@ import Stack from '@mui/material/Stack';
 import SvgIcon from '@mui/material/SvgIcon';
 import Tooltip from '@mui/material/Tooltip';
 import { useMockedUser } from '@/hooks/use-mocked-user';
+import { io, Socket } from 'socket.io-client';
 
 interface ChatMessageAddProps {
   disabled?: boolean;
@@ -19,31 +20,46 @@ interface ChatMessageAddProps {
 }
 
 export const ChatMessageAdd: FC<ChatMessageAddProps> = (props) => {
-  const { disabled = false, ...other } = props;
+  const { disabled = false, onSend, ...other } = props;
   const user = useMockedUser();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [body, setBody] = useState<string>('');
   const [typing, setTyping] = useState<boolean>(false);
+  const [socket, setSocket] = useState<Socket | null>(null);
+
+  useEffect(() => {
+    // Initialize socket connection
+    const newSocket = io('http://localhost:3000/dashboard/chat', {
+      transports: ['websocket'],
+      ackTimeout: 10000,
+    });
+    setSocket(newSocket);
+
+    // Cleanup on unmount
+    return () => {
+      newSocket.disconnect();
+    };
+  }, []);
 
   // Emit typing event
-  const handleTyping = () => {
+  const handleTyping = useCallback(() => {
     if (!typing) {
       setTyping(true);
-      // socket.emit('typing', { sender: user.id }); // Replace with actual user ID
+      socket?.emit('typing', { sender: user._id });
     }
     debounceStopTyping();
-  };
+  }, [typing, socket, user._id]);
 
-  const debounceStopTyping = (() => {
+  const debounceStopTyping = useCallback(() => {
     let timeout: NodeJS.Timeout;
     return () => {
       clearTimeout(timeout);
       timeout = setTimeout(() => {
         setTyping(false);
-        // socket.emit('stopTyping');
+        socket?.emit('stopTyping', { sender: user._id });
       }, 1000);
     };
-  })();
+  }, [socket, user._id])();
 
   const handleAttach = useCallback((): void => {
     fileInputRef.current?.click();
@@ -51,17 +67,18 @@ export const ChatMessageAdd: FC<ChatMessageAddProps> = (props) => {
 
   const handleChange = useCallback((event: ChangeEvent<HTMLInputElement>): void => {
     setBody(event.target.value);
-    handleTyping(); // Call to emit typing event
-  }, []);
+    handleTyping();
+  }, [handleTyping]);
 
   const handleSend = useCallback((): void => {
     if (!body) {
       return;
     }
 
-    // socket.emit('message', { content: body, sender: user.id }); // Emit message to server
+    socket?.emit('message', { content: body, sender: user._id });
+    onSend?.(body);  // Optional callback for parent component
     setBody('');
-  }, [body, user.id]);
+  }, [body, onSend, socket, user._id]);
 
   const handleKeyUp = useCallback(
     (event: KeyboardEvent<HTMLInputElement>): void => {

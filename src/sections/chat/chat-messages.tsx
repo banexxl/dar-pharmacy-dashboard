@@ -6,7 +6,7 @@ import { Message, Contact } from '@/schemas/chat';
 import { useMockedUser } from '@/hooks/use-mocked-user';
 
 const getAuthor = (message: Message, participants: Contact[], user: Contact) => {
-  const participant = participants.find((participant) => participant.id === message.authorId);
+  const participant = participants.find((participant) => participant._id === message.authorId);
 
   // This should never happen
   if (!participant) {
@@ -19,7 +19,7 @@ const getAuthor = (message: Message, participants: Contact[], user: Contact) => 
 
   // Since chat mock db is not synced with external auth providers
   // we set the user details from user auth state instead of thread participants
-  if (message.authorId === user.id) {
+  if (message.authorId === user._id) {
     return {
       name: 'Me',
       avatar: user.avatar,

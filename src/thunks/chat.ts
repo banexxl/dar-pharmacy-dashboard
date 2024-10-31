@@ -31,7 +31,7 @@ const getThread = (params: GetThreadParams): AppThunk => async (dispatch): Promi
           headers: {
                'Content-Type': 'application/json',
           },
-          body: JSON.stringify(params),
+          body: JSON.stringify(params.threadKey),
      }).then((response) => response.json());
      dispatch(slice.actions.getThread(response));
      return response?.id;

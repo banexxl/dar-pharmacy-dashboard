@@ -6,19 +6,15 @@ const io = new Server(); // Create a new socket server instance
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
      const { method, body } = req;
+     console.log('req', req.body);
 
      try {
 
           if (method === 'GET') {
                const threads = await ChatService().getThreads();
                res.status(200).json(threads);
-          } else {
-               res.setHeader('Allow', ['GET']);
-               res.status(405).end(`Method ${method} Not Allowed`);
-          }
-
-          if (method === 'POST') {
-               const thread = await ChatService().getThreadById(body.threadId as string);
+          } if (method === 'POST') {
+               const thread = await ChatService().getThreadById(body as string);
                if (thread) {
                     res.status(200).json(thread);
                } else {

@@ -59,8 +59,8 @@ export const ChatComposerRecipients: FC<ChatComposerRecipientsProps> = (props) =
 
         // Filter already picked recipients
 
-        const recipientIds = recipients.map((recipient) => recipient.id);
-        const filtered = contacts.filter((contact: Contact) => !recipientIds.includes(contact.id));
+        const recipientIds = recipients.map((recipient) => recipient._id);
+        const filtered = contacts.filter((contact: Contact) => !recipientIds.includes(contact._id));
 
         setSearchResults(filtered);
       } catch (err) {
@@ -157,7 +157,7 @@ export const ChatComposerRecipients: FC<ChatComposerRecipientsProps> = (props) =
                           <List>
                             {searchResults.map((contact) => (
                               <ListItemButton
-                                key={contact.id}
+                                key={contact._id}
                                 onClick={(): void => handleSearchSelect(contact)}
                               >
                                 <ListItemAvatar>
@@ -216,9 +216,9 @@ export const ChatComposerRecipients: FC<ChatComposerRecipientsProps> = (props) =
               {recipients.map((recipient) => (
                 <Chip
                   avatar={<Avatar src={recipient.avatar} />}
-                  key={recipient.id}
+                  key={recipient._id}
                   label={recipient.name}
-                  onDelete={(): void => onRecipientRemove?.(recipient.id)}
+                  onDelete={(): void => onRecipientRemove?.(recipient._id)}
                 />
               ))}
             </Stack>

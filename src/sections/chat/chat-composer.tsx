@@ -16,7 +16,7 @@ const useRecipients = () => {
 
   const handleRecipientAdd = useCallback((recipient: Contact): void => {
     setRecipients((prevState) => {
-      const found = prevState.find((_recipient) => _recipient.id === recipient.id);
+      const found = prevState.find((_recipient) => _recipient._id === recipient._id);
 
       if (found) {
         return prevState;
@@ -28,7 +28,7 @@ const useRecipients = () => {
 
   const handleRecipientRemove = useCallback((recipientId: string): void => {
     setRecipients((prevState) => {
-      return prevState.filter((recipient) => recipient.id !== recipientId);
+      return prevState.filter((recipient) => recipient._id !== recipientId);
     });
   }, []);
 
@@ -46,7 +46,7 @@ export const ChatComposer: FC = (props) => {
 
   const handleSend = useCallback(
     async (body: string): Promise<void> => {
-      const recipientIds = recipients.map((recipient) => recipient.id);
+      const recipientIds = recipients.map((recipient) => recipient._id);
 
       let threadId: string;
 
