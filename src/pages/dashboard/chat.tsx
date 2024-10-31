@@ -15,6 +15,7 @@ import { ChatThread } from '@/sections/chat/chat-thread';
 import { ChatComposer } from '@/sections/chat/chat-composer';
 import { ChatBlank } from '@/sections/chat/chat-blank';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
+import { useSession } from 'next-auth/react';
 // import { useSession } from 'next-auth/react';
 
 /**
@@ -94,7 +95,9 @@ const Page = () => {
   const compose = searchParams.get('compose') === 'true';
   const threadKey = searchParams.get('threadKey') || undefined;
   const sidebar = useSidebar();
-  // const { data: session } = useSession();
+  const session = useSession();
+  console.log(session);
+
 
   useThreads();
 

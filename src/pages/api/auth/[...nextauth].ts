@@ -27,12 +27,21 @@ export const authOptions: NextAuthOptions = {
                return false; // Do different verification for other providers that don't have `email_verified`
           },
           async session({ session, token }: any) {
-               const sessionUser = await userServices().getUserByEmailAndRole(session.user.email, 'admin');
+               const sessionUser: any = await userServices().getUserByEmailAndRole(session.user.email, 'admin');
+               console.log('aaaaaa', sessionUser);
 
                if (sessionUser) {
                     session.user.email = sessionUser.email;
+                    session.user.role = sessionUser.role;
+                    session.user._id = sessionUser._id;
                }
-               return session;
+               return {
+                    ...session,
+                    user: {
+                         ...session.user,
+                         email: sessionUser?.email
+                    }
+               };
           },
           async redirect({ url, baseUrl }: any) {
                const redirectUrl = url.startsWith('/') ? new URL(url, baseUrl).toString() : url;
