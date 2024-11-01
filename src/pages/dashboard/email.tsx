@@ -14,6 +14,7 @@ import { MailComposer } from '@/sections/mail/mail-composer';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { useSearchParams } from 'next/navigation';
 import { debounce } from 'lodash';
+import { useSession } from 'next-auth/react';
 
 const useLabels = (): Label[] => {
   const dispatch = useDispatch();
@@ -169,6 +170,7 @@ const Page = () => {
   const labels = useLabels();
   const composer = useComposer();
   const sidebar = useSidebar();
+  const session = useSession();
 
   const view = emailId ? 'details' : 'list';
 
@@ -207,6 +209,7 @@ const Page = () => {
             {view === 'details' && (
               <MailThread
                 emailId={emailId!}
+                session={session.data!}
               />
             )}
             {view === 'list' && (

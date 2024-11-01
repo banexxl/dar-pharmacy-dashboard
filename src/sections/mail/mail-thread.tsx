@@ -39,6 +39,7 @@ interface MailThreadProps {
   session: Session;
 }
 
+
 export const MailThread: FC<MailThreadProps> = (props) => {
 
   const { emailId, session } = props;
