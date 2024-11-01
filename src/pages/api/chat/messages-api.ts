@@ -6,12 +6,13 @@ const io = new Server(); // Create a new socket server instance
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
-     const { method, body } = req;
-     const { threadId, recipientIds, body: messageBody } = body;
+     const { method } = req;
+     const { senderId, threadId, recipientIds, body } = req.body;
 
      try {
+
           if (method === 'POST') {
-               const newMessage = await ChatService().addMessage(threadId, recipientIds, messageBody);
+               const newMessage = await ChatService().addMessage(senderId, threadId, recipientIds, body);
                return res.status(201).json(newMessage);
           } else if (method === 'GET') {
                //get participants from thread
@@ -19,7 +20,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                const participants = await ChatService().getParticipants(threadId);
                return res.status(200).json({ participants });
           } else {
-               res.setHeader('Allow', ['POST']);
+               res.setHeader('Allow', ['POST', 'GET']);
                res.status(405).end(`Method ${method} Not Allowed`);
           }
      } catch (error: any) {

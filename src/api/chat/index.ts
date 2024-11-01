@@ -275,7 +275,7 @@
 //                          const participantIds = [user.id, ...(recipientIds || [])];
 
 //                          thread = {
-//                               id: createResourceId(),
+//                               _id: createResourceId(),
 //                               messages: [],
 //                               participantIds,
 //                               type: participantIds.length === 2 ? 'ONE_TO_ONE' : 'GROUP',

@@ -12,18 +12,16 @@ import Stack from '@mui/material/Stack';
 import SvgIcon from '@mui/material/SvgIcon';
 import Tooltip from '@mui/material/Tooltip';
 import { io, Socket } from 'socket.io-client';
-import { Session } from 'next-auth';
-import { Contact } from '@/schemas/chat';
+import { CustomSession } from '@/schemas/chat';
 
 interface ChatMessageAddProps {
   disabled?: boolean;
-  onSend?: (value: string) => void;
-  session?: Session
+  onSend?: (value: string, senderId: string) => void;
+  session: CustomSession
 }
 
 export const ChatMessageAdd: FC<ChatMessageAddProps> = (props) => {
   const { disabled = false, onSend, session, ...other } = props;
-  const user = session?.user as Contact
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [body, setBody] = useState<string>('');
   const [typing, setTyping] = useState<boolean>(false);
@@ -47,10 +45,10 @@ export const ChatMessageAdd: FC<ChatMessageAddProps> = (props) => {
   const handleTyping = useCallback(() => {
     if (!typing) {
       setTyping(true);
-      socket?.emit('typing', { sender: user._id });
+      socket?.emit('typing', { sender: session?.data.user.name });
     }
     debounceStopTyping();
-  }, [typing, socket, user._id]);
+  }, [typing, socket, session?.data.user._id]);
 
   const debounceStopTyping = useCallback(() => {
     let timeout: NodeJS.Timeout;
@@ -58,10 +56,10 @@ export const ChatMessageAdd: FC<ChatMessageAddProps> = (props) => {
       clearTimeout(timeout);
       timeout = setTimeout(() => {
         setTyping(false);
-        socket?.emit('stopTyping', { sender: user._id });
+        socket?.emit('stopTyping', { sender: session?.data.user.name });
       }, 1000);
     };
-  }, [socket, user._id])();
+  }, [socket, session?.data.user?._id])();
 
   const handleAttach = useCallback((): void => {
     fileInputRef.current?.click();
@@ -77,17 +75,16 @@ export const ChatMessageAdd: FC<ChatMessageAddProps> = (props) => {
       return;
     }
 
-    socket?.emit('message', { content: body, sender: user._id });
-    onSend?.(body);  // Optional callback for parent component
-    setBody('');
-  }, [body, onSend, socket, user._id]);
+    socket?.emit('message', { content: body, sender: session?.data.user._id });
+    onSend?.(body, session?.data.user?._id!);  // Optional callback for parent component
+    setBody(''); // Clear the input after sending
+  }, [body, onSend, socket, session?.data.user?._id]);
 
-  const handleKeyUp = useCallback(
-    (event: KeyboardEvent<HTMLInputElement>): void => {
-      if (event.code === 'Enter') {
-        handleSend();
-      }
-    },
+  const handleKeyUp = useCallback((event: KeyboardEvent<HTMLInputElement>): void => {
+    if (event.code === 'Enter') {
+      handleSend();
+    }
+  },
     [handleSend]
   );
 
@@ -109,7 +106,7 @@ export const ChatMessageAdd: FC<ChatMessageAddProps> = (props) => {
             sm: 'inline',
           },
         }}
-        src={user.avatar!}
+        src={session?.data.user.avatar ? session?.data.user.avatar : '/assets/avatars/avatar-anika-visser.png'}
       />
       <OutlinedInput
         disabled={disabled}

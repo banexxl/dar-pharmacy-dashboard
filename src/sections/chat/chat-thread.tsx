@@ -13,7 +13,7 @@ import { thunks } from 'src/thunks/chat';
 import { ChatMessageAdd } from './chat-message-add';
 import { ChatMessages } from './chat-messages';
 import { ChatThreadToolbar } from './chat-thread-toolbar';
-import { Contact, Thread } from '@/schemas/chat';
+import { Contact, CustomSession, Thread } from '@/schemas/chat';
 import { useRouter } from 'next/router';
 import { paths } from 'paths';
 import { Session } from 'next-auth';
@@ -146,65 +146,63 @@ const useMessagesScroll = (
 
 interface ChatThreadProps {
   threadKey: string;
-  session: Session
+  session: CustomSession;
 }
 
 export const ChatThread: FC<ChatThreadProps> = (props) => {
   const { threadKey, session, ...other } = props;
   const dispatch = useDispatch();
-  const user = session?.user as Contact
+  const user = session?.user
   const thread = useThread(threadKey);
   const participants = useParticipants(threadKey);
   const { messagesRef } = useMessagesScroll(thread);
 
-  const handleSend = useCallback(
-    async (body: string): Promise<void> => {
-      // If we have the thread, we use its ID to add a new message
+  const handleSend = useCallback(async (body: string): Promise<void> => {
 
-      if (thread) {
-        try {
-          await dispatch(thunks.addMessage({ threadId: thread._id, body }));
-        } catch (err) {
-          console.error(err);
-        }
+    // If we have the thread, we use its ID to add a new message
 
-        return;
-      }
-
-      // Otherwise we use the recipients IDs. When using participant IDs, it means that we have to
-      // get the thread.
-
-      // Filter the current user to get only the other participants
-
-      const recipientIds = participants
-        .filter((participant) => participant._id !== user._id)
-        .map((participant) => participant._id);
-
-      // Add the new message
-
-      let threadId: string;
-
+    if (thread) {
       try {
-        threadId = (await dispatch(
-          thunks.addMessage({ recipientIds, body, }))) as unknown as string;
+        await dispatch(thunks.addMessage({ threadId: thread._id, body }));
       } catch (err) {
         console.error(err);
-        return;
       }
 
-      // Load the thread because we did not have it
+      return;
+    }
 
-      try {
-        await dispatch(thunks.getThread({ threadKey: threadId }));
-      } catch (err) {
-        console.error(err);
-        return;
-      }
+    // Otherwise we use the recipients IDs. When using participant IDs, it means that we have to
+    // get the thread.
 
-      // Set the new thread as active
+    // Filter the current user to get only the other participants
 
-      dispatch(thunks.setCurrentThread({ threadId }));
-    },
+    const recipientIds = participants
+      .filter((participant) => participant._id !== user._id)
+      .map((participant) => participant._id);
+
+    // Add the new message
+    let threadId: string;
+
+    try {
+      threadId = (await dispatch(thunks.addMessage({ recipientIds, body, }))) as unknown as string;
+    } catch (err) {
+      console.error(err);
+      return;
+    }
+
+    // Load the thread because we did not have it
+
+    try {
+      await dispatch(thunks.getThread({ threadKey: threadId }));
+    } catch (err) {
+      console.error(err);
+      return;
+    }
+
+    // Set the new thread as active
+
+    dispatch(thunks.setCurrentThread({ threadId }));
+  },
     [dispatch, participants, thread, user]
   );
 

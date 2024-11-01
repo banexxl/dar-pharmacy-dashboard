@@ -1,4 +1,6 @@
 import { Contact, Thread } from '@/schemas/chat';
+import { createResourceId } from '@/utils/create-resource-id';
+import { id } from 'date-fns/locale';
 import { MongoClient, ObjectId } from 'mongodb';
 
 export const ChatService = () => {
@@ -50,7 +52,7 @@ export const ChatService = () => {
      }
 
      const getThreadById = async (threadId: string) => {
-          console.log(threadId);
+          console.log('threadId', threadId);
 
           const client = await MongoClient.connect(process.env.MONGODB_URI!)
           const db = client.db('DAR_DB');
@@ -74,7 +76,9 @@ export const ChatService = () => {
           return true;
      };
 
-     const addMessage = async (threadId: string | undefined, recipientIds: string[] | undefined, body: string) => {
+     const addMessage = async (senderId: string, threadId: string | undefined, recipientIds: string[] | undefined, body: string) => {
+          console.log('senderId', senderId, 'threadId', threadId, 'recipientIds', recipientIds, 'body', body);
+
           const client = await MongoClient.connect(process.env.MONGODB_URI!)
           const db = client.db('DAR_DB');
           const threadsCollection = db.collection('Threads');
@@ -102,10 +106,12 @@ export const ChatService = () => {
           }
 
           const message = {
+               id: createResourceId(),
                body,
                createdAt: new Date(),
-               authorId: 'mockUserId', // Replace with actual user ID
+               authorId: senderId, // Replace with actual user ID
                attachments: [],
+               contentType: 'text',
           };
 
           await threadsCollection.updateOne(

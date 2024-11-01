@@ -16,7 +16,6 @@ import { ChatComposer } from '@/sections/chat/chat-composer';
 import { ChatBlank } from '@/sections/chat/chat-blank';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { useSession } from 'next-auth/react';
-// import { useSession } from 'next-auth/react';
 
 /**
  * NOTE:
@@ -151,8 +150,8 @@ const Page = () => {
               </IconButton>
             </Box>
             <Divider />
-            {view === 'thread' && <ChatThread threadKey={threadKey!} session={session.data!} />}
-            {view === 'compose' && <ChatComposer session={session.data!} />}
+            {view === 'thread' && <ChatThread threadKey={threadKey!} session={session as any} />}
+            {view === 'compose' && <ChatComposer threadId={threadKey} session={session as any} />}
             {view === 'blank' && <ChatBlank />}
           </ChatContainer>
         </Box>

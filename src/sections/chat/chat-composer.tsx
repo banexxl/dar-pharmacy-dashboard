@@ -6,11 +6,10 @@ import { useDispatch } from 'src/store';
 
 import { ChatComposerRecipients } from './chat-composer-recipients';
 import { ChatMessageAdd } from './chat-message-add';
-import { Contact } from '@/schemas/chat';
+import { Contact, CustomSession } from '@/schemas/chat';
 import { useRouter } from 'next/router';
 import { paths } from 'paths';
 import { thunks } from '@/thunks/chat';
-import { Session } from 'next-auth';
 
 const useRecipients = () => {
   const [recipients, setRecipients] = useState<Contact[]>([]);
@@ -41,35 +40,33 @@ const useRecipients = () => {
 };
 
 type ChatComposerProps = {
-  session: Session
+  //Override session.user with contact
+  session: CustomSession,
+  threadId?: string
 };
 
 export const ChatComposer = (props: ChatComposerProps) => {
-  const { session } = props;
+  const { session, threadId } = props;
   const dispatch = useDispatch();
   const router = useRouter();
   const { handleRecipientAdd, handleRecipientRemove, recipients } = useRecipients();
 
-  const handleSend = useCallback(
-    async (body: string): Promise<void> => {
-      const recipientIds = recipients.map((recipient) => recipient._id);
+  const handleSend = useCallback(async (body: string, senderId: string): Promise<void> => {
 
-      let threadId: string;
+    const recipientIds = recipients.map((recipient) => recipient._id);
 
-      try {
-        // Handle send message and redirect to the new thread
-        threadId = (await dispatch(thunks.addMessage({
-          recipientIds,
-          body,
-        })
-        )) as unknown as string;
-      } catch (err) {
-        console.error(err);
-        return;
-      }
+    let newThreadId: string;
 
-      router.push(paths.dashboard.chat + `?threadKey=${threadId}`);
-    },
+    try {
+      // Handle send message and redirect to the new thread
+      newThreadId = (await dispatch(thunks.addMessage({ senderId, threadId, recipientIds, body }))) as unknown as string;
+    } catch (err) {
+      console.error(err);
+      return;
+    }
+
+    router.push(paths.dashboard.chat + `?threadKey=${newThreadId}`);
+  },
     [dispatch, router, recipients]
   );
 

@@ -30,7 +30,6 @@ export const authOptions: NextAuthOptions = {
                const sessionUser: any = await userServices().getUserByEmailAndRole(session.user.email, 'admin');
 
                if (sessionUser) {
-                    session.user.email = sessionUser.email;
                     session.user.role = sessionUser.role;
                     session.user._id = sessionUser._id;
                }
@@ -38,7 +37,8 @@ export const authOptions: NextAuthOptions = {
                     ...session,
                     user: {
                          ...session.user,
-                         email: sessionUser?.email
+                         role: sessionUser.role,
+                         _id: sessionUser._id
                     }
                };
           },

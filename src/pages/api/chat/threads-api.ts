@@ -6,7 +6,8 @@ const io = new Server(); // Create a new socket server instance
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
      const { method, body } = req;
-     console.log('req', req.body);
+     //Distinguish body that contains thread id or new thread
+
 
      try {
 

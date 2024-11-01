@@ -26,7 +26,7 @@ type GetThreadParams = {
 };
 
 const getThread = (params: GetThreadParams): AppThunk => async (dispatch): Promise<string | undefined> => {
-     console.log(params)
+     console.log('params', params.threadKey);
      const response = await fetch(`/api/chat/threads-api/`, {
           method: 'POST',
           headers: {
@@ -34,8 +34,13 @@ const getThread = (params: GetThreadParams): AppThunk => async (dispatch): Promi
           },
           body: JSON.stringify(params.threadKey),
      }).then((response) => response.json());
-     dispatch(slice.actions.getThread(response));
-     return response?.id;
+
+     if (response.status === 200) {
+          dispatch(slice.actions.getThread(response));
+          return response?.id;
+     }
+
+     return undefined;
 };
 
 type MarkThreadAsSeenParams = {
@@ -56,12 +61,15 @@ const setCurrentThread = (params: SetCurrentThreadParams): AppThunk => (dispatch
 };
 
 type AddMessageParams = {
+     senderId: string;
      threadId?: string;
      recipientIds?: string[];
      body: string;
 };
 
 const addMessage = (params: AddMessageParams): AppThunk => async (dispatch): Promise<string> => {
+     console.log('senderId', params.senderId, 'threadId', params.threadId, 'recipientIds', params.recipientIds, 'body', params.body);
+
      const response = await fetch('/api/chat/messages-api',
           {
                method: 'POST',
@@ -70,9 +78,12 @@ const addMessage = (params: AddMessageParams): AppThunk => async (dispatch): Pro
                },
                body: JSON.stringify(params)
           }).then((response) => response.json());
-     dispatch(slice.actions.addMessage(response));
-
-     return response.threadId;
+     if (response.status === 200) {
+          dispatch(slice.actions.addMessage(response));
+          return response.threadId;
+     } else {
+          throw new Error('Failed to add message');
+     }
 };
 
 export const thunks = {
