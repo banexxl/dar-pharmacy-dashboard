@@ -50,10 +50,19 @@ export const ChatService = () => {
      }
 
      const getThreadById = async (threadId: string) => {
+          console.log(threadId);
+
           const client = await MongoClient.connect(process.env.MONGODB_URI!)
           const db = client.db('DAR_DB');
           const collection = db.collection('Threads');
-          return await collection.findOne({ _id: new ObjectId(threadId) });
+          const thread = await collection.findOne({ _id: new ObjectId(threadId) });
+          console.log(thread);
+
+          if (!thread) {
+               //return not found
+               return null;
+          }
+          return thread;
      };
 
      const markThreadAsSeen = async (threadId: string) => {
@@ -69,6 +78,7 @@ export const ChatService = () => {
           const client = await MongoClient.connect(process.env.MONGODB_URI!)
           const db = client.db('DAR_DB');
           const threadsCollection = db.collection('Threads');
+          const type = recipientIds?.length === 1 ? 'ONE_TO_ONE' : 'GROUP';
           let thread;
 
           if (threadId) {
@@ -82,6 +92,7 @@ export const ChatService = () => {
                          messages: [],
                          unreadCount: 0,
                          createdAt: new Date(),
+                         type: type
                     };
                     const result = await threadsCollection.insertOne(newThread);
                     threadId = result.insertedId.toString();

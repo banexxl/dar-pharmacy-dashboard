@@ -14,7 +14,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                const threads = await ChatService().getThreads();
                res.status(200).json(threads);
           } if (method === 'POST') {
-               const thread = await ChatService().getThreadById(body as string);
+               const thread = await ChatService().getThreadById(req.body as string);
                if (thread) {
                     res.status(200).json(thread);
                } else {

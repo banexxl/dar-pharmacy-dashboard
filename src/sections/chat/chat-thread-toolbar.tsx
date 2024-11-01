@@ -21,8 +21,8 @@ import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 
 import { usePopover } from 'src/hooks/use-popover';
-import { useMockedUser } from '@/hooks/use-mocked-user';
 import { Contact } from '@/schemas/chat';
+import { Session } from 'next-auth';
 
 const getRecipients = (participants: Contact[], userId: string): Contact[] => {
   return participants.filter((participant) => participant._id !== userId);
@@ -44,12 +44,14 @@ const getLastActive = (recipients: Contact[]): string | null => {
 
 interface ChatThreadToolbarProps {
   participants?: Contact[];
+  session?: Session
 }
 
 export const ChatThreadToolbar: FC<ChatThreadToolbarProps> = (props) => {
-  const { participants = [], ...other } = props;
-  const user = useMockedUser();
+  const { participants = [], session, ...other } = props;
+  const user = session?.user as Contact
   const popover = usePopover();
+  console.log(user);
 
   // Maybe use memo for these values
 
@@ -182,4 +184,5 @@ export const ChatThreadToolbar: FC<ChatThreadToolbarProps> = (props) => {
 
 ChatThreadToolbar.propTypes = {
   participants: PropTypes.array,
+  session: PropTypes.any
 };

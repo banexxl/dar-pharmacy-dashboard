@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Stack from '@mui/material/Stack';
 import { ChatMessage } from './chat-message';
 import { Message, Contact } from '@/schemas/chat';
-import { useMockedUser } from '@/hooks/use-mocked-user';
+import { Session } from 'next-auth';
 
 const getAuthor = (message: Message, participants: Contact[], user: Contact) => {
   const participant = participants.find((participant) => participant._id === message.authorId);
@@ -37,11 +37,12 @@ const getAuthor = (message: Message, participants: Contact[], user: Contact) => 
 interface ChatMessagesProps {
   messages?: Message[];
   participants?: Contact[];
+  session?: Session
 }
 
 export const ChatMessages: FC<ChatMessagesProps> = (props) => {
-  const { messages = [], participants = [], ...other } = props;
-  const user = useMockedUser();
+  const { messages = [], participants = [], session, ...other } = props;
+  const user = session?.user as Contact
 
   return (
     <Stack
@@ -71,4 +72,5 @@ export const ChatMessages: FC<ChatMessagesProps> = (props) => {
 ChatMessages.propTypes = {
   messages: PropTypes.array,
   participants: PropTypes.array,
+  session: PropTypes.any
 };

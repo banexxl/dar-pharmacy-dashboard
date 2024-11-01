@@ -26,6 +26,7 @@ type GetThreadParams = {
 };
 
 const getThread = (params: GetThreadParams): AppThunk => async (dispatch): Promise<string | undefined> => {
+     console.log(params)
      const response = await fetch(`/api/chat/threads-api/`, {
           method: 'POST',
           headers: {

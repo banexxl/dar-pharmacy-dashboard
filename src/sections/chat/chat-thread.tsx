@@ -16,7 +16,7 @@ import { ChatThreadToolbar } from './chat-thread-toolbar';
 import { Contact, Thread } from '@/schemas/chat';
 import { useRouter } from 'next/router';
 import { paths } from 'paths';
-import { useMockedUser } from '@/hooks/use-mocked-user';
+import { Session } from 'next-auth';
 
 const useParticipants = (threadKey: string): Contact[] => {
   const router = useRouter();
@@ -49,6 +49,8 @@ const useParticipants = (threadKey: string): Contact[] => {
 };
 
 const useThread = (threadKey: string): Thread | undefined => {
+  console.log(threadKey);
+
   const router = useRouter();
   const dispatch = useDispatch();
   const thread = useSelector((state: any) => {
@@ -65,11 +67,7 @@ const useThread = (threadKey: string): Thread | undefined => {
     let threadId: string | undefined;
 
     try {
-      threadId = (await dispatch(
-        thunks.getThread({
-          threadKey,
-        })
-      )) as unknown as string | undefined;
+      threadId = (await dispatch(thunks.getThread({ threadKey }))) as unknown as string | undefined;
     } catch (err) {
       console.error(err);
       router.push(paths.dashboard.chat);
@@ -148,12 +146,13 @@ const useMessagesScroll = (
 
 interface ChatThreadProps {
   threadKey: string;
+  session: Session
 }
 
 export const ChatThread: FC<ChatThreadProps> = (props) => {
-  const { threadKey, ...other } = props;
+  const { threadKey, session, ...other } = props;
   const dispatch = useDispatch();
-  const user = useMockedUser();
+  const user = session?.user as Contact
   const thread = useThread(threadKey);
   const participants = useParticipants(threadKey);
   const { messagesRef } = useMessagesScroll(thread);
@@ -164,12 +163,7 @@ export const ChatThread: FC<ChatThreadProps> = (props) => {
 
       if (thread) {
         try {
-          await dispatch(
-            thunks.addMessage({
-              threadId: thread._id,
-              body,
-            })
-          );
+          await dispatch(thunks.addMessage({ threadId: thread._id, body }));
         } catch (err) {
           console.error(err);
         }
@@ -192,11 +186,7 @@ export const ChatThread: FC<ChatThreadProps> = (props) => {
 
       try {
         threadId = (await dispatch(
-          thunks.addMessage({
-            recipientIds,
-            body,
-          })
-        )) as unknown as string;
+          thunks.addMessage({ recipientIds, body, }))) as unknown as string;
       } catch (err) {
         console.error(err);
         return;
@@ -205,11 +195,7 @@ export const ChatThread: FC<ChatThreadProps> = (props) => {
       // Load the thread because we did not have it
 
       try {
-        await dispatch(
-          thunks.getThread({
-            threadKey: threadId,
-          })
-        );
+        await dispatch(thunks.getThread({ threadKey: threadId }));
       } catch (err) {
         console.error(err);
         return;
@@ -232,7 +218,7 @@ export const ChatThread: FC<ChatThreadProps> = (props) => {
       }}
       {...other}
     >
-      <ChatThreadToolbar participants={participants} />
+      <ChatThreadToolbar participants={participants} session={session} />
       <Divider />
       <Box
         sx={{
@@ -251,11 +237,12 @@ export const ChatThread: FC<ChatThreadProps> = (props) => {
         </Scrollbar>
       </Box>
       <Divider />
-      <ChatMessageAdd onSend={handleSend} />
+      <ChatMessageAdd onSend={handleSend} session={session} />
     </Stack>
   );
 };
 
 ChatThread.propTypes = {
   threadKey: PropTypes.string.isRequired,
+  session: PropTypes.any
 };

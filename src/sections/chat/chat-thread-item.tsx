@@ -9,7 +9,7 @@ import Typography from '@mui/material/Typography';
 
 import { customLocale } from '@/utils/date-locale';
 import { Message, Contact, Thread } from '@/schemas/chat';
-import { useMockedUser } from '@/hooks/use-mocked-user';
+import { Session } from 'next-auth';
 
 
 const getLastMessage = (thread: Thread): Message | undefined => {
@@ -36,6 +36,8 @@ const getDisplayContent = (userId: string, lastMessage?: Message): string => {
 };
 
 const getLastActivity = (lastMessage?: Message): string | null => {
+  console.log(lastMessage);
+
   if (!lastMessage) {
     return null;
   }
@@ -52,17 +54,18 @@ interface ChatThreadItemProps {
   active?: boolean;
   onSelect?: () => void;
   thread: Thread;
+  session?: Session
 }
 
 export const ChatThreadItem: FC<ChatThreadItemProps> = (props) => {
-  const { active = false, thread, onSelect, ...other } = props;
-  const user = useMockedUser();
+  const { active = false, thread, onSelect, session, ...other } = props;
+  const user = session?.user as Contact
 
-  const recipients = getRecipients(thread.participants || [], user._id);
+  const recipients = getRecipients(thread.participants || [], user!._id);
   const lastMessage = getLastMessage(thread);
   const lastActivity = getLastActivity(lastMessage);
   const displayName = getDisplayName(recipients);
-  const displayContent = getDisplayContent(user._id, lastMessage);
+  const displayContent = getDisplayContent(user!._id, lastMessage);
   const groupThread = recipients.length > 1;
   const isUnread = !!(thread.unreadCount && thread.unreadCount > 0);
 
@@ -167,4 +170,5 @@ ChatThreadItem.propTypes = {
   onSelect: PropTypes.func,
   // @ts-ignore
   thread: PropTypes.object.isRequired,
+  session: PropTypes.any,
 };

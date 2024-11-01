@@ -12,7 +12,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
      try {
           if (method === 'POST') {
                const newMessage = await ChatService().addMessage(threadId, recipientIds, messageBody);
-               return res.status(201).json({ message: 'sent' });
+               return res.status(201).json(newMessage);
           } else if (method === 'GET') {
                //get participants from thread
 

@@ -25,6 +25,9 @@ import { Session } from 'next-auth';
 
 const getThreadKey = (thread: Thread, userId: string): string | undefined => {
   let threadKey: string | undefined;
+  console.log(thread);
+  console.log(userId);
+
 
   if (thread.type === 'GROUP') {
     threadKey = thread._id;
@@ -126,8 +129,14 @@ export const ChatSidebar: FC<ChatSidebarProps> = (props) => {
   );
 
   const handleThreadSelect = useCallback((threadId: string): void => {
+    console.log(threadId);
+
     const thread = threads.byId[threadId];
+    console.log(thread);
+
     const threadKey = getThreadKey(thread, user?._id || '');
+    console.log(threadKey);
+
 
     if (!threadKey) {
       router.push(paths.dashboard.chat);
@@ -200,6 +209,7 @@ export const ChatSidebar: FC<ChatSidebarProps> = (props) => {
                   handleThreadSelect(threadId)
                 }
                 thread={threads.byId[threadId]}
+                session={session}
               />
             ))}
           </Stack>

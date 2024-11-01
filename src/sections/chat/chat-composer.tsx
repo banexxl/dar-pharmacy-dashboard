@@ -10,6 +10,7 @@ import { Contact } from '@/schemas/chat';
 import { useRouter } from 'next/router';
 import { paths } from 'paths';
 import { thunks } from '@/thunks/chat';
+import { Session } from 'next-auth';
 
 const useRecipients = () => {
   const [recipients, setRecipients] = useState<Contact[]>([]);
@@ -39,7 +40,12 @@ const useRecipients = () => {
   };
 };
 
-export const ChatComposer: FC = (props) => {
+type ChatComposerProps = {
+  session: Session
+};
+
+export const ChatComposer = (props: ChatComposerProps) => {
+  const { session } = props;
   const dispatch = useDispatch();
   const router = useRouter();
   const { handleRecipientAdd, handleRecipientRemove, recipients } = useRecipients();
@@ -89,6 +95,7 @@ export const ChatComposer: FC = (props) => {
       <ChatMessageAdd
         disabled={!canAddMessage}
         onSend={handleSend}
+        session={session}
       />
     </Box>
   );

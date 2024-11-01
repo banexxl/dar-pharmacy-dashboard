@@ -12,11 +12,16 @@ import Stack from '@mui/material/Stack';
 import SvgIcon from '@mui/material/SvgIcon';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
+import { Contact } from '@/schemas/chat';
+import { Session } from 'next-auth';
 
-// import { useMockedUser } from 'src/hooks/use-mocked-user';
+type MailThreadReplyProps = {
+  session: Session
+};
 
-export const MailThreadReply: FC = (props) => {
-  // const user = useMockedUser();
+export const MailThreadReply = (props: MailThreadReplyProps) => {
+  const { session } = props
+  const user = session?.user as Contact
   const fileRef = useRef<HTMLInputElement | null>(null);
   const [message, setMessage] = useState<string>('');
 
@@ -39,7 +44,7 @@ export const MailThreadReply: FC = (props) => {
           direction="row"
           spacing={2}
         >
-          {/* <Avatar src={user.avatar} /> */}
+          <Avatar src={user.avatar} />
           <Box sx={{ flexGrow: 1 }}>
             <TextField
               fullWidth

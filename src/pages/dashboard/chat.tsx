@@ -151,7 +151,7 @@ const Page = () => {
               </IconButton>
             </Box>
             <Divider />
-            {view === 'thread' && <ChatThread threadKey={threadKey!} />}
+            {view === 'thread' && <ChatThread threadKey={threadKey!} session={session.data!} />}
             {view === 'compose' && <ChatComposer />}
             {view === 'blank' && <ChatBlank />}
           </ChatContainer>

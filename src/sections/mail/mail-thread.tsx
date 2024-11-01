@@ -14,6 +14,7 @@ import { MailThreadReply } from './mail-thread-reply';
 import { MailThreadToolbar } from './mail-thread-toolbar';
 import { Email } from '@/schemas/mail';
 import { paths } from 'paths';
+import { Session } from 'next-auth';
 
 const useEmail = (emailId: string): Email => {
   const dispatch = useDispatch();
@@ -35,11 +36,12 @@ const useEmail = (emailId: string): Email => {
 
 interface MailThreadProps {
   emailId: string;
+  session: Session;
 }
 
 export const MailThread: FC<MailThreadProps> = (props) => {
 
-  const { emailId } = props;
+  const { emailId, session } = props;
   const email = useEmail(emailId);
   if (!email) {
     return null;
@@ -80,7 +82,7 @@ export const MailThread: FC<MailThreadProps> = (props) => {
           {hasAttachments && <MailThreadAttachments attachments={email.attachments} />}
         </Stack>
       </Box>
-      <MailThreadReply />
+      <MailThreadReply session={session} />
     </Stack>
   );
 };
