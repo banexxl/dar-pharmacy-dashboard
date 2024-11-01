@@ -152,7 +152,7 @@ const Page = () => {
             </Box>
             <Divider />
             {view === 'thread' && <ChatThread threadKey={threadKey!} session={session.data!} />}
-            {view === 'compose' && <ChatComposer />}
+            {view === 'compose' && <ChatComposer session={session.data!} />}
             {view === 'blank' && <ChatBlank />}
           </ChatContainer>
         </Box>
