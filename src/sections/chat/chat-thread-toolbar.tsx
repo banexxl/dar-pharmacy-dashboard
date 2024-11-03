@@ -21,10 +21,13 @@ import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 
 import { usePopover } from 'src/hooks/use-popover';
-import { Contact } from '@/schemas/chat';
+import { Contact, CustomSession } from '@/schemas/chat';
 import { Session } from 'next-auth';
 
 const getRecipients = (participants: Contact[], userId: string): Contact[] => {
+  console.log('participants', participants);
+  console.log('userId', userId);
+
   return participants.filter((participant) => participant._id !== userId);
 };
 
@@ -44,18 +47,17 @@ const getLastActive = (recipients: Contact[]): string | null => {
 
 interface ChatThreadToolbarProps {
   participants?: Contact[];
-  session?: Session
+  session?: CustomSession
 }
 
 export const ChatThreadToolbar: FC<ChatThreadToolbarProps> = (props) => {
   const { participants = [], session, ...other } = props;
-  const user = session?.user as Contact
+
   const popover = usePopover();
-  console.log(user);
 
   // Maybe use memo for these values
 
-  const recipients = getRecipients(participants, user._id);
+  const recipients = getRecipients(participants, session?.data.user._id!);
   const displayName = getDisplayName(recipients);
   const lastActive = getLastActive(recipients);
 

@@ -16,19 +16,17 @@ import { ChatThreadToolbar } from './chat-thread-toolbar';
 import { Contact, CustomSession, Thread } from '@/schemas/chat';
 import { useRouter } from 'next/router';
 import { paths } from 'paths';
-import { Session } from 'next-auth';
-
 const useParticipants = (threadKey: string): Contact[] => {
   const router = useRouter();
   const [participants, setParticipants] = useState<Contact[]>([]);
 
   const handleParticipantsGet = useCallback(async (): Promise<void> => {
     try {
-      const participants = await fetch('/api/chat/messages-api', {
-        method: 'GET',
-        body: JSON.stringify({ threadKey }),
+      const participants = await fetch('/api/chat/participants-api', {
+        method: 'POST',
+        body: JSON.stringify(threadKey),
       }).then((res) => res.json());
-      console.log(participants);
+      console.log('participantsdsssss', participants);
 
       setParticipants(participants);
     } catch (err) {
@@ -39,7 +37,7 @@ const useParticipants = (threadKey: string): Contact[] => {
 
   useEffect(
     () => {
-      handleParticipantsGet();
+      handleParticipantsGet;
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [threadKey]
@@ -48,9 +46,7 @@ const useParticipants = (threadKey: string): Contact[] => {
   return participants;
 };
 
-const useThread = (threadKey: string): Thread | undefined => {
-  console.log(threadKey);
-
+const useThread = (threadKey: string): Thread => {
   const router = useRouter();
   const dispatch = useDispatch();
   const thread = useSelector((state: any) => {
@@ -64,10 +60,10 @@ const useThread = (threadKey: string): Thread | undefined => {
     // the server throws an error, this means that the user tried a shady route
     // and we redirect them on the home view
 
-    let threadId: string | undefined;
+    let threadId: string;
 
     try {
-      threadId = (await dispatch(thunks.getThread({ threadKey }))) as unknown as string | undefined;
+      threadId = (await dispatch(thunks.getThread({ threadKey }))) as unknown as string;
     } catch (err) {
       console.error(err);
       router.push(paths.dashboard.chat);
@@ -152,7 +148,6 @@ interface ChatThreadProps {
 export const ChatThread: FC<ChatThreadProps> = (props) => {
   const { threadKey, session, ...other } = props;
   const dispatch = useDispatch();
-  const user = session?.user
   const thread = useThread(threadKey);
   const participants = useParticipants(threadKey);
   const { messagesRef } = useMessagesScroll(thread);
@@ -163,7 +158,12 @@ export const ChatThread: FC<ChatThreadProps> = (props) => {
 
     if (thread) {
       try {
-        await dispatch(thunks.addMessage({ threadId: thread._id, body }));
+        await dispatch(thunks.addMessage({
+          recipientIds: participants.map((participant) => participant._id),
+          body,
+          senderId: session.data.user._id,
+          threadId: thread._id!,
+        }));
       } catch (err) {
         console.error(err);
       }
@@ -177,14 +177,19 @@ export const ChatThread: FC<ChatThreadProps> = (props) => {
     // Filter the current user to get only the other participants
 
     const recipientIds = participants
-      .filter((participant) => participant._id !== user._id)
+      .filter((participant) => participant._id !== session.data.user._id)
       .map((participant) => participant._id);
 
     // Add the new message
     let threadId: string;
 
     try {
-      threadId = (await dispatch(thunks.addMessage({ recipientIds, body, }))) as unknown as string;
+      threadId = (await dispatch(thunks.addMessage({
+        recipientIds,
+        body,
+        senderId: session.data.user._id,
+        threadId: threadKey
+      }))) as unknown as string;
     } catch (err) {
       console.error(err);
       return;
@@ -203,7 +208,7 @@ export const ChatThread: FC<ChatThreadProps> = (props) => {
 
     dispatch(thunks.setCurrentThread({ threadId }));
   },
-    [dispatch, participants, thread, user]
+    [dispatch, participants, thread, session.data.user]
   );
 
   // Maybe implement a loading state

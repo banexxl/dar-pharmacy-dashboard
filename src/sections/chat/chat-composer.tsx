@@ -42,7 +42,7 @@ const useRecipients = () => {
 type ChatComposerProps = {
   //Override session.user with contact
   session: CustomSession,
-  threadId?: string
+  threadId: string
 };
 
 export const ChatComposer = (props: ChatComposerProps) => {
@@ -58,8 +58,9 @@ export const ChatComposer = (props: ChatComposerProps) => {
     let newThreadId: string;
 
     try {
-      // Handle send message and redirect to the new thread
-      newThreadId = (await dispatch(thunks.addMessage({ senderId, threadId, recipientIds, body }))) as unknown as string;
+      // This line now returns a Promise<string>, so `newThreadId` will be a string
+      newThreadId = await dispatch(thunks.addMessage({ senderId, threadId, recipientIds, body })) as unknown as string
+
     } catch (err) {
       console.error(err);
       return;

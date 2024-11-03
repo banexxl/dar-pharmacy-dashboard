@@ -19,7 +19,7 @@ export interface Message {
   attachments: Attachment[];
   body: string;
   contentType: string;
-  createdAt: number;
+  createdAt: string;
   authorId: string;
 }
 
@@ -30,6 +30,7 @@ export interface Thread {
   participants?: Contact[];
   type: 'ONE_TO_ONE' | 'GROUP';
   unreadCount?: number;
+  participantsReadMessage?: string[];
 }
 
 // Extend the default Session type
@@ -40,7 +41,6 @@ export interface CustomSession extends Session {
       name?: string | null;
       email?: string | null;
       avatar?: string | null;
-      // Add your custom properties
       role: string;
       _id: string;
     };

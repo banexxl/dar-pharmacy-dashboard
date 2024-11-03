@@ -25,10 +25,6 @@ import { Session } from 'next-auth';
 
 const getThreadKey = (thread: Thread, userId: string): string | undefined => {
   let threadKey: string | undefined;
-  console.log(thread);
-  console.log(userId);
-
-
   if (thread.type === 'GROUP') {
     threadKey = thread._id;
   } else {
@@ -69,7 +65,6 @@ export const ChatSidebar: FC<ChatSidebarProps> = (props) => {
   const [searchResults, setSearchResults] = useState<Contact[]>([]);
   const mdUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
   const user: Contact | undefined = session.user as Contact | undefined;
-  console.log(user);
 
   const handleCompose = useCallback((): void => {
     router.push(paths.dashboard.chat + '?compose=true');
@@ -129,14 +124,8 @@ export const ChatSidebar: FC<ChatSidebarProps> = (props) => {
   );
 
   const handleThreadSelect = useCallback((threadId: string): void => {
-    console.log(threadId);
-
     const thread = threads.byId[threadId];
-    console.log(thread);
-
     const threadKey = getThreadKey(thread, user?._id || '');
-    console.log(threadKey);
-
 
     if (!threadKey) {
       router.push(paths.dashboard.chat);

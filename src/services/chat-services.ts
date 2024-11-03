@@ -52,14 +52,10 @@ export const ChatService = () => {
      }
 
      const getThreadById = async (threadId: string) => {
-          console.log('threadId', threadId);
-
           const client = await MongoClient.connect(process.env.MONGODB_URI!)
           const db = client.db('DAR_DB');
           const collection = db.collection('Threads');
           const thread = await collection.findOne({ _id: new ObjectId(threadId) });
-          console.log(thread);
-
           if (!thread) {
                //return not found
                return null;
@@ -76,50 +72,71 @@ export const ChatService = () => {
           return true;
      };
 
-     const addMessage = async (senderId: string, threadId: string | undefined, recipientIds: string[] | undefined, body: string) => {
+     const addMessage = async (senderId: string, threadId: string, recipientIds: string[], body: string) => {
           console.log('senderId', senderId, 'threadId', threadId, 'recipientIds', recipientIds, 'body', body);
 
-          const client = await MongoClient.connect(process.env.MONGODB_URI!)
+          // Establish a MongoDB client connection
+          const client = await MongoClient.connect(process.env.MONGODB_URI!);
           const db = client.db('DAR_DB');
           const threadsCollection = db.collection('Threads');
-          const type = recipientIds?.length === 1 ? 'ONE_TO_ONE' : 'GROUP';
+
           let thread;
 
+          // Check if `threadId` is provided and find the thread
           if (threadId) {
                thread = await threadsCollection.findOne({ _id: new ObjectId(threadId) });
                if (!thread) throw new Error('Invalid thread ID');
-          } else if (recipientIds) {
+          }
+          // If `threadId` is not provided, check `recipientIds` to find or create a thread
+          else if (recipientIds) {
+               // Attempt to find an existing thread with the same participants
                thread = await threadsCollection.findOne({ participantIds: { $all: recipientIds } });
+
+               // If no thread is found, create a new one
                if (!thread) {
+                    const type = recipientIds.length === 1 ? 'ONE_TO_ONE' : 'GROUP';
                     const newThread = {
-                         participantIds: recipientIds,
+                         participantIds: recipientIds.concat([senderId]),
                          messages: [],
                          unreadCount: 0,
                          createdAt: new Date(),
-                         type: type
+                         type,
+                         participantsReadMessage: [], // Initialize empty
                     };
                     const result = await threadsCollection.insertOne(newThread);
                     threadId = result.insertedId.toString();
+                    thread = { _id: result.insertedId, ...newThread }; // Construct a thread object
                }
           } else {
                throw new Error('Thread ID or recipient IDs must be provided');
           }
 
+          // Construct the message object
           const message = {
                id: createResourceId(),
                body,
                createdAt: new Date(),
-               authorId: senderId, // Replace with actual user ID
+               authorId: senderId,
                attachments: [],
                contentType: 'text',
           };
 
+          // Update the thread by adding the new message
           await threadsCollection.updateOne(
-               { _id: new ObjectId(threadId) },
-               { $push: { messages: message } as any }
+               { _id: new ObjectId(thread._id) },
+               {
+                    $push: { messages: message } as any,
+                    $set: {
+                         // Update `participantsReadMessage` to only contain the recipients
+                         participantsReadMessage: recipientIds || [],
+                    },
+               }
           );
 
-          return { threadId, message };
+          // Close the MongoDB client connection
+          await client.close();
+
+          return { threadId: thread._id.toString(), message };
      };
 
      const getParticipants = async (threadId: string) => {

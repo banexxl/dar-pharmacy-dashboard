@@ -8,13 +8,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
      const { method, body } = req;
      //Distinguish body that contains thread id or new thread
 
-
      try {
-
           if (method === 'GET') {
                const threads = await ChatService().getThreads();
                res.status(200).json(threads);
-          } if (method === 'POST') {
+          } else if (method === 'POST') {
                const thread = await ChatService().getThreadById(req.body as string);
                if (thread) {
                     res.status(200).json(thread);

@@ -26,7 +26,6 @@ type GetThreadParams = {
 };
 
 const getThread = (params: GetThreadParams): AppThunk => async (dispatch): Promise<string | undefined> => {
-     console.log('params', params.threadKey);
      const response = await fetch(`/api/chat/threads-api/`, {
           method: 'POST',
           headers: {
@@ -62,29 +61,43 @@ const setCurrentThread = (params: SetCurrentThreadParams): AppThunk => (dispatch
 
 type AddMessageParams = {
      senderId: string;
-     threadId?: string;
-     recipientIds?: string[];
+     threadId: string;
+     recipientIds: string[];
      body: string;
 };
 
 const addMessage = (params: AddMessageParams): AppThunk => async (dispatch): Promise<string> => {
-     console.log('senderId', params.senderId, 'threadId', params.threadId, 'recipientIds', params.recipientIds, 'body', params.body);
+     console.log(
+          'senderId', params.senderId,
+          'threadId', params.threadId,
+          'recipientIds', params.recipientIds,
+          'body', params.body
+     );
 
-     const response = await fetch('/api/chat/messages-api',
-          {
+     try {
+          const response = await fetch('/api/chat/messages-api', {
                method: 'POST',
                headers: {
                     'Content-Type': 'application/json',
                },
-               body: JSON.stringify(params)
-          }).then((response) => response.json());
-     if (response.status === 200) {
-          dispatch(slice.actions.addMessage(response));
-          return response.threadId;
-     } else {
-          throw new Error('Failed to add message');
+               body: JSON.stringify(params),
+          });
+
+          const data = await response.json();
+          console.log('add message response', data);
+
+          if (response.ok) {
+               dispatch(slice.actions.addMessage(data));
+               return data.threadId;
+          } else {
+               throw new Error('Failed to add message');
+          }
+     } catch (error) {
+          console.error('Error in addMessage thunk:', error);
+          throw error; // Ensure the error is propagated to the caller
      }
 };
+
 
 export const thunks = {
      addMessage,

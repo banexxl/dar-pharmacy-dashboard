@@ -14,12 +14,13 @@ interface ChatMessageProps {
   authorName: string;
   body: string;
   contentType: string;
-  createdAt: number;
+  createdAt: string;
   position?: 'left' | 'right';
 }
 
 export const ChatMessage: FC<ChatMessageProps> = (props) => {
   const { authorAvatar, authorName, body, contentType, createdAt, position, ...other } = props;
+  console.log('props', props);
 
   const date = new Date(createdAt);
   const ago = formatDistanceToNowStrict(date, { addSuffix: false });
@@ -113,6 +114,6 @@ ChatMessage.propTypes = {
   authorName: PropTypes.string.isRequired,
   body: PropTypes.string.isRequired,
   contentType: PropTypes.string.isRequired,
-  createdAt: PropTypes.number.isRequired,
+  createdAt: PropTypes.string.isRequired,
   position: PropTypes.oneOf(['left', 'right']),
 };

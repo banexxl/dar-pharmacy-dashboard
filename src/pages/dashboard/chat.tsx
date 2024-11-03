@@ -90,9 +90,9 @@ const useSidebar = () => {
 
 const Page = () => {
   const rootRef = useRef<HTMLDivElement | null>(null);
-  const searchParams = useSearchParams();
+  const searchParams = useSearchParams()
   const compose = searchParams.get('compose') === 'true';
-  const threadKey = searchParams.get('threadKey') || undefined;
+  const threadKey = searchParams.get('threadKey');
   const sidebar = useSidebar();
   const session = useSession();
   //Session object
@@ -151,7 +151,7 @@ const Page = () => {
             </Box>
             <Divider />
             {view === 'thread' && <ChatThread threadKey={threadKey!} session={session as any} />}
-            {view === 'compose' && <ChatComposer threadId={threadKey} session={session as any} />}
+            {view === 'compose' && <ChatComposer threadId={threadKey ?? ''} session={session as any} />}
             {view === 'blank' && <ChatBlank />}
           </ChatContainer>
         </Box>

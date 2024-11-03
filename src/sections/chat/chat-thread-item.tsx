@@ -36,8 +36,6 @@ const getDisplayContent = (userId: string, lastMessage?: Message): string => {
 };
 
 const getLastActivity = (lastMessage?: Message): string | null => {
-  console.log(lastMessage);
-
   if (!lastMessage) {
     return null;
   }

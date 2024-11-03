@@ -12,7 +12,6 @@ const imapConfig: any = {
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
      const emailId = req.query.emailId as string;
-     console.log('emailId', emailId);
 
      if (!emailId) {
           return res.status(400).json({ error: 'Email ID is required' });
