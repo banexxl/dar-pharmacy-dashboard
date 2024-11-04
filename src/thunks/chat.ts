@@ -67,12 +67,6 @@ type AddMessageParams = {
 };
 
 const addMessage = (params: AddMessageParams): AppThunk => async (dispatch): Promise<string> => {
-     console.log(
-          'senderId', params.senderId,
-          'threadId', params.threadId,
-          'recipientIds', params.recipientIds,
-          'body', params.body
-     );
 
      try {
           const response = await fetch('/api/chat/messages-api', {
@@ -84,8 +78,6 @@ const addMessage = (params: AddMessageParams): AppThunk => async (dispatch): Pro
           });
 
           const data = await response.json();
-          console.log('add message response', data);
-
           if (response.ok) {
                dispatch(slice.actions.addMessage(data));
                return data.threadId;

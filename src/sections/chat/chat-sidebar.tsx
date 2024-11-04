@@ -16,14 +16,15 @@ import { Scrollbar } from 'src/components/scrollbar';
 import { useSelector } from 'src/store';
 import { ChatSidebarSearch } from './chat-sidebar-search';
 import { ChatThreadItem } from './chat-thread-item';
-import { Contact, Thread } from '@/schemas/chat';
+import { Contact, CustomSession, Thread } from '@/schemas/chat';
 import { useRouter } from 'next/router';
 import { paths } from 'paths';
 import { Session } from 'next-auth';
+import { th } from 'date-fns/locale';
 // import { Session } from 'next-auth';
 // import { useSession } from 'next-auth/react';
 
-const getThreadKey = (thread: Thread, userId: string): string | undefined => {
+const getThreadKey = (thread: Thread): string | undefined => {
   let threadKey: string | undefined;
   if (thread.type === 'GROUP') {
     threadKey = thread._id;
@@ -33,7 +34,7 @@ const getThreadKey = (thread: Thread, userId: string): string | undefined => {
     // When implementing this app with a real database, replace this
     // ID with the ID from Auth Context.
 
-    threadKey = thread.participantIds.find((participantId) => participantId !== userId);
+    threadKey = thread._id
   }
 
   return threadKey;
@@ -51,7 +52,7 @@ interface ChatSidebarProps {
   container?: HTMLDivElement | null;
   onClose?: () => void;
   open?: boolean;
-  session: Session;
+  session: CustomSession;
 }
 
 export const ChatSidebar: FC<ChatSidebarProps> = (props) => {
@@ -60,6 +61,8 @@ export const ChatSidebar: FC<ChatSidebarProps> = (props) => {
   const router = useRouter();
   const threads = useThreads();
   const currentThreadId = useCurrentThreadId();
+
+
   const [searchFocused, setSearchFocused] = useState(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [searchResults, setSearchResults] = useState<Contact[]>([]);
@@ -72,7 +75,6 @@ export const ChatSidebar: FC<ChatSidebarProps> = (props) => {
 
   const handleSearchChange = useCallback(async (event: ChangeEvent<HTMLInputElement>): Promise<void> => {
     const { value } = event.target;
-
     setSearchQuery(value);
 
     if (!value) {
@@ -81,7 +83,7 @@ export const ChatSidebar: FC<ChatSidebarProps> = (props) => {
     }
 
     try {
-      const contacts = await fetch('/api/chat/', {
+      const contacts = await fetch('/api/chat/threads-api', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -89,8 +91,9 @@ export const ChatSidebar: FC<ChatSidebarProps> = (props) => {
         body: JSON.stringify({ query: value }),
       })
         .then((response) => response.json())
-        .then((response) => response.contacts);
-
+        .then((response) =>
+          response.contacts
+        );
       setSearchResults(contacts);
     } catch (err) {
       console.error(err);
@@ -110,27 +113,27 @@ export const ChatSidebar: FC<ChatSidebarProps> = (props) => {
     setSearchFocused(true);
   }, []);
 
-  const handleSearchSelect = useCallback(
-    (contact: Contact): void => {
-      // We use the contact ID as a thread key
-      const threadKey = contact._id;
+  const handleSearchSelect = useCallback((contact: Contact): void => {
+    // We use the contact ID as a thread key
+    const threadKey = contact._id;
 
-      setSearchFocused(false);
-      setSearchQuery('');
+    setSearchFocused(false);
+    setSearchQuery('');
 
-      router.push(paths.dashboard.chat + `?threadKey=${threadKey}`);
-    },
+    router.push(paths.dashboard.chat + `?threadKey=${threadKey}`);
+  },
     [router]
   );
 
   const handleThreadSelect = useCallback((threadId: string): void => {
-    const thread = threads.byId[threadId];
-    const threadKey = getThreadKey(thread, user?._id || '');
 
-    if (!threadKey) {
+    const thread = threads.byId[threadId];
+    const threadKey = getThreadKey(thread);
+
+    if (!threadId) {
       router.push(paths.dashboard.chat);
     } else {
-      router.push(paths.dashboard.chat + `?threadKey=${threadKey}`);
+      router.push(paths.dashboard.chat + `?threadKey=${threadId}`);
     }
   },
     [router, threads, user]

@@ -26,8 +26,6 @@ const useParticipants = (threadKey: string): Contact[] => {
         method: 'POST',
         body: JSON.stringify(threadKey),
       }).then((res) => res.json());
-      console.log('participantsdsssss', participants);
-
       setParticipants(participants);
     } catch (err) {
       console.error(err);

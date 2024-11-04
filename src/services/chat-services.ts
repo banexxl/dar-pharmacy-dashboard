@@ -73,8 +73,6 @@ export const ChatService = () => {
      };
 
      const addMessage = async (senderId: string, threadId: string, recipientIds: string[], body: string) => {
-          console.log('senderId', senderId, 'threadId', threadId, 'recipientIds', recipientIds, 'body', body);
-
           // Establish a MongoDB client connection
           const client = await MongoClient.connect(process.env.MONGODB_URI!);
           const db = client.db('DAR_DB');

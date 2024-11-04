@@ -20,8 +20,6 @@ interface ChatMessageProps {
 
 export const ChatMessage: FC<ChatMessageProps> = (props) => {
   const { authorAvatar, authorName, body, contentType, createdAt, position, ...other } = props;
-  console.log('props', props);
-
   const date = new Date(createdAt);
   const ago = formatDistanceToNowStrict(date, { addSuffix: false });
 

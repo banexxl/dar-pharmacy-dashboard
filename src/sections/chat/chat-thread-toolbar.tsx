@@ -25,9 +25,6 @@ import { Contact, CustomSession } from '@/schemas/chat';
 import { Session } from 'next-auth';
 
 const getRecipients = (participants: Contact[], userId: string): Contact[] => {
-  console.log('participants', participants);
-  console.log('userId', userId);
-
   return participants.filter((participant) => participant._id !== userId);
 };
 
