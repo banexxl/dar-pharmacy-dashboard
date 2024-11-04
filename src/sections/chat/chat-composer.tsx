@@ -64,6 +64,8 @@ export const ChatComposer = (props: ChatComposerProps) => {
     } catch (err) {
       console.error(err);
       return;
+    } finally {
+      dispatch(thunks.getThreads());
     }
 
     router.push(paths.dashboard.chat + `?threadKey=${newThreadId}`);
