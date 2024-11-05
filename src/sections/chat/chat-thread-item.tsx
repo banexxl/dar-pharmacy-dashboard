@@ -9,8 +9,6 @@ import Typography from '@mui/material/Typography';
 
 import { customLocale } from '@/utils/date-locale';
 import { Message, Contact, Thread, CustomSession } from '@/schemas/chat';
-import { Session } from 'next-auth';
-
 
 const getLastMessage = (thread: Thread): Message | undefined => {
   return thread.messages?.[thread.messages.length - 1];
@@ -58,29 +56,13 @@ interface ChatThreadItemProps {
 export const ChatThreadItem: FC<ChatThreadItemProps> = (props) => {
   const { active = false, thread, onSelect, session, ...other } = props;
   const user = session?.user as Contact
-  console.log('thread', thread);
-
   const recipients = getRecipients(thread.participants || [], user!._id);
-  console.log('recipients', recipients);
-
   const lastMessage = getLastMessage(thread);
-  console.log('lastMessage', lastMessage);
-
   const lastActivity = getLastActivity(lastMessage);
-  console.log('lastActivity', lastActivity);
-
   const displayName = getDisplayName(recipients);
-  console.log('displayName', displayName);
-
   const displayContent = getDisplayContent(user!._id, lastMessage);
-  console.log('displayContent', displayContent);
-
   const groupThread = recipients.length > 1;
-  console.log('groupThread', groupThread);
-
   const isUnread = !!(thread.unreadCount && thread.unreadCount > 0);
-  console.log('isUnread', isUnread);
-
 
   return (
     <Stack
