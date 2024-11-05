@@ -78,6 +78,8 @@ export const ChatService = () => {
           recipientIds: string[],
           body: string
      ) => {
+          console.log(senderId, threadId, recipientIds, body);
+
           // Establish a MongoDB client connection
           const client = await MongoClient.connect(process.env.MONGODB_URI!);
           const db = client.db('DAR_DB');
@@ -85,17 +87,15 @@ export const ChatService = () => {
           const dbAccounts = client.db('ACCOUNTS_DB');
           const accountsCollection = dbAccounts.collection('Accounts');
 
-          let thread
+          let thread;
 
           // Check if `threadId` is provided and find the thread
           if (threadId) {
                thread = await threadsCollection.findOne({ _id: new ObjectId(threadId) });
                if (!thread) throw new Error('Invalid thread ID');
           }
-          // If `threadId` is not provided, check `recipientIds` to find or create a thread
 
-
-          // If no thread is found, create a new one
+          // If `threadId` is not provided or no thread was found, check `recipientIds` to find or create a thread
           if (!thread) {
                const type = recipientIds.length === 1 ? 'ONE_TO_ONE' : 'GROUP';
                const newThread = {
@@ -110,14 +110,12 @@ export const ChatService = () => {
                const result = await threadsCollection.insertOne(newThread);
                threadId = result.insertedId.toString();
                thread = { _id: result.insertedId.toString(), ...newThread };
-          } else {
-               throw new Error('Thread ID or recipient IDs must be provided');
           }
 
-          // Fetch participant details from the `Contacts` collection
+          // Fetch participant details from the `Accounts` collection
           const participantIds = thread.participantIds;
           const participants = await accountsCollection
-               .find({ _id: { $in: participantIds.map((id) => new ObjectId(id)) } })
+               .find({ _id: { $in: participantIds.map((id: string) => new ObjectId(id)) } })
                .toArray();
 
           // Construct the message object
