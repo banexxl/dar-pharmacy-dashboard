@@ -49,7 +49,6 @@ const useThread = (threadKey: string): Thread => {
   const dispatch = useDispatch();
   const thread = useSelector((state: any) => {
     const { threads, currentThreadId } = state.chat;
-
     return threads.byId[currentThreadId as string];
   });
 
@@ -147,6 +146,7 @@ export const ChatThread: FC<ChatThreadProps> = (props) => {
   const { threadKey, session, ...other } = props;
   const dispatch = useDispatch();
   const thread = useThread(threadKey);
+
   const participants = useParticipants(threadKey);
   const { messagesRef } = useMessagesScroll(thread);
 

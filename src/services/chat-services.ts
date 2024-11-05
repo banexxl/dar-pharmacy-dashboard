@@ -1,4 +1,4 @@
-import { Contact, Thread } from '@/schemas/chat';
+import { Contact, Message, Thread } from '@/schemas/chat';
 import { createResourceId } from '@/utils/create-resource-id';
 import { id } from 'date-fns/locale';
 import { MongoClient, ObjectId } from 'mongodb';
@@ -72,13 +72,20 @@ export const ChatService = () => {
           return true;
      };
 
-     const addMessage = async (senderId: string, threadId: string, recipientIds: string[], body: string) => {
+     const addMessage = async (
+          senderId: string,
+          threadId: string,
+          recipientIds: string[],
+          body: string
+     ) => {
           // Establish a MongoDB client connection
           const client = await MongoClient.connect(process.env.MONGODB_URI!);
           const db = client.db('DAR_DB');
           const threadsCollection = db.collection('Threads');
+          const dbAccounts = client.db('ACCOUNTS_DB');
+          const accountsCollection = dbAccounts.collection('Accounts');
 
-          let thread;
+          let thread
 
           // Check if `threadId` is provided and find the thread
           if (threadId) {
@@ -86,34 +93,38 @@ export const ChatService = () => {
                if (!thread) throw new Error('Invalid thread ID');
           }
           // If `threadId` is not provided, check `recipientIds` to find or create a thread
-          else if (recipientIds) {
-               // Attempt to find an existing thread with the same participants
-               thread = await threadsCollection.findOne({ participantIds: { $all: recipientIds } });
 
-               // If no thread is found, create a new one
-               if (!thread) {
-                    const type = recipientIds.length === 1 ? 'ONE_TO_ONE' : 'GROUP';
-                    const newThread = {
-                         participantIds: recipientIds.concat([senderId]),
-                         messages: [],
-                         unreadCount: 0,
-                         createdAt: new Date(),
-                         type,
-                         participantsReadMessage: [], // Initialize empty
-                    };
-                    const result = await threadsCollection.insertOne(newThread);
-                    threadId = result.insertedId.toString();
-                    thread = { _id: result.insertedId, ...newThread }; // Construct a thread object
-               }
+
+          // If no thread is found, create a new one
+          if (!thread) {
+               const type = recipientIds.length === 1 ? 'ONE_TO_ONE' : 'GROUP';
+               const newThread = {
+                    participantIds: recipientIds.concat([senderId]),
+                    messages: [],
+                    unreadCount: 0,
+                    participants: [],
+                    type,
+                    participantsReadMessage: [], // Initialize empty
+               };
+
+               const result = await threadsCollection.insertOne(newThread);
+               threadId = result.insertedId.toString();
+               thread = { _id: result.insertedId.toString(), ...newThread };
           } else {
                throw new Error('Thread ID or recipient IDs must be provided');
           }
 
+          // Fetch participant details from the `Contacts` collection
+          const participantIds = thread.participantIds;
+          const participants = await accountsCollection
+               .find({ _id: { $in: participantIds.map((id) => new ObjectId(id)) } })
+               .toArray();
+
           // Construct the message object
-          const message = {
+          const message: Message = {
                id: createResourceId(),
                body,
-               createdAt: new Date(),
+               createdAt: new Date().toISOString(),
                authorId: senderId,
                attachments: [],
                contentType: 'text',
@@ -127,6 +138,7 @@ export const ChatService = () => {
                     $set: {
                          // Update `participantsReadMessage` to only contain the recipients
                          participantsReadMessage: recipientIds || [],
+                         participants, // Add participants array to the thread
                     },
                }
           );
@@ -134,7 +146,7 @@ export const ChatService = () => {
           // Close the MongoDB client connection
           await client.close();
 
-          return { threadId: thread._id.toString(), message };
+          return { threadId: thread._id!.toString(), message };
      };
 
      const getParticipants = async (threadId: string) => {

@@ -27,7 +27,7 @@ export interface Thread {
   _id?: string;
   messages: Message[];
   participantIds: string[];
-  participants?: Contact[];
+  participants: Contact[];
   type: 'ONE_TO_ONE' | 'GROUP';
   unreadCount?: number;
   participantsReadMessage?: string[];

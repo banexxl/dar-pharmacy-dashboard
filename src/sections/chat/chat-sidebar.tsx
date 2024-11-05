@@ -13,32 +13,13 @@ import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import type { Theme } from '@mui/material/styles/createTheme';
 import { Scrollbar } from 'src/components/scrollbar';
-import { useSelector } from 'src/store';
+import { useDispatch, useSelector } from 'src/store';
 import { ChatSidebarSearch } from './chat-sidebar-search';
 import { ChatThreadItem } from './chat-thread-item';
 import { Contact, CustomSession, Thread } from '@/schemas/chat';
 import { useRouter } from 'next/router';
 import { paths } from 'paths';
-import { Session } from 'next-auth';
-import { th } from 'date-fns/locale';
-// import { Session } from 'next-auth';
-// import { useSession } from 'next-auth/react';
-
-const getThreadKey = (thread: Thread): string | undefined => {
-  let threadKey: string | undefined;
-  if (thread.type === 'GROUP') {
-    threadKey = thread._id;
-  } else {
-    // We hardcode the current user ID because the mocked that is not in sync
-    // with the auth provider.
-    // When implementing this app with a real database, replace this
-    // ID with the ID from Auth Context.
-
-    threadKey = thread._id
-  }
-
-  return threadKey;
-};
+import { thunks } from '@/thunks/chat';
 
 const useThreads = (): { byId: Record<string, Thread>; allIds: string[] } => {
   return useSelector((state: any) => state.chat?.threads);
@@ -61,8 +42,6 @@ export const ChatSidebar: FC<ChatSidebarProps> = (props) => {
   const router = useRouter();
   const threads = useThreads();
   const currentThreadId = useCurrentThreadId();
-
-
   const [searchFocused, setSearchFocused] = useState(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [searchResults, setSearchResults] = useState<Contact[]>([]);
@@ -125,15 +104,15 @@ export const ChatSidebar: FC<ChatSidebarProps> = (props) => {
     [router]
   );
 
-  const handleThreadSelect = useCallback((threadId: string): void => {
-
+  const handleThreadSelect = useCallback((threadId: string): boolean => {
     const thread = threads.byId[threadId];
-    const threadKey = getThreadKey(thread);
 
-    if (!threadId) {
+    if (!thread || !threadId) {
       router.push(paths.dashboard.chat);
+      return false
     } else {
       router.push(paths.dashboard.chat + `?threadKey=${threadId}`);
+      return true
     }
   },
     [router, threads, user]
@@ -197,9 +176,10 @@ export const ChatSidebar: FC<ChatSidebarProps> = (props) => {
               <ChatThreadItem
                 active={currentThreadId === threadId}
                 key={threadId}
-                onSelect={(): void =>
-                  handleThreadSelect(threadId)
-                }
+                onSelect={(): void => {
+                  handleThreadSelect(threadId) ??
+                    thunks.setCurrentThread({ threadId: threadId });
+                }}
                 thread={threads.byId[threadId]}
                 session={session}
               />
