@@ -16,6 +16,7 @@ import { ChatComposer } from '@/sections/chat/chat-composer';
 import { ChatBlank } from '@/sections/chat/chat-blank';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { useSession } from 'next-auth/react';
+import { CustomSession } from '@/schemas/chat';
 
 /**
  * NOTE:
@@ -139,7 +140,7 @@ const Page = () => {
             container={rootRef.current}
             onClose={sidebar.handleClose}
             open={sidebar.open}
-            session={session.data!}
+            session={session.data! as CustomSession}
           />
           <ChatContainer open={sidebar.open}>
             <Box sx={{ p: 2 }}>

@@ -49,7 +49,7 @@ const useThread = (threadKey: string): Thread => {
   const dispatch = useDispatch();
   const thread = useSelector((state: any) => {
     const { threads, currentThreadId } = state.chat;
-    return threads.byId[currentThreadId as string];
+    return threads.byId[threadKey as string];
   });
 
   const handleThreadGet = useCallback(async (): Promise<void> => {
@@ -234,6 +234,7 @@ export const ChatThread: FC<ChatThreadProps> = (props) => {
           <ChatMessages
             messages={thread?.messages || []}
             participants={thread?.participants || []}
+            session={session}
           />
         </Scrollbar>
       </Box>

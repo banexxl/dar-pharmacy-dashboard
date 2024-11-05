@@ -2,8 +2,7 @@ import type { FC } from 'react';
 import PropTypes from 'prop-types';
 import Stack from '@mui/material/Stack';
 import { ChatMessage } from './chat-message';
-import { Message, Contact } from '@/schemas/chat';
-import { Session } from 'next-auth';
+import { Message, Contact, CustomSession } from '@/schemas/chat';
 
 const getAuthor = (message: Message, participants: Contact[], user: Contact) => {
   const participant = participants.find((participant) => participant._id === message.authorId);
@@ -37,12 +36,13 @@ const getAuthor = (message: Message, participants: Contact[], user: Contact) => 
 interface ChatMessagesProps {
   messages?: Message[];
   participants?: Contact[];
-  session?: Session
+  session?: CustomSession
 }
 
 export const ChatMessages: FC<ChatMessagesProps> = (props) => {
   const { messages = [], participants = [], session, ...other } = props;
-  const user = session?.user as Contact
+
+  const user = session?.data
 
   return (
     <Stack
@@ -51,7 +51,7 @@ export const ChatMessages: FC<ChatMessagesProps> = (props) => {
       {...other}
     >
       {messages.map((message) => {
-        const author = getAuthor(message, participants, user);
+        const author = getAuthor(message, participants, user?.user!);
 
         return (
           <ChatMessage

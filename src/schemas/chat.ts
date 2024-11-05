@@ -1,12 +1,13 @@
 import { Session } from "next-auth";
 
 export interface Contact {
-  _id: string;
-  avatar: string;
-  lastActivity?: number;
   name: string;
+  email: string;
+  avatar: string;
+  role: string;
+  _id: string;
+  lastActivity: number;
   isActive: boolean;
-  email?: string;
 }
 
 interface Attachment {
@@ -38,11 +39,13 @@ export interface CustomSession extends Session {
   data: {
     user: {
       // Include the default properties from the original Session user type
-      name?: string | null;
-      email?: string | null;
-      avatar?: string | null;
+      name: string
+      email: string
+      avatar: string
       role: string;
       _id: string;
+      lastActivity: number;
+      isActive: boolean;
     };
   }
 }
