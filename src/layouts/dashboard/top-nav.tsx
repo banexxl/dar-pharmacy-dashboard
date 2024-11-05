@@ -25,6 +25,7 @@ export const TopNav = (props: any) => {
      const lgUp = useMediaQuery((theme: any) => theme.breakpoints.up('lg'));
      const accountPopover = usePopover();
 
+
      return (
           <>
                <Box
@@ -106,7 +107,7 @@ export const TopNav = (props: any) => {
                                         height: 40,
                                         width: 40
                                    }}
-                                   src="/assets/avatars/avatar-anika-visser.png"
+                                   src={props.session.data.user.avatar}
                               />
                          </Stack>
                     </Stack>
@@ -121,5 +122,6 @@ export const TopNav = (props: any) => {
 };
 
 TopNav.propTypes = {
-     onNavOpen: PropTypes.func
+     onNavOpen: PropTypes.func,
+     session: PropTypes.any
 };
