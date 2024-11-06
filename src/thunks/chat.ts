@@ -11,12 +11,13 @@ const getContacts = (): AppThunk => async (dispatch): Promise<void> => {
      dispatch(slice.actions.getContacts(response));
 };
 
-const getThreads = (): AppThunk => async (dispatch): Promise<void> => {
-     const response = await fetch('/api/chat/threads-api', {
-          method: 'GET',
+const getThreads = (clientId: string): AppThunk => async (dispatch): Promise<void> => {
+     const response = await fetch('/api/chat/threads-by-user-api', {
+          method: 'POST',
           headers: {
                'Content-Type': 'application/json',
           },
+          body: JSON.stringify({ clientId }),
      }).then((response) => response.json());
      dispatch(slice.actions.getThreads(response));
 };

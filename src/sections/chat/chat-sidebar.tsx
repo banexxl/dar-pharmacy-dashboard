@@ -13,7 +13,7 @@ import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import type { Theme } from '@mui/material/styles/createTheme';
 import { Scrollbar } from 'src/components/scrollbar';
-import { useDispatch, useSelector } from 'src/store';
+import { useSelector } from 'src/store';
 import { ChatSidebarSearch } from './chat-sidebar-search';
 import { ChatThreadItem } from './chat-thread-item';
 import { Contact, CustomSession, Thread } from '@/schemas/chat';

@@ -65,7 +65,7 @@ export const ChatComposer = (props: ChatComposerProps) => {
       console.error(err);
       return;
     } finally {
-      dispatch(thunks.getThreads());
+      dispatch(thunks.getThreads(session.data?.user._id! as string));
     }
 
     router.push(paths.dashboard.chat + `?threadKey=${newThreadId}`);

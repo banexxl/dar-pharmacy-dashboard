@@ -25,21 +25,7 @@ import { CustomSession } from '@/schemas/chat';
  * if threadKey does not exist, it means that the chat is in compose mode
  */
 
-const useThreads = (): void => {
-  const dispatch = useDispatch();
 
-  const handleThreadsGet = useCallback((): void => {
-    dispatch(thunks.getThreads());
-  }, [dispatch]);
-
-  useEffect(
-    () => {
-      handleThreadsGet();
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
-};
 
 const useSidebar = () => {
   const searchParams = useSearchParams();
@@ -95,7 +81,7 @@ const Page = () => {
   const compose = searchParams.get('compose') === 'true';
   const threadKey = searchParams.get('threadKey');
   const sidebar = useSidebar();
-  const session = useSession();
+  const session = useSession() as unknown as CustomSession
   //Session object
   // data: {
   //   user: {
@@ -107,7 +93,21 @@ const Page = () => {
   //   },
   //   expires: '2024-10-31T14:08:59.025Z'
   // },
+  const useThreads = (): void => {
+    const dispatch = useDispatch();
 
+    const handleThreadsGet = useCallback((): void => {
+      dispatch(thunks.getThreads(session.data?.user._id! as string));
+    }, [dispatch]);
+
+    useEffect(
+      () => {
+        handleThreadsGet();
+      },
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      []
+    );
+  };
 
   useThreads();
 
@@ -140,7 +140,7 @@ const Page = () => {
             container={rootRef.current}
             onClose={sidebar.handleClose}
             open={sidebar.open}
-            session={session.data! as CustomSession}
+            session={session.data! as unknown as CustomSession}
           />
           <ChatContainer open={sidebar.open}>
             <Box sx={{ p: 2 }}>

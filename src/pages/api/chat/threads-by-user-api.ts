@@ -10,12 +10,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
      try {
           if (method === 'POST') {
-               const thread = await ChatService().getThreadById(req.body as string);
-               if (thread) {
-                    res.status(200).json(thread);
-               } else {
-                    res.status(404).json({ message: 'Thread not found' });
-               }
+               const threads = await ChatService().getThreadsForUser(body.clientId);
+               res.status(200).json(threads);
           } else {
                res.setHeader('Allow', ['POST']);
                res.status(405).end(`Method ${method} Not Allowed`);

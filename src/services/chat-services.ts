@@ -36,20 +36,24 @@ export const ChatService = () => {
           })) as Contact[];
      };
 
-     const getThreads = async (): Promise<Thread[]> => {
-          const client = await MongoClient.connect(process.env.MONGODB_URI!)
+     const getThreadsForUser = async (clientId: string): Promise<Thread[]> => {
+          const client = await MongoClient.connect(process.env.MONGODB_URI!);
           const db = client.db('DAR_DB'); // Use your actual chat database name
           const collection = db.collection('Threads');
-          const threads = await collection.find().toArray();
+
+          // Use MongoDB's `find` method to filter threads where `participantIds` includes `clientId`
+          const threads = await collection.find({ participantIds: { $in: [clientId] } }).toArray();
+          // Map the raw MongoDB documents to the `Thread` type
           return threads.map((thread: any) => ({
                _id: thread._id.toString(),
                messages: thread.messages,
                participantIds: thread.participantIds,
                participants: thread.participants,
                unreadCount: thread.unreadCount,
-               type: thread.type
-          }))
-     }
+               type: thread.type,
+          }));
+     };
+
 
      const getThreadById = async (threadId: string) => {
           const client = await MongoClient.connect(process.env.MONGODB_URI!)
@@ -78,8 +82,6 @@ export const ChatService = () => {
           recipientIds: string[],
           body: string
      ) => {
-          console.log(senderId, threadId, recipientIds, body);
-
           // Establish a MongoDB client connection
           const client = await MongoClient.connect(process.env.MONGODB_URI!);
           const db = client.db('DAR_DB');
@@ -158,7 +160,7 @@ export const ChatService = () => {
 
      return {
           getContact,
-          getThreads,
+          getThreadsForUser,
           getThreadById,
           markThreadAsSeen,
           addMessage,
