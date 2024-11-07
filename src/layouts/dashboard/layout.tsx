@@ -5,6 +5,7 @@ import { withAuthGuard } from 'src/hocs/with-auth-guard';
 import { SideNav } from './side-nav';
 import { TopNav } from './top-nav';
 import { useSession } from 'next-auth/react';
+import { subscribeToSNSTopic } from '@/utils/aws-sns-subscribe';
 
 const SIDE_NAV_WIDTH = 280;
 
@@ -42,6 +43,7 @@ export const Layout = withAuthGuard((props: any) => {
      useEffect(
           () => {
                handlePathnameChange();
+               subscribeToSNSTopic();
           },
           // eslint-disable-next-line react-hooks/exhaustive-deps
           [pathname]
