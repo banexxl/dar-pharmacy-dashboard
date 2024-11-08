@@ -158,6 +158,15 @@ export const ChatService = () => {
           return thread.participantIds;
      };
 
+     const getParticipantById = async (participantId: string) => {
+          const client = await MongoClient.connect(process.env.MONGODB_URI!)
+          const db = client.db('ACCOUNTS_DB');
+          const accountsCollection = db.collection('Accounts');
+          const participant = await accountsCollection.findOne({ _id: new ObjectId(participantId) });
+          if (!participant) throw new Error('Invalid participant ID');
+          return participant;
+     }
+
      return {
           getContact,
           getThreadsForUser,
@@ -165,6 +174,7 @@ export const ChatService = () => {
           markThreadAsSeen,
           addMessage,
           getParticipants,
-          getAllContacts
+          getAllContacts,
+          getParticipantById
      };
 };
