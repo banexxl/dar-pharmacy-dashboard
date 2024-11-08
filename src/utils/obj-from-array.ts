@@ -1,9 +1,13 @@
-export const objFromArray = (arr?: any[], key = '_id'): Record<string, any> => {
+export const objFromArray = (arr?: any[]): Record<string, any> => {
   if (!arr || !arr.length) {
     return {};
   }
+
   return arr.reduce((acc, item) => {
-    acc[item[key]] = item;
+    const key = item._id ?? item.id; // Use `_id` if available, otherwise use `id`.
+    if (key) {
+      acc[key] = item;
+    }
     return acc;
-  }, {});
+  }, {} as Record<string, any>);
 };

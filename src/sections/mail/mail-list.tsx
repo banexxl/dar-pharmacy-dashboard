@@ -32,7 +32,6 @@ import toast from 'react-hot-toast';
 const useEmails = (currentLabelId?: string): { byId: Record<string, Email>; allIds: string[] } => {
   const dispatch = useDispatch();
   const { emails } = useSelector((state) => state.mail);
-
   useEffect(
     () => {
       dispatch(thunks.getEmails(currentLabelId!));
