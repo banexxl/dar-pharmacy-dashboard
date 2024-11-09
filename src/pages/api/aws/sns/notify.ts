@@ -9,6 +9,12 @@ const sns = new SNS({
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
 
+     console.log('req.body', req.body);
+     console.log('req.headers', req.headers);
+     console.log('req.method', req.method);
+     console.log('req.body[Token]', req.body['Token']);
+     console.log('req.body[TopicArn]', req.body['TopicArn']);
+
      if (req.method === 'POST') {
           try {
                const messageType = req.headers['x-amz-sns-message-type'];
