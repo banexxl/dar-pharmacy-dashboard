@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { SNS } from 'aws-sdk';
 
 const sns = new SNS({
-     region: 'eu-central-1', // e.g., 'us-east-1'
+     region: 'eu-central-1',
      accessKeyId: process.env.AWS_S3_ACCESS_KEY,
      secretAccessKey: process.env.AWS_S3_SECRET_KEY,
 });
@@ -10,16 +10,17 @@ const sns = new SNS({
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
      if (req.method === 'POST') {
           try {
-               // Subscribe to the SNS topic
                const result = await sns
                     .subscribe({
-                         TopicArn: process.env.AWS_SNS_TOPIC_ARN!,
-                         Protocol: 'https', // 'https' for HTTPS endpoint
-                         Endpoint: 'https://dar-pharmacy-dashboard.vercel.app/api/aws/sns/notify', // Endpoint of the Next.js app
+                         TopicArn: `arn:aws:sns:eu-central-1:056076663705:${req.body.topicArn}`,
+                         Protocol: 'https',
+                         Endpoint: 'https://dar-pharmacy-dashboard.vercel.app/api/aws/sns/notify',
                     })
                     .promise();
 
-               res.status(200).json({ message: 'Subscription successful', result });
+               console.log('Subscription response:', result);
+
+               res.status(200).json({ message: 'Subscription request sent. Awaiting confirmation.' });
           } catch (error) {
                console.error(error);
                res.status(500).json({ error: 'Subscription failed' });

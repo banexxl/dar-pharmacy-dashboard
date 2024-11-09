@@ -25,30 +25,30 @@ export const ChatMessageAdd: FC<ChatMessageAddProps> = (props) => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [body, setBody] = useState<string>('');
   const [typing, setTyping] = useState<boolean>(false);
-  const [socket, setSocket] = useState<Socket | null>(null);
+  // const [socket, setSocket] = useState<Socket | null>(null);
 
-  useEffect(() => {
-    // Initialize socket connection
-    const newSocket = io('http://localhost:3000/dashboard/chat', {
-      transports: ['websocket'],
-      ackTimeout: 10000,
-    });
-    setSocket(newSocket);
+  // useEffect(() => {
+  //   // Initialize socket connection
+  //   const newSocket = io('http://localhost:3000/dashboard/chat', {
+  //     transports: ['websocket'],
+  //     ackTimeout: 10000,
+  //   });
+  //   setSocket(newSocket);
 
-    // Cleanup on unmount
-    return () => {
-      newSocket.disconnect();
-    };
-  }, []);
+  //   // Cleanup on unmount
+  //   return () => {
+  //     newSocket.disconnect();
+  //   };
+  // }, []);
 
   // Emit typing event
   const handleTyping = useCallback(() => {
     if (!typing) {
       setTyping(true);
-      socket?.emit('typing', { sender: session?.data.user.name });
+      // socket?.emit('typing', { sender: session?.data.user.name });
     }
     debounceStopTyping();
-  }, [typing, socket, session?.data.user._id]);
+  }, [typing, session?.data.user._id]);
 
   const debounceStopTyping = useCallback(() => {
     let timeout: NodeJS.Timeout;
@@ -56,10 +56,10 @@ export const ChatMessageAdd: FC<ChatMessageAddProps> = (props) => {
       clearTimeout(timeout);
       timeout = setTimeout(() => {
         setTyping(false);
-        socket?.emit('stopTyping', { sender: session?.data.user.name });
+        // socket?.emit('stopTyping', { sender: session?.data.user.name });
       }, 1000);
     };
-  }, [socket, session?.data.user?._id])();
+  }, [session?.data.user?._id])();
 
   const handleAttach = useCallback((): void => {
     fileInputRef.current?.click();
@@ -75,10 +75,10 @@ export const ChatMessageAdd: FC<ChatMessageAddProps> = (props) => {
       return;
     }
 
-    socket?.emit('message', { content: body, sender: session?.data.user._id });
+    // socket?.emit('message', { content: body, sender: session?.data.user._id });
     onSend?.(body, session?.data.user?._id!);  // Optional callback for parent component
     setBody(''); // Clear the input after sending
-  }, [body, onSend, socket, session?.data.user?._id]);
+  }, [body, onSend, session?.data.user?._id]);
 
   const handleKeyUp = useCallback((event: KeyboardEvent<HTMLInputElement>): void => {
     if (event.code === 'Enter') {

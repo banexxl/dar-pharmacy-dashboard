@@ -12,7 +12,6 @@ import { Provider } from 'react-redux'
 import { SessionProvider } from 'next-auth/react';
 import { store } from '@/store';
 import { Toaster } from 'react-hot-toast';
-import { subscribeToSNSTopic } from '@/utils/aws-sns-subscribe';
 
 const clientSideEmotionCache = createEmotionCache();
 

@@ -54,7 +54,6 @@ export const ChatService = () => {
           }));
      };
 
-
      const getThreadById = async (threadId: string) => {
           const client = await MongoClient.connect(process.env.MONGODB_URI!)
           const db = client.db('DAR_DB');
@@ -167,7 +166,26 @@ export const ChatService = () => {
           return participant;
      }
 
+     const deleteThreadById = async (threadId: string): Promise<boolean> => {
+          const client = await MongoClient.connect(process.env.MONGODB_URI!)
+          const db = client.db('DAR_DB');
+          const threadsCollection = db.collection('Threads');
+          const response = await threadsCollection.deleteOne({ _id: new ObjectId(threadId) });
+          if (response.deletedCount === 0) return true;
+          return false;
+     };
+
+     const getThreadIdsByClientId = async (clientId: string) => {
+          const client = await MongoClient.connect(process.env.MONGODB_URI!)
+          const db = client.db('DAR_DB');
+          const threadsCollection = db.collection('Threads');
+          const threads = await threadsCollection.find({ participantIds: { $in: [clientId.toString()] } }).toArray();
+          return threads.map((thread: any) => thread._id.toString());
+     };
+
      return {
+          getThreadIdsByClientId,
+          deleteThreadById,
           getContact,
           getThreadsForUser,
           getThreadById,

@@ -17,6 +17,10 @@ import { ChatBlank } from '@/sections/chat/chat-blank';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { useSession } from 'next-auth/react';
 import { CustomSession } from '@/schemas/chat';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '../api/auth/[...nextauth]';
+import { ChatService } from '@/services/chat-services';
+import { subscribeToSNSTopic } from '@/utils/aws-sns-subscribe';
 
 /**
  * NOTE:
@@ -75,13 +79,19 @@ const useSidebar = () => {
   };
 };
 
-const Page = () => {
+const Page = (props: any) => {
   const rootRef = useRef<HTMLDivElement | null>(null);
   const searchParams = useSearchParams()
   const compose = searchParams.get('compose') === 'true';
   const threadKey = searchParams.get('threadKey');
   const sidebar = useSidebar();
   const session = useSession() as unknown as CustomSession
+
+  //Subscribe to SNS topic
+  props.clientThreadIds.forEach((threadId: string) =>
+    subscribeToSNSTopic(`chat-topic-${threadId}`)
+  );
+
   //Session object
   // data: {
   //   user: {
@@ -164,3 +174,23 @@ const Page = () => {
 Page.getLayout = (page: any) => <DashboardLayout>{page}</DashboardLayout>;
 
 export default Page;
+
+export const getServerSideProps = async (context: any) => {
+  const session = await getServerSession(context.req, context.res, authOptions) as unknown as any
+  const clientThreadIds = await ChatService().getThreadIdsByClientId(session?.user!._id!)
+
+  if (!session) {
+    return {
+      redirect: {
+        destination: '/auth/login',
+        permanent: false,
+      },
+    };
+  }
+  return {
+    props: {
+      clientThreadIds,
+    },
+  };
+
+}
