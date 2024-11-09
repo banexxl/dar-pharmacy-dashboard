@@ -15,6 +15,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                          TopicArn: `arn:aws:sns:eu-central-1:056076663705:${req.body.topicArn}`,
                          Protocol: 'https',
                          Endpoint: 'https://dar-pharmacy-dashboard.vercel.app/api/aws/sns/notify',
+                         ReturnSubscriptionArn: true,
                     })
                     .promise();
 

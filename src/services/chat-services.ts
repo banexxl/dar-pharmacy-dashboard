@@ -176,6 +176,8 @@ export const ChatService = () => {
      };
 
      const getThreadIdsByClientId = async (clientId: string) => {
+          console.log('clientId', clientId);
+
           const client = await MongoClient.connect(process.env.MONGODB_URI!)
           const db = client.db('DAR_DB');
           const threadsCollection = db.collection('Threads');

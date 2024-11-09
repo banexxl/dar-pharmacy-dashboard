@@ -8,6 +8,8 @@ const sns = new SNS({
 });
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+     console.log('Received SNS message NOTIFICATION:', req.body);
+
      if (req.method === 'POST') {
           try {
                const messageType = req.headers['x-amz-sns-message-type'];
