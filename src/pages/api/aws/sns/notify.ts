@@ -10,20 +10,11 @@ const sns = new SNS({
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
      try {
           const body = JSON.parse(req.body);
-          console.log('Parsed body:', body);
-
           const messageType = req.headers['x-amz-sns-message-type'];
 
           if (messageType === 'SubscriptionConfirmation') {
                const token = body['Token'];
-               const token2 = body.Token
-               console.log('Token2:', token2);
-
                const topicArn = body['TopicArn'];
-               const topicArn2 = body.TopicArn
-               console.log('TopicArn2:', topicArn2);
-
-               console.log('Confirming subscription with token:', token);
 
                const result = await sns
                     .confirmSubscription({
