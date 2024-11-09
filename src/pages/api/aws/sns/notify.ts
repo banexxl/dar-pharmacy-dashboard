@@ -9,6 +9,7 @@ const sns = new SNS({
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
      console.log('Received SNS message NOTIFICATION:', req.body);
+     console.log('req.method:', req.method);
 
      if (req.method === 'POST') {
           try {
