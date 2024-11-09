@@ -16,7 +16,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
                if (messageType === 'SubscriptionConfirmation') {
                     const token = req.body.Token;
+                    console.log('Token:', token);
+
                     const topicArn = req.body.TopicArn;
+                    console.log('TopicArn:', topicArn);
 
                     console.log('Confirming subscription with token:', token);
 
