@@ -9,22 +9,19 @@ const sns = new SNS({
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
      try {
-          console.log('req.headers', req.headers);
-
-          // Parse the body manually if it's sent as text/plain
-          let body = req.body;
-          if (req.headers['content-type'] === 'text/plain') {
-               body = JSON.parse(req.body);
-          }
-
+          const body = JSON.parse(req.body);
           console.log('Parsed body:', body);
 
           const messageType = req.headers['x-amz-sns-message-type'];
-          console.log('Message type:', messageType);
 
           if (messageType === 'SubscriptionConfirmation') {
                const token = body['Token'];
+               const token2 = body.Token
+               console.log('Token2:', token2);
+
                const topicArn = body['TopicArn'];
+               const topicArn2 = body.TopicArn
+               console.log('TopicArn2:', topicArn2);
 
                console.log('Confirming subscription with token:', token);
 
