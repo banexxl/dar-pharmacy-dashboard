@@ -1,3 +1,4 @@
+import { sendNotification } from '@/pages/api/aws/sns/send-notification';
 import { slice } from '@/slices/chat';
 import type { AppThunk } from 'src/store';
 
@@ -81,6 +82,7 @@ const addMessage = (params: AddMessageParams): AppThunk => async (dispatch): Pro
           const data = await response.json();
           if (response.ok) {
                dispatch(slice.actions.addMessage(data));
+               sendNotification(params.senderId, params.body);
                return data.threadId;
           } else {
                throw new Error('Failed to add message');

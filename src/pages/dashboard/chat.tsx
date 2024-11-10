@@ -176,8 +176,8 @@ Page.getLayout = (page: any) => <DashboardLayout>{page}</DashboardLayout>;
 export default Page;
 
 export const getServerSideProps = async (context: any) => {
-  const session = await getServerSession(context.req, context.res, authOptions) as unknown as any
-  const clientThreadIds = await ChatService().getThreadIdsByClientId(session?.user!._id!)
+  const session = await getServerSession(context.req, context.res, authOptions) as unknown as any || null
+  const clientThreadIds = await ChatService().getThreadIdsByClientId(session?.user!._id! ?? '');
 
   if (!session) {
     return {
