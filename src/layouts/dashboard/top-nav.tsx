@@ -71,16 +71,9 @@ export const TopNav = (props: any) => {
                shortcutContent = `[InternetShortcut]\nURL=${appUrl}\nIconFile=${iconUrl}`
                downloadShortcut(`${appName}.url`, shortcutContent)
           } else {
-               // Assume macOS for simplicity
-               shortcutContent = `<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-  <key>URL</key>
-  <string>${appUrl}</string>
-</dict>
-</plist>`
-               downloadShortcut(`${appName}.webloc`, shortcutContent)
+               //Assume android
+               shortcutContent = `[Desktop Entry]\nName=${appName}\nURL=${appUrl}\nIcon=${iconUrl}`
+               downloadShortcut(`${appName}.desktop`, shortcutContent)
           }
      }
 
