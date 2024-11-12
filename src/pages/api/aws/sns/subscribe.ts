@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { SNS } from 'aws-sdk';
 
-const sns = new SNS({
+export const sns = new SNS({
      region: 'eu-central-1',
      accessKeyId: process.env.AWS_S3_ACCESS_KEY,
      secretAccessKey: process.env.AWS_S3_SECRET_KEY,
@@ -18,8 +18,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                          ReturnSubscriptionArn: true,
                     })
                     .promise();
-
-               console.log('Subscription response:', result);
 
                res.status(200).json({ message: 'Subscription request sent. Awaiting confirmation.' });
           } catch (error) {
