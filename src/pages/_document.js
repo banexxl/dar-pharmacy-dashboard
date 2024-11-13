@@ -12,7 +12,7 @@ const Favicon = () => (
     />
     <link
       rel="icon"
-      href="/favicon.ico"
+      href="/favicon1.ico"
     />
     <link
       rel="icon"
