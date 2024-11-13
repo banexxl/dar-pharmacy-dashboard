@@ -23,6 +23,8 @@ import Typography from '@mui/material/Typography';
 import { usePopover } from 'src/hooks/use-popover';
 import { Contact, CustomSession } from '@/schemas/chat';
 import { Session } from 'next-auth';
+import { useDispatch } from '@/store';
+import { thunks } from '@/thunks/chat';
 
 const getRecipients = (participants: Contact[], userId: string): Contact[] => {
   return participants.filter((participant) => participant._id !== userId);
@@ -44,11 +46,12 @@ const getLastActive = (recipients: Contact[]): string | null => {
 
 interface ChatThreadToolbarProps {
   participants?: Contact[];
-  session?: CustomSession
+  session?: CustomSession;
+  threadId: string
 }
 
 export const ChatThreadToolbar: FC<ChatThreadToolbarProps> = (props) => {
-  const { participants = [], session, ...other } = props;
+  const { participants = [], session, threadId, ...other } = props;
 
   const popover = usePopover();
 
@@ -57,6 +60,12 @@ export const ChatThreadToolbar: FC<ChatThreadToolbarProps> = (props) => {
   const recipients = getRecipients(participants, session?.data.user._id!);
   const displayName = getDisplayName(recipients);
   const lastActive = getLastActive(recipients);
+  const dispatch = useDispatch();
+
+  const onDelete = () => {
+    popover.handleClose();
+    dispatch(thunks.deleteThreadById({ threadId }));
+  }
 
   return (
     <>
@@ -152,7 +161,7 @@ export const ChatThreadToolbar: FC<ChatThreadToolbarProps> = (props) => {
           </ListItemIcon>
           <ListItemText primary="Block" />
         </MenuItem>
-        <MenuItem>
+        <MenuItem onClick={() => onDelete()} >
           <ListItemIcon>
             <SvgIcon>
               <Trash02Icon />
@@ -183,5 +192,6 @@ export const ChatThreadToolbar: FC<ChatThreadToolbarProps> = (props) => {
 
 ChatThreadToolbar.propTypes = {
   participants: PropTypes.array,
-  session: PropTypes.any
+  session: PropTypes.any,
+  threadId: PropTypes.string.isRequired
 };

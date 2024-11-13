@@ -171,7 +171,7 @@ export const ChatService = () => {
           const db = client.db('DAR_DB');
           const threadsCollection = db.collection('Threads');
           const response = await threadsCollection.deleteOne({ _id: new ObjectId(threadId) });
-          if (response.deletedCount === 0) return true;
+          if (response.deletedCount === 1) return true;
           return false;
      };
 

@@ -28,6 +28,8 @@ type SetCurrentThreadAction = PayloadAction<string | undefined>;
 
 type AddMessageAction = PayloadAction<{ message: Message; threadId: string }>;
 
+type DeleteThreadParams = PayloadAction<{ threadId: string }>;
+
 const initialState: ChatState = {
      contacts: {
           byId: {},
@@ -83,6 +85,10 @@ const reducers = {
                thread.messages.push(message);
           }
      },
+     deleteThread(state: ChatState, action: DeleteThreadParams): void {
+          const { threadId } = action.payload;
+          delete state.threads.byId[threadId];
+     }
 };
 
 export const slice = createSlice({

@@ -91,6 +91,20 @@ const addMessage = (params: AddMessageParams): AppThunk => async (dispatch): Pro
      }
 };
 
+type DeleteThreadParams = {
+     threadId: string;
+};
+
+const deleteThreadById = (params: DeleteThreadParams): AppThunk => async (dispatch): Promise<void> => {
+     await fetch('/api/chat/threads-api', {
+          method: 'DELETE',
+          headers: {
+               'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ threadId: params.threadId }),
+     });
+     dispatch(slice.actions.deleteThread({ threadId: params.threadId }));
+};
 
 export const thunks = {
      addMessage,
@@ -99,4 +113,5 @@ export const thunks = {
      getThreads,
      markThreadAsSeen,
      setCurrentThread,
+     deleteThreadById
 };
