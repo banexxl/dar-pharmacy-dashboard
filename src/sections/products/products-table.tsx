@@ -142,7 +142,7 @@ export const ProductsTable = (props: any) => {
                          title: 'Sve OK!',
                          text: 'Artikl izmenjen :)',
                     })
-                    router.refresh()
+                    //router.refresh()
                } else {
                     const errorData = await response.json(); // Parse the error response
                }
