@@ -20,7 +20,6 @@ import { CustomSession } from '@/schemas/chat';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../api/auth/[...nextauth]';
 import { ChatService } from '@/services/chat-services';
-import { subscribeToSNSTopic } from '@/utils/aws-sns-subscribe';
 
 /**
  * NOTE:
@@ -89,7 +88,13 @@ const Page = (props: any) => {
 
   //Subscribe to SNS topic
   props.clientThreadIds.forEach((threadId: string) =>
-    subscribeToSNSTopic(`chat-topic-${threadId}`)
+    fetch(`/api/aws/sns/subscribe`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ topicArn: `arn:aws:sns:eu-central-1:056076663705:chat-topic-${threadId}` }),
+    })
   );
 
   //Session object
@@ -162,7 +167,7 @@ const Page = (props: any) => {
             </Box>
             <Divider />
             {view === 'thread' && <ChatThread threadKey={threadKey!} session={session as any} />}
-            {view === 'compose' && <ChatComposer threadId={threadKey ?? ''} session={session as any} />}
+            {view === 'compose' && <ChatComposer threadId={threadKey ? threadKey : ''} session={session as any} />}
             {view === 'blank' && <ChatBlank />}
           </ChatContainer>
         </Box>

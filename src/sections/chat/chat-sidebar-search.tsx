@@ -89,7 +89,7 @@ export const ChatSidebarSearch = forwardRef<HTMLDivElement, ChatSidebarSearchPro
                   <List>
                     {results.map((contact) => (
                       <ListItemButton
-                        key={contact._id}
+                        key={contact._id.toString()}
                         onClick={(): void => handleSelect(contact)}
                       >
                         <ListItemAvatar>

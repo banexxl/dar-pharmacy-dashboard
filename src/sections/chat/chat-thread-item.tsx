@@ -164,6 +164,6 @@ ChatThreadItem.propTypes = {
   active: PropTypes.bool,
   onSelect: PropTypes.func,
   // @ts-ignore
-  thread: PropTypes.object.isRequired,
+  thread: PropTypes.object,
   session: PropTypes.any,
 };

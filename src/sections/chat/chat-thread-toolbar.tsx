@@ -25,6 +25,8 @@ import { Contact, CustomSession } from '@/schemas/chat';
 import { Session } from 'next-auth';
 import { useDispatch } from '@/store';
 import { thunks } from '@/thunks/chat';
+import Swal from 'sweetalert2';
+import { useRouter } from 'next/router';
 
 const getRecipients = (participants: Contact[], userId: string): Contact[] => {
   return participants.filter((participant) => participant._id !== userId);
@@ -52,7 +54,7 @@ interface ChatThreadToolbarProps {
 
 export const ChatThreadToolbar: FC<ChatThreadToolbarProps> = (props) => {
   const { participants = [], session, threadId, ...other } = props;
-
+  const router = useRouter();
   const popover = usePopover();
 
   // Maybe use memo for these values
@@ -63,8 +65,22 @@ export const ChatThreadToolbar: FC<ChatThreadToolbarProps> = (props) => {
   const dispatch = useDispatch();
 
   const onDelete = () => {
-    popover.handleClose();
-    dispatch(thunks.deleteThreadById({ threadId }));
+    popover.handleClose()
+    Swal.fire({
+      title: 'Da li ste sigurni?',
+      text: 'Ova akcija je nepovratna!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Da, obrisite!',
+      cancelButtonText: 'Odustani!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        dispatch(thunks.deleteThreadById({ threadId }));
+        router.push('/dashboard/chat');
+      }
+    })
   }
 
   return (

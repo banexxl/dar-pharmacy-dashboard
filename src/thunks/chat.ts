@@ -96,14 +96,16 @@ type DeleteThreadParams = {
 };
 
 const deleteThreadById = (params: DeleteThreadParams): AppThunk => async (dispatch): Promise<void> => {
-     await fetch('/api/chat/threads-api', {
+     const response = await fetch('/api/chat/threads-api', {
           method: 'DELETE',
           headers: {
                'Content-Type': 'application/json',
           },
           body: JSON.stringify({ threadId: params.threadId }),
-     });
-     dispatch(slice.actions.deleteThread({ threadId: params.threadId }));
+     })
+     if (response.ok) {
+          dispatch(slice.actions.deleteThread({ threadId: params.threadId }));
+     }
 };
 
 export const thunks = {

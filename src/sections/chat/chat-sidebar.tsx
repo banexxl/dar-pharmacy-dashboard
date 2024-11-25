@@ -47,6 +47,7 @@ export const ChatSidebar: FC<ChatSidebarProps> = (props) => {
   const [searchResults, setSearchResults] = useState<Contact[]>([]);
   const mdUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
   const user: Contact | undefined = session.user as Contact | undefined;
+  console.log('searchresults', searchResults);
 
   const handleCompose = useCallback((): void => {
     router.push(paths.dashboard.chat + '?compose=true');
@@ -71,9 +72,9 @@ export const ChatSidebar: FC<ChatSidebarProps> = (props) => {
       })
         .then((response) => response.json())
         .then((response) =>
-          response.contacts
+          response.participants
         );
-      setSearchResults(contacts);
+      setSearchResults(contacts[0]);
     } catch (err) {
       console.error(err);
     }

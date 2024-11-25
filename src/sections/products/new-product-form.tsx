@@ -1,9 +1,7 @@
 "use client"
 import React, { useState } from 'react';
-import { useFormik } from 'formik';
 import { TextField, Typography, Button, Checkbox, FormControlLabel, Box, Input, Card, CardContent, Grid, MenuItem, Stack, Container, IconButton, CardActionArea, colors, useMediaQuery } from '@mui/material';
-import { Form, Formik, FormikErrors, FormikTouched } from 'formik';
-import PhotoCamera from "@mui/icons-material/PhotoCamera";
+import { Form, Formik } from 'formik';
 import { initialValues, mainCategoryOptions, manufacturerOptions, midCategoryOptions, newProductSchema, quantityUnitOptions } from './new-product-schema'
 import { useRouter } from 'next/navigation';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -15,7 +13,6 @@ import Image from 'next/image';
 import { LoadingButton } from '@mui/lab';
 import "@uploadthing/react/styles.css";
 import { Theme, useTheme } from '@mui/material/styles';
-import { UploadButton } from "../../utils/image-upload-components";
 import { IProduct } from './products-table';
 
 export const fetchSubCategoryOptions = async (selectedMidCategory: any) => {
@@ -442,8 +439,6 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }: any) => {
                                         ))}
                                    </TextField>
 
-
-
                                    <TextField
                                         fullWidth
                                         disabled={loading}
@@ -486,7 +481,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }: any) => {
 
                                    <Card>
                                         <CardContent sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', disabled: `${loading}` }}>
-                                             <UploadButton
+                                             {/* <UploadButton
                                                   endpoint="imageUploader"
                                                   onUploadBegin={() => setLoading(true)}
                                                   onClientUploadComplete={(res) => {
@@ -533,7 +528,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }: any) => {
                                                             color: theme.palette.primary.main,
                                                        },
                                                   }}
-                                             />
+                                             /> */}
                                              {fileURL.length ? (
                                                   <Image
                                                        src={fileURL}

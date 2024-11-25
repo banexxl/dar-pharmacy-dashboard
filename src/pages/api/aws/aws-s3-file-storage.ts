@@ -1,11 +1,6 @@
 import { Item, ItemType } from '@/schemas/file-manager';
+import { s3 } from '@/utils/aws/aws-s3';
 import aws from 'aws-sdk';
-
-const s3 = new aws.S3({
-     accessKeyId: process.env.AWS_S3_ACCESS_KEY,
-     secretAccessKey: process.env.AWS_S3_SECRET_KEY,
-     region: process.env.AWS_REGION,
-});
 
 export const config = {
      api: {

@@ -1,12 +1,6 @@
 import { ChatService } from '@/services/chat-services';
+import { sns } from '@/utils/aws/aws-sns';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { SNS } from 'aws-sdk';
-
-export const sns = new SNS({
-     region: 'eu-central-1',
-     accessKeyId: process.env.AWS_S3_ACCESS_KEY,
-     secretAccessKey: process.env.AWS_S3_SECRET_KEY,
-});
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
      const { method } = req;
@@ -27,15 +21,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                                    })
                                    .promise().then((response) => {
                                         if (response.TopicArn) {
-                                             const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https';
-                                             const endpoint = process.env.NODE_ENV === 'development'
-                                                  ? 'http://localhost:3000/api/aws/sns/notify'
-                                                  : 'https://dar-pharmacy-dashboard.vercel.app/api/aws/sns/notify';
-
                                              sns.subscribe({
-                                                  Protocol: protocol,
+                                                  Protocol: 'https',
                                                   TopicArn: response.TopicArn,
-                                                  Endpoint: endpoint,
+                                                  Endpoint: 'https://dar-pharmacy-dashboard.vercel.app/api/aws/sns/notify',
                                              }).promise();
                                         }
                                    })

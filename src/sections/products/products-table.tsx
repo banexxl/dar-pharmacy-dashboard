@@ -5,6 +5,7 @@ import {
      OutlinedInput,
      Stack, SvgIcon, Switch, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography, useTheme
 } from '@mui/material';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import PropTypes from 'prop-types';
 import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
 import Image from 'next/image';
@@ -15,7 +16,6 @@ import { fetchSubCategoryOptions } from './new-product-form';
 import Swal from 'sweetalert2';
 import { useRouter } from 'next/navigation';
 import "@uploadthing/react/styles.css";
-import { UploadButton } from "../../utils/image-upload-components";
 import { mainCategoryOptions, manufacturerOptions, midCategoryOptions, quantityUnitOptions } from './new-product-schema';
 import MagnifyingGlassIcon from '@heroicons/react/24/solid/MagnifyingGlassIcon';
 import ClearIcon from '@mui/icons-material/Clear';
@@ -120,6 +120,7 @@ export const ProductsTable = (props: any) => {
      }
 
      const handleUpdateProduct = async (currentProductObject: any) => {
+          console.log('currentProductObject', currentProductObject);
 
           try {
                //API CALL
@@ -222,9 +223,76 @@ export const ProductsTable = (props: any) => {
           setSearchQuery(event.target.value);
      };
 
-     // const filteredItems = items.filter((product: IProduct) =>
-     //      product.name.toLowerCase().includes(searchQuery.toLowerCase())
-     // );
+     const handleImageChange = async (event: any) => {
+
+          const selectedFile = event.target.files[0];
+
+          if (!selectedFile) {
+               return;
+          }
+
+          setLoading(true);
+
+          // Extract file extension
+          const fileExtension = selectedFile.name.split('.')[1]
+
+          // Assuming you have a title for the image
+          const title = selectedFile.name.split('.')[0]
+          const apiUrl = '/api/aws/aws-s3-image-storage'
+
+          try {
+               const reader = new FileReader();
+               reader.readAsDataURL(selectedFile);
+               reader.onloadend = async () => {
+                    const base64Data = reader.result;
+                    const data = {
+                         file: base64Data,
+                         title: title,
+                         extension: fileExtension,
+                         fileName: selectedFile.name,
+                         manufacturer: currentProductObject!.manufacturer || '',
+                    };
+
+                    const response = await fetch(apiUrl, {
+                         method: 'POST',
+                         headers: {
+                              'Content-Type': 'application/json'
+                         },
+                         body: JSON.stringify(data),
+                    });
+
+                    if (!response.ok) {
+                         Swal.fire({
+                              title: 'Greška',
+                              text: "Neuspešan upload slike!",
+                              icon: 'error',
+                              confirmButtonColor: '#3085d6',
+                              confirmButtonText: 'OK',
+                         })
+                    } else {
+                         Swal.fire({
+                              title: 'OK',
+                              text: "Uspešan upload slike!",
+                              icon: 'success',
+                              confirmButtonColor: '#3085d6',
+                              confirmButtonText: 'OK',
+                         })
+                         const result = await response.json();
+                         setFileURL(result.imageUrl)
+                         setLoading(false)
+                         setCurrentProductObject((previousObject: any) => ({
+                              ...previousObject,
+                              imageURL: result.imageUrl
+                         }))
+                    }
+               }
+          } catch (error) {
+               console.error('Error uploading image:', error);
+          } finally {
+               setLoading(false);
+          }
+     };
+
 
      const visibleRows = useMemo(
           () =>
@@ -1028,7 +1096,7 @@ export const ProductsTable = (props: any) => {
                                                                                                     />
                                                                                                </Button> */}
 
-                                                                                               <UploadButton
+                                                                                               {/* <UploadButton
                                                                                                     endpoint="imageUploader"
                                                                                                     onUploadProgress={() => setLoading(true)}
                                                                                                     onClientUploadComplete={(res) => {
@@ -1078,10 +1146,32 @@ export const ProductsTable = (props: any) => {
                                                                                                               color: theme.palette.primary.main,
                                                                                                          },
                                                                                                     }}
-                                                                                               />
+                                                                                               /> */}
+                                                                                               <Button component="label"
+                                                                                                    variant="contained"
+                                                                                                    startIcon={<CloudUploadIcon />}
+                                                                                                    sx={{ maxWidth: '200px' }}
+                                                                                               >
+                                                                                                    Učitaj sliku
+                                                                                                    <Input
+                                                                                                         type="file"
+                                                                                                         inputProps={{ accept: 'image/*' }}
+                                                                                                         sx={{
+                                                                                                              clip: 'rect(0 0 0 0)',
+                                                                                                              clipPath: 'inset(50%)',
+                                                                                                              height: 1,
+                                                                                                              overflow: 'hidden',
+                                                                                                              position: 'absolute',
+                                                                                                              bottom: 0,
+                                                                                                              left: 0,
+                                                                                                              whiteSpace: 'nowrap',
+                                                                                                              width: 1,
+                                                                                                         }}
+                                                                                                         onChange={async (e: any) => await handleImageChange(e)}
+                                                                                                    />
+                                                                                               </Button>
                                                                                                {currentProductObject?.imageURL.length ? (
                                                                                                     <Image
-
                                                                                                          src={currentProductObject!.imageURL}
                                                                                                          alt='Uploaded Image'
                                                                                                          width={300}

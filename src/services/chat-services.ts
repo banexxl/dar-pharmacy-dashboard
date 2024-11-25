@@ -176,14 +176,26 @@ export const ChatService = () => {
      };
 
      const getThreadIdsByClientId = async (clientId: string) => {
-          console.log('clientId', clientId);
-
           const client = await MongoClient.connect(process.env.MONGODB_URI!)
           const db = client.db('DAR_DB');
           const threadsCollection = db.collection('Threads');
           const threads = await threadsCollection.find({ participantIds: { $in: [clientId.toString()] } }).toArray();
           return threads.map((thread: any) => thread._id.toString());
      };
+
+     const getThreadByParticipantName = async (participant: string) => {
+          const client = await MongoClient.connect(process.env.MONGODB_URI!)
+          const db = client.db('DAR_DB');
+          const threadsCollection = db.collection('Threads');
+          const threads = await threadsCollection.find({
+               participants: {
+                    $elemMatch: {
+                         name: { $regex: participant, $options: 'i' }
+                    }
+               }
+          }).toArray();
+          return threads.map((thread: any) => thread.participants);
+     }
 
      return {
           getThreadIdsByClientId,
@@ -195,6 +207,7 @@ export const ChatService = () => {
           addMessage,
           getParticipants,
           getAllContacts,
-          getParticipantById
+          getParticipantById,
+          getThreadByParticipantName
      };
 };
