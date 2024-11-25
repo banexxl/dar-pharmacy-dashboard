@@ -1,6 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { sns } from '../../chat/messages-api';
-import { sendNotification } from '@/utils/send-aws-sns-notiffication';
+import { sns } from '@/utils/aws/aws-sns';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
 
@@ -32,7 +31,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                const { senderId, recipientId, content } = parsedMessage;
 
                // Send a notification to the recipient
-               await sendNotification(topicArn, content);
+               // await sendNotification(topicArn, content);
 
                return res.status(200).json({ message: 'Notification processed and sent' });
           }
