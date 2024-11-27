@@ -88,13 +88,13 @@ export const items = [
                </SvgIcon>
           ),
      },
-     {
-          title: 'Chat',
-          path: '/dashboard/chat',
-          icon: (
-               <SvgIcon fontSize="small">
-                    <UserIcon />
-               </SvgIcon>
-          )
-     }
+     // {
+     //      title: 'Chat',
+     //      path: '/dashboard/chat',
+     //      icon: (
+     //           <SvgIcon fontSize="small">
+     //                <UserIcon />
+     //           </SvgIcon>
+     //      )
+     // }
 ];

@@ -87,15 +87,15 @@ const Page = (props: any) => {
   const session = useSession() as unknown as CustomSession
 
   //Subscribe to SNS topic
-  props.clientThreadIds.forEach((threadId: string) =>
-    fetch(`/api/aws/sns/subscribe`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ topicArn: `arn:aws:sns:eu-central-1:056076663705:chat-topic-${threadId}` }),
-    })
-  );
+  // props.clientThreadIds.forEach((threadId: string) =>
+  //   fetch(`/api/aws/sns/subscribe`, {
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //     },
+  //     body: JSON.stringify({ topicArn: `arn:aws:sns:eu-central-1:056076663705:chat-topic-${threadId}` }),
+  //   })
+  // );
 
   //Session object
   // data: {
