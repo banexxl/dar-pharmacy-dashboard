@@ -31,7 +31,7 @@ export default async (req: any, res: any) => {
 
                // Determine the content type based on the file extension
                let contentType: string;
-               const imageExtensions = ['png', 'jpg', 'jpeg', 'gif', 'webp'];
+               const imageExtensions = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'avif'];
                const videoExtensions = ['mp4', 'webm', 'mov', 'avi'];
 
                if (imageExtensions.includes(extension.toLowerCase())) {
