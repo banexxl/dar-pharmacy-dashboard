@@ -1,6 +1,5 @@
 import { s3 } from '@/utils/aws/aws-s3';
 import aws from 'aws-sdk';
-import moment from 'moment';
 
 export const config = {
      api: {
