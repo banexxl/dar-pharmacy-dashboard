@@ -1,3 +1,4 @@
+import { generateSlug } from '@/utils/generate-slug';
 import { MongoClient, ObjectId } from 'mongodb';
 import type { NextApiRequest, NextApiResponse } from 'next/types';
 import { UTApi } from 'uploadthing/server';
@@ -11,8 +12,10 @@ export default async function handler(request: NextApiRequest, response: NextApi
                const allProducts = await dbProducts.find({}).toArray();
                return response.status(200).json({ message: 'Products found!', data: allProducts });
           } else if (request.method === 'POST') {
+               const slug = generateSlug(request.body.name);
                const newProduct = {
                     ...request.body,
+                    slug: slug,
                     updatedAt: new Date() // Set updatedAt to the current date and time
                };
                await dbProducts.insertOne(newProduct);
@@ -29,6 +32,7 @@ export default async function handler(request: NextApiRequest, response: NextApi
                     return response.status(500).json({ error: 'Error deleting product.' });
                }
           } else if (request.method === 'PUT') {
+               const slug = generateSlug(request.body.name);
                try {
                     await dbProducts.findOneAndUpdate(
                          { _id: new ObjectId(request.body._id) },
@@ -56,7 +60,8 @@ export default async function handler(request: NextApiRequest, response: NextApi
                                    warning: request.body.warning,
                                    updatedAt: new Date(), // Update the updatedAt field to the current date and time
                                    promotionText: request.body.promotionText,
-                                   promoting: request.body.promoting
+                                   promoting: request.body.promoting,
+                                   slug: slug
                               }
                          }
                     );
