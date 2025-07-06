@@ -549,6 +549,10 @@ export const manufacturerOptions = [
           value: 'priroda-na-dar',
      },
      {
+          label: 'Pure Hristina Lazarević',
+          value: 'pure-hristina-lazarevic',
+     },
+     {
           label: 'RabenHorst',
           value: 'rabenhorst',
      },
