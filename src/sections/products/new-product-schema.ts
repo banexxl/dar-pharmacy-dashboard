@@ -581,6 +581,10 @@ export const manufacturerOptions = [
           value: 'sofija',
      },
      {
+          label: 'Srijemus La Vita',
+          value: 'srijemus-la-vita',
+     },
+     {
           label: 'Suplemania',
           value: 'suplemania',
      },
