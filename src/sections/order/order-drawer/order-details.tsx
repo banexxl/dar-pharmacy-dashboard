@@ -86,6 +86,12 @@ export const OrderDetails = (props: OrderDetailsProps) => {
               color="text.secondary"
               variant="body2"
             >
+              {order.customer.phoneNumber}
+            </Typography>
+            <Typography
+              color="text.secondary"
+              variant="body2"
+            >
               {order.customer.streetAddress}
             </Typography>
             <Typography

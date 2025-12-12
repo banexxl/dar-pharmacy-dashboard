@@ -1,7 +1,5 @@
 import Head from 'next/head';
 import { CacheProvider } from '@emotion/react';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { CssBaseline } from '@mui/material';
 import { ThemeProvider } from '@mui/material/styles';
 import { useNProgress } from 'src/hooks/use-nprogress';
@@ -39,14 +37,12 @@ const App = (props: any) => {
                                    content="initial-scale=1, width=device-width"
                               />
                          </Head>
-                         <LocalizationProvider dateAdapter={AdapterDateFns}>
-                              <ThemeProvider theme={theme}>
-                                   <CssBaseline />
-                                   {
-                                        getLayout(<Component {...pageProps} />)
-                                   }
-                              </ThemeProvider>
-                         </LocalizationProvider>
+                         <ThemeProvider theme={theme}>
+                              <CssBaseline />
+                              {
+                                   getLayout(<Component {...pageProps} />)
+                              }
+                         </ThemeProvider>
                          <Toaster />
                     </CacheProvider>
                </Provider>

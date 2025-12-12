@@ -1,184 +1,182 @@
+import type { NextApiRequest, NextApiResponse } from 'next';
 import { Item, ItemType } from '@/schemas/file-manager';
+import {
+     PutObjectCommand,
+     ListObjectsV2Command,
+     DeleteObjectCommand,
+     DeleteObjectsCommand,
+     type _Object,
+} from '@aws-sdk/client-s3';
 import { s3 } from '@/utils/aws/aws-s3';
-import aws from 'aws-sdk';
 
 export const config = {
      api: {
           bodyParser: {
-               sizeLimit: '5mb', // Adjust as needed
+               sizeLimit: '5mb',
           },
      },
 };
 
-const mapS3ObjectToItem = (s3Object: aws.S3.Object): Item => {
-     const isFolder = s3Object.Key?.endsWith('/');
+const BUCKET = process.env.AWS_S3_BUCKET_NAME!;
+
+const mapS3ObjectToItem = (obj: _Object): Item => {
+     const key = obj.Key ?? '';
+     const isFolder = key.endsWith('/');
+
      return {
-          id: s3Object.Key!,
-          name: isFolder
-               ? s3Object.Key!.split('/').slice(-2, -1)[0] // Extract folder name
-               : s3Object.Key!.split('/').pop()!, // Extract file name
-          updatedAt: s3Object.LastModified
-               ? new Date(s3Object.LastModified).getTime()
-               : null,
-          size: s3Object.Size ?? 0,
-          type: isFolder ? 'folder' : 'file', // Assign 'folder' or 'file' correctly
-          extension: !isFolder ? s3Object.Key!.split('.').pop() : undefined, // Set extension for files only
+          id: key,
+          name: isFolder ? key.split('/').slice(-2, -1)[0] : key.split('/').pop()!,
+          updatedAt: obj.LastModified ? new Date(obj.LastModified).getTime() : null,
+          size: obj.Size ?? 0,
+          type: (isFolder ? 'folder' : 'file') as ItemType,
+          extension: !isFolder ? key.split('.').pop() : undefined,
           items: undefined,
           itemsCount: undefined,
      };
 };
 
-export default async (req: any, res: any) => {
-     if (req.method === 'POST') {
-          const { fileName, type, folderPath, fileContent } = req.body;
-          try {
-               // Check for required fields based on the type
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+     try {
+          // ------------------------------------------------
+          // POST – create folder or upload file
+          // ------------------------------------------------
+          if (req.method === 'POST') {
+               const { fileName, type, folderPath, fileContent } = req.body;
+
                if (type === 'folder') {
                     if (!fileName || !folderPath) {
                          return res.status(400).json({ error: 'Folder name or path not provided!' });
                     }
 
-                    // Ensure folderPath ends with a slash
-                    const cleanFolderPath = folderPath.endsWith('/') ? folderPath : `${folderPath}/`;
+                    const key = folderPath.endsWith('/') ? folderPath : `${folderPath}/`;
 
-                    // Create folder at the specified path
-                    const params = {
-                         Bucket: process.env.AWS_S3_BUCKET_NAME!,
-                         Key: `${cleanFolderPath}`, // Ensure folder is created at the right path
-                         Body: '', // Empty body for a folder
-                    };
+                    await s3.send(
+                         new PutObjectCommand({
+                              Bucket: BUCKET,
+                              Key: key,
+                              Body: '',
+                         })
+                    );
 
-                    const folderCreated = await s3.upload(params).promise();
-                    return res.status(200).json({ folderURL: folderCreated.Location });
-
-               } else if (type === 'file') {
-                    if (!fileName || !fileContent || !type) {
-                         return res.status(400).json({ error: 'File, file name, or file type not provided!' });
-                    }
-                    const fileExtension = fileName.split('.').pop(); // Extract file extension
-                    console.log('fileExtension:', fileExtension);
-
-                    //Convert file content to binary format
-                    let content
-                    if (fileExtension === 'pdf') {
-                         // Assuming fileContent is base64 encoded
-                         content = Buffer.from(fileContent, 'binary');
-                    } else {
-                         content = Buffer.from(fileContent); // For other files (images, docs)
-                    }
-
-                    const params: aws.S3.PutObjectRequest = {
-                         Bucket: process.env.AWS_S3_BUCKET_NAME!,
-                         Key: `${folderPath}`, // File name
-                         Body: content, // The actual file content
-                         ContentType: fileExtension === 'pdf' ? 'application/pdf' : 'base64', // Set content type based on the file extension
-                         ACL: 'public-read', // Make uploaded file publicly accessible if needed
-                    };
-
-                    const uploadedFileResponse = await s3.upload(params).promise();
-                    console.log('uploadedFileResponse:', uploadedFileResponse);
-                    return res.status(200).json({ message: 'OK' });
-               } else {
-                    // Handle unsupported type
-                    return res.status(400).json({ error: 'Invalid type provided!' });
+                    return res.status(200).json({ folderURL: `s3://${BUCKET}/${key}` });
                }
-          } catch (error) {
-               console.error('Error handling S3 upload:', error);
-               return res.status(500).json({ error: 'Failed to handle upload on AWS S3' });
+
+               if (type === 'file') {
+                    if (!fileName || !fileContent || !folderPath) {
+                         return res.status(400).json({ error: 'File, file name, or path not provided!' });
+                    }
+
+                    const extension = fileName.split('.').pop()?.toLowerCase();
+                    const contentType =
+                         extension === 'pdf'
+                              ? 'application/pdf'
+                              : 'application/octet-stream';
+
+                    const body = Buffer.from(
+                         String(fileContent).includes('base64,')
+                              ? String(fileContent).split('base64,').pop()!
+                              : String(fileContent),
+                         'base64'
+                    );
+
+                    await s3.send(
+                         new PutObjectCommand({
+                              Bucket: BUCKET,
+                              Key: folderPath,
+                              Body: body,
+                              ContentType: contentType,
+                              // ACL: 'public-read', // remove if bucket-owner-enforced
+                         })
+                    );
+
+                    return res.status(200).json({ message: 'OK' });
+               }
+
+               return res.status(400).json({ error: 'Invalid type provided!' });
           }
-     }
-     else if (req.method === 'PUT') {
-          // Uploading a file
-          try {
+
+          // ------------------------------------------------
+          // PUT – upload file
+          // ------------------------------------------------
+          if (req.method === 'PUT') {
                const { file, fileName, fileType } = req.body;
 
                if (!file || !fileName || !fileType) {
                     return res.status(400).json({ error: 'File, fileName, or fileType not provided!' });
                }
 
-               // Decode base64 file data if necessary
-               const decodedFile = Buffer.from(file.replace(/^data:.+;base64,/, ''), 'base64');
+               const decodedFile = Buffer.from(
+                    String(file).replace(/^data:.+;base64,/, ''),
+                    'base64'
+               );
 
-               const params: aws.S3.PutObjectRequest = {
-                    Bucket: process.env.AWS_S3_BUCKET_NAME!,
-                    Key: fileName, // File name including path
-                    Body: decodedFile, // The actual file content
-                    ContentType: fileType,
-                    ACL: 'public-read', // Make uploaded file publicly accessible if needed
-               };
+               await s3.send(
+                    new PutObjectCommand({
+                         Bucket: BUCKET,
+                         Key: fileName,
+                         Body: decodedFile,
+                         ContentType: fileType,
+                         // ACL: 'public-read',
+                    })
+               );
 
-               const uploadedFile = await s3.upload(params).promise();
-               return res.status(200).json({ fileURL: uploadedFile.Location });
-          } catch (error) {
-               console.error('Error uploading file:', error);
-               return res.status(500).json({ error: 'Failed to upload file to AWS S3' });
+               return res.status(200).json({
+                    fileURL: `https://${BUCKET}.s3.amazonaws.com/${fileName}`,
+               });
           }
 
-     }
-     else if (req.method === 'DELETE') {
-          try {
+          // ------------------------------------------------
+          // DELETE – delete folder + contents
+          // ------------------------------------------------
+          if (req.method === 'DELETE') {
                const { fileURL } = req.body;
                if (!fileURL) {
                     return res.status(400).json({ error: 'Missing file URL' });
                }
 
-               // First, list all objects under the folder
-               const listParams = {
-                    Bucket: process.env.AWS_S3_BUCKET_NAME!,
-                    Prefix: fileURL, // The folder path
-               };
+               const listed = await s3.send(
+                    new ListObjectsV2Command({
+                         Bucket: BUCKET,
+                         Prefix: fileURL,
+                    })
+               );
 
-               const listedObjects = await s3.listObjectsV2(listParams).promise();
+               const objects =
+                    listed.Contents?.filter((o: any) => o.Key).map((o: any) => ({ Key: o.Key! })) ?? [];
 
-               if (listedObjects.Contents?.length === 0) {
-                    // If no objects are inside, delete the folder
-                    const deleteParams = {
-                         Bucket: process.env.AWS_S3_BUCKET_NAME!,
-                         Key: fileURL,
-                    };
-
-                    await s3.deleteObject(deleteParams).promise();
-                    return res.status(200).json({ message: 'Folder successfully deleted' });
+               if (objects.length > 0) {
+                    await s3.send(
+                         new DeleteObjectsCommand({
+                              Bucket: BUCKET,
+                              Delete: { Objects: objects },
+                         })
+                    );
                }
 
-               // If there are objects, delete them all
-               const deleteParams = {
-                    Bucket: process.env.AWS_S3_BUCKET_NAME!,
-                    Delete: {
-                         Objects: listedObjects.Contents!
-                              .filter((item) => item.Key !== undefined)
-                              .map((item) => ({ Key: item.Key! })),
-                    },
-               };
-
-               await s3.deleteObjects(deleteParams).promise();
-
-               // After deleting all objects, delete the folder itself
-               await s3.deleteObject({
-                    Bucket: process.env.AWS_S3_BUCKET_NAME!,
-                    Key: fileURL,
-               }).promise();
+               await s3.send(
+                    new DeleteObjectCommand({
+                         Bucket: BUCKET,
+                         Key: fileURL,
+                    })
+               );
 
                return res.status(200).json({ message: 'Folder and its contents successfully deleted' });
-
-          } catch (error) {
-               console.error('Error deleting folder or file:', error);
-               return res.status(500).json({ error: 'Failed to delete folder or file from S3' });
           }
-     }
-     else if (req.method === 'GET') {
-          try {
-               const { putanja } = req.query;
 
-               const params: aws.S3.ListObjectsV2Request = {
-                    Bucket: process.env.AWS_S3_BUCKET_NAME!,
-                    Prefix: putanja ? `${putanja}/` : '', // Set prefix based on the current folder path
-                    Delimiter: '/', // Ensures that we separate folders
-               };
+          // ------------------------------------------------
+          // GET – list folders & files
+          // ------------------------------------------------
+          if (req.method === 'GET') {
+               const putanja = req.query.putanja as string | undefined;
 
-               const data = await s3.listObjectsV2(params).promise();
+               const data = await s3.send(
+                    new ListObjectsV2Command({
+                         Bucket: BUCKET,
+                         Prefix: putanja ? `${putanja}/` : '',
+                         Delimiter: '/',
+                    })
+               );
 
-               // Check if the folder contains only itself
                const isEmptyFolder =
                     data.Contents?.length === 1 &&
                     data.Contents[0].Size === 0 &&
@@ -186,52 +184,44 @@ export default async (req: any, res: any) => {
 
                const items: Item[] = isEmptyFolder
                     ? []
-                    : data.Contents!.map(mapS3ObjectToItem).filter((item) => item.type !== 'folder'); // Exclude folders from the items array
+                    : (data.Contents || [])
+                         .map(mapS3ObjectToItem)
+                         .filter((i: any) => i.type !== 'folder');
 
-               // Process folders and calculate their size, item count, and creation date
                const folders: Item[] = await Promise.all(
-                    (data.CommonPrefixes || []).map(async (prefix) => {
+                    (data.CommonPrefixes || []).map(async (prefix: any) => {
                          const folderPrefix = prefix.Prefix!;
-                         const folderName = folderPrefix.split('/').slice(-2, -1)[0]; // Extract folder name from prefix
+                         const folderName = folderPrefix.split('/').slice(-2, -1)[0];
 
-                         // Fetch all items (files and subfolders) inside the folder
-                         const folderParams: aws.S3.ListObjectsV2Request = {
-                              Bucket: process.env.AWS_S3_BUCKET_NAME!,
-                              Prefix: folderPrefix, // Get all items inside the folder
-                         };
-                         const folderData = await s3.listObjectsV2(folderParams).promise();
+                         const folderData = await s3.send(
+                              new ListObjectsV2Command({
+                                   Bucket: BUCKET,
+                                   Prefix: folderPrefix,
+                              })
+                         );
 
-                         // Sum the sizes of items in the folder
-                         const folderSize = folderData.Contents!.reduce((acc, item) => acc + (item.Size || 0), 0);
-
-                         // Count total number of items (files + folders)
-                         const itemCount = folderData.Contents!.length + (folderData.CommonPrefixes?.length || 0);
-
-                         // Get the folder creation date (use the 'LastModified' of the first item in the folder)
-                         const folderCreationDate = folderData.Contents?.[0]?.LastModified || null;
+                         const contents = folderData.Contents || [];
+                         const folderSize = contents.reduce((acc: any, it: any) => acc + (it.Size || 0), 0);
 
                          return {
                               id: folderPrefix,
                               name: folderName,
                               type: 'folder' as ItemType,
-                              size: folderSize,          // Return the calculated size of the folder
-                              itemsCount: itemCount,     // Return total number of items (files + folders)
-                              updatedAt: folderCreationDate ? new Date(folderCreationDate).getTime() : null, // Creation date based on the first file
+                              size: folderSize,
+                              itemsCount: contents.length,
+                              updatedAt: contents[0]?.LastModified
+                                   ? new Date(contents[0].LastModified).getTime()
+                                   : null,
                          };
                     })
                );
 
-               return res.status(200).json({
-                    folders,
-                    items,
-                    isEmptyFolder,
-               });
-          } catch (error) {
-               console.error('Error retrieving items from S3:', error);
-               return res.status(500).json({ error: 'Failed to retrieve items from S3' });
+               return res.status(200).json({ folders, items, isEmptyFolder });
           }
+
+          return res.status(405).end();
+     } catch (error) {
+          console.error('S3 error:', error);
+          return res.status(500).json({ error: 'Failed to handle S3 operation' });
      }
-     else {
-          res.status(405).end(); // Method Not Allowed
-     }
-};
+}

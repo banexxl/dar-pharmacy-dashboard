@@ -1,6 +1,5 @@
 import Head from 'next/head';
-import { subDays, subHours } from 'date-fns';
-import { Box, Container, Unstable_Grid2 as Grid } from '@mui/material';
+import { Box, Container, Grid } from '@mui/material';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { OverviewBudget } from 'src/sections/overview/overview-budget';
 import { OverviewLatestProducts } from 'src/sections/overview/overview-latest-products';
@@ -48,9 +47,7 @@ const Page = (props: any) => {
                               spacing={3}
                          >
                               <Grid
-                                   xs={12}
-                                   sm={6}
-                                   lg={3}
+                                   size={{ xs: 12, sm: 6, lg: 3 }}
                               >
                                    <OverviewBudget
                                         difference={percantageChange}
@@ -62,9 +59,7 @@ const Page = (props: any) => {
                                    />
                               </Grid>
                               <Grid
-                                   xs={12}
-                                   sm={6}
-                                   lg={3}
+                                   size={{ xs: 12, sm: 6, lg: 3 }}
                               >
                                    <OverviewTotalCustomers
                                         difference={
@@ -79,9 +74,7 @@ const Page = (props: any) => {
                                    />
                               </Grid>
                               <Grid
-                                   xs={12}
-                                   sm={6}
-                                   lg={3}
+                                   size={{ xs: 12, sm: 6, lg: 3 }}
                               >
                                    <OverviewTasksProgress
                                         sx={{ height: '100%' }}
@@ -89,9 +82,7 @@ const Page = (props: any) => {
                                    />
                               </Grid>
                               <Grid
-                                   xs={12}
-                                   sm={6}
-                                   lg={3}
+                                   size={{ xs: 12, sm: 6, lg: 3 }}
                               >
                                    <OverviewTotalProfit
                                         sx={{ height: '100%' }}
@@ -99,8 +90,7 @@ const Page = (props: any) => {
                                    />
                               </Grid>
                               <Grid
-                                   xs={12}
-                                   lg={8}
+                                   size={{ xs: 12, md: 6, lg: 4 }}
                               >
                                    <OverviewSales
                                         chartSeries={[
@@ -117,9 +107,7 @@ const Page = (props: any) => {
                                    />
                               </Grid>
                               <Grid
-                                   xs={12}
-                                   md={6}
-                                   lg={4}
+                                   size={{ xs: 12, md: 6, lg: 4 }}
                               >
                                    <OverviewTraffic
                                         chartSeries={[63, 15, 22]}
@@ -128,9 +116,7 @@ const Page = (props: any) => {
                                    />
                               </Grid>
                               <Grid
-                                   xs={12}
-                                   md={6}
-                                   lg={4}
+                                   size={{ xs: 12, lg: 4 }}
                               >
                                    <OverviewLatestProducts
                                         products={props.lastNProducts}
@@ -138,9 +124,7 @@ const Page = (props: any) => {
                                    />
                               </Grid>
                               <Grid
-                                   xs={12}
-                                   md={12}
-                                   lg={8}
+                                   size={{ xs: 12, lg: 8 }}
                               >
                                    <OverviewLatestOrders
                                         orders={props.lastNOrders}

@@ -250,13 +250,13 @@ export const CalendarEventDialog: FC<CalendarEventDialogProps> = (props) => {
             label="Start date"
             onChange={handleStartDateChange}
             value={formik.values.start}
-            renderInput={(params) => <TextField {...params} />}
+            slotProps={{ textField: { fullWidth: true } }}
           />
           <DateTimePicker
             label="End date"
             onChange={handleEndDateChange}
             value={formik.values.end}
-            renderInput={(params) => <TextField {...params} />}
+            slotProps={{ textField: { fullWidth: true } }}
           />
           {!!(formik.touched.end && formik.errors.end) && (
             <FormHelperText error>{formik.errors.end as string}</FormHelperText>

@@ -10,7 +10,7 @@ import {
   FormControlLabel,
   Stack,
   Typography,
-  Unstable_Grid2 as Grid
+  Grid
 } from '@mui/material';
 
 export const SettingsNotifications = () => {
@@ -36,9 +36,7 @@ export const SettingsNotifications = () => {
             wrap="wrap"
           >
             <Grid
-              xs={12}
-              sm={6}
-              md={4}
+              size={{ xs: 12, md: 4, sm: 6 }}
             >
               <Stack spacing={1}>
                 <Typography variant="h6">
@@ -65,9 +63,7 @@ export const SettingsNotifications = () => {
               </Stack>
             </Grid>
             <Grid
-              md={4}
-              sm={6}
-              xs={12}
+              size={{ xs: 12, sm: 6, md: 4 }}
             >
               <Stack spacing={1}>
                 <Typography variant="h6">

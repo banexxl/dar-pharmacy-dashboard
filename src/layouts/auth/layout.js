@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import NextLink from 'next/link';
 import Image from 'next/image'
-import { Box, Unstable_Grid2 as Grid } from '@mui/material';
+import { Box, Grid } from '@mui/material';
 
 // TODO: Change subtitle text
 

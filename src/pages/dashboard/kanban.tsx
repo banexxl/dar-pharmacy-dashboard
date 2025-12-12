@@ -1,6 +1,14 @@
 import { useCallback, useEffect, useState } from 'react';
-import type { DropResult } from 'react-beautiful-dnd';
-import { DragDropContext } from 'react-beautiful-dnd';
+import {
+  DndContext,
+  DragEndEvent,
+  KeyboardSensor,
+  PointerSensor,
+  closestCorners,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import toast, { Toaster } from 'react-hot-toast';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
@@ -8,7 +16,7 @@ import Typography from '@mui/material/Typography';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
-import { useDispatch, useSelector } from 'src/store';
+import { RootState, useDispatch, useSelector } from 'src/store';
 import { TaskModal } from '@/sections/kanban/task-modal';
 import { ColumnAdd } from '@/sections/kanban/column-add';
 import { ColumnCard } from '@/sections/kanban/column-card';
@@ -18,12 +26,18 @@ import { Board, Column, Member, Task } from '@/schemas/kanban';
 import { Button, Divider, Modal, TextField, Theme, useMediaQuery } from '@mui/material';
 import { indigo } from '@/theme/colors';
 import sweetalert2 from 'sweetalert2';
-import { useSession, UseSessionOptions } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import { createResourceId } from '@/utils/create-resource-id';
 
 
+type DragItemData = {
+  type: 'task' | 'column';
+  columnId: string;
+  index?: number;
+};
+
 const useColumnsIds = (): string[] => {
-  const { columns } = useSelector((state: any) => state.kanban);
+  const { columns } = useSelector((state: RootState) => state.kanban);
   return columns.allIds;
 };
 
@@ -53,6 +67,7 @@ type PageProps = {
 const Page = ({ boards, members }: PageProps) => {
   const dispatch = useDispatch();
   const columnIds = useColumnsIds();
+  const columnsById = useSelector((state: RootState) => state.kanban.columns.byId);
   const [currentTaskId, setCurrentTaskId] = useState<string | null>(null);
   const [selectedBoardId, setSelectedBoardId] = useState<string | null>('');
   const [boardData, setBoardData] = useState<Board[]>(boards);
@@ -63,6 +78,10 @@ const Page = ({ boards, members }: PageProps) => {
   const isScreentoMedium = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'));
   const handleOpenModal = () => setOpenModal(true);
   const handleCloseModal = () => setOpenModal(false);
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
   useBoard(selectedBoardId);
 
   const handleBoardChange = (event: React.ChangeEvent<{ value: unknown }>) => {
@@ -163,43 +182,69 @@ const Page = ({ boards, members }: PageProps) => {
   }, []
   );
 
-  const handleDragEnd = useCallback(async ({ source, destination, draggableId }: DropResult): Promise<void> => {
+  const handleDragEnd = useCallback(async (event: DragEndEvent): Promise<void> => {
+    const { active, over } = event;
+
+    if (!over || !selectedBoardId) {
+      return;
+    }
+
+    const activeData = active.data.current as DragItemData | undefined;
+    const overData = over.data.current as DragItemData | undefined;
+
+    if (activeData?.type !== 'task') {
+      return;
+    }
+
+    const sourceColumnId = activeData.columnId;
+    const destinationColumnId =
+      overData?.type === 'task' || overData?.type === 'column'
+        ? overData.columnId
+        : typeof over.id === 'string'
+          ? over.id
+          : undefined;
+
+    if (!sourceColumnId || !destinationColumnId) {
+      return;
+    }
+
+    const sourceTasks = columnsById[sourceColumnId]?.taskIds || [];
+    const destinationTasks = columnsById[destinationColumnId]?.taskIds || [];
+
+    const sourceIndex = activeData.index ?? sourceTasks.indexOf(active.id as string);
+
+    let destinationIndex: number;
+
+    if (overData?.type === 'task') {
+      destinationIndex = overData.index ?? destinationTasks.indexOf(over.id as string);
+    } else {
+      destinationIndex = destinationTasks.length - (sourceColumnId === destinationColumnId ? 1 : 0);
+    }
+
+    if (
+      sourceIndex < 0 ||
+      destinationIndex < 0 ||
+      (sourceColumnId === destinationColumnId && sourceIndex === destinationIndex)
+    ) {
+      return;
+    }
+
     try {
-      if (!destination) {
-        return;
-      }
-
-      if (source.droppableId === destination.droppableId && source.index === destination.index) {
-        return;
-      }
-
-      if (source.droppableId === destination.droppableId) {
-        await dispatch(
-          thunks.moveTask({
-            boardId: selectedBoardId!,
-            taskId: draggableId,
-            position: destination.index,
-            sourceColumnId: source.droppableId,
-            destinationColumnId: destination.droppableId,
-          })
-        );
-      } else {
-        await dispatch(
-          thunks.moveTask({
-            boardId: selectedBoardId!,
-            taskId: draggableId,
-            position: destination.index,
-            sourceColumnId: source.droppableId,
-            destinationColumnId: destination.droppableId,
-          })
-        );
-      }
+      await dispatch(
+        thunks.moveTask({
+          boardId: selectedBoardId,
+          taskId: active.id as string,
+          position: destinationIndex,
+          sourceColumnId,
+          destinationColumnId,
+        })
+      );
     } catch (err) {
       console.error(err);
       toast.error('Something went wrong!');
     }
   },
-    [dispatch, selectedBoardId]
+    [columnsById, dispatch, selectedBoardId]
   );
 
   const handleSubmit = async () => {
@@ -331,7 +376,11 @@ const Page = ({ boards, members }: PageProps) => {
         <Divider sx={{ borderBottomWidth: '2px', borderColor: indigo.dark }} />
         {
           selectedBoardId && (
-            <DragDropContext onDragEnd={handleDragEnd}>
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCorners}
+              onDragEnd={handleDragEnd}
+            >
               <Box
                 sx={{
                   display: 'flex',
@@ -367,7 +416,7 @@ const Page = ({ boards, members }: PageProps) => {
               >
                 Obriši tablu
               </Button>
-            </DragDropContext>
+            </DndContext>
           )
         }
       </Box>

@@ -1,97 +1,101 @@
-import { s3 } from '@/utils/aws/aws-s3';
-import aws from 'aws-sdk';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import {
+     S3Client,
+     PutObjectCommand,
+     DeleteObjectCommand,
+} from '@aws-sdk/client-s3';
+
+const s3 = new S3Client({
+     region: process.env.AWS_REGION!,
+     credentials: {
+          accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+          secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+     },
+});
 
 export const config = {
      api: {
           bodyParser: {
-               sizeLimit: '4mb' // Set desired value here
-          }
-     }
-}
+               sizeLimit: '4mb',
+          },
+     },
+};
+
+const BUCKET = process.env.AWS_S3_BUCKET_NAME!;
 
 export const extractInfoFromUrl = (url: string) => {
+     const splitUrl = url.split('.com/')[1].split('?')[0];
+     return decodeURIComponent(splitUrl);
+};
 
-     let splitUrl = url.split('.com/')[1].split('?')[0]
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+     try {
+          // ------------------------
+          // POST: upload image/video
+          // ------------------------
+          if (req.method === 'POST') {
+               const { file, extension, fileName, manufacturer } = req.body;
 
-     let key = splitUrl.replace(/%20/g, " ")
-
-     return key;
-}
-
-export default async (req: any, res: any) => {
-
-     if (req.method === 'POST') {
-          try {
-               const { file, title, extension, fileName, manufacturer } = req.body;
-
-               if (!file || !title || !extension) {
-                    return res.status(400).json({ error: 'Missing file, title, or extension' });
+               if (!file || !extension || !fileName || !manufacturer) {
+                    return res.status(400).json({ error: 'Missing required fields' });
                }
 
-               // Determine the content type based on the file extension
-               let contentType: string;
-               const imageExtensions = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'avif'];
-               const videoExtensions = ['mp4', 'webm', 'mov', 'avi'];
+               const imageExt = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'avif'];
+               const videoExt = ['mp4', 'webm', 'mov', 'avi'];
 
-               if (imageExtensions.includes(extension.toLowerCase())) {
+               let contentType: string;
+               if (imageExt.includes(extension.toLowerCase())) {
                     contentType = `image/${extension}`;
-               } else if (videoExtensions.includes(extension.toLowerCase())) {
+               } else if (videoExt.includes(extension.toLowerCase())) {
                     contentType = `video/${extension}`;
                } else {
                     return res.status(400).json({ error: 'Unsupported file type' });
                }
 
-               // Decode base64 data, removing the correct prefix
-               const base64Prefix = contentType.startsWith('image')
-                    ? /^data:image\/\w+;base64,/
-                    : /^data:video\/\w+;base64,/;
+               const base64Prefix = /^data:(image|video)\/\w+;base64,/;
+               const body = Buffer.from(file.replace(base64Prefix, ''), 'base64');
 
-               const decodedFile = Buffer.from(file.replace(base64Prefix, ''), 'base64');
-
-               // Adjust key to desired structure
                const key = `slike artikla/${manufacturer}/${fileName.split('.')[0]}.${extension}`;
 
-               const params: aws.S3.PutObjectRequest = {
-                    Bucket: process.env.AWS_S3_BUCKET_NAME!,
-                    Key: key,
-                    Body: decodedFile,
-                    ACL: 'public-read',
-                    ContentType: contentType, // Use dynamic content type
-               };
+               await s3.send(
+                    new PutObjectCommand({
+                         Bucket: BUCKET,
+                         Key: key,
+                         Body: body,
+                         ContentType: contentType,
+                         // ⚠️ Remove ACL if your bucket has "Bucket owner enforced"
+                         // ACL: 'public-read',
+                    })
+               );
 
-               const uploadedFile = await s3.upload(params).promise();
-               return res.status(200).json({ imageUrl: uploadedFile.Location });
-          } catch (error) {
-               console.error('Error uploading file:', error);
-               return res.status(500).json({ error: 'Failed to upload file to S3' });
+               return res.status(200).json({
+                    imageUrl: `https://${BUCKET}.s3.amazonaws.com/${key}`,
+               });
           }
-     }
-     else if (req.method === 'DELETE') {
 
-          let awsUrl = extractInfoFromUrl(req.body);
-          try {
+          // ------------------------
+          // DELETE: delete image
+          // ------------------------
+          if (req.method === 'DELETE') {
+               const awsUrl = extractInfoFromUrl(req.body);
 
                if (!awsUrl) {
                     return res.status(400).json({ error: 'Missing key' });
                }
 
-               const params: aws.S3.DeleteObjectRequest = {
-                    Bucket: process.env.AWS_S3_BUCKET_NAME!,
-                    Key: awsUrl
-               };
-
-               await s3.deleteObject(params, function (err, data) {
-                    if (err) console.log(err, err.stack);
-                    else console.log(data);
-               }).promise();
+               await s3.send(
+                    new DeleteObjectCommand({
+                         Bucket: BUCKET,
+                         Key: awsUrl,
+                    })
+               );
 
                return res.status(200).json({ message: 'Image deleted successfully' });
-          } catch (error) {
-               console.error('Error deleting image:', error);
-               return res.status(500).json({ error: 'Failed to delete image from S3' });
           }
+
+          return res.status(405).end();
+     } catch (error) {
+          console.error('S3 error:', error);
+          return res.status(500).json({ error: 'AWS S3 operation failed' });
      }
-     else {
-          res.status(405).end(); // Method Not Allowed
-     }
-};
+}

@@ -1,10 +1,16 @@
 import type { FC } from 'react';
-import { Draggable, Droppable } from 'react-beautiful-dnd';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
+import { useDroppable } from '@dnd-kit/core';
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 import { useSelector } from 'src/store';
-import type { Column, Task } from 'src/schemas/kanban';
+import type { Column } from 'src/schemas/kanban';
 
 import { TaskAdd } from '../task-add';
 import { TaskCard } from '../task-card';
@@ -26,9 +32,66 @@ interface ColumnCardProps {
   onTaskOpen?: (taskId: string) => void;
 }
 
+type DragItemData = {
+  type: 'task' | 'column';
+  columnId: string;
+  index?: number;
+};
+
+interface SortableTaskCardProps {
+  columnId: string;
+  taskId: string;
+  index: number;
+  onTaskOpen?: (taskId: string) => void;
+}
+
+const SortableTaskCard: FC<SortableTaskCardProps> = ({ columnId, taskId, index, onTaskOpen }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
+    id: taskId,
+    data: { type: 'task', columnId, index } satisfies DragItemData,
+  });
+
+  const style = {
+    transform: transform ? CSS.Transform.toString(transform) : undefined,
+    transition,
+  };
+
+  return (
+    <Box
+      ref={setNodeRef}
+      style={style}
+      sx={{
+        outline: 'none',
+        py: 1.5,
+      }}
+      {...attributes}
+      {...listeners}
+    >
+      <TaskCard
+        key={taskId}
+        dragging={isDragging}
+        onOpen={() => onTaskOpen?.(taskId)}
+        taskId={taskId}
+      />
+    </Box>
+  );
+};
+
 export const ColumnCard: FC<ColumnCardProps> = (props) => {
   const { columnId, onTaskAdd, onTaskOpen, onClear, onDelete, onRename, ...other } = props;
   const column = useColumn(columnId);
+  const { setNodeRef } = useDroppable({
+    id: column?._id?.toString() ?? columnId,
+    data: { type: 'column', columnId } satisfies DragItemData,
+  });
+
   if (!column) {
     return null;
   }
@@ -64,54 +127,34 @@ export const ColumnCard: FC<ColumnCardProps> = (props) => {
           borderRadius: 2.5,
         }}
       >
-        <Droppable
-          droppableId={column._id?.toString() ? column._id.toString() : ''}
-          type="task"
+        <SortableContext
+          id={columnId}
+          items={column.taskIds || []}
+          strategy={verticalListSortingStrategy}
         >
-          {(droppableProvider): JSX.Element => (
-            <Box
-              ref={droppableProvider.innerRef}
-              sx={{
-                flexGrow: 1,
-                minHeight: 80,
-                overflowY: 'auto',
-                px: 3,
-                pt: 1.5,
-              }}
-            >
-              {
-                column?.taskIds &&
-                column?.taskIds.map((task: string, index: number) => (
-                  <Draggable
-                    key={task}
-                    draggableId={task}
-                    index={index}
-                  >
-                    {(draggableProvided, snapshot): JSX.Element => (
-                      <Box
-                        ref={draggableProvided.innerRef}
-                        style={{ ...draggableProvided.draggableProps.style }}
-                        sx={{
-                          outline: 'none',
-                          py: 1.5,
-                        }}
-                        {...draggableProvided.draggableProps}
-                        {...draggableProvided.dragHandleProps}
-                      >
-                        <TaskCard
-                          key={task}
-                          dragging={snapshot.isDragging}
-                          onOpen={() => onTaskOpen?.(task)}
-                          taskId={task}
-                        />
-                      </Box>
-                    )}
-                  </Draggable>
-                ))}
-              {droppableProvider.placeholder}
-            </Box>
-          )}
-        </Droppable>
+          <Box
+            ref={setNodeRef}
+            sx={{
+              flexGrow: 1,
+              minHeight: 80,
+              overflowY: 'auto',
+              px: 3,
+              pt: 1.5,
+            }}
+          >
+            {
+              column?.taskIds &&
+              column?.taskIds.map((task: string, index: number) => (
+                <SortableTaskCard
+                  key={task}
+                  columnId={columnId}
+                  index={index}
+                  onTaskOpen={onTaskOpen}
+                  taskId={task}
+                />
+              ))}
+          </Box>
+        </SortableContext>
         <Box
           sx={{
             pt: 1.5,

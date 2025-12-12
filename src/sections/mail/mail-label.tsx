@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import type { FC, JSX } from 'react';
 import PropTypes from 'prop-types';
 import AlertCircleIcon from '@untitled-ui/icons-react/build/esm/AlertCircle';
 import BookmarkIcon from '@untitled-ui/icons-react/build/esm/Bookmark';

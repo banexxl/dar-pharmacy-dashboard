@@ -269,7 +269,6 @@ export const MailItem: FC<MailItemProps> = (props) => {
 };
 
 MailItem.propTypes = {
-  // @ts-expect-error
   email: PropTypes.object.isRequired,
   href: PropTypes.string.isRequired,
   onDeselect: PropTypes.func,

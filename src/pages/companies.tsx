@@ -10,7 +10,7 @@ import {
   Stack,
   SvgIcon,
   Typography,
-  Unstable_Grid2 as Grid
+  Grid
 } from '@mui/material';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { CompanyCard } from 'src/sections/companies/company-card';
@@ -141,9 +141,7 @@ const Page = () => (
           >
             {companies.map((company) => (
               <Grid
-                xs={12}
-                md={6}
-                lg={4}
+                size={{ xs: 12, sm: 6 }}
                 key={company.id}
               >
                 <CompanyCard company={company} />

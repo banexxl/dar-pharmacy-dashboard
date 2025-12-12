@@ -1,18 +1,14 @@
 "use client"
 import React, { useState } from 'react';
-import { TextField, Typography, Button, Checkbox, FormControlLabel, Box, Input, Card, CardContent, Grid, MenuItem, Stack, Container, IconButton, CardActionArea, colors, useMediaQuery } from '@mui/material';
+import { TextField, Button, Checkbox, FormControlLabel, Box, Input, Card, CardContent, Grid, MenuItem, Stack, Container, IconButton, CardActionArea, colors, useMediaQuery } from '@mui/material';
 import { Form, Formik } from 'formik';
 import { initialValues, mainCategoryOptions, manufacturerOptions, midCategoryOptions, newProductSchema, quantityUnitOptions } from './new-product-schema'
 import { useRouter } from 'next/navigation';
-import CircularProgress from '@mui/material/CircularProgress';
 import Swal from 'sweetalert2'
-import AttachFileIcon from '@mui/icons-material/AttachFile';
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
 import Image from 'next/image';
-import { LoadingButton } from '@mui/lab';
-import "@uploadthing/react/styles.css";
-import { Theme, useTheme } from '@mui/material/styles';
+
+import { Theme } from '@mui/material/styles';
 import { IProduct } from './products-table';
 
 export const fetchSubCategoryOptions = async (selectedMidCategory: any) => {
@@ -176,7 +172,6 @@ export const fetchSubCategoryOptions = async (selectedMidCategory: any) => {
 
 export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }: any) => {
 
-     const theme = useTheme()
      const router = useRouter();
      //const [selectedFile, setSelectedFile] = useState(null);
      const [fileURL, setFileURL] = useState("")

@@ -1,6 +1,7 @@
 import { IProduct } from "@/sections/products/products-table";
 import { ICustomer } from "./customer";
 import { error, indigo, info, success } from "@/theme/colors";
+import { JSX } from "react";
 
 export type PaymentMethod = 'credit card' | 'paypal' | 'cash' | 'check' | 'cash-on-delivery';
 

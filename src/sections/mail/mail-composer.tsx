@@ -18,10 +18,9 @@ import Stack from '@mui/material/Stack';
 import SvgIcon from '@mui/material/SvgIcon';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import { QuillEditor } from 'src/components/quill-editor';
+import EditorJsEditor from 'src/components/editorjs-editor';
 import toast from 'react-hot-toast';
 import { useDispatch } from '@/store';
-import { text } from 'stream/consumers';
 
 interface MailComposerProps {
   maximize?: boolean;
@@ -38,7 +37,7 @@ interface MailComposerProps {
 }
 
 export const MailComposer: FC<MailComposerProps> = (props) => {
-  const dispatch = useDispatch();
+
   const {
     maximize = false,
     message = '',
@@ -113,7 +112,6 @@ export const MailComposer: FC<MailComposerProps> = (props) => {
           margin: 3,
           maxHeight: (theme) => `calc(100% - ${theme.spacing(6)})`,
           maxWidth: (theme) => `calc(100% - ${theme.spacing(6)})`,
-          minHeight: 500,
           outline: 'none',
           position: 'fixed',
           right: 0,
@@ -184,15 +182,13 @@ export const MailComposer: FC<MailComposerProps> = (props) => {
           }}
           defaultValue={subject}
         />
-        <QuillEditor
-          onChange={onMessageChange}
-          placeholder="Leave a message"
-          sx={{
-            border: 'none',
-            flexGrow: 1,
-          }}
-          value={message}
-        />
+        <Box sx={{ flexGrow: 1, p: 2 }}>
+          <EditorJsEditor
+            onChange={onMessageChange}
+            placeholder="Leave a message"
+            value={message}
+          />
+        </Box>
         <Divider />
         <Stack
           alignItems="center"

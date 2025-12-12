@@ -107,7 +107,6 @@ export const OrderListSearch = (props: any) => {
         textColor="primary"
         value={tab}
         variant="scrollable"
-        name='tab'
       >
         {tabOptions.map((tab) => (
           <Tab

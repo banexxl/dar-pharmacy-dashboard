@@ -19,7 +19,7 @@ import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
 import Divider from '@mui/material/Divider';
 import Drawer from '@mui/material/Drawer';
-import Grid from '@mui/material/Unstable_Grid2';
+import Grid from '@mui/material/Grid';
 import Input from '@mui/material/Input';
 import Stack from '@mui/material/Stack';
 import SvgIcon from '@mui/material/SvgIcon';
@@ -842,8 +842,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
             >
               {/* Created */}
               <Grid
-                xs={12}
-                sm={4}
+                size={{ xs: 12, sm: 4 }}
               >
                 <Typography
                   color="text.secondary"
@@ -853,8 +852,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
                 </Typography>
               </Grid>
               <Grid
-                xs={12}
-                sm={8}
+                size={{ xs: 12, sm: 8 }}
               >
                 <Typography color="text.secondary" variant="caption">
                   {task.createdBy.name}
@@ -862,8 +860,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
               </Grid>
               {/* Assigned to */}
               <Grid
-                xs={12}
-                sm={4}
+                size={{ xs: 12, sm: 4 }}
               >
                 <Typography
                   color="text.secondary"
@@ -872,7 +869,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
                   Assigned to
                 </Typography>
               </Grid>
-              <Grid xs={12} sm={8}>
+              <Grid size={{ xs: 12, sm: 8 }}>
                 <Stack alignItems="center" direction="row" spacing={1}>
                   <FormControl fullWidth>
                     <Autocomplete
@@ -927,8 +924,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
               </Grid>
               {/* Attachments */}
               <Grid
-                xs={12}
-                sm={4}
+                size={{ xs: 12, sm: 4 }}
               >
                 <Typography
                   color="text.secondary"
@@ -938,8 +934,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
                 </Typography>
               </Grid>
               <Grid
-                xs={12}
-                sm={8}
+                size={{ xs: 12, sm: 8 }}
               >
                 <Stack
                   sx={{
@@ -1024,8 +1019,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
               </Grid>
               {/* Due Date */}
               <Grid
-                xs={12}
-                sm={4}
+                size={{ xs: 12, sm: 4 }}
               >
                 <Typography
                   color="text.secondary"
@@ -1035,8 +1029,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
                 </Typography>
               </Grid>
               <Grid
-                xs={12}
-                sm={8}
+                size={{ xs: 12, sm: 8 }}
               >
                 {task.due && (
                   <>
@@ -1051,19 +1044,22 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
                       value={task?.due}
                       onChange={(newValue: any) => handleDateChange(newValue)}
                       onClose={() => setOpenDatePicker(false)} // Close the picker when clicked outside
-                      PopperProps={{
-                        anchorEl: chipRef.current, // Position the calendar relative to the chip
-                        placement: 'bottom-start', // Opens below the chip
+                      slotProps={{
+                        popper: {
+                          anchorEl: chipRef.current,
+                          placement: 'bottom-start',
+                        },
+                        textField: {
+                          style: { display: 'none' }
+                        }
                       }}
-                      renderInput={(params) => <div style={{ display: 'none' }} />} // Hides the default input
                     />
                   </>
                 )}
               </Grid>
               {/* Labels */}
               <Grid
-                xs={12}
-                sm={4}
+                size={{ xs: 12, sm: 4 }}
               >
                 <Typography
                   color="text.secondary"
@@ -1073,8 +1069,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
                 </Typography>
               </Grid>
               <Grid
-                xs={12}
-                sm={8}
+                size={{ xs: 12, sm: 8 }}
               >
                 <TaskLabels
                   labels={task.labels}
@@ -1083,8 +1078,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
               </Grid>
               {/* Description */}
               <Grid
-                xs={12}
-                sm={4}
+                size={{ xs: 12, sm: 4 }}
               >
                 <Typography
                   color="text.secondary"
@@ -1094,8 +1088,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
                 </Typography>
               </Grid>
               <Grid
-                xs={12}
-                sm={8}
+                size={{ xs: 12, sm: 8 }}
               >
                 <Input
                   defaultValue={task.description}

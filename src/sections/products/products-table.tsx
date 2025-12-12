@@ -15,7 +15,7 @@ import { SeverityPill } from '@/components/severity-pill';
 import { fetchSubCategoryOptions } from './new-product-form';
 import Swal from 'sweetalert2';
 import { useRouter } from 'next/navigation';
-import "@uploadthing/react/styles.css";
+
 import { mainCategoryOptions, manufacturerOptions, midCategoryOptions, quantityUnitOptions } from './new-product-schema';
 import MagnifyingGlassIcon from '@heroicons/react/24/solid/MagnifyingGlassIcon';
 import ClearIcon from '@mui/icons-material/Clear';
@@ -523,9 +523,7 @@ export const ProductsTable = (props: any) => {
                                                                                      spacing={3}
                                                                                 >
                                                                                      <Grid key={Math.random()}
-                                                                                          item
-                                                                                          md={6}
-                                                                                          xs={12}
+                                                                                          size={{ md: 6, xs: 12 }}
                                                                                      >
                                                                                           <Typography key={Math.random()} variant="h6">Osnovni detalji</Typography>
                                                                                           <Divider key={Math.random()} sx={{ my: 2 }} />
@@ -534,9 +532,7 @@ export const ProductsTable = (props: any) => {
                                                                                                spacing={3}
                                                                                           >
                                                                                                <Grid key={Math.random()}
-                                                                                                    item
-                                                                                                    md={6}
-                                                                                                    xs={12}
+                                                                                                    size={{ md: 6, xs: 12 }}
                                                                                                >
                                                                                                     <TextField key={Math.random()}
                                                                                                          defaultValue={currentProductObject?.name}
@@ -554,9 +550,7 @@ export const ProductsTable = (props: any) => {
                                                                                                     />
                                                                                                </Grid>
                                                                                                <Grid key={Math.random()}
-                                                                                                    item
-                                                                                                    md={6}
-                                                                                                    xs={12}
+                                                                                                    size={{ md: 6, xs: 12 }}
                                                                                                >
                                                                                                     <TextField key={Math.random()}
                                                                                                          defaultValue={currentProductObject?._id!.slice(-8)}
@@ -567,9 +561,7 @@ export const ProductsTable = (props: any) => {
                                                                                                     />
                                                                                                </Grid>
                                                                                                <Grid key={Math.random()}
-                                                                                                    item
-                                                                                                    md={6}
-                                                                                                    xs={12}
+                                                                                                    size={{ md: 6, xs: 12 }}
                                                                                                >
                                                                                                     <TextField key={Math.random()}
                                                                                                          defaultValue={currentProductObject?.mainCategory}
@@ -595,9 +587,7 @@ export const ProductsTable = (props: any) => {
                                                                                                     </TextField>
                                                                                                </Grid>
                                                                                                <Grid key={Math.random()}
-                                                                                                    item
-                                                                                                    md={6}
-                                                                                                    xs={12}
+                                                                                                    size={{ md: 6, xs: 12 }}
                                                                                                >
                                                                                                     <TextField key={Math.random()}
                                                                                                          defaultValue={currentProductObject?.midCategory}
@@ -625,9 +615,7 @@ export const ProductsTable = (props: any) => {
                                                                                                     </TextField>
                                                                                                </Grid>
                                                                                                <Grid key={Math.random()}
-                                                                                                    item
-                                                                                                    md={6}
-                                                                                                    xs={12}
+                                                                                                    size={{ md: 6, xs: 12 }}
                                                                                                >
                                                                                                     <TextField key={Math.random()}
                                                                                                          defaultValue={currentProductObject?.subCategory}
@@ -655,9 +643,7 @@ export const ProductsTable = (props: any) => {
                                                                                                </Grid>
 
                                                                                                <Grid
-                                                                                                    item
-                                                                                                    md={6}
-                                                                                                    xs={12}
+                                                                                                    size={{ md: 6, xs: 12 }}
                                                                                                >
                                                                                                     <TextField key={Math.random()}
                                                                                                          defaultValue={currentProductObject?.description}
@@ -675,9 +661,7 @@ export const ProductsTable = (props: any) => {
                                                                                                     />
                                                                                                </Grid>
                                                                                                <Grid key={Math.random()}
-                                                                                                    item
-                                                                                                    md={6}
-                                                                                                    xs={12}
+                                                                                                    size={{ md: 6, xs: 12 }}
                                                                                                >
                                                                                                     <TextField key={Math.random()}
                                                                                                          defaultValue={currentProductObject?.instructions}
@@ -695,9 +679,7 @@ export const ProductsTable = (props: any) => {
                                                                                                     />
                                                                                                </Grid>
                                                                                                <Grid key={Math.random()}
-                                                                                                    item
-                                                                                                    md={6}
-                                                                                                    xs={12}
+                                                                                                    size={{ md: 6, xs: 12 }}
                                                                                                >
                                                                                                     <TextField key={Math.random()}
                                                                                                          defaultValue={currentProductObject?.warning}
@@ -715,9 +697,7 @@ export const ProductsTable = (props: any) => {
                                                                                                     />
                                                                                                </Grid>
                                                                                                <Grid key={Math.random()}
-                                                                                                    item
-                                                                                                    md={6}
-                                                                                                    xs={12}
+                                                                                                    size={{ md: 6, xs: 12 }}
                                                                                                >
                                                                                                     <TextField key={Math.random()}
                                                                                                          defaultValue={currentProductObject?.ingredients}
@@ -735,9 +715,7 @@ export const ProductsTable = (props: any) => {
                                                                                                     />
                                                                                                </Grid>
                                                                                                <Grid key={Math.random()}
-                                                                                                    item
-                                                                                                    md={6}
-                                                                                                    xs={12}
+                                                                                                    size={{ md: 6, xs: 12 }}
                                                                                                >
                                                                                                     <TextField key={Math.random()}
                                                                                                          defaultValue={currentProductObject?.promotionText}
@@ -756,10 +734,9 @@ export const ProductsTable = (props: any) => {
                                                                                                </Grid>
                                                                                           </Grid>
                                                                                      </Grid>
-                                                                                     <Grid key={Math.random()}
-                                                                                          item
-                                                                                          md={6}
-                                                                                          xs={12}
+                                                                                     <Grid
+                                                                                          key={Math.random()}
+                                                                                          size={{ md: 6, xs: 12 }}
                                                                                      >
                                                                                           <Typography key={Math.random()} variant="h6">Napredni podaci</Typography>
                                                                                           <Divider key={Math.random()} sx={{ my: 2 }} />
@@ -768,9 +745,7 @@ export const ProductsTable = (props: any) => {
                                                                                                spacing={3}
                                                                                           >
                                                                                                <Grid key={Math.random()}
-                                                                                                    item
-                                                                                                    md={6}
-                                                                                                    xs={12}
+                                                                                                    size={{ md: 6, xs: 12 }}
                                                                                                >
                                                                                                     <TextField key={Math.random()}
                                                                                                          defaultValue={currentProductObject?.price}
@@ -795,9 +770,7 @@ export const ProductsTable = (props: any) => {
                                                                                                </Grid>
 
                                                                                                <Grid key={Math.random()}
-                                                                                                    item
-                                                                                                    md={6}
-                                                                                                    xs={12}
+                                                                                                    size={{ md: 6, xs: 12 }}
                                                                                                >
                                                                                                     <TextField
                                                                                                          fullWidth
@@ -826,9 +799,7 @@ export const ProductsTable = (props: any) => {
                                                                                                </Grid>
 
                                                                                                <Grid key={Math.random()}
-                                                                                                    item
-                                                                                                    md={6}
-                                                                                                    xs={12}
+                                                                                                    size={{ md: 6, xs: 12 }}
                                                                                                >
                                                                                                     <TextField key={Math.random()}
                                                                                                          defaultValue={currentProductObject?.availableStock}
@@ -847,9 +818,7 @@ export const ProductsTable = (props: any) => {
                                                                                                     />
                                                                                                </Grid>
                                                                                                <Grid key={Math.random()}
-                                                                                                    item
-                                                                                                    md={6}
-                                                                                                    xs={12}
+                                                                                                    size={{ md: 6, xs: 12 }}
                                                                                                >
                                                                                                     <TextField key={Math.random()}
                                                                                                          defaultValue={currentProductObject?.discountAmount}
@@ -875,9 +844,7 @@ export const ProductsTable = (props: any) => {
                                                                                                     />
                                                                                                </Grid>
                                                                                                <Grid
-                                                                                                    item
-                                                                                                    md={6}
-                                                                                                    xs={12}
+                                                                                                    size={{ md: 6, xs: 12 }}
                                                                                                >
                                                                                                     <TextField
                                                                                                          key={Math.random()}
@@ -896,9 +863,7 @@ export const ProductsTable = (props: any) => {
                                                                                                     />
                                                                                                </Grid>
                                                                                                <Grid
-                                                                                                    item
-                                                                                                    md={6}
-                                                                                                    xs={12}
+                                                                                                    size={{ md: 6, xs: 12 }}
                                                                                                >
                                                                                                     <TextField key={Math.random()}
                                                                                                          defaultValue={currentProductObject?.quantityUnit}
@@ -925,9 +890,7 @@ export const ProductsTable = (props: any) => {
                                                                                                     </TextField>
                                                                                                </Grid>
                                                                                                <Grid key={Math.random()}
-                                                                                                    item
-                                                                                                    md={6}
-                                                                                                    xs={12}
+                                                                                                    size={{ md: 6, xs: 12 }}
                                                                                                     sx={{
                                                                                                          alignItems: 'center',
                                                                                                          display: 'flex',
@@ -944,9 +907,7 @@ export const ProductsTable = (props: any) => {
                                                                                                     </Typography>
                                                                                                </Grid>
                                                                                                <Grid key={Math.random()}
-                                                                                                    item
-                                                                                                    md={6}
-                                                                                                    xs={12}
+                                                                                                    size={{ md: 6, xs: 12 }}
                                                                                                     sx={{
                                                                                                          alignItems: 'center',
                                                                                                          display: 'flex',
@@ -963,9 +924,7 @@ export const ProductsTable = (props: any) => {
                                                                                                     </Typography>
                                                                                                </Grid>
                                                                                                <Grid key={Math.random()}
-                                                                                                    item
-                                                                                                    md={6}
-                                                                                                    xs={12}
+                                                                                                    size={{ md: 6, xs: 12 }}
                                                                                                     sx={{
                                                                                                          alignItems: 'center',
                                                                                                          display: 'flex',
@@ -984,9 +943,7 @@ export const ProductsTable = (props: any) => {
                                                                                                     </Typography>
                                                                                                </Grid>
                                                                                                <Grid key={Math.random()}
-                                                                                                    item
-                                                                                                    md={6}
-                                                                                                    xs={12}
+                                                                                                    size={{ md: 6, xs: 12 }}
                                                                                                     sx={{
                                                                                                          alignItems: 'center',
                                                                                                          display: 'flex',
@@ -1003,9 +960,7 @@ export const ProductsTable = (props: any) => {
                                                                                                     </Typography>
                                                                                                </Grid>
                                                                                                <Grid key={Math.random()}
-                                                                                                    item
-                                                                                                    md={6}
-                                                                                                    xs={12}
+                                                                                                    size={{ md: 6, xs: 12 }}
                                                                                                     sx={{
                                                                                                          alignItems: 'center',
                                                                                                          display: 'flex',

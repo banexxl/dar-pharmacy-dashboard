@@ -64,7 +64,7 @@ export const PropertyListItem: React.FC<PropertyListItemProps> = (props) => {
 // Ensure PropTypes match the TypeScript types
 PropertyListItem.propTypes = {
   align: PropTypes.oneOf(['horizontal', 'vertical']),
-  children: PropTypes.node,
+  // children: PropTypes.node,
   disableGutters: PropTypes.bool,
   label: PropTypes.string.isRequired,
   value: PropTypes.string,

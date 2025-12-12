@@ -4,7 +4,7 @@ import Upload01Icon from '@untitled-ui/icons-react/build/esm/Upload01';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
-import Grid from '@mui/material/Unstable_Grid2';
+import Grid from '@mui/material/Grid';
 import Stack from '@mui/material/Stack';
 import SvgIcon from '@mui/material/SvgIcon';
 import Typography from '@mui/material/Typography';
@@ -24,7 +24,7 @@ import { Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@m
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/router';
 import { GetServerSideProps } from 'next';
-import aws from 'aws-sdk';
+import { S3Client, ListObjectsV2Command } from '@aws-sdk/client-s3';
 
 type View = 'grid' | 'list';
 
@@ -294,7 +294,7 @@ const Page = ({ totalBucketSize }: any) => {
               lg: 4,
             }}
           >
-            <Grid xs={12}>
+            <Grid size={{ xs: 12 }}>
               <Stack
                 direction="row"
                 justifyContent="space-between"
@@ -334,8 +334,7 @@ const Page = ({ totalBucketSize }: any) => {
               </Stack>
             </Grid>
             <Grid
-              xs={12}
-              md={8}
+              size={{ xs: 12, md: 8 }}
             >
               <Stack
                 spacing={{
@@ -397,8 +396,7 @@ const Page = ({ totalBucketSize }: any) => {
               </Stack>
             </Grid>
             <Grid
-              xs={12}
-              md={4}
+              size={{ xs: 12, md: 8 }}
             >
               <StorageStats
                 totalBucketSize={totalBucketSize}
@@ -449,38 +447,34 @@ Page.getLayout = (page: any) => <DashboardLayout>{page}</DashboardLayout>;
 
 export default Page;
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async () => {
   const bucketName = process.env.AWS_S3_BUCKET_NAME!;
+  const region = process.env.AWS_REGION!;
 
-  aws.config.update({
-    accessKeyId: process.env.AWS_S3_ACCESS_KEY,
-    secretAccessKey: process.env.AWS_S3_SECRET_KEY,
-    region: process.env.AWS_REGION,
+  const s3 = new S3Client({
+    region,
+    credentials: {
+      accessKeyId: process.env.AWS_S3_ACCESS_KEY!,
+      secretAccessKey: process.env.AWS_S3_SECRET_KEY!,
+    },
   });
 
-  const s3 = new aws.S3();
-
-  const getTotalBucketSize = async (bucketName: string): Promise<number> => {
+  const getTotalBucketSize = async (bucket: string): Promise<number> => {
     let totalSize = 0;
-    let continuationToken: string | undefined = undefined;
+    let continuationToken: string | undefined;
 
     try {
       do {
-        // Prepare the request parameters
-        const params: aws.S3.ListObjectsV2Request = {
-          Bucket: bucketName,
-          ContinuationToken: continuationToken,
-        };
+        const data = await s3.send(
+          new ListObjectsV2Command({
+            Bucket: bucket,
+            ContinuationToken: continuationToken,
+          })
+        );
 
-        // Fetch the list of objects
-        const data = await s3.listObjectsV2(params).promise();
-
-        // Sum the size of all objects in the current batch
-        totalSize += data.Contents?.reduce((acc, obj) => acc + (obj.Size || 0), 0) || 0;
-
-        // Check if there are more objects to fetch
+        totalSize += (data.Contents || []).reduce((acc, obj) => acc + (obj.Size || 0), 0);
         continuationToken = data.IsTruncated ? data.NextContinuationToken : undefined;
-      } while (continuationToken); // Continue fetching if more pages exist
+      } while (continuationToken);
     } catch (error) {
       console.error('Error retrieving total size from S3:', error);
       throw new Error('Failed to calculate total size from S3 bucket');
@@ -493,18 +487,15 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     const totalBucketSize = await getTotalBucketSize(bucketName);
 
     return {
-      props: {
-        totalBucketSize, // Return the total size in bytes to the page component
-      },
+      props: { totalBucketSize },
     };
   } catch (error) {
     console.error('Error in getServerSideProps:', error);
 
     return {
-      props: {
-        totalBucketSize: 0, // In case of error, fallback to 0
-      },
+      props: { totalBucketSize: 0 },
     };
   }
 };
+
 

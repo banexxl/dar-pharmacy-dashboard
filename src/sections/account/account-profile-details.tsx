@@ -8,7 +8,7 @@ import {
   CardHeader,
   Divider,
   TextField,
-  Unstable_Grid2 as Grid
+  Grid
 } from '@mui/material';
 
 const states = [
@@ -75,8 +75,7 @@ export const AccountProfileDetails = () => {
               spacing={3}
             >
               <Grid
-                xs={12}
-                md={6}
+                size={{ xs: 12, sm: 6 }}
               >
                 <TextField
                   fullWidth
@@ -89,8 +88,7 @@ export const AccountProfileDetails = () => {
                 />
               </Grid>
               <Grid
-                xs={12}
-                md={6}
+                size={{ xs: 12, sm: 6 }}
               >
                 <TextField
                   fullWidth
@@ -102,8 +100,7 @@ export const AccountProfileDetails = () => {
                 />
               </Grid>
               <Grid
-                xs={12}
-                md={6}
+                size={{ xs: 12, sm: 6 }}
               >
                 <TextField
                   fullWidth
@@ -115,8 +112,7 @@ export const AccountProfileDetails = () => {
                 />
               </Grid>
               <Grid
-                xs={12}
-                md={6}
+                size={{ xs: 12, sm: 6 }}
               >
                 <TextField
                   fullWidth
@@ -128,8 +124,7 @@ export const AccountProfileDetails = () => {
                 />
               </Grid>
               <Grid
-                xs={12}
-                md={6}
+                size={{ xs: 12, sm: 6 }}
               >
                 <TextField
                   fullWidth
@@ -141,8 +136,7 @@ export const AccountProfileDetails = () => {
                 />
               </Grid>
               <Grid
-                xs={12}
-                md={6}
+                size={{ xs: 12, sm: 6 }}
               >
                 <TextField
                   fullWidth

@@ -72,15 +72,35 @@ export const ItemListRow: FC<ItemListRowProps> = (props) => {
             borderTopColor: 'divider',
             borderTopStyle: 'solid',
             '&:first-of-type': {
-              borderTopLeftRadius: (theme) => theme.shape.borderRadius * 1.5,
-              borderBottomLeftRadius: (theme) => theme.shape.borderRadius * 1.5,
+              borderTopLeftRadius: (theme) => {
+                const radius = typeof theme.shape.borderRadius === 'number'
+                  ? theme.shape.borderRadius
+                  : parseFloat(theme.shape.borderRadius);
+                return radius * 1.5;
+              },
+              borderBottomLeftRadius: (theme) => {
+                const radius = typeof theme.shape.borderRadius === 'number'
+                  ? theme.shape.borderRadius
+                  : parseFloat(theme.shape.borderRadius);
+                return radius * 1.5;
+              },
               borderLeftWidth: 1,
               borderLeftColor: 'divider',
               borderLeftStyle: 'solid',
             },
             '&:last-of-type': {
-              borderTopRightRadius: (theme) => theme.shape.borderRadius * 1.5,
-              borderBottomRightRadius: (theme) => theme.shape.borderRadius * 1.5,
+              borderTopRightRadius: (theme) => {
+                const radius = typeof theme.shape.borderRadius === 'number'
+                  ? theme.shape.borderRadius
+                  : parseFloat(theme.shape.borderRadius);
+                return radius * 1.5;
+              },
+              borderBottomRightRadius: (theme) => {
+                const radius = typeof theme.shape.borderRadius === 'number'
+                  ? theme.shape.borderRadius
+                  : parseFloat(theme.shape.borderRadius);
+                return radius * 1.5;
+              },
               borderRightWidth: 1,
               borderRightColor: 'divider',
               borderRightStyle: 'solid',

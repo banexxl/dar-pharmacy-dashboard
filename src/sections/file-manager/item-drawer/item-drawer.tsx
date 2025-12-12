@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import type { FC, JSX } from 'react';
 import PropTypes from 'prop-types';
 import { format } from 'date-fns';
 import Edit02Icon from '@untitled-ui/icons-react/build/esm/Edit02';
@@ -10,7 +10,7 @@ import { backdropClasses } from '@mui/material/Backdrop';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Drawer from '@mui/material/Drawer';
-import Grid from '@mui/material/Unstable_Grid2';
+import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import Stack from '@mui/material/Stack';
 import SvgIcon from '@mui/material/SvgIcon';
@@ -140,8 +140,7 @@ export const ItemDrawer: FC<ItemDrawerProps> = (props) => {
           >
 
             <Grid
-              xs={12}
-              sm={4}
+              size={{ xs: 12, sm: 4 }}
             >
               <Typography
                 color="text.secondary"
@@ -151,14 +150,12 @@ export const ItemDrawer: FC<ItemDrawerProps> = (props) => {
               </Typography>
             </Grid>
             <Grid
-              xs={12}
-              sm={8}
+              size={{ xs: 12, sm: 8 }}
             >
               <Typography variant="body2">{size}</Typography>
             </Grid>
             <Grid
-              xs={12}
-              sm={4}
+              size={{ xs: 12, sm: 4 }}
             >
               <Typography
                 color="text.secondary"
@@ -168,14 +165,12 @@ export const ItemDrawer: FC<ItemDrawerProps> = (props) => {
               </Typography>
             </Grid>
             <Grid
-              xs={12}
-              sm={8}
+              size={{ xs: 12, sm: 8 }}
             >
               <Typography variant="body2">{updatedAt}</Typography>
             </Grid>
             <Grid
-              xs={12}
-              sm={4}
+              size={{ xs: 12, sm: 4 }}
             >
               <Typography
                 color="text.secondary"
@@ -185,8 +180,7 @@ export const ItemDrawer: FC<ItemDrawerProps> = (props) => {
               </Typography>
             </Grid>
             <Grid
-              xs={12}
-              sm={8}
+              size={{ xs: 12, sm: 8 }}
             >
               <IconButton onClick={() => onDeleteClick(item)}>
                 <SvgIcon fontSize="small">
