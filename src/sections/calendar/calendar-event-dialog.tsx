@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import toast from 'react-hot-toast';
 import { addMinutes } from 'date-fns';
 import * as Yup from 'yup';
-import { useFormik } from 'formik';
 import Trash02Icon from '@untitled-ui/icons-react/build/esm/Trash02';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -22,6 +21,7 @@ import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { thunks } from 'src/thunks/calendar';
 import { CalendarEvent } from '@/schemas/calendar';
 import { useAppDispatch } from '@/store/hooks';
+import { useFormik } from 'formik';
 
 interface Values {
   allDay: boolean;
