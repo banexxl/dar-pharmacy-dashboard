@@ -18,7 +18,7 @@ import SvgIcon from '@mui/material/SvgIcon';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 
-import { useDispatch, useSelector } from 'src/store';
+import { useAppDispatch, useAppSelector } from 'src/store/hooks';
 import { thunks } from 'src/thunks/mail';
 
 import { MailItem } from './mail-item';
@@ -30,8 +30,8 @@ import toast from 'react-hot-toast';
 
 
 const useEmails = (currentLabelId?: string): { byId: Record<string, Email>; allIds: string[] } => {
-  const dispatch = useDispatch();
-  const { emails } = useSelector((state) => state.mail);
+  const dispatch = useAppDispatch();
+  const { emails } = useAppSelector((state) => state.mail);
   useEffect(
     () => {
       dispatch(thunks.getEmails(currentLabelId!));
@@ -146,7 +146,7 @@ const useEmailSearch = () => {
 
 export const MailList: FC<MailListProps> = (props) => {
   const { currentLabelId, onSidebarToggle, ...other } = props;
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const emails = useEmails(currentLabelId);
 
   const emailSearch = useEmailSearch();

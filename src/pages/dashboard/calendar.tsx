@@ -17,7 +17,7 @@ import type { Theme } from '@mui/material/styles/createTheme';
 
 import { useDialog } from 'src/hooks/use-dialog';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
-import { useDispatch, useSelector } from 'src/store';
+import { useAppDispatch, useAppSelector } from 'src/store/hooks';
 import { thunks } from 'src/thunks/calendar';
 import { CalendarEvent, CalendarView } from '@/schemas/calendar';
 import { CalendarContainer } from '@/sections/calendar/calendar-container';
@@ -36,8 +36,8 @@ interface UpdateDialogData {
 }
 
 const useEvents = (): CalendarEvent[] => {
-  const dispatch = useDispatch();
-  const events = useSelector((state) => state.calendar.events);
+  const dispatch = useAppDispatch();
+  const events = useAppSelector((state) => state.calendar.events);
 
   const handleEventsGet = useCallback((): void => {
     dispatch(thunks.getEvents());
@@ -65,7 +65,7 @@ const useCurrentEvent = (events: CalendarEvent[], dialogData?: UpdateDialogData)
 };
 
 const Page = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const calendarRef = useRef<Calendar | null>(null);
   const events = useEvents();
   const mdUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));

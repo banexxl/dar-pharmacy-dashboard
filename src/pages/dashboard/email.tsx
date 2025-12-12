@@ -4,7 +4,6 @@ import Divider from '@mui/material/Divider';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import type { Theme } from '@mui/material/styles/createTheme';
 import { Label } from '@/schemas/mail';
-import { useDispatch, useSelector } from '@/store';
 import { thunks } from '@/thunks/mail';
 import { MailSidebar } from '@/sections/mail/mail-sidebar';
 import { MailContainer } from '@/sections/mail/mail-container';
@@ -15,10 +14,11 @@ import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { useSearchParams } from 'next/navigation';
 import { debounce } from 'lodash';
 import { useSession } from 'next-auth/react';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 
 const useLabels = (): Label[] => {
-  const dispatch = useDispatch();
-  const labels = useSelector((state) => state.mail.labels);
+  const dispatch = useAppDispatch();
+  const labels = useAppSelector((state) => state.mail.labels);
 
   const handleLabelsGet = useCallback((): void => {
     dispatch(thunks.getLabels());

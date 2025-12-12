@@ -8,16 +8,15 @@ import {
   useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-
-import { useSelector } from 'src/store';
 import type { Column } from 'src/schemas/kanban';
 
 import { TaskAdd } from '../task-add';
 import { TaskCard } from '../task-card';
 import { ColumnHeader } from './column-header';
+import { useAppSelector } from '@/store/hooks';
 
 const useColumn = (columnId: string): Column | undefined => {
-  return useSelector((state) => {
+  return useAppSelector((state) => {
     const { columns } = state.kanban;
     return columns.byId[columnId];
   });

@@ -31,7 +31,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import type { Theme } from '@mui/material/styles/createTheme';
 import { IconButton, MenuItem } from '@mui/material';
 import type { RootState } from 'src/store';
-import { useDispatch, useSelector } from 'src/store';
+import { useAppDispatch, useAppSelector } from 'src/store/hooks';
 import { thunks } from 'src/thunks/kanban';
 import type { Attachment, CheckItem, Column, Member, Task } from 'src/schemas/kanban';
 import { TaskChecklist } from './task-checklist';
@@ -47,7 +47,7 @@ import { Session } from 'next-auth';
 import { indigo } from '@/theme/colors';
 
 const useColumns = (): Column[] => {
-  return useSelector((state) => {
+  return useAppSelector((state) => {
     const { columns } = state.kanban;
 
     return Object.values(columns.byId);
@@ -55,7 +55,7 @@ const useColumns = (): Column[] => {
 };
 
 const useTask = (taskId?: string): Task | null => {
-  return useSelector((state: RootState) => {
+  return useAppSelector((state: RootState) => {
     const { tasks } = state.kanban;
 
     if (!taskId) {
@@ -67,7 +67,7 @@ const useTask = (taskId?: string): Task | null => {
 };
 
 const useColumn = (columnId?: string): Column | null => {
-  return useSelector((state) => {
+  return useAppSelector((state) => {
     const { columns } = state.kanban;
 
     if (!columnId) {
@@ -80,7 +80,7 @@ const useColumn = (columnId?: string): Column | null => {
 
 // const useAuthor = (authorId?: string): Member | null => {
 
-//   return useSelector((state: RootState) => {
+//   return useAppSelector((state: RootState) => {
 //     const { members } = state.kanban;
 //     if (!authorId) {
 //       return null;
@@ -90,7 +90,7 @@ const useColumn = (columnId?: string): Column | null => {
 // };
 
 const useAssignees = (assigneesIds?: string[]): Member[] => {
-  return useSelector((state: RootState) => {
+  return useAppSelector((state: RootState) => {
     const { members } = state.kanban;
 
     if (!assigneesIds) {
@@ -115,7 +115,7 @@ interface TaskModalProps {
 export const TaskModal: FC<TaskModalProps> = (props) => {
   const { taskId, onClose, open = false, boardId, members, userLoggedIn, ...other } = props;
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const columns = useColumns();
   const task = useTask(taskId);
   const column = useColumn(task?.columnId);

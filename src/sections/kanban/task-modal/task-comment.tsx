@@ -5,12 +5,11 @@ import Avatar from '@mui/material/Avatar';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-
-import { useSelector } from 'src/store';
 import type { Comment, Member } from 'src/schemas/kanban';
+import { useAppSelector } from '@/store/hooks';
 
 const useAuthor = (authorId: string): Member | null => {
-  return useSelector((state) => {
+  return useAppSelector((state) => {
     const { members } = state.kanban;
     const member = Object.values(members.byId).find(
       (member: Member) => member.email === authorId

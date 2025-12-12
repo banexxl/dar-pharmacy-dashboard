@@ -1,9 +1,7 @@
 import NextLink from 'next/link';
 import PropTypes from 'prop-types';
-import { Box, ButtonBase, CircularProgress, Typography } from '@mui/material';
-import { ReactNode, useEffect, useState } from 'react';
-import { useSelector } from '@/store';
-import { success } from '@/theme/colors';
+import { Box, ButtonBase } from '@mui/material';
+import { ReactNode } from 'react';
 
 interface SideNavItemProps {
      active: boolean;

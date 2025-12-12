@@ -5,7 +5,7 @@ import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
-import { useDispatch, useSelector } from 'src/store';
+import { useAppDispatch, useAppSelector } from 'src/store/hooks';
 import { thunks } from 'src/thunks/mail';
 
 import { MailThreadAttachments } from './mail-thread-attachments';
@@ -17,8 +17,8 @@ import { paths } from 'paths';
 import { Session } from 'next-auth';
 
 const useEmail = (emailId: string): Email => {
-  const dispatch = useDispatch();
-  const email = useSelector((state) => state.mail.emails.byId[emailId]);
+  const dispatch = useAppDispatch();
+  const email = useAppSelector((state) => state.mail.emails.byId[emailId]);
 
   useEffect(
     () => {

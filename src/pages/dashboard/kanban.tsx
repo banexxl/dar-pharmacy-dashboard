@@ -16,7 +16,7 @@ import Typography from '@mui/material/Typography';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
-import { RootState, useDispatch, useSelector } from 'src/store';
+import { RootState } from 'src/store';
 import { TaskModal } from '@/sections/kanban/task-modal';
 import { ColumnAdd } from '@/sections/kanban/column-add';
 import { ColumnCard } from '@/sections/kanban/column-card';
@@ -28,6 +28,7 @@ import { indigo } from '@/theme/colors';
 import sweetalert2 from 'sweetalert2';
 import { useSession } from 'next-auth/react';
 import { createResourceId } from '@/utils/create-resource-id';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 
 
 type DragItemData = {
@@ -37,12 +38,12 @@ type DragItemData = {
 };
 
 const useColumnsIds = (): string[] => {
-  const { columns } = useSelector((state: RootState) => state.kanban);
+  const { columns } = useAppSelector((state: RootState) => state.kanban);
   return columns.allIds;
 };
 
 const useBoard = (boardId: string | null | undefined): void => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const handleBoardGet = useCallback((boardId: string): void => {
     if (boardId) {
@@ -65,9 +66,9 @@ type PageProps = {
 };
 
 const Page = ({ boards, members }: PageProps) => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const columnIds = useColumnsIds();
-  const columnsById = useSelector((state: RootState) => state.kanban.columns.byId);
+  const columnsById = useAppSelector((state: RootState) => state.kanban.columns.byId);
   const [currentTaskId, setCurrentTaskId] = useState<string | null>(null);
   const [selectedBoardId, setSelectedBoardId] = useState<string | null>('');
   const [boardData, setBoardData] = useState<Board[]>(boards);

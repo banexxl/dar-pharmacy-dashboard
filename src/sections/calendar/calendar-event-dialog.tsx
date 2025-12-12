@@ -19,10 +19,9 @@ import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-
-import { useDispatch } from 'src/store';
 import { thunks } from 'src/thunks/calendar';
 import { CalendarEvent } from '@/schemas/calendar';
+import { useAppDispatch } from '@/store/hooks';
 
 interface Values {
   allDay: boolean;
@@ -108,13 +107,13 @@ export const CalendarEventDialog: FC<CalendarEventDialogProps> = (props) => {
     range,
   } = props;
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const initialValues = useInitialValues(event, range);
   const formik = useFormik({
     enableReinitialize: true,
     initialValues,
     validationSchema,
-    onSubmit: async (values, helpers): Promise<void> => {
+    onSubmit: async (values: any, helpers: any): Promise<void> => {
       try {
         const data = {
           allDay: values.allDay,

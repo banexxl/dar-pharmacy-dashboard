@@ -13,22 +13,19 @@ import Chip from '@mui/material/Chip';
 import Stack from '@mui/material/Stack';
 import SvgIcon from '@mui/material/SvgIcon';
 import Typography from '@mui/material/Typography';
-import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
-import ImageIcon from '@mui/icons-material/Image';
-import ArticleIcon from '@mui/icons-material/Article';
 import type { RootState } from 'src/store';
-import { useSelector } from 'src/store';
 import type { Member, Task } from 'src/schemas/kanban';
+import { useAppSelector } from '@/store/hooks';
 
 const useTask = (taskId: string): Task | undefined => {
-  return useSelector((state: RootState) => {
+  return useAppSelector((state: RootState) => {
     const { tasks } = state.kanban;
     return tasks.byId[taskId];
   });
 };
 
 const useAssignees = (assignedTo?: Member[]): Member[] => {
-  return useSelector((state: RootState) => {
+  return useAppSelector((state: RootState) => {
     const { members } = state.kanban;
 
     if (!assignedTo) {
