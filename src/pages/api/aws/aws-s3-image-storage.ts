@@ -1,18 +1,9 @@
+// src/pages/api/aws/aws-s3-image-storage.ts
 import type { NextApiRequest, NextApiResponse } from 'next';
-import {
-     S3Client,
-     PutObjectCommand,
-     DeleteObjectCommand,
-} from '@aws-sdk/client-s3';
+import { PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
+import { s3 } from '@/utils/aws/aws-s3';
 
-const s3 = new S3Client({
-     region: process.env.AWS_REGION!,
-     credentials: {
-          accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-          secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
-     },
-});
-
+// Keep your body size limit
 export const config = {
      api: {
           bodyParser: {
@@ -21,81 +12,131 @@ export const config = {
      },
 };
 
-const BUCKET = process.env.AWS_S3_BUCKET_NAME!;
-
-export const extractInfoFromUrl = (url: string) => {
-     const splitUrl = url.split('.com/')[1].split('?')[0];
-     return decodeURIComponent(splitUrl);
+type UploadBody = {
+     file: string; // base64 data URL
+     title?: string;
+     extension: string;
+     fileName: string;
+     manufacturer: string;
 };
 
+function buildContentType(extension: string): string | null {
+     const ext = extension.toLowerCase();
+
+     // Normalize jpg -> jpeg for content-type correctness
+     if (ext === 'jpg') return 'image/jpeg';
+
+     const imageExtensions = ['png', 'jpeg', 'gif', 'webp', 'avif'];
+     const videoExtensions = ['mp4', 'webm', 'mov', 'avi'];
+
+     if (imageExtensions.includes(ext)) return `image/${ext}`;
+     if (videoExtensions.includes(ext)) {
+          // mov/avi aren’t always video/<ext> officially, but keep it simple.
+          // If you want stricter mapping, we can add it.
+          return `video/${ext}`;
+     }
+
+     return null;
+}
+
+function stripDataUrlPrefix(dataUrl: string): string {
+     // Handles image/* and video/* prefixes generically
+     return dataUrl.replace(/^data:[^;]+;base64,/, '');
+}
+
+function encodeS3KeyForUrl(key: string): string {
+     // Encode each segment so slashes stay slashes, spaces become %20, etc.
+     return key.split('/').map(encodeURIComponent).join('/');
+}
+
+export function extractKeyFromS3Url(url: string): string {
+     // Supports URLs like:
+     // https://bucket.s3.amazonaws.com/key...
+     // https://bucket.s3.eu-central-1.amazonaws.com/key...
+     // and strips query params
+     const afterHost = url.split('.amazonaws.com/')[1] ?? url.split('.com/')[1];
+     if (!afterHost) throw new Error('Invalid S3 URL');
+     const rawKey = afterHost.split('?')[0];
+     return decodeURIComponent(rawKey);
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-     try {
-          // ------------------------
-          // POST: upload image/video
-          // ------------------------
-          if (req.method === 'POST') {
-               const { file, extension, fileName, manufacturer } = req.body;
+     const bucket = process.env.AWS_S3_BUCKET_NAME;
+     const region = process.env.AWS_REGION;
+
+     if (!bucket || !region) {
+          return res.status(500).json({ error: 'Server misconfigured: missing AWS_S3_BUCKET_NAME or AWS_REGION' });
+     }
+
+     // ✅ UPLOAD
+     if (req.method === 'POST') {
+          try {
+               const { file, extension, fileName, manufacturer } = req.body as UploadBody;
 
                if (!file || !extension || !fileName || !manufacturer) {
-                    return res.status(400).json({ error: 'Missing required fields' });
+                    return res.status(400).json({ error: 'Missing file, extension, fileName, or manufacturer' });
                }
 
-               const imageExt = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'avif'];
-               const videoExt = ['mp4', 'webm', 'mov', 'avi'];
-
-               let contentType: string;
-               if (imageExt.includes(extension.toLowerCase())) {
-                    contentType = `image/${extension}`;
-               } else if (videoExt.includes(extension.toLowerCase())) {
-                    contentType = `video/${extension}`;
-               } else {
+               const contentType = buildContentType(extension);
+               if (!contentType) {
                     return res.status(400).json({ error: 'Unsupported file type' });
                }
 
-               const base64Prefix = /^data:(image|video)\/\w+;base64,/;
-               const body = Buffer.from(file.replace(base64Prefix, ''), 'base64');
+               const base64 = stripDataUrlPrefix(file);
+               const body = Buffer.from(base64, 'base64');
 
+               // IMPORTANT: key has a space in "slike artikla" — that’s OK in S3,
+               // but URLs must be encoded. We'll encode when generating the URL.
                const key = `slike artikla/${manufacturer}/${fileName.split('.')[0]}.${extension}`;
 
                await s3.send(
                     new PutObjectCommand({
-                         Bucket: BUCKET,
+                         Bucket: bucket,
                          Key: key,
                          Body: body,
                          ContentType: contentType,
-                         // ⚠️ Remove ACL if your bucket has "Bucket owner enforced"
-                         // ACL: 'public-read',
+                         // Note: ACL requires bucket/object ACLs enabled. Many buckets block ACLs.
+                         // If your bucket blocks ACLs (recommended), REMOVE this line.
+                         ACL: 'public-read',
                     })
                );
 
-               return res.status(200).json({
-                    imageUrl: `https://${BUCKET}.s3.amazonaws.com/${key}`,
-               });
+               // Construct a consistent regional URL
+               const url = `https://${bucket}.s3.${region}.amazonaws.com/${encodeS3KeyForUrl(key)}`;
+
+               return res.status(200).json({ imageUrl: url, key });
+          } catch (error) {
+               console.error('Error uploading file:', error);
+               return res.status(500).json({ error: 'Failed to upload file to S3' });
           }
+     }
 
-          // ------------------------
-          // DELETE: delete image
-          // ------------------------
-          if (req.method === 'DELETE') {
-               const awsUrl = extractInfoFromUrl(req.body);
+     // ✅ DELETE
+     if (req.method === 'DELETE') {
+          try {
+               // You can send either:
+               // { "url": "https://..." } OR { "key": "slike artikla/..." }
+               const body = req.body as { url?: string; key?: string };
 
-               if (!awsUrl) {
-                    return res.status(400).json({ error: 'Missing key' });
+               const key = body.key ?? (body.url ? extractKeyFromS3Url(body.url) : null);
+
+               if (!key) {
+                    return res.status(400).json({ error: 'Missing key or url' });
                }
 
                await s3.send(
                     new DeleteObjectCommand({
-                         Bucket: BUCKET,
-                         Key: awsUrl,
+                         Bucket: bucket,
+                         Key: key,
                     })
                );
 
-               return res.status(200).json({ message: 'Image deleted successfully' });
+               return res.status(200).json({ message: 'Image deleted successfully', key });
+          } catch (error) {
+               console.error('Error deleting image:', error);
+               return res.status(500).json({ error: 'Failed to delete image from S3' });
           }
-
-          return res.status(405).end();
-     } catch (error) {
-          console.error('S3 error:', error);
-          return res.status(500).json({ error: 'AWS S3 operation failed' });
      }
+
+     return res.status(405).end();
 }

@@ -239,22 +239,6 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }: any) => {
           }
      }
 
-     // const handleFileChange = (e) => {
-     //      const file = e.target.files?.[0] ?? null
-     //      setSelectedFile(file)
-     //      if (fileURL) {
-     //           URL.revokeObjectURL(fileURL)
-     //      }
-     //      if (file) {
-     //           const url = URL.createObjectURL(file)
-     //           setFileURL(url)
-     //      } else {
-     //           setFileURL(null)
-     //      }
-     // };
-
-
-
      return (
           <Box>
                <Formik
@@ -266,9 +250,6 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }: any) => {
                     {
                          (formik) => (
                               <Form style={{ display: 'flex', flexDirection: 'column', gap: '15px', opacity: loading ? .5 : 1, }}>
-                                   {/* <Typography>
-                                        {`${ JSON.stringify(formik.errors) }`}
-                                   </Typography> */}
                                    <TextField
                                         label="Naziv"
                                         name="name"
@@ -473,77 +454,6 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }: any) => {
                                         error={formik.touched.warning && !!formik.errors.warning}
                                         helperText={formik.touched.warning && formik.errors.warning}
                                    />
-
-                                   <Card>
-                                        <CardContent sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', disabled: `${loading}` }}>
-                                             {/* <UploadButton
-                                                  endpoint="imageUploader"
-                                                  onUploadBegin={() => setLoading(true)}
-                                                  onClientUploadComplete={(res) => {
-                                                       setFileURL(res[0].url)
-                                                       formik.setFieldValue("imageURL", res[0].url)
-                                                       Swal.fire({
-                                                            icon: 'success',
-                                                            title: 'Jeeej',
-                                                            text: 'Slika je uspešno poslata na server!',
-                                                       })
-                                                       setLoading(false)
-                                                  }}
-                                                  onUploadError={(error) => {
-                                                       Swal.fire({
-                                                            icon: 'error',
-                                                            title: 'Neee',
-                                                            text: 'Nešto je pošlo po zlu :(',
-                                                       })
-                                                  }}
-                                                  content={{
-                                                       button({ ready }: any) {
-                                                            if (ready) return <Typography sx={{ color: theme.palette.divider }}>Pronadji sliku...</Typography>;
-                                                            return "Pronadji sliku...";
-                                                       },
-                                                       allowedContent({ ready, fileTypes }) {
-                                                            if (!ready) return "Proveravam tip datoteke...";
-                                                            if (loading) return "Slika se uploaduje...";
-                                                            return `Tip datoteke: ${fileTypes.join(", ")}`;
-                                                       },
-                                                  }}
-                                                  appearance={{
-                                                       button({ ready }: any) {
-                                                            return {
-                                                                 fontSize: "1.6rem",
-                                                                 backgroundColor: theme.palette.primary.main,
-                                                                 color: "black",
-                                                                 ...(ready && { color: theme.palette.primary.main, }),
-                                                                 ...(loading && { color: theme.palette.primary.main, }),
-                                                                 borderRadius: "10px",
-                                                                 cursor: 'pointer'
-                                                            };
-                                                       },
-                                                       allowedContent: {
-                                                            color: theme.palette.primary.main,
-                                                       },
-                                                  }}
-                                             /> */}
-                                             {fileURL.length ? (
-                                                  <Image
-                                                       src={fileURL}
-                                                       alt='Uploaded Image'
-                                                       width={300}
-                                                       height={300}
-                                                       style={{
-                                                            borderRadius: '10px',
-                                                            cursor: 'pointer'
-                                                       }}
-                                                       onClick={handleFileRemove}
-                                                  />
-                                             ) : (
-                                                  <InsertPhotoIcon
-                                                       color='primary'
-                                                       sx={{ width: '300px', height: '300px' }}
-                                                  />
-                                             )}
-                                        </CardContent>
-                                   </Card>
 
                                    <TextField
                                         label="Cena"

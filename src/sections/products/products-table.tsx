@@ -120,8 +120,6 @@ export const ProductsTable = (props: any) => {
      }
 
      const handleUpdateProduct = async (currentProductObject: any) => {
-          console.log('currentProductObject', currentProductObject);
-
           try {
                //API CALL
                const response = await fetch('/api/product-api', {
