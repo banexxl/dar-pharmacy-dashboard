@@ -55,7 +55,7 @@ export const productsServices = () => {
 
           try {
                const db = client.db('DAR_DB')
-               let data = await db.collection('Products').find().toArray()
+               let data = await db.collection('Products').find({ displayOnHome: true }).toArray()
                return data
           } catch (error) {
                return { message: error }

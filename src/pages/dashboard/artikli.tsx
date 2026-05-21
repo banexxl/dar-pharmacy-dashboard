@@ -99,6 +99,15 @@ const Page = (props: any) => {
      const router = useRouter();
      const [loading, setLoading] = useState(false)
 
+     const handleProductUpdated = (updatedProduct: any) => {
+          setProductStore((prevState: any) => ({
+               ...prevState,
+               allProducts: prevState.allProducts.map((product: any) =>
+                    product._id === updatedProduct._id ? updatedProduct : product
+               )
+          }));
+     };
+
      const handleSubmitSuccess = () => {
           setOpen(false); // Close the dialog
      };
@@ -222,6 +231,7 @@ const Page = (props: any) => {
                                    <ProductsTable
                                         count={productStore.allProducts.length}
                                         items={productStore.allProducts}
+                                        onProductUpdated={handleProductUpdated}
                                         page={productSearch.state.page}
                                         rowsPerPage={productSearch.state.rowsPerPage}
                                         selected={productsSelection.selected}

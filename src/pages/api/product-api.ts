@@ -14,6 +14,7 @@ export default async function handler(request: NextApiRequest, response: NextApi
                const slug = generateSlug(request.body.name);
                const newProduct = {
                     ...request.body,
+                    displayOnHome: Boolean(request.body.displayOnHome),
                     slug: slug,
                     updatedAt: new Date() // Set updatedAt to the current date and time
                };
@@ -29,39 +30,56 @@ export default async function handler(request: NextApiRequest, response: NextApi
                }
           } else if (request.method === 'PUT') {
                const slug = generateSlug(request.body.name);
+               const rawId = request.body._id;
+               const idFilter = ObjectId.isValid(rawId)
+                    ? { $or: [{ _id: new ObjectId(rawId) }, { _id: rawId }] }
+                    : { _id: rawId };
                try {
-                    await dbProducts.findOneAndUpdate(
-                         { _id: new ObjectId(request.body._id) },
-                         {
-                              $set: {
-                                   bestSeller: request.body.bestSeller,
-                                   description: request.body.description,
-                                   discount: request.body.discount,
-                                   discountAmount: request.body.discountAmount,
-                                   availableStock: request.body.availableStock,
-                                   imageURL: request.body.imageURL,
-                                   ingredients: request.body.ingredients,
-                                   instructions: request.body.instructions,
-                                   mainCategory: request.body.mainCategory,
-                                   manufacturer: request.body.manufacturer,
-                                   manufacturerURL: request.body.manufacturerURL,
-                                   midCategory: request.body.midCategory,
-                                   name: request.body.name,
-                                   newArrival: request.body.newArrival,
-                                   isActive: request.body.isActive,
-                                   price: request.body.price,
-                                   quantity: request.body.quantity,
-                                   quantityUnit: request.body.quantityUnit,
-                                   subCategory: request.body.subCategory,
-                                   warning: request.body.warning,
-                                   updatedAt: new Date(), // Update the updatedAt field to the current date and time
-                                   promotionText: request.body.promotionText,
-                                   promoting: request.body.promoting,
-                                   slug: slug
-                              }
-                         }
-                    );
-                    return response.status(200).json({ message: 'Product successfully updated!' });
+                    const updatePayload = {
+                         bestSeller: request.body.bestSeller,
+                         description: request.body.description,
+                         discount: request.body.discount,
+                         discountAmount: request.body.discountAmount,
+                         availableStock: request.body.availableStock,
+                         imageURL: request.body.imageURL,
+                         ingredients: request.body.ingredients,
+                         instructions: request.body.instructions,
+                         mainCategory: request.body.mainCategory,
+                         manufacturer: request.body.manufacturer,
+                         manufacturerURL: request.body.manufacturerURL,
+                         midCategory: request.body.midCategory,
+                         name: request.body.name,
+                         newArrival: request.body.newArrival,
+                         isActive: request.body.isActive,
+                         displayOnHome: Boolean(request.body.displayOnHome),
+                         price: request.body.price,
+                         quantity: request.body.quantity,
+                         quantityUnit: request.body.quantityUnit,
+                         subCategory: request.body.subCategory,
+                         warning: request.body.warning,
+                         updatedAt: new Date(), // Update the updatedAt field to the current date and time
+                         promotionText: request.body.promotionText,
+                         promoting: request.body.promoting,
+                         slug: slug
+                    };
+
+                    let updateResult = await dbProducts.updateOne(idFilter, { $set: updatePayload });
+
+                    if (updateResult.matchedCount === 0 && request.body.slug) {
+                         updateResult = await dbProducts.updateOne(
+                              { slug: request.body.slug },
+                              { $set: updatePayload }
+                         );
+                    }
+
+                    if (updateResult.matchedCount === 0) {
+                         return response.status(404).json({ error: 'Product not found.' });
+                    }
+
+                    const updatedProduct = await dbProducts.findOne(idFilter);
+                    const responseProduct = updatedProduct || (request.body.slug ? await dbProducts.findOne({ slug: request.body.slug }) : null);
+                    await response.revalidate('/dashboard/artikli');
+                    return response.status(200).json({ message: 'Product successfully updated!', data: responseProduct });
                } catch (error) {
                     return response.status(500).json({ error: 'Error updating product.' });
                }

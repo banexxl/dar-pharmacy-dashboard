@@ -1,9 +1,9 @@
 import ChevronRightIcon from '@untitled-ui/icons-react/build/esm/ChevronRight';
 import ChevronDownIcon from '@untitled-ui/icons-react/build/esm/ChevronDown';
 import {
-     Box, Button, Card, CardContent, Checkbox, Divider, Grid, IconButton, Input, InputAdornment, LinearProgress, MenuItem,
+     Box, Button, Card, CardContent, Checkbox, Divider, Grid, IconButton, Input, InputAdornment, LinearProgress, ListItemText, MenuItem,
      OutlinedInput,
-     Stack, SvgIcon, Switch, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography, useTheme
+     Select, Stack, SvgIcon, Switch, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography, useTheme
 } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import PropTypes from 'prop-types';
@@ -37,6 +37,7 @@ export interface IProduct {
      name: string;
      newArrival: boolean;
      isActive: boolean;
+     displayOnHome: boolean;
      price: string;
      quantity: number;
      quantityUnit: string;
@@ -57,6 +58,7 @@ export const ProductsTable = (props: any) => {
           sortDir = 'desc',
           sortBy = 'createdAt',
           onSelect = () => { },
+          onProductUpdated = () => { },
           count = 0,
      } = props;
 
@@ -133,6 +135,10 @@ export const ProductsTable = (props: any) => {
                });
 
                if (response.ok) {
+                    const result = await response.json();
+                    if (result?.data) {
+                         onProductUpdated(result.data);
+                    }
                     handleProductClose()
                     setCurrentProductObject(null)
                     Swal.fire({
@@ -213,6 +219,16 @@ export const ProductsTable = (props: any) => {
      }
 
      const [searchQuery, setSearchQuery] = useState('');
+     const [booleanFilters, setBooleanFilters] = useState<string[]>([]);
+
+     const booleanFilterOptions = [
+          { value: 'isActive', label: 'Aktivan' },
+          { value: 'displayOnHome', label: 'Na početnoj' },
+          { value: 'discount', label: 'Popust' },
+          { value: 'newArrival', label: 'Novi proizvod' },
+          { value: 'bestSeller', label: 'Najprodavaniji' },
+          { value: 'promoting', label: 'Promocija' }
+     ];
 
      const handleClearSearch = () => {
           setSearchQuery('');
@@ -298,46 +314,75 @@ export const ProductsTable = (props: any) => {
                     .filter((product: IProduct) =>
                          !searchQuery || product.name.toLowerCase().includes(searchQuery.toLowerCase())
                     )
+                    .filter((product: IProduct) => {
+                         if (booleanFilters.length === 0) return true;
+                         return booleanFilters.every((key) => Boolean((product as any)[key]) === true);
+                    })
                     .sort(getComparator(sortDir, sortBy))
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
-          [searchQuery, items, page, rowsPerPage],
+          [searchQuery, items, page, rowsPerPage, booleanFilters],
      );
 
 
      return (
           <Card>
                <Card sx={{ p: 2 }}>
-                    <OutlinedInput
-                         value={searchQuery}
-                         onChange={handleSearchChange}
-                         fullWidth
-                         placeholder="Pronađi proizvod po nazivu..."
-                         startAdornment={(
-                              <InputAdornment position="start">
-                                   <SvgIcon
-                                        color="action"
-                                        fontSize="small"
-                                   >
-                                        <MagnifyingGlassIcon />
-                                   </SvgIcon>
-                              </InputAdornment>
-                         )}
-                         endAdornment={(
-                              <InputAdornment position="end">
-                                   <IconButton
-                                        onClick={handleClearSearch}
-                                   >
+                    <Stack direction="row" spacing={2} useFlexGap flexWrap="wrap" alignItems="center">
+                         <OutlinedInput
+                              value={searchQuery}
+                              onChange={handleSearchChange}
+                              fullWidth
+                              placeholder="Pronađi proizvod po nazivu..."
+                              startAdornment={(
+                                   <InputAdornment position="start">
                                         <SvgIcon
                                              color="action"
                                              fontSize="small"
                                         >
-                                             <ClearIcon />
+                                             <MagnifyingGlassIcon />
                                         </SvgIcon>
-                                   </IconButton>
-                              </InputAdornment>
-                         )}
-                         sx={{ maxWidth: 500 }}
-                    />
+                                   </InputAdornment>
+                              )}
+                              endAdornment={(
+                                   <InputAdornment position="end">
+                                        <IconButton
+                                             onClick={handleClearSearch}
+                                        >
+                                             <SvgIcon
+                                                  color="action"
+                                                  fontSize="small"
+                                             >
+                                                  <ClearIcon />
+                                             </SvgIcon>
+                                        </IconButton>
+                                   </InputAdornment>
+                              )}
+                              sx={{ maxWidth: 500 }}
+                         />
+                         <Select
+                              multiple
+                              displayEmpty
+                              value={booleanFilters}
+                              onChange={(event) => setBooleanFilters(event.target.value as string[])}
+                              renderValue={(selected) => {
+                                   if (selected.length === 0) {
+                                        return 'Svi filteri';
+                                   }
+                                   return booleanFilterOptions
+                                        .filter((option) => selected.includes(option.value))
+                                        .map((option) => option.label)
+                                        .join(', ');
+                              }}
+                              sx={{ minWidth: 240 }}
+                         >
+                              {booleanFilterOptions.map((option) => (
+                                   <MenuItem key={option.value} value={option.value}>
+                                        <Checkbox checked={booleanFilters.includes(option.value)} />
+                                        <ListItemText primary={option.label} />
+                                   </MenuItem>
+                              ))}
+                         </Select>
+                    </Stack>
                </Card>
                <Scrollbar>
                     <Box sx={{ minWidth: 800 }}>
@@ -365,6 +410,9 @@ export const ProductsTable = (props: any) => {
                                         <TableCell>
                                              Popust %
                                         </TableCell>
+                                        <TableCell>
+                                             Na početnoj
+                                        </TableCell>
                                    </TableRow>
                               </TableHead>
                               <TableBody>
@@ -376,6 +424,7 @@ export const ProductsTable = (props: any) => {
                                                   // const price = numeral(product.price).format(`${product.currency}0,0.00`);
                                                   const quantityColor = product.quantity >= 10 ? 'success' : 'error';
                                                   const statusColor = product.isActive === true ? 'success' : 'info';
+                                                  const homeColor = product.displayOnHome ? 'success' : 'info';
                                                   // const hasManyVariants = product.variants > 1;
 
                                                   return (
@@ -495,12 +544,17 @@ export const ProductsTable = (props: any) => {
                                                                  <TableCell key={Math.random()}>
                                                                       <SeverityPill key={Math.random()} color={statusColor}>{product.discountAmount}</SeverityPill>
                                                                  </TableCell>
+                                                                 <TableCell key={Math.random()}>
+                                                                      <SeverityPill key={Math.random()} color={homeColor}>
+                                                                           {product.displayOnHome ? 'Da' : 'Ne'}
+                                                                      </SeverityPill>
+                                                                 </TableCell>
                                                             </TableRow>
                                                             {isCurrent && (
                                                                  <TableRow key={Math.random()}>
                                                                       <TableCell
                                                                            key={Math.random()}
-                                                                           colSpan={7}
+                                                                           colSpan={8}
                                                                            sx={{
                                                                                 p: 0,
                                                                                 position: 'relative',
@@ -974,6 +1028,24 @@ export const ProductsTable = (props: any) => {
                                                                                                          Promocija
                                                                                                     </Typography>
                                                                                                </Grid>
+                                                                                               <Grid key={Math.random()}
+                                                                                                    size={{ md: 6, xs: 12 }}
+                                                                                                    sx={{
+                                                                                                         alignItems: 'center',
+                                                                                                         display: 'flex',
+                                                                                                    }}
+                                                                                               >
+                                                                                                    <Switch key={Math.random()} disabled={loading}
+                                                                                                         checked={!!currentProductObject?.displayOnHome}
+                                                                                                         onChange={() => setCurrentProductObject((previousObject: any) => ({
+                                                                                                              ...previousObject,
+                                                                                                              displayOnHome: !previousObject.displayOnHome
+                                                                                                         }))}
+                                                                                                    />
+                                                                                                    <Typography key={Math.random()} variant="subtitle2">
+                                                                                                         Na početnoj
+                                                                                                    </Typography>
+                                                                                               </Grid>
                                                                                           </Grid>
                                                                                      </Grid>
                                                                                 </Grid>
@@ -1193,7 +1265,7 @@ export const ProductsTable = (props: any) => {
                                              })
                                              :
                                              <TableRow>
-                                                  <TableCell colSpan={7} align="center">
+                                                  <TableCell colSpan={8} align="center">
                                                        Nije pronađen nijedan proizvod...
                                                   </TableCell>
                                              </TableRow>
@@ -1211,6 +1283,7 @@ ProductsTable.propTypes = {
      items: PropTypes.array,
      onDeselectAll: PropTypes.func,
      onDeselectOne: PropTypes.func,
+     onProductUpdated: PropTypes.func,
      onPageChange: PropTypes.func,
      onRowsPerPageChange: PropTypes.func,
      onSelectAll: PropTypes.func,

@@ -51,7 +51,9 @@ export const newProductSchema = () => yup.object().shape({
      discount: yup
           .boolean(),
      discountAmmount: yup
-          .number()
+          .number(),
+     displayOnHome: yup
+          .boolean()
 });
 
 export const initialValues: IProduct = {
@@ -73,6 +75,7 @@ export const initialValues: IProduct = {
      bestSeller: false,
      discount: false,
      isActive: true,
+     displayOnHome: false,
      discountAmount: 0,
      quantityUnit: ''
 };

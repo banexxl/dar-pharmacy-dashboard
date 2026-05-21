@@ -193,10 +193,6 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }: any) => {
 
      };
 
-     const handleFileRemove = () => {
-          setFileURL(""); // Remove the selected file
-     };
-
      const handleSubmit = async (values: IProduct) => {
           try {
                const responseValues = await fetch('/api/product-api', {
@@ -485,6 +481,18 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }: any) => {
                                         }
                                         disabled={loading}
                                         label="Aktivan"
+                                   />
+
+                                   <FormControlLabel
+                                        control={
+                                             <Checkbox
+                                                  name="displayOnHome"
+                                                  checked={formik.values.displayOnHome}
+                                                  onChange={formik.handleChange}
+                                             />
+                                        }
+                                        disabled={loading}
+                                        label="Na početnoj"
                                    />
 
                                    <FormControlLabel
