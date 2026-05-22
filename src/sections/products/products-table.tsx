@@ -17,7 +17,7 @@ import { fetchSubCategoryOptions } from './new-product-form';
 import Swal from 'sweetalert2';
 import { useRouter } from 'next/navigation';
 
-import { mainCategoryOptions, manufacturerOptions, midCategoryOptions, quantityUnitOptions } from './new-product-schema';
+import { mainCategoryOptions, midCategoryOptions, quantityUnitOptions } from './new-product-schema';
 import MagnifyingGlassIcon from '@heroicons/react/24/solid/MagnifyingGlassIcon';
 import ClearIcon from '@mui/icons-material/Clear';
 import { getComparator } from '../order/order-list-table';
@@ -54,6 +54,7 @@ export const ProductsTable = (props: any) => {
 
      const {
           items = [],
+          manufacturers = [],
           page = 0,
           rowsPerPage = 5,
           sortDir = 'desc',
@@ -74,6 +75,19 @@ export const ProductsTable = (props: any) => {
      const [subCategoryOptions, setSubCategoryOptions] = useState<any>([]);
      const [isSubCategoryEnabled, setIsSubCategoryEnabled] = useState(false);
      const [selectedMidCategory, setSelectedMidCategory] = useState('');
+
+     const manufacturerOptions = useMemo(() => {
+          if (!Array.isArray(manufacturers)) {
+               return [];
+          }
+
+          return manufacturers
+               .map((item: any) => ({
+                    label: item?.name || item?.label || '',
+                    value: item?.value || ''
+               }))
+               .filter((option: any) => option.label);
+     }, [manufacturers]);
 
      const getObjectById = (_id: any, arrayToSearch: any) => {
           for (const obj of arrayToSearch) {

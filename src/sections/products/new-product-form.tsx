@@ -1,12 +1,10 @@
 "use client"
-import React, { useState } from 'react';
-import { TextField, Button, Checkbox, FormControlLabel, Box, Input, Card, CardContent, Grid, MenuItem, Stack, Container, IconButton, CardActionArea, colors, useMediaQuery } from '@mui/material';
+import React, { useMemo, useState } from 'react';
+import { TextField, Button, Checkbox, FormControlLabel, Box, Grid, MenuItem, Stack, Container, IconButton, CardActionArea, colors, useMediaQuery } from '@mui/material';
 import { Form, Formik } from 'formik';
-import { initialValues, mainCategoryOptions, manufacturerOptions, midCategoryOptions, newProductSchema, quantityUnitOptions } from './new-product-schema'
+import { initialValues, mainCategoryOptions, midCategoryOptions, newProductSchema, quantityUnitOptions } from './new-product-schema'
 import { useRouter } from 'next/navigation';
 import Swal from 'sweetalert2'
-import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
-import Image from 'next/image';
 
 import { Theme } from '@mui/material/styles';
 import { IProduct } from './products-table';
@@ -170,7 +168,7 @@ export const fetchSubCategoryOptions = async (selectedMidCategory: any) => {
      }
 };
 
-export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }: any) => {
+export const AddProductForm = ({ onSubmitSuccess, onSubmitFail, manufacturers = [] }: any) => {
 
      const router = useRouter();
      //const [selectedFile, setSelectedFile] = useState(null);
@@ -192,6 +190,19 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail }: any) => {
           setIsSubCategoryEnabled(!!selectedMidCategory);
 
      };
+
+     const manufacturerOptions = useMemo(() => {
+          if (!Array.isArray(manufacturers)) {
+               return [];
+          }
+
+          return manufacturers
+               .map((item: any) => ({
+                    label: item?.name || item?.label || '',
+                    value: item?.value || ''
+               }))
+               .filter((option: any) => option.label);
+     }, [manufacturers]);
 
      const handleSubmit = async (values: IProduct) => {
           try {

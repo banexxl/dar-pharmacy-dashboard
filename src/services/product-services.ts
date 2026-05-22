@@ -65,22 +65,6 @@ export const productsServices = () => {
           }
      }
 
-     const getAllLogos = async () => {
-
-          const client = await MongoClient.connect(process.env.MONGODB_URI!)
-
-          try {
-               const db = client.db('DAR_DB')
-               let data = await db.collection('LogoURLs').find().toArray()
-               return data
-          } catch (error) {
-               return { message: error }
-          }
-          finally {
-               await client.close();
-          }
-     }
-
      const getProductById = async (_id: string) => {
           const client = await MongoClient.connect(process.env.MONGODB_URI!)
           try {
@@ -199,24 +183,17 @@ export const productsServices = () => {
           const client = await MongoClient.connect(process.env.MONGODB_URI!)
 
           try {
-               await client.connect();
                const db = client.db('DAR_DB');
-               const productsCollection = db.collection('Products');
-
-               const manufacturers = await new Promise((resolve, reject) => {
-                    productsCollection.distinct("manufacturer", (error: string, manufacturers: string) => {
-                         if (error) {
-                              reject(error);
-                         } else {
-                              resolve(manufacturers);
-                         }
-                    });
-               });
+               const manufacturers = await db
+                    .collection('Manufacturers')
+                    .find()
+                    .sort({ name: 1 })
+                    .toArray();
                return manufacturers;
           } catch (error) {
                return { message: error };
           } finally {
-               client.close();
+               await client.close();
           }
      }
 
@@ -266,7 +243,6 @@ export const productsServices = () => {
           getProductsByMainCategory,
           getProductsByMainCategoryMidCategory,
           getProductsByMainCategoryMidCategorySubCategory,
-          getAllLogos,
           getAllManufacturers
      }
 }

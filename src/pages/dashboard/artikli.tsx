@@ -108,10 +108,10 @@ const Page = (props: any) => {
                     allProducts: props.allProducts,
                });
                setLogoStore({
-                    allLogos: props.allLogos,
+                    allLogos: props.allManufacturers,
                });
           }
-     }, [isMounted, props.allProducts, props.allLogos]);
+     }, [isMounted, props.allProducts, props.allManufacturers]);
 
      const [open, setOpen] = useState(false)
      const productsSelection = useSelection(productsIds);
@@ -192,7 +192,7 @@ const Page = (props: any) => {
           }
 
           try {
-               const response = await fetch('/api/logo-urls', {
+               const response = await fetch('/api/manufacturers', {
                     method: 'PUT',
                     headers: {
                          'Content-Type': 'application/json'
@@ -282,7 +282,7 @@ const Page = (props: any) => {
           }
 
           try {
-               const response = await fetch('/api/logo-urls', {
+               const response = await fetch('/api/manufacturers', {
                     method: 'DELETE',
                     headers: {
                          'Content-Type': 'application/json'
@@ -327,7 +327,7 @@ const Page = (props: any) => {
           }
 
           try {
-               const response = await fetch('/api/logo-urls', {
+               const response = await fetch('/api/manufacturers', {
                     method: 'POST',
                     headers: {
                          'Content-Type': 'application/json'
@@ -381,7 +381,7 @@ const Page = (props: any) => {
           try {
                setLogoUploadId(logo._id);
                const imageUrl = await uploadLogoImage(file, manufacturerKey);
-               const response = await fetch('/api/logo-urls', {
+               const response = await fetch('/api/manufacturers', {
                     method: 'PUT',
                     headers: {
                          'Content-Type': 'application/json'
@@ -464,6 +464,7 @@ const Page = (props: any) => {
                                              <ProductsTable
                                                   count={productStore.allProducts.length}
                                                   items={productStore.allProducts}
+                                                  manufacturers={logoStore.allLogos}
                                                   onProductUpdated={handleProductUpdated}
                                                   onAddProductClick={() => setOpen(true)}
                                                   page={productSearch.state.page}
@@ -663,7 +664,8 @@ const Page = (props: any) => {
                          <DialogContent dividers >
                               <AddProductForm
                                    onSubmitSuccess={handleSubmitSuccess}
-                                   onSubmitFail={handleSubmitFail} />
+                                   onSubmitFail={handleSubmitFail}
+                                   manufacturers={logoStore.allLogos} />
                          </DialogContent>
                     </Dialog>
                     <Dialog open={logoModalOpen} onClose={() => setLogoModalOpen(false)}>
@@ -695,15 +697,15 @@ const Page = (props: any) => {
 
 export async function getServerSideProps(context: any) {
      try {
-          const [allProducts, allLogos] = await Promise.all([
+          const [allProducts, allManufacturers] = await Promise.all([
                productsServices().getAllProducts(),
-               productsServices().getAllLogos()
+               productsServices().getAllManufacturers()
           ]);
 
           return {
                props: {
                     allProducts: JSON.parse(JSON.stringify(allProducts)),
-                    allLogos: JSON.parse(JSON.stringify(allLogos)),
+                    allManufacturers: JSON.parse(JSON.stringify(allManufacturers)),
                },
           };
      } catch (error) {
@@ -711,6 +713,7 @@ export async function getServerSideProps(context: any) {
           return {
                props: {
                     allProducts: [],
+                    allManufacturers: [],
                },
           };
      }

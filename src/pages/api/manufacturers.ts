@@ -4,12 +4,12 @@ import type { NextApiRequest, NextApiResponse } from 'next/types';
 
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
      const mongoClient = await MongoClient.connect(process.env.MONGODB_URI!, {});
-     const logoCollection = mongoClient.db('DAR_DB').collection('LogoURLs');
+     const manufacturersCollection = mongoClient.db('DAR_DB').collection('Manufacturers');
 
      try {
           if (request.method === 'GET') {
-               const allLogos = await logoCollection.find({}).toArray();
-               return response.status(200).json({ message: 'Logos found!', data: allLogos });
+               const manufacturers = await manufacturersCollection.find({}).toArray();
+               return response.status(200).json({ message: 'Manufacturers found!', data: manufacturers });
           }
 
           if (request.method === 'POST') {
@@ -19,13 +19,13 @@ export default async function handler(request: NextApiRequest, response: NextApi
                }
 
                const finalValue = value || generateSlug(name);
-               const insertResult = await logoCollection.insertOne({
+               const insertResult = await manufacturersCollection.insertOne({
                     name,
                     value: finalValue,
                     url: url || ''
                });
-               const createdLogo = await logoCollection.findOne({ _id: insertResult.insertedId });
-               return response.status(200).json({ message: 'Logo successfully created!', data: createdLogo });
+               const createdManufacturer = await manufacturersCollection.findOne({ _id: insertResult.insertedId });
+               return response.status(200).json({ message: 'Manufacturer successfully created!', data: createdManufacturer });
           }
 
           if (request.method === 'PUT') {
@@ -43,17 +43,17 @@ export default async function handler(request: NextApiRequest, response: NextApi
                     return response.status(400).json({ error: 'No fields to update.' });
                }
 
-               const updateResult = await logoCollection.updateOne(
+               const updateResult = await manufacturersCollection.updateOne(
                     { _id: new ObjectId(_id) },
                     { $set: updatePayload }
                );
 
                if (updateResult.matchedCount === 0) {
-                    return response.status(404).json({ error: 'Logo not found.' });
+                    return response.status(404).json({ error: 'Manufacturer not found.' });
                }
 
-               const updatedLogo = await logoCollection.findOne({ _id: new ObjectId(_id) });
-               return response.status(200).json({ message: 'Logo successfully updated!', data: updatedLogo });
+               const updatedManufacturer = await manufacturersCollection.findOne({ _id: new ObjectId(_id) });
+               return response.status(200).json({ message: 'Manufacturer successfully updated!', data: updatedManufacturer });
           }
 
           if (request.method === 'DELETE') {
@@ -62,12 +62,12 @@ export default async function handler(request: NextApiRequest, response: NextApi
                     return response.status(400).json({ error: 'Missing _id.' });
                }
 
-               const deleteResult = await logoCollection.deleteOne({ _id: new ObjectId(_id) });
+               const deleteResult = await manufacturersCollection.deleteOne({ _id: new ObjectId(_id) });
                if (deleteResult.deletedCount === 0) {
-                    return response.status(404).json({ error: 'Logo not found.' });
+                    return response.status(404).json({ error: 'Manufacturer not found.' });
                }
 
-               return response.status(200).json({ message: 'Logo successfully deleted!' });
+               return response.status(200).json({ message: 'Manufacturer successfully deleted!' });
           }
 
           return response.status(405).json({ error: 'Method not allowed!' });
