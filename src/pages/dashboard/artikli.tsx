@@ -97,6 +97,8 @@ const Page = (props: any) => {
      const [newLogoName, setNewLogoName] = useState('');
      const [logoModalOpen, setLogoModalOpen] = useState(false);
      const [logoUploadId, setLogoUploadId] = useState<string | null>(null);
+     const [logoPage, setLogoPage] = useState(0);
+     const [logoRowsPerPage, setLogoRowsPerPage] = useState(10);
 
      const isMounted = useMounted();
 
@@ -150,6 +152,11 @@ const Page = (props: any) => {
                );
           });
      }, [logoStore.allLogos, logoSearch]);
+
+     const pagedLogos = useMemo(() => {
+          const start = logoPage * logoRowsPerPage;
+          return filteredLogos.slice(start, start + logoRowsPerPage);
+     }, [filteredLogos, logoPage, logoRowsPerPage]);
 
      const handleLogoEditStart = (logo: any) => {
           setEditingLogoId(logo._id);
@@ -524,7 +531,7 @@ const Page = (props: any) => {
                                                        </Button>
                                                   </Stack>
                                                   <Stack spacing={2}>
-                                                       {filteredLogos.map((logo: any) => {
+                                                       {pagedLogos.map((logo: any) => {
                                                             const isEditing = editingLogoId === logo._id;
                                                             const draft = logoDrafts[logo._id] || { name: logo.name || '', value: logo.value || '', url: logo.url || '' };
 
@@ -624,6 +631,21 @@ const Page = (props: any) => {
                                                             );
                                                        })}
                                                   </Stack>
+                                                  <TablePagination
+                                                       component="div"
+                                                       count={filteredLogos.length}
+                                                       onPageChange={(event, page) => setLogoPage(page)}
+                                                       onRowsPerPageChange={(event) => {
+                                                            setLogoPage(0);
+                                                            setLogoRowsPerPage(parseInt(event.target.value, 10));
+                                                       }}
+                                                       page={logoPage}
+                                                       rowsPerPage={logoRowsPerPage}
+                                                       rowsPerPageOptions={[5, 10, 25, 50]}
+                                                       showFirstButton
+                                                       showLastButton
+                                                       labelRowsPerPage={'Broj po stranici'}
+                                                  />
                                              </Stack>
                                         </Card>
                                    )}
