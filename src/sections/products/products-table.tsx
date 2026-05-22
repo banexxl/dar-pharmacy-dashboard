@@ -327,9 +327,14 @@ export const ProductsTable = (props: any) => {
      const visibleRows = useMemo(
           () =>
                [...items]
-                    .filter((product: IProduct) =>
-                         !searchQuery || product.name.toLowerCase().includes(searchQuery.toLowerCase())
-                    )
+                    .filter((product: IProduct) => {
+                         if (!searchQuery) {
+                              return true;
+                         }
+
+                         const name = (product.name || '').toString().toLowerCase();
+                         return name.includes(searchQuery.toLowerCase());
+                    })
                     .filter((product: IProduct) => {
                          if (booleanFilters.length === 0) return true;
                          return booleanFilters.every((key) => Boolean((product as any)[key]) === true);
