@@ -1,5 +1,6 @@
 import ChevronRightIcon from '@untitled-ui/icons-react/build/esm/ChevronRight';
 import ChevronDownIcon from '@untitled-ui/icons-react/build/esm/ChevronDown';
+import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
 import {
      Box, Button, Card, CardContent, Checkbox, Divider, Grid, IconButton, Input, InputAdornment, LinearProgress, ListItemText, MenuItem,
      OutlinedInput,
@@ -59,6 +60,7 @@ export const ProductsTable = (props: any) => {
           sortBy = 'createdAt',
           onSelect = () => { },
           onProductUpdated = () => { },
+          onAddProductClick = () => { },
           count = 0,
      } = props;
 
@@ -327,61 +329,75 @@ export const ProductsTable = (props: any) => {
      return (
           <Card>
                <Card sx={{ p: 2 }}>
-                    <Stack direction="row" spacing={2} useFlexGap flexWrap="wrap" alignItems="center">
-                         <OutlinedInput
-                              value={searchQuery}
-                              onChange={handleSearchChange}
-                              fullWidth
-                              placeholder="Pronađi proizvod po nazivu..."
-                              startAdornment={(
-                                   <InputAdornment position="start">
-                                        <SvgIcon
-                                             color="action"
-                                             fontSize="small"
-                                        >
-                                             <MagnifyingGlassIcon />
-                                        </SvgIcon>
-                                   </InputAdornment>
-                              )}
-                              endAdornment={(
-                                   <InputAdornment position="end">
-                                        <IconButton
-                                             onClick={handleClearSearch}
-                                        >
+                    <Stack direction="row" spacing={2} useFlexGap flexWrap="wrap" alignItems="center" justifyContent="space-between">
+                         <Stack direction="row" spacing={2} useFlexGap flexWrap="wrap" alignItems="center" sx={{ flexGrow: 1 }}>
+                              <OutlinedInput
+                                   value={searchQuery}
+                                   onChange={handleSearchChange}
+                                   fullWidth
+                                   placeholder="Pronađi proizvod po nazivu..."
+                                   startAdornment={(
+                                        <InputAdornment position="start">
                                              <SvgIcon
                                                   color="action"
                                                   fontSize="small"
                                              >
-                                                  <ClearIcon />
+                                                  <MagnifyingGlassIcon />
                                              </SvgIcon>
-                                        </IconButton>
-                                   </InputAdornment>
+                                        </InputAdornment>
+                                   )}
+                                   endAdornment={(
+                                        <InputAdornment position="end">
+                                             <IconButton
+                                                  onClick={handleClearSearch}
+                                             >
+                                                  <SvgIcon
+                                                       color="action"
+                                                       fontSize="small"
+                                                  >
+                                                       <ClearIcon />
+                                                  </SvgIcon>
+                                             </IconButton>
+                                        </InputAdornment>
+                                   )}
+                                   sx={{ maxWidth: 500 }}
+                              />
+                              <Select
+                                   multiple
+                                   displayEmpty
+                                   value={booleanFilters}
+                                   onChange={(event) => setBooleanFilters(event.target.value as string[])}
+                                   renderValue={(selected) => {
+                                        if (selected.length === 0) {
+                                             return 'Svi filteri';
+                                        }
+                                        return booleanFilterOptions
+                                             .filter((option) => selected.includes(option.value))
+                                             .map((option) => option.label)
+                                             .join(', ');
+                                   }}
+                                   sx={{ minWidth: 240 }}
+                              >
+                                   {booleanFilterOptions.map((option) => (
+                                        <MenuItem key={option.value} value={option.value}>
+                                             <Checkbox checked={booleanFilters.includes(option.value)} />
+                                             <ListItemText primary={option.label} />
+                                        </MenuItem>
+                                   ))}
+                              </Select>
+                         </Stack>
+                         <Button
+                              size="small"
+                              startIcon={(
+                                   <SvgIcon fontSize="small">
+                                        <PlusIcon />
+                                   </SvgIcon>
                               )}
-                              sx={{ maxWidth: 500 }}
-                         />
-                         <Select
-                              multiple
-                              displayEmpty
-                              value={booleanFilters}
-                              onChange={(event) => setBooleanFilters(event.target.value as string[])}
-                              renderValue={(selected) => {
-                                   if (selected.length === 0) {
-                                        return 'Svi filteri';
-                                   }
-                                   return booleanFilterOptions
-                                        .filter((option) => selected.includes(option.value))
-                                        .map((option) => option.label)
-                                        .join(', ');
-                              }}
-                              sx={{ minWidth: 240 }}
+                              variant="contained"
+                              onClick={onAddProductClick}
                          >
-                              {booleanFilterOptions.map((option) => (
-                                   <MenuItem key={option.value} value={option.value}>
-                                        <Checkbox checked={booleanFilters.includes(option.value)} />
-                                        <ListItemText primary={option.label} />
-                                   </MenuItem>
-                              ))}
-                         </Select>
+                              Dodaj proizvod
+                         </Button>
                     </Stack>
                </Card>
                <Scrollbar>
@@ -1283,6 +1299,7 @@ ProductsTable.propTypes = {
      items: PropTypes.array,
      onDeselectAll: PropTypes.func,
      onDeselectOne: PropTypes.func,
+     onAddProductClick: PropTypes.func,
      onProductUpdated: PropTypes.func,
      onPageChange: PropTypes.func,
      onRowsPerPageChange: PropTypes.func,
