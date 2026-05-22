@@ -327,7 +327,7 @@ const Page = (props: any) => {
           }
 
           try {
-               const response = await fetch('/api/logo-urls', {
+               const response = await fetch('/api/manufacturers', {
                     method: 'POST',
                     headers: {
                          'Content-Type': 'application/json'
@@ -381,7 +381,7 @@ const Page = (props: any) => {
           try {
                setLogoUploadId(logo._id);
                const imageUrl = await uploadLogoImage(file, manufacturerKey);
-               const response = await fetch('/api/logo-urls', {
+               const response = await fetch('/api/manufacturers', {
                     method: 'PUT',
                     headers: {
                          'Content-Type': 'application/json'
