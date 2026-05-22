@@ -2,7 +2,7 @@ import ChevronRightIcon from '@untitled-ui/icons-react/build/esm/ChevronRight';
 import ChevronDownIcon from '@untitled-ui/icons-react/build/esm/ChevronDown';
 import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
 import {
-     Box, Button, Card, CardContent, Checkbox, Divider, Grid, IconButton, Input, InputAdornment, LinearProgress, ListItemText, MenuItem,
+     Autocomplete, Box, Button, Card, CardContent, Checkbox, Divider, Grid, IconButton, Input, InputAdornment, LinearProgress, ListItemText, MenuItem,
      OutlinedInput,
      Select, Stack, SvgIcon, Switch, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography, useTheme
 } from '@mui/material';
@@ -854,30 +854,44 @@ export const ProductsTable = (props: any) => {
                                                                                                <Grid key={Math.random()}
                                                                                                     size={{ md: 6, xs: 12 }}
                                                                                                >
-                                                                                                    <TextField
+                                                                                                    <Autocomplete
                                                                                                          fullWidth
-                                                                                                         label="Proizvođač"
-                                                                                                         name="manufacturer"
-                                                                                                         disabled={loading}
-                                                                                                         onBlur={(e: any) =>
-                                                                                                              setCurrentProductObject((previousObject: any) => ({
-                                                                                                                   ...previousObject,
-                                                                                                                   manufacturer: e.target.value,
-                                                                                                                   manufacturerURL: manufacturerOptions.find((option) => option.label === e.target.value)?.value
-                                                                                                              }))
+                                                                                                         options={manufacturerOptions}
+                                                                                                         value={
+                                                                                                              manufacturerOptions.find(
+                                                                                                                   (option: any) => option.label === currentProductObject?.manufacturer
+                                                                                                              ) || null
                                                                                                          }
-                                                                                                         select
-                                                                                                         defaultValue={currentProductObject?.manufacturer}
-                                                                                                    >
-                                                                                                         {manufacturerOptions.map((option: any) => (
-                                                                                                              <MenuItem
-                                                                                                                   key={option.value}
-                                                                                                                   value={option.label}
-                                                                                                              >
-                                                                                                                   {option.label}
-                                                                                                              </MenuItem>
-                                                                                                         ))}
-                                                                                                    </TextField>
+                                                                                                         getOptionLabel={(option: any) => option?.label || ''}
+                                                                                                         isOptionEqualToValue={(option: any, value: any) => option?.value === value?.value}
+                                                                                                         onChange={(event, newValue) => {
+                                                                                                              setCurrentProductObject((previousObject: any) => {
+                                                                                                                   if (!previousObject) {
+                                                                                                                        return previousObject;
+                                                                                                                   }
+
+                                                                                                                   return {
+                                                                                                                        ...previousObject,
+                                                                                                                        manufacturer: newValue?.label || '',
+                                                                                                                        manufacturerURL: newValue?.value || ''
+                                                                                                                   };
+                                                                                                              });
+                                                                                                         }}
+                                                                                                         disabled={loading}
+                                                                                                         ListboxProps={{
+                                                                                                              style: {
+                                                                                                                   maxHeight: 48 * 10 + 16,
+                                                                                                                   overflow: 'auto'
+                                                                                                              }
+                                                                                                         }}
+                                                                                                         renderInput={(params) => (
+                                                                                                              <TextField
+                                                                                                                   {...params}
+                                                                                                                   label="Proizvođač"
+                                                                                                                   name="manufacturer"
+                                                                                                              />
+                                                                                                         )}
+                                                                                                    />
                                                                                                </Grid>
 
                                                                                                <Grid key={Math.random()}
