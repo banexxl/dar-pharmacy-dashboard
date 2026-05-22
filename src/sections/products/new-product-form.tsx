@@ -1,6 +1,6 @@
 "use client"
 import React, { useMemo, useState } from 'react';
-import { TextField, Button, Checkbox, FormControlLabel, Box, Grid, MenuItem, Stack, Container, IconButton, CardActionArea, colors, useMediaQuery } from '@mui/material';
+import { Autocomplete, TextField, Button, Checkbox, FormControlLabel, Box, Grid, MenuItem, Stack, Container, IconButton, CardActionArea, colors, useMediaQuery } from '@mui/material';
 import { Form, Formik } from 'formik';
 import { initialValues, mainCategoryOptions, midCategoryOptions, newProductSchema, quantityUnitOptions } from './new-product-schema'
 import { useRouter } from 'next/navigation';
@@ -422,35 +422,37 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail, manufacturers = 
                                         ))}
                                    </TextField>
 
-                                   <TextField
+                                   <Autocomplete
                                         fullWidth
+                                        options={manufacturerOptions}
+                                        value={
+                                             manufacturerOptions.find(
+                                                  (option: any) => option.label === formik.values.manufacturer
+                                             ) || null
+                                        }
+                                        getOptionLabel={(option: any) => option?.label || ''}
+                                        isOptionEqualToValue={(option: any, value: any) => option?.value === value?.value}
+                                        onChange={(event, newValue) => {
+                                             formik.setFieldValue('manufacturer', newValue?.label || '');
+                                             formik.setFieldValue('manufacturerURL', newValue?.value || '');
+                                        }}
                                         disabled={loading}
-                                        label="Proizvodjac"
-                                        name="manufacturer"
-                                        onChange={(event) => {
-                                             const selectedLabel = event.target.value;
-                                             const selectedOption = manufacturerOptions.find(option => option.label === selectedLabel);
-
-                                             if (selectedOption) {
-                                                  formik.setFieldValue('manufacturer', selectedLabel);
-                                                  formik.setFieldValue('manufacturerURL', selectedOption.value);
+                                        ListboxProps={{
+                                             style: {
+                                                  maxHeight: 48 * 10 + 16,
+                                                  overflow: 'auto'
                                              }
-                                        }
-                                        }
-                                        select
-                                        error={formik.touched.manufacturer && !!formik.errors.manufacturer}
-                                        helperText={formik.touched.manufacturer && formik.errors.manufacturer}
-                                        value={formik.values.manufacturer}
-                                   >
-                                        {manufacturerOptions.map((option) => (
-                                             <MenuItem
-                                                  key={option.value}
-                                                  value={option.label}
-                                             >
-                                                  {option.label}
-                                             </MenuItem>
-                                        ))}
-                                   </TextField>
+                                        }}
+                                        renderInput={(params) => (
+                                             <TextField
+                                                  {...params}
+                                                  label="Proizvodjac"
+                                                  name="manufacturer"
+                                                  error={formik.touched.manufacturer && !!formik.errors.manufacturer}
+                                                  helperText={formik.touched.manufacturer && formik.errors.manufacturer}
+                                             />
+                                        )}
+                                   />
 
                                    <TextField
                                         label="Upozorenje"
