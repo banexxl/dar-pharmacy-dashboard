@@ -81,7 +81,7 @@ const useCurrentOrder = (orders: Order[], orderId: string | undefined) => {
       return undefined;
     }
 
-    return orders.find((order) => order._id === orderId);
+    return orders.find((order) => order.id === orderId);
   }, [orders, orderId]);
 };
 

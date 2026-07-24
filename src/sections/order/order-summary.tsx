@@ -70,7 +70,7 @@ export const OrderSummary = (props: OrderSummaryProps) => {
         <PropertyListItem
           align={align}
           label="ID"
-          value={order._id}
+          value={order.id}
         />
         <Divider />
         <PropertyListItem

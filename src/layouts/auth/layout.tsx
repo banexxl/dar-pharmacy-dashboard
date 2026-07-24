@@ -5,7 +5,7 @@ import { Box, Grid } from '@mui/material';
 
 // TODO: Change subtitle text
 
-export const Layout = (props) => {
+export const Layout = (props: any) => {
      const { children } = props;
 
      return (
@@ -21,8 +21,7 @@ export const Layout = (props) => {
                     sx={{ flex: '1 1 auto' }}
                >
                     <Grid
-                         xs={12}
-                         lg={6}
+                         size={{ xs: 12, lg: 6 }}
                          sx={{
                               display: 'flex',
                               flexDirection: 'column',

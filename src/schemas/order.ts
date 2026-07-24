@@ -8,7 +8,7 @@ export type PaymentMethod = 'credit card' | 'paypal' | 'cash' | 'check' | 'cash-
 export type OrderStatus = 'pending' | 'shipped' | 'delivered' | 'cancelled'
 
 export type Order = {
-     _id: string;
+     id: string;
      orderNumber: string;
      createdAt: Date;
      customer: ICustomer;
@@ -17,7 +17,7 @@ export type Order = {
      total: number;
      status: OrderStatus;
      logs: {
-          _id: string;
+          id: string;
           message: string;
           createdAt: string;
      }[];

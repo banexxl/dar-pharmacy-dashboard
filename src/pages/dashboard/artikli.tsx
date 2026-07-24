@@ -79,7 +79,7 @@ const Page = (props: any) => {
           if (!Array.isArray(props.products)) {
                return [];
           }
-          return props.allProducts.map((product: any) => product._id);
+          return props.allProducts.map((product: any) => product.id);
      }, [props.products]);
 
 
@@ -121,7 +121,7 @@ const Page = (props: any) => {
           setProductStore((prevState: any) => ({
                ...prevState,
                allProducts: prevState.allProducts.map((product: any) =>
-                    product._id === updatedProduct._id ? updatedProduct : product
+                    product.id === updatedProduct.id ? updatedProduct : product
                )
           }));
      };
@@ -159,10 +159,10 @@ const Page = (props: any) => {
      }, [filteredLogos, logoPage, logoRowsPerPage]);
 
      const handleLogoEditStart = (logo: any) => {
-          setEditingLogoId(logo._id);
+          setEditingLogoId(logo.id);
           setLogoDrafts((prev) => ({
                ...prev,
-               [logo._id]: {
+               [logo.id]: {
                     name: logo.name || '',
                     value: logo.value || '',
                     url: logo.url || ''
@@ -197,7 +197,7 @@ const Page = (props: any) => {
                     headers: {
                          'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ _id: logoId, ...draft })
+                    body: JSON.stringify({ id: logoId, ...draft })
                });
 
                if (response.ok) {
@@ -206,7 +206,7 @@ const Page = (props: any) => {
                          setLogoStore((prev: any) => ({
                               ...prev,
                               allLogos: prev.allLogos.map((logo: any) =>
-                                   logo._id === result.data._id ? result.data : logo
+                                   logo.id === result.data.id ? result.data : logo
                               )
                          }));
                     }
@@ -287,13 +287,13 @@ const Page = (props: any) => {
                     headers: {
                          'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ _id: logoId })
+                    body: JSON.stringify({ id: logoId })
                });
 
                if (response.ok) {
                     setLogoStore((prev: any) => ({
                          ...prev,
-                         allLogos: prev.allLogos.filter((logo: any) => logo._id !== logoId)
+                         allLogos: prev.allLogos.filter((logo: any) => logo.id !== logoId)
                     }));
                     Swal.fire({
                          icon: 'success',
@@ -379,14 +379,14 @@ const Page = (props: any) => {
           }
 
           try {
-               setLogoUploadId(logo._id);
+               setLogoUploadId(logo.id);
                const imageUrl = await uploadLogoImage(file, manufacturerKey);
                const response = await fetch('/api/manufacturers', {
                     method: 'PUT',
                     headers: {
                          'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ _id: logo._id, url: imageUrl })
+                    body: JSON.stringify({ id: logo.id, url: imageUrl })
                });
 
                if (response.ok) {
@@ -395,7 +395,7 @@ const Page = (props: any) => {
                          setLogoStore((prev: any) => ({
                               ...prev,
                               allLogos: prev.allLogos.map((item: any) =>
-                                   item._id === result.data._id ? result.data : item
+                                   item.id === result.data.id ? result.data : item
                               )
                          }));
                     }
@@ -533,12 +533,12 @@ const Page = (props: any) => {
                                                   </Stack>
                                                   <Stack spacing={2}>
                                                        {pagedLogos.map((logo: any) => {
-                                                            const isEditing = editingLogoId === logo._id;
-                                                            const draft = logoDrafts[logo._id] || { name: logo.name || '', value: logo.value || '', url: logo.url || '' };
+                                                            const isEditing = editingLogoId === logo.id;
+                                                            const draft = logoDrafts[logo.id] || { name: logo.name || '', value: logo.value || '', url: logo.url || '' };
 
                                                             return (
                                                                  <Box
-                                                                      key={logo._id}
+                                                                          key={logo.id}
                                                                       sx={{
                                                                            display: 'flex',
                                                                            gap: 2,
@@ -565,7 +565,7 @@ const Page = (props: any) => {
                                                                            <TextField
                                                                                 label="Naziv"
                                                                                 value={isEditing ? draft.name : logo.name}
-                                                                                onChange={(event) => handleLogoDraftChange(logo._id, 'name', event.target.value)}
+                                                                                  onChange={(event) => handleLogoDraftChange(logo.id, 'name', event.target.value)}
                                                                                 disabled={!isEditing}
                                                                                 size="small"
                                                                                 sx={{ minWidth: 200 }}
@@ -573,7 +573,7 @@ const Page = (props: any) => {
                                                                            <TextField
                                                                                 label="Value"
                                                                                 value={isEditing ? draft.value : logo.value}
-                                                                                onChange={(event) => handleLogoDraftChange(logo._id, 'value', event.target.value)}
+                                                                                  onChange={(event) => handleLogoDraftChange(logo.id, 'value', event.target.value)}
                                                                                 disabled
                                                                                 size="small"
                                                                                 sx={{ minWidth: 200 }}
@@ -582,7 +582,7 @@ const Page = (props: any) => {
                                                                       <Stack direction="row" spacing={1} alignItems="center">
                                                                            {isEditing ? (
                                                                                 <>
-                                                                                     <Button variant="contained" onClick={() => handleLogoSave(logo._id)}>
+                                                                                     <Button variant="contained" onClick={() => handleLogoSave(logo.id)}>
                                                                                           Sačuvaj
                                                                                      </Button>
                                                                                      <Button color="inherit" onClick={handleLogoEditCancel}>
@@ -597,9 +597,9 @@ const Page = (props: any) => {
                                                                                      <Button
                                                                                           component="label"
                                                                                           variant="outlined"
-                                                                                          disabled={logoUploadId === logo._id}
+                                                                                          disabled={logoUploadId === logo.id}
                                                                                      >
-                                                                                          {logoUploadId === logo._id ? 'Uploadujem...' : 'Update logo'}
+                                                                                          {logoUploadId === logo.id ? 'Uploadujem...' : 'Update logo'}
                                                                                           <Input
                                                                                                type="file"
                                                                                                inputProps={{ accept: 'image/*' }}
@@ -622,7 +622,7 @@ const Page = (props: any) => {
                                                                                                }}
                                                                                           />
                                                                                      </Button>
-                                                                                     <Button color="error" onClick={() => handleLogoDelete(logo._id)}>
+                                                                                     <Button color="error" onClick={() => handleLogoDelete(logo.id)}>
                                                                                           Obriši
                                                                                      </Button>
                                                                                 </>

@@ -108,8 +108,8 @@ export const OrderListTable = (props: any) => {
             return (
               <TableRow
                 hover
-                key={order._id}
-                onClick={() => onSelect?.(order._id)}
+                key={order.id}
+                onClick={() => onSelect?.(order.id)}
                 sx={{ cursor: 'pointer' }}
               >
                 <TableCell sx={{ alignItems: 'center', display: 'flex' }}>

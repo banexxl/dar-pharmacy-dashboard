@@ -40,7 +40,7 @@ export const OrderLogs = (props: any) => {
 
             return (
               <TimelineItem
-                key={log._id}
+                key={log.id}
                 sx={{
                   '&::before': {
                     display: 'none',

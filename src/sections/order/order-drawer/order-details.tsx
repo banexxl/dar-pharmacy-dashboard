@@ -62,7 +62,7 @@ export const OrderDetails = (props: OrderDetailsProps) => {
             disableGutters
 
             label="ID"
-            value={order._id}
+            value={order.id}
           />
           <PropertyListItem
             align={align}
@@ -187,7 +187,7 @@ export const OrderDetails = (props: OrderDetailsProps) => {
             <TableBody>
               {items.map((item) => {
                 return (
-                  <TableRow key={item._id}>
+                  <TableRow key={item.id}>
                     <TableCell>
                       {item.name}
                     </TableCell>

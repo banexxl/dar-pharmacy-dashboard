@@ -87,12 +87,12 @@ export const CustomersTable = (props: any) => {
                               <TableBody>
                                    {
                                         visibleRows.map((customer: ICustomer) => {
-                                             const isSelected = selected.includes(customer._id);
+                                             const isSelected = selected.includes(customer.id);
 
                                              return (
                                                   <TableRow
                                                        hover
-                                                       key={customer._id}
+                                                       key={customer.id}
                                                        selected={isSelected}
                                                   >
                                                        <TableCell padding="checkbox" >
@@ -100,9 +100,9 @@ export const CustomersTable = (props: any) => {
                                                                  checked={isSelected}
                                                                  onChange={(event) => {
                                                                       if (event.target.checked) {
-                                                                           onSelectOne?.(customer._id);
+                                                                           onSelectOne?.(customer.id);
                                                                       } else {
-                                                                           onDeselectOne?.(customer._id);
+                                                                           onDeselectOne?.(customer.id);
                                                                       }
                                                                  }
                                                                  }
@@ -114,12 +114,12 @@ export const CustomersTable = (props: any) => {
                                                                  direction="row"
                                                                  spacing={2}
                                                             >
-                                                                 <Avatar src={customer.avatar} >
-                                                                      {getInitials(customer.name)
+                                                                 <Avatar src={customer.avatar || customer.avatar} >
+                                                                      {getInitials(customer.avatar || customer.name)
                                                                       }
                                                                  </Avatar>
                                                                  < Typography variant="subtitle2" >
-                                                                      {customer.name}
+                                                                      {customer.name || customer.name}
                                                                  </Typography>
                                                             </Stack>
                                                        </TableCell>

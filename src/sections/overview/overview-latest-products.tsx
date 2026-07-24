@@ -38,7 +38,7 @@ export const OverviewLatestProducts = (props: any) => {
           return (
             <ListItem
               divider={hasDivider}
-              key={product._id}
+              key={product.id}
             >
               <ListItemAvatar>
                 {

@@ -74,7 +74,7 @@ export const OrderEdit = (props: OrderEditProps) => {
               fullWidth
               label="ID"
               name="id"
-              value={order?._id}
+              value={order?.id}
             />
             <TextField
               disabled

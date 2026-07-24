@@ -3,7 +3,6 @@ import { Box, Container, Grid } from '@mui/material';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { OverviewBudget } from 'src/sections/overview/overview-budget';
 import { OverviewLatestProducts } from 'src/sections/overview/overview-latest-products';
-import { OverviewTasksProgress } from 'src/sections/overview/overview-tasks-progress';
 import { OverviewTotalCustomers } from 'src/sections/overview/overview-total-customers';
 import { OverviewSales } from '@/sections/overview/overview-sales';
 import { OverviewTotalProfit } from 'src/sections/overview/overview-total-profit';
@@ -71,14 +70,6 @@ const Page = (props: any) => {
                                         positive={props.usersActiveThisWeek.length > props.usersActiveLastWeek.length}
                                         sx={{ height: '100%' }}
                                         value={props.usersActiveThisWeek.length}
-                                   />
-                              </Grid>
-                              <Grid
-                                   size={{ xs: 12, sm: 6, lg: 3 }}
-                              >
-                                   <OverviewTasksProgress
-                                        sx={{ height: '100%' }}
-                                        value={75.5}
                                    />
                               </Grid>
                               <Grid

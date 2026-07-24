@@ -44,7 +44,7 @@ export interface IProduct {
      quantityUnit: string;
      subCategory: string;
      warning: string;
-     _id?: string;
+     id?: string;
      updatedAt?: string;
      promotionText?: string;
      promoting?: boolean;
@@ -89,9 +89,9 @@ export const ProductsTable = (props: any) => {
                .filter((option: any) => option.label);
      }, [manufacturers]);
 
-     const getObjectById = (_id: any, arrayToSearch: any) => {
+     const getObjectById = (id: any, arrayToSearch: any) => {
           for (const obj of arrayToSearch) {
-               if (obj._id === _id) {
+               if (obj.id === id) {
                     return obj;  // Found the object with the desired ID
                }
           }
@@ -454,8 +454,8 @@ export const ProductsTable = (props: any) => {
                                    {
                                         visibleRows.length > 0 ?
                                              visibleRows.map((product: IProduct) => {
-                                                  //const isSelected = selected.includes(product._id);
-                                                  const isCurrent = product._id === currentProductID;
+                                                  //const isSelected = selected.includes(product.id);
+                                                  const isCurrent = product.id === currentProductID;
                                                   // const price = numeral(product.price).format(`${product.currency}0,0.00`);
                                                   const quantityColor = product.quantity >= 10 ? 'success' : 'error';
                                                   const statusColor = product.isActive === true ? 'success' : 'info';
@@ -487,7 +487,7 @@ export const ProductsTable = (props: any) => {
                                                                       }}
                                                                       width="25%"
                                                                  >
-                                                                      <IconButton key={Math.random()} onClick={() => handleProductToggle(product._id)}>
+                                                                      <IconButton key={Math.random()} onClick={() => handleProductToggle(product.id)}>
                                                                            <SvgIcon key={Math.random()}>{isCurrent ? <ChevronDownIcon key={Math.random()} /> : <ChevronRightIcon key={Math.random()} />}</SvgIcon >
                                                                       </IconButton>
                                                                  </TableCell>
@@ -572,7 +572,7 @@ export const ProductsTable = (props: any) => {
                                                                       </Typography>
                                                                  </TableCell>
                                                                  <TableCell key={Math.random()}>{product.price}</TableCell>
-                                                                 <TableCell key={Math.random()}>{product._id!.slice(-8)}</TableCell>
+                                                                 <TableCell key={Math.random()}>{product.id?.slice(-8)}</TableCell>
                                                                  <TableCell key={Math.random()}>
                                                                       <SeverityPill key={Math.random()} color={statusColor}>{product.discount.toString()}</SeverityPill>
                                                                  </TableCell>
@@ -640,11 +640,11 @@ export const ProductsTable = (props: any) => {
                                                                                                     size={{ md: 6, xs: 12 }}
                                                                                                >
                                                                                                     <TextField key={Math.random()}
-                                                                                                         defaultValue={currentProductObject?._id!.slice(-8)}
+                                                                                                         defaultValue={currentProductObject?.id?.slice(-8)}
                                                                                                          disabled
                                                                                                          fullWidth
                                                                                                          label="Šifra proizvoda"
-                                                                                                         name={product._id!.slice(-8)}
+                                                                                                         name={product.id?.slice(-8)}
                                                                                                     />
                                                                                                </Grid>
                                                                                                <Grid key={Math.random()}

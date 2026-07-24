@@ -1,14 +1,43 @@
 import { generateSlug } from '@/utils/generate-slug';
-import { MongoClient, ObjectId } from 'mongodb';
 import type { NextApiRequest, NextApiResponse } from 'next/types';
+import { supabase } from '@/services/supabase';
+
+const PRODUCT_TABLE_CANDIDATES = ['products'];
+
+const isMissingRelationError = (error: any) => {
+     return error?.code === '42P01' || /does not exist/i.test(error?.message ?? '');
+};
+
+const getProductsTableName = async () => {
+     for (const tableName of PRODUCT_TABLE_CANDIDATES) {
+          const { error } = await supabase.from(tableName).select('id', { head: true, count: 'exact' }).limit(1);
+
+          if (!error) {
+               return tableName;
+          }
+
+          if (!isMissingRelationError(error)) {
+               throw error;
+          }
+     }
+
+     throw new Error('Products table was not found in Supabase.');
+};
 
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
-     const mongoClient = await MongoClient.connect(process.env.MONGODB_URI!, {});
-     const dbProducts = mongoClient.db('DAR_DB').collection('Products');
-
      try {
+          const productsTable = await getProductsTableName();
+
           if (request.method === 'GET') {
-               const allProducts = await dbProducts.find({}).toArray();
+               const { data: allProducts, error } = await supabase
+                    .from(productsTable)
+                    .select('*')
+                    .order('updatedAt', { ascending: false });
+
+               if (error) {
+                    return response.status(500).json({ error: 'Failed to fetch products.' });
+               }
+
                return response.status(200).json({ message: 'Products found!', data: allProducts });
           } else if (request.method === 'POST') {
                const slug = generateSlug(request.body.name);
@@ -18,22 +47,44 @@ export default async function handler(request: NextApiRequest, response: NextApi
                     slug: slug,
                     updatedAt: new Date() // Set updatedAt to the current date and time
                };
-               await dbProducts.insertOne(newProduct);
-               return response.status(200).json({ message: 'Product successfully added!' });
+
+               const { data, error } = await supabase
+                    .from(productsTable)
+                    .insert(newProduct)
+                    .select('*')
+                    .single();
+
+               if (error) {
+                    return response.status(500).json({ error: 'Failed to add product.' });
+               }
+
+               return response.status(200).json({ message: 'Product successfully added!', data });
           } else if (request.method === 'DELETE') {
                try {
-                    const newUrl = request.body.imageID.substring(request.body.imageID.lastIndexOf('/') + 1);
-                    await dbProducts.deleteOne({ _id: new ObjectId(request.body.currentProductID) });
+                    const currentProductID = request.body.currentProductID;
+
+                    const { data, error } = await supabase
+                         .from(productsTable)
+                         .delete()
+                         .eq('id', currentProductID)
+                         .select('id');
+
+                    if (error) {
+                         return response.status(500).json({ error: 'Error deleting product.' });
+                    }
+
+                    if (!data || data.length === 0) {
+                         return response.status(404).json({ error: 'Product not found.' });
+                    }
+
                     return response.status(200).json({ message: 'Product successfully deleted!' });
                } catch (error) {
                     return response.status(500).json({ error: 'Error deleting product.' });
                }
           } else if (request.method === 'PUT') {
                const slug = generateSlug(request.body.name);
-               const rawId = request.body._id;
-               const idFilter = ObjectId.isValid(rawId)
-                    ? { $or: [{ _id: new ObjectId(rawId) }, { _id: rawId }] }
-                    : { _id: rawId };
+               const rawId = request.body.id ?? request.body._id;
+
                try {
                     const updatePayload = {
                          bestSeller: request.body.bestSeller,
@@ -63,23 +114,32 @@ export default async function handler(request: NextApiRequest, response: NextApi
                          slug: slug
                     };
 
-                    let updateResult = await dbProducts.updateOne(idFilter, { $set: updatePayload });
+                    let updateResult = await supabase
+                         .from(productsTable)
+                         .update(updatePayload)
+                         .eq('id', rawId)
+                         .select('*')
+                         .maybeSingle();
 
-                    if (updateResult.matchedCount === 0 && request.body.slug) {
-                         updateResult = await dbProducts.updateOne(
-                              { slug: request.body.slug },
-                              { $set: updatePayload }
-                         );
+                    if ((!updateResult.data || updateResult.error) && request.body.slug) {
+                         updateResult = await supabase
+                              .from(productsTable)
+                              .update(updatePayload)
+                              .eq('slug', request.body.slug)
+                              .select('*')
+                              .maybeSingle();
                     }
 
-                    if (updateResult.matchedCount === 0) {
+                    if (updateResult.error) {
+                         return response.status(500).json({ error: 'Error updating product.' });
+                    }
+
+                    if (!updateResult.data) {
                          return response.status(404).json({ error: 'Product not found.' });
                     }
 
-                    const updatedProduct = await dbProducts.findOne(idFilter);
-                    const responseProduct = updatedProduct || (request.body.slug ? await dbProducts.findOne({ slug: request.body.slug }) : null);
                     await response.revalidate('/dashboard/artikli');
-                    return response.status(200).json({ message: 'Product successfully updated!', data: responseProduct });
+                    return response.status(200).json({ message: 'Product successfully updated!', data: updateResult.data });
                } catch (error) {
                     return response.status(500).json({ error: 'Error updating product.' });
                }
@@ -88,7 +148,5 @@ export default async function handler(request: NextApiRequest, response: NextApi
           }
      } catch (error) {
           return response.status(500).json({ error: 'Internal server error!' });
-     } finally {
-          await mongoClient.close();
      }
 }

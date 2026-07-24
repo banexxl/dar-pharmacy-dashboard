@@ -34,7 +34,7 @@ export const OrderItems = (props: any) => {
                 const unitAmount = numeral(item.unitAmount).format(`${item.currency}0,0.00`);
 
                 return (
-                  <TableRow key={item._id}>
+                  <TableRow key={item.id}>
                     <TableCell>
                       <Typography variant="subtitle2">{title}</Typography>
                     </TableCell>

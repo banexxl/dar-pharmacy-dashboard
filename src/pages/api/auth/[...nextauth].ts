@@ -1,13 +1,6 @@
 import NextAuth, { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import { userServices } from "@/services/user-services";
-
-// Define the User type
-type User = {
-     _id: string;
-     email: string;
-     // other user properties
-}
+import { fetchSingleRow } from "@/services/supabase";
 
 export const authOptions: NextAuthOptions = {
      secret: process.env.NEXTAUTH_SECRET,
@@ -20,28 +13,23 @@ export const authOptions: NextAuthOptions = {
      ],
      callbacks: {
           async signIn({ account, profile }: any) {
-               if (account.provider === "google") {
-                    const user = await userServices().getUserByEmailAndRole(profile.email, 'admin');
-                    return profile.email_verified && profile.email.endsWith("@gmail.com") && user?.email ? true : false;
-               }
-               return false; // Do different verification for other providers that don't have `email_verified`
-          },
-          async session({ session, token }: any) {
-               const sessionUser: any = await userServices().getUserByEmailAndRole(session.user.email, 'admin');
+               if (account?.provider === "google") {
+                    const email = profile?.email?.toLowerCase();
 
-               if (sessionUser) {
-                    session.user.role = sessionUser.role;
-                    session.user._id = sessionUser._id;
-                    session.user.avatar = sessionUser.avatar
-               }
-               return {
-                    ...session,
-                    user: {
-                         ...session.user,
-                         role: sessionUser.role,
-                         _id: sessionUser._id
+                    if (!email) {
+                         return false;
                     }
-               };
+
+                    const admin = await fetchSingleRow<{ id: string; email: string }>(['admins'], 'email', email);
+                    return !!admin?.email;
+               }
+               return false;
+          },
+          async session({ session }: any) {
+               session.user.id = session?.user?.email ?? '';
+               session.user.avatar = session?.user?.image || '';
+
+               return session;
           },
           async redirect({ url, baseUrl }: any) {
                const redirectUrl = url.startsWith('/') ? new URL(url, baseUrl).toString() : url;

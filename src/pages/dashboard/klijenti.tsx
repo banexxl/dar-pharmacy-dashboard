@@ -68,7 +68,7 @@ const CustomersPage = (props: any) => {
           if (!Array.isArray(props.customers)) {
                return [];
           }
-          return props.customers.map((customer: any) => customer._id);
+          return props.customers.map((customer: any) => customer.id);
      }, [props.customers]);
 
      const router = useRouter();

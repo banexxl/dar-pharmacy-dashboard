@@ -1,18 +1,121 @@
-import { MongoClient } from "mongodb"
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseSecretKey = process.env.NEXT_SUPABASE_SECRET_KEY;
 
-type User = {
-     _id: any;
-     email: string;
-     // other user properties
+export type UserProfile = {
+     id: string;
+     email: string | null;
+     full_name: string;
+     avatar_url: string | null;
+
+     email_verified_at: string | null;
+     phone_number: string | null;
+
+     street_address: string | null;
+     city: string | null;
+     province_state: string | null;
+     country: string | null;
+     zip_postal_code: string | null;
+
+     should_create_account: boolean;
+
+     created_at: string;
+     updated_at: string;
+     raw_user_meta_data: Record<string, any>;
 };
 
-type GetUserByEmailResult = User | null;
+export type Admin = {
+     id: string;
+     name: string;
+     email: string;
+     created_at: string;
+};
+
+type AuthUserRecord = {
+     id: string;
+     email: string | null;
+     phone: string | null;
+     email_confirmed_at: string | null;
+     created_at: string;
+     updated_at: string;
+     raw_user_meta_data?: Record<string, any> | null;
+     user_metadata?: Record<string, any> | null;
+};
+
+type AuthUsersResponse = {
+     users?: AuthUserRecord[];
+};
+
+const getUserMetadata = (user: AuthUserRecord) => user.raw_user_meta_data ?? user.user_metadata ?? {};
+
+const mapAuthUserToProfile = (user: AuthUserRecord): UserProfile => ({
+     id: user.id,
+     email: user.email,
+     full_name: String(getUserMetadata(user).full_name ?? getUserMetadata(user).name ?? ''),
+     avatar_url: getUserMetadata(user).avatar_url ?? getUserMetadata(user).picture ?? null,
+     email_verified_at: user.email_confirmed_at,
+     phone_number: user.phone,
+     street_address: getUserMetadata(user).street_address ?? null,
+     city: getUserMetadata(user).city ?? null,
+     province_state: getUserMetadata(user).province_state ?? getUserMetadata(user).state ?? null,
+     country: getUserMetadata(user).country ?? null,
+     zip_postal_code: getUserMetadata(user).zip_postal_code ?? null,
+     should_create_account: Boolean(getUserMetadata(user).should_create_account ?? false),
+     created_at: user.created_at,
+     updated_at: user.updated_at,
+     raw_user_meta_data: getUserMetadata(user),
+});
+
+const getAuthAdminHeaders = () => {
+     if (!supabaseUrl || !supabaseSecretKey) {
+          throw new Error('NEXT_SUPABASE_SECRET_KEY is required to read auth.users.');
+     }
+
+     return {
+          url: supabaseUrl,
+          headers: {
+               apikey: supabaseSecretKey,
+               Authorization: `Bearer ${supabaseSecretKey}`,
+          },
+     };
+};
+
+const fetchAuthUsersPage = async (page: number, perPage: number): Promise<AuthUserRecord[]> => {
+     const { url, headers } = getAuthAdminHeaders();
+     const response = await fetch(`${url}/auth/v1/admin/users?page=${page}&per_page=${perPage}`, {
+          headers,
+     });
+
+     const payload = await response.json().catch(() => null);
+
+     if (!response.ok) {
+          throw payload ?? new Error(`Failed to fetch auth users: ${response.status}`);
+     }
+
+     return ((payload as AuthUsersResponse | null)?.users ?? []) as AuthUserRecord[];
+};
+
+const fetchAuthUsers = async (): Promise<AuthUserRecord[]> => {
+     const perPage = 1000;
+     const users: AuthUserRecord[] = [];
+     let page = 1;
+
+     while (true) {
+          const batch = await fetchAuthUsersPage(page, perPage);
+          users.push(...batch);
+
+          if (batch.length < perPage) {
+               break;
+          }
+
+          page += 1;
+     }
+
+     return users;
+};
 
 export const userServices = () => {
 
      const getUsersByPage = async (page: number, limit: any) => {
-
-          const client = await MongoClient.connect(process.env.MONGODB_URI!)
           const parsedLimit = parseInt(limit, 10); // Parse limit as an integer
 
           if (isNaN(parsedLimit) || parsedLimit <= 0) {
@@ -21,84 +124,50 @@ export const userServices = () => {
           }
 
           try {
-               const skip = page * limit;
-               const database = client.db('ACCOUNTS_DB');
-               const collection = database.collection('Users');
-               const users = await collection
-                    .find({})
-                    .skip(skip)
-                    .limit(parsedLimit)
-                    .toArray();
-               return users;
+               const skip = page * parsedLimit;
+               const currentPage = Math.floor(skip / parsedLimit) + 1;
+               const users = await fetchAuthUsersPage(currentPage, parsedLimit);
+               return users.map(mapAuthUserToProfile);
           } catch (error) {
                return { message: error }
           }
-          finally {
-               await client.close();
-          }
      }
 
-     const getUserByEmailAndRole = async (email: string, role: string): Promise<GetUserByEmailResult> => {
-
-          const client = new MongoClient(process.env.MONGODB_URI!);
-
+     const getUserByEmail = async (email: string): Promise<UserProfile | null> => {
           try {
-               await client.connect();
-               const database = client.db('ACCOUNTS_DB');
-               const collection = await database.collection('Accounts').find({ email: email, role: role }).toArray();
-               const user = collection[0] as User;
-               return user;
+               const users = await fetchAuthUsers();
+               const user = users.find((candidate) => candidate.email?.toLowerCase() === email.toLowerCase());
+               return user ? mapAuthUserToProfile(user) : null;
           } catch (error: any) {
-               console.error('Error while fetching count:', error);
-               return null; // Return false or handle the error accordingly
-          } finally {
-               await client.close(); // Ensure the client is closed after operation
+               console.error('Error while fetching user by email:', error);
+               return null;
           }
      }
 
      const getUsersCount = async () => {
-          const client = new MongoClient(process.env.MONGODB_URI!);
-
           try {
-               await client.connect();
-               const database = client.db('ACCOUNTS_DB');
-               const collection = await database.collection('users').find({}).toArray();
-               return collection.length;
+               const users = await fetchAuthUsers();
+               return users.length;
           } catch (error: any) {
                console.error('Error while fetching count:', error);
                return 0; // Return false or handle the error accordingly
-          } finally {
-               await client.close(); // Ensure the client is closed after operation
           }
      }
 
      const getAllUsers = async () => {
-          const client = new MongoClient(process.env.MONGODB_URI!);
-
           try {
-               await client.connect();
-               const database = client.db('ACCOUNTS_DB');
-               const collection = await database.collection('Users').find({}).toArray();
-               return collection;
+               const users = await fetchAuthUsers();
+               return users.map(mapAuthUserToProfile);
           } catch (error: any) {
                console.error('Error while fetching count:', error);
                return 0; // Return false or handle the error accordingly
-          } finally {
-               await client.close(); // Ensure the client is closed after operation
           }
      }
 
      const getUsersActiveInWeek = async (weekOffset: number) => {
-          const client = new MongoClient(process.env.MONGODB_URI!);
-
           try {
-               await client.connect();
-               const database = client.db('ACCOUNTS_DB');
-
-               // Get current date
                const now = new Date();
 
-               // Calculate the start and end of the target week
                const startOfWeek = new Date(
                     now.getFullYear(),
                     now.getMonth(),
@@ -107,20 +176,18 @@ export const userServices = () => {
                const endOfWeek = new Date(startOfWeek);
                endOfWeek.setDate(startOfWeek.getDate() + 7); // End of the week is 7 days after the start
 
-               // Fetch users whose 'emailVerified' date is within the date range
-               const activeUsers = await database.collection('Users').find({
-                    emailVerified: {
-                         $gte: startOfWeek,
-                         $lt: endOfWeek
-                    }
-               }).toArray();
+               const users = await fetchAuthUsers();
 
-               return activeUsers; // Return the count of active users
+               return users
+                    .filter((user) => {
+                         const emailVerified = user.email_confirmed_at ? new Date(user.email_confirmed_at) : new Date(NaN);
+
+                         return !Number.isNaN(emailVerified.getTime()) && emailVerified >= startOfWeek && emailVerified < endOfWeek;
+                    })
+                    .map(mapAuthUserToProfile);
           } catch (error: any) {
                console.error('Error while fetching active users count:', error);
                return 0; // Handle the error accordingly
-          } finally {
-               await client.close(); // Ensure the client is closed after operation
           }
      };
 
@@ -129,7 +196,7 @@ export const userServices = () => {
           getUsersActiveInWeek,
           getAllUsers,
           getUsersByPage,
-          getUserByEmailAndRole,
+          getUserByEmail,
           getUsersCount
      }
 }

@@ -1,12 +1,6 @@
 import ChartBarIcon from '@heroicons/react/24/solid/ChartBarIcon';
-import CogIcon from '@heroicons/react/24/solid/CogIcon';
-import LockClosedIcon from '@heroicons/react/24/solid/LockClosedIcon';
 import ShoppingBagIcon from '@heroicons/react/24/solid/ShoppingBagIcon';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
-import UserIcon from '@heroicons/react/24/solid/UserIcon';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import EmailIcon from '@mui/icons-material/Email';
 import UsersIcon from '@heroicons/react/24/solid/UsersIcon';
 import StorageIcon from '@mui/icons-material/Storage';
 import { SvgIcon } from '@mui/material';
@@ -53,15 +47,6 @@ export const items = [
           disabled: false
      },
      {
-          title: 'Kanban',
-          path: '/dashboard/kanban',
-          icon: (
-               <SvgIcon fontSize="small">
-                    <AssignmentTurnedInIcon />
-               </SvgIcon>
-          ),
-     },
-     {
           title: 'Datoteke',
           path: '/dashboard/datoteke',
           icon: (
@@ -70,31 +55,4 @@ export const items = [
                </SvgIcon>
           ),
      },
-     {
-          title: 'Email',
-          path: '/dashboard/email',
-          icon: (
-               <SvgIcon fontSize="small">
-                    <EmailIcon />
-               </SvgIcon>
-          ),
-     },
-     {
-          title: 'Kalendar',
-          path: '/dashboard/calendar',
-          icon: (
-               <SvgIcon fontSize="small">
-                    <CalendarMonthIcon />
-               </SvgIcon>
-          ),
-     },
-     // {
-     //      title: 'Chat',
-     //      path: '/dashboard/chat',
-     //      icon: (
-     //           <SvgIcon fontSize="small">
-     //                <UserIcon />
-     //           </SvgIcon>
-     //      )
-     // }
 ];

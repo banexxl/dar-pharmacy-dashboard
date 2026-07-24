@@ -4,7 +4,7 @@ export const objFromArray = (arr?: any[]): Record<string, any> => {
   }
 
   return arr.reduce((acc, item) => {
-    const key = item._id ?? item.id; // Use `_id` if available, otherwise use `id`.
+    const key = item.id;
     if (key) {
       acc[key] = item;
     }
