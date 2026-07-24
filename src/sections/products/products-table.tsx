@@ -21,34 +21,9 @@ import { mainCategoryOptions, midCategoryOptions, quantityUnitOptions } from './
 import MagnifyingGlassIcon from '@heroicons/react/24/solid/MagnifyingGlassIcon';
 import ClearIcon from '@mui/icons-material/Clear';
 import { getComparator } from '../order/order-list-table';
+import { Product } from '../../schemas/product';
 
-export interface IProduct {
-     bestSeller: boolean;
-     description: string;
-     discount: boolean;
-     discountAmount: number;
-     availableStock: number;
-     imageURL: string;
-     ingredients: string;
-     instructions: string;
-     mainCategory: string;
-     manufacturer: string;
-     manufacturerURL: string;
-     midCategory: string;
-     name: string;
-     newArrival: boolean;
-     isActive: boolean;
-     displayOnHome: boolean;
-     price: string;
-     quantity: number;
-     quantityUnit: string;
-     subCategory: string;
-     warning: string;
-     id?: string;
-     updatedAt?: string;
-     promotionText?: string;
-     promoting?: boolean;
-}
+export type IProduct = Product;
 
 export const ProductsTable = (props: any) => {
 
@@ -457,7 +432,7 @@ export const ProductsTable = (props: any) => {
                                                   //const isSelected = selected.includes(product.id);
                                                   const isCurrent = product.id === currentProductID;
                                                   // const price = numeral(product.price).format(`${product.currency}0,0.00`);
-                                                  const quantityColor = product.quantity >= 10 ? 'success' : 'error';
+                                                  const quantityColor = (product.quantity ?? 0) >= 10 ? 'success' : 'error';
                                                   const statusColor = product.isActive === true ? 'success' : 'info';
                                                   const homeColor = product.displayOnHome ? 'success' : 'info';
                                                   // const hasManyVariants = product.variants > 1;
@@ -554,7 +529,7 @@ export const ProductsTable = (props: any) => {
                                                                  <TableCell width="25%" key={Math.random()}>
                                                                       <LinearProgress
                                                                            key={Math.random()}
-                                                                           value={product.quantity}
+                                                                           value={product.quantity ?? 0}
                                                                            variant="determinate"
                                                                            color={quantityColor}
                                                                            sx={{
@@ -737,7 +712,7 @@ export const ProductsTable = (props: any) => {
                                                                                                          fullWidth
                                                                                                          label="Opis"
                                                                                                          disabled={loading}
-                                                                                                         name={product.description}
+                                                                                                         name="description"
                                                                                                          onBlur={(e: any) =>
                                                                                                               setCurrentProductObject((previousObject: any) => ({
                                                                                                                    ...previousObject,
@@ -755,7 +730,7 @@ export const ProductsTable = (props: any) => {
                                                                                                          fullWidth
                                                                                                          label="Instrukcije"
                                                                                                          disabled={loading}
-                                                                                                         name={product.instructions}
+                                                                                                         name="instructions"
                                                                                                          onBlur={(e: any) =>
                                                                                                               setCurrentProductObject((previousObject: any) => ({
                                                                                                                    ...previousObject,
@@ -773,7 +748,7 @@ export const ProductsTable = (props: any) => {
                                                                                                          fullWidth
                                                                                                          label="Upozorenje"
                                                                                                          disabled={loading}
-                                                                                                         name={product.warning}
+                                                                                                         name="warning"
                                                                                                          onBlur={(e: any) =>
                                                                                                               setCurrentProductObject((previousObject: any) => ({
                                                                                                                    ...previousObject,
@@ -791,7 +766,7 @@ export const ProductsTable = (props: any) => {
                                                                                                          fullWidth
                                                                                                          disabled={loading}
                                                                                                          label="Sastav"
-                                                                                                         name={product.ingredients}
+                                                                                                         name="ingredients"
                                                                                                          onBlur={(e: any) =>
                                                                                                               setCurrentProductObject((previousObject: any) => ({
                                                                                                                    ...previousObject,
@@ -809,7 +784,7 @@ export const ProductsTable = (props: any) => {
                                                                                                          fullWidth
                                                                                                          disabled={!currentProductObject?.promoting}
                                                                                                          label="Promo tekst"
-                                                                                                         name={product.promotionText}
+                                                                                                         name="promotion_text"
                                                                                                          onBlur={(e: any) =>
                                                                                                               setCurrentProductObject((previousObject: any) => ({
                                                                                                                    ...previousObject,
@@ -1244,7 +1219,7 @@ export const ProductsTable = (props: any) => {
                                                                                                          onChange={async (e: any) => await handleImageChange(e)}
                                                                                                     />
                                                                                                </Button>
-                                                                                               {currentProductObject?.imageURL.length ? (
+                                                                                               {currentProductObject?.imageURL?.length ? (
                                                                                                     <Image
                                                                                                          src={currentProductObject!.imageURL}
                                                                                                          alt='Uploaded Image'

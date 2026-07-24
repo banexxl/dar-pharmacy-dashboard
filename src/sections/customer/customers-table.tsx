@@ -15,11 +15,11 @@ import {
      Typography
 } from '@mui/material';
 import { Scrollbar } from 'src/components/scrollbar';
-import { getInitials } from 'src/utils/get-initials';
 import Image from 'next/image';
 import { useMemo } from 'react';
 import { ICustomer } from '@/schemas/customer';
 import { getComparator } from '../order/order-list-table';
+import { getInitials } from '@/utils/get-initials';
 
 export const CustomersTable = (props: any) => {
      const {

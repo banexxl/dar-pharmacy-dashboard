@@ -4,7 +4,7 @@ import { createComponents } from './create-components';
 import { createShadows } from './create-shadows';
 import { createTypography } from './create-typography';
 
-export function createTheme() {
+export const createCustomTheme = () => {
      const palette = createPalette();
      const components = createComponents({ palette });
      const shadows = createShadows();
@@ -20,9 +20,9 @@ export function createTheme() {
                     xl: 1440
                }
           },
-          components,
-          palette,
-          shadows,
+          components: components as any,
+          palette: palette as any,
+          shadows: shadows as any,
           shape: {
                borderRadius: 8
           },

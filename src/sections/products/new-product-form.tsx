@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import Swal from 'sweetalert2'
 
 import { Theme } from '@mui/material/styles';
-import { IProduct } from './products-table';
+import { ProductDraft } from '../../schemas/product';
 
 export const fetchSubCategoryOptions = async (selectedMidCategory: any) => {
 
@@ -204,7 +204,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail, manufacturers = 
                .filter((option: any) => option.label);
      }, [manufacturers]);
 
-     const handleSubmit = async (values: IProduct) => {
+     const handleSubmit = async (values: ProductDraft) => {
           try {
                const responseValues = await fetch('/api/product-api', {
                     method: 'POST',

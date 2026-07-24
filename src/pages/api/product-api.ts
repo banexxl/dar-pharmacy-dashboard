@@ -1,6 +1,7 @@
 import { generateSlug } from '@/utils/generate-slug';
 import type { NextApiRequest, NextApiResponse } from 'next/types';
 import { supabase } from '@/services/supabase';
+import { hydrateProduct, hydrateProducts, normalizeProductInput } from '../../schemas/product';
 
 const PRODUCT_TABLE_CANDIDATES = ['products'];
 
@@ -32,21 +33,19 @@ export default async function handler(request: NextApiRequest, response: NextApi
                const { data: allProducts, error } = await supabase
                     .from(productsTable)
                     .select('*')
-                    .order('updatedAt', { ascending: false });
+                    .order('updated_at', { ascending: false });
 
                if (error) {
                     return response.status(500).json({ error: 'Failed to fetch products.' });
                }
 
-               return response.status(200).json({ message: 'Products found!', data: allProducts });
+               return response.status(200).json({ message: 'Products found!', data: hydrateProducts((allProducts ?? []) as any) });
           } else if (request.method === 'POST') {
                const slug = generateSlug(request.body.name);
-               const newProduct = {
+               const newProduct = normalizeProductInput({
                     ...request.body,
-                    displayOnHome: Boolean(request.body.displayOnHome),
-                    slug: slug,
-                    updatedAt: new Date() // Set updatedAt to the current date and time
-               };
+                    slug,
+               });
 
                const { data, error } = await supabase
                     .from(productsTable)
@@ -58,7 +57,7 @@ export default async function handler(request: NextApiRequest, response: NextApi
                     return response.status(500).json({ error: 'Failed to add product.' });
                }
 
-               return response.status(200).json({ message: 'Product successfully added!', data });
+               return response.status(200).json({ message: 'Product successfully added!', data: hydrateProduct(data as any) });
           } else if (request.method === 'DELETE') {
                try {
                     const currentProductID = request.body.currentProductID;
@@ -83,36 +82,13 @@ export default async function handler(request: NextApiRequest, response: NextApi
                }
           } else if (request.method === 'PUT') {
                const slug = generateSlug(request.body.name);
-               const rawId = request.body.id ?? request.body._id;
+               const rawId = request.body.id;
 
                try {
-                    const updatePayload = {
-                         bestSeller: request.body.bestSeller,
-                         description: request.body.description,
-                         discount: request.body.discount,
-                         discountAmount: request.body.discountAmount,
-                         availableStock: request.body.availableStock,
-                         imageURL: request.body.imageURL,
-                         ingredients: request.body.ingredients,
-                         instructions: request.body.instructions,
-                         mainCategory: request.body.mainCategory,
-                         manufacturer: request.body.manufacturer,
-                         manufacturerURL: request.body.manufacturerURL,
-                         midCategory: request.body.midCategory,
-                         name: request.body.name,
-                         newArrival: request.body.newArrival,
-                         isActive: request.body.isActive,
-                         displayOnHome: Boolean(request.body.displayOnHome),
-                         price: request.body.price,
-                         quantity: request.body.quantity,
-                         quantityUnit: request.body.quantityUnit,
-                         subCategory: request.body.subCategory,
-                         warning: request.body.warning,
-                         updatedAt: new Date(), // Update the updatedAt field to the current date and time
-                         promotionText: request.body.promotionText,
-                         promoting: request.body.promoting,
-                         slug: slug
-                    };
+                    const updatePayload = normalizeProductInput({
+                         ...request.body,
+                         slug,
+                    });
 
                     let updateResult = await supabase
                          .from(productsTable)
@@ -139,7 +115,7 @@ export default async function handler(request: NextApiRequest, response: NextApi
                     }
 
                     await response.revalidate('/dashboard/artikli');
-                    return response.status(200).json({ message: 'Product successfully updated!', data: updateResult.data });
+                    return response.status(200).json({ message: 'Product successfully updated!', data: hydrateProduct(updateResult.data as any) });
                } catch (error) {
                     return response.status(500).json({ error: 'Error updating product.' });
                }

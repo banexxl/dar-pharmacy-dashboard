@@ -1,5 +1,5 @@
 import * as yup from 'yup';
-import { IProduct } from './products-table';
+import { ProductDraft } from '../../schemas/product';
 
 export const newProductSchema = () => yup.object().shape({
      name: yup
@@ -56,7 +56,7 @@ export const newProductSchema = () => yup.object().shape({
           .boolean()
 });
 
-export const initialValues: IProduct = {
+export const initialValues: ProductDraft = {
      name: '',
      description: '',
      mainCategory: '',
@@ -70,7 +70,7 @@ export const initialValues: IProduct = {
      manufacturerURL: '',
      warning: '',
      imageURL: '',
-     price: '',
+     price: 0,
      newArrival: false,
      bestSeller: false,
      discount: false,

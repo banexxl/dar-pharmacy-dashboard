@@ -1,4 +1,4 @@
-import { IProduct } from "@/sections/products/products-table";
+import { Product } from "./product";
 import { ICustomer } from "./customer";
 import { error, indigo, info, success } from "@/theme/colors";
 import { JSX } from "react";
@@ -23,7 +23,7 @@ export type Order = {
      }[];
 }
 
-export default interface ICartItem extends IProduct {
+export default interface ICartItem extends Product {
      count: number;
 }
 

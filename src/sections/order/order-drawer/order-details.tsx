@@ -17,7 +17,6 @@ import { PropertyList } from 'src/components/property-list';
 import { PropertyListItem } from 'src/components/property-list-item';
 import { SeverityPill } from 'src/components/severity-pill';
 import { Scrollbar } from 'src/components/scrollbar';
-import { IProduct } from '@/sections/products/products-table';
 import { ICustomer } from '@/schemas/customer';
 import { OrderDetailsProps, OrderStatus } from '@/schemas/order';
 import Link from 'next/link';

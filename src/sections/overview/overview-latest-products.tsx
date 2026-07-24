@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import ArrowRightIcon from '@heroicons/react/24/solid/ArrowRightIcon';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import Link from 'next/link';
-import { IProduct } from '../products/products-table';
+import { Product } from '../../schemas/product';
 import {
   Box,
   Button,
@@ -29,10 +29,10 @@ export const OverviewLatestProducts = (props: any) => {
     <Card sx={sx}>
       <CardHeader title="Poslednje dodati artikli" />
       <List>
-        {products.map((product: IProduct, index: number) => {
+        {products.map((product: Product, index: number) => {
           const hasDivider = index < products.length - 1;
           // Convert updatedAt to a Date object
-          const updatedAtDate = new Date(product.updatedAt!);
+          const updatedAtDate = new Date(product.updated_at ?? product.updatedAt ?? 0);
           const ago = formatDistanceToNow(updatedAtDate);
 
           return (
@@ -42,11 +42,11 @@ export const OverviewLatestProducts = (props: any) => {
             >
               <ListItemAvatar>
                 {
-                  product.imageURL
+                  (product.image_url ?? product.imageURL)
                     ? (
                       <Box
                         component="img"
-                        src={product.imageURL}
+                        src={product.image_url ?? product.imageURL ?? ''}
                         sx={{
                           borderRadius: 1,
                           height: 48,
