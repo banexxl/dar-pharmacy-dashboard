@@ -1,3 +1,5 @@
+import 'server-only';
+
 import { Order } from '@/schemas/order';
 import { asDate, fetchRows } from './supabase';
 

@@ -8,14 +8,14 @@ export const newProductSchema = () => yup.object().shape({
      description: yup
           .string()
           .required('Product description is required'),
-     mainCategory: yup
+     main_category: yup
           .string()
           .required('Main category is required'),
-     midCategory: yup
+     mid_category: yup
           .string(),
-     subCategory: yup
+     sub_category: yup
           .string(),
-     availableStock: yup
+     available_stock: yup
           .number()
           .required('Available stock is required'),
      ingredients: yup
@@ -27,7 +27,7 @@ export const newProductSchema = () => yup.object().shape({
      quantity: yup
           .string()
           .required('Product quantity is required'),
-     quantityUnit: yup
+     quantity_unit: yup
           .string()
           .required('Product quantity unit is required'),
      manufacturer: yup
@@ -59,25 +59,25 @@ export const newProductSchema = () => yup.object().shape({
 export const initialValues: ProductDraft = {
      name: '',
      description: '',
-     mainCategory: '',
-     midCategory: '',
-     subCategory: '',
-     availableStock: 0,
+     main_category: '',
+     mid_category: '',
+     sub_category: '',
+     available_stock: 0,
      ingredients: '',
      instructions: '',
      quantity: 0,
-     manufacturer: '',
-     manufacturerURL: '',
+     manufacturer_id: '',
+     manufacturer_url: '',
      warning: '',
-     imageURL: '',
+     image_url: '',
      price: 0,
-     newArrival: false,
-     bestSeller: false,
+     new_arrival: false,
+     best_seller: false,
      discount: false,
-     isActive: true,
-     displayOnHome: false,
-     discountAmount: 0,
-     quantityUnit: ''
+     is_active: true,
+     display_on_home: false,
+     discount_amount: 0,
+     quantity_unit: ''
 };
 
 export const mainCategoryOptions = [

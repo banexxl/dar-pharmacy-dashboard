@@ -1,3 +1,7 @@
+import 'server-only';
+
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
+
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseSecretKey = process.env.NEXT_SUPABASE_SECRET_KEY;
 
@@ -41,10 +45,6 @@ type AuthUserRecord = {
      user_metadata?: Record<string, any> | null;
 };
 
-type AuthUsersResponse = {
-     users?: AuthUserRecord[];
-};
-
 const getUserMetadata = (user: AuthUserRecord) => user.raw_user_meta_data ?? user.user_metadata ?? {};
 
 const mapAuthUserToProfile = (user: AuthUserRecord): UserProfile => ({
@@ -65,33 +65,36 @@ const mapAuthUserToProfile = (user: AuthUserRecord): UserProfile => ({
      raw_user_meta_data: getUserMetadata(user),
 });
 
-const getAuthAdminHeaders = () => {
+const getSupabaseAdminClient = (): SupabaseClient => {
      if (!supabaseUrl || !supabaseSecretKey) {
           throw new Error('NEXT_SUPABASE_SECRET_KEY is required to read auth.users.');
      }
 
-     return {
-          url: supabaseUrl,
-          headers: {
-               apikey: supabaseSecretKey,
-               Authorization: `Bearer ${supabaseSecretKey}`,
+     return createClient(supabaseUrl, supabaseSecretKey, {
+          auth: {
+               autoRefreshToken: false,
+               persistSession: false,
           },
-     };
+          global: {
+               headers: {
+                    Authorization: `Bearer ${supabaseSecretKey}`,
+               },
+          },
+     });
 };
 
 const fetchAuthUsersPage = async (page: number, perPage: number): Promise<AuthUserRecord[]> => {
-     const { url, headers } = getAuthAdminHeaders();
-     const response = await fetch(`${url}/auth/v1/admin/users?page=${page}&per_page=${perPage}`, {
-          headers,
+     const supabaseAdmin = getSupabaseAdminClient();
+     const { data, error } = await supabaseAdmin.auth.admin.listUsers({
+          page,
+          perPage,
      });
 
-     const payload = await response.json().catch(() => null);
-
-     if (!response.ok) {
-          throw payload ?? new Error(`Failed to fetch auth users: ${response.status}`);
+     if (error) {
+          throw error;
      }
 
-     return ((payload as AuthUsersResponse | null)?.users ?? []) as AuthUserRecord[];
+     return (data?.users ?? []) as AuthUserRecord[];
 };
 
 const fetchAuthUsers = async (): Promise<AuthUserRecord[]> => {

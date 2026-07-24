@@ -51,6 +51,8 @@ export const ProductsTable = (props: any) => {
      const [isSubCategoryEnabled, setIsSubCategoryEnabled] = useState(false);
      const [selectedMidCategory, setSelectedMidCategory] = useState('');
 
+     const normalizeKey = (value: unknown) => String(value ?? '').trim().toLowerCase();
+
      const manufacturerOptions = useMemo(() => {
           if (!Array.isArray(manufacturers)) {
                return [];
@@ -58,11 +60,44 @@ export const ProductsTable = (props: any) => {
 
           return manufacturers
                .map((item: any) => ({
+                    id: item?.id || '',
                     label: item?.name || item?.label || '',
-                    value: item?.value || ''
+                    value: item?.value || '',
+                    url: item?.url || ''
                }))
                .filter((option: any) => option.label);
      }, [manufacturers]);
+
+     const getManufacturerOptionFromProduct = (product?: IProduct | null) => {
+          if (!product || !Array.isArray(manufacturerOptions)) {
+               return null;
+          }
+
+          const productRecord = product as Record<string, any>;
+
+          const lookupKeys = [
+               normalizeKey(productRecord.manufacturer_id),
+               normalizeKey(productRecord.manufacturerId),
+               normalizeKey(productRecord.manufacturerURL),
+               normalizeKey(productRecord.manufacturer_url),
+               normalizeKey(productRecord.manufacturer),
+          ].filter(Boolean);
+
+          if (lookupKeys.length === 0) {
+               return null;
+          }
+
+          return manufacturerOptions.find((option: any) => {
+               const optionKeys = [
+                    normalizeKey(option?.id),
+                    normalizeKey(option?.value),
+                    normalizeKey(option?.url),
+                    normalizeKey(option?.label)
+               ].filter(Boolean);
+
+               return optionKeys.some((key: string) => lookupKeys.includes(key));
+          }) ?? null;
+     };
 
      const getObjectById = (id: any, arrayToSearch: any) => {
           for (const obj of arrayToSearch) {
@@ -79,7 +114,22 @@ export const ProductsTable = (props: any) => {
                     setCurrentProductObject(null)
                     return null;
                } ``
-               setCurrentProductObject(getObjectById(productId, items))
+               const selectedProduct = getObjectById(productId, items);
+               const selectedManufacturer = getManufacturerOptionFromProduct(selectedProduct);
+               console.log('selectedProduct', selectedProduct);
+               if (selectedProduct) {
+
+
+                    setCurrentProductObject({
+                         ...selectedProduct,
+                         manufacturer: selectedManufacturer?.label || selectedProduct.manufacturer || selectedProduct.manufacturer_id || '',
+                         manufacturerURL: selectedManufacturer?.value || selectedProduct.manufacturerURL || selectedProduct.manufacturer_id || '',
+                         manufacturer_id: selectedProduct.manufacturer_id || selectedManufacturer?.id || selectedManufacturer?.value || '',
+                    });
+               } else {
+                    setCurrentProductObject(null);
+               }
+
                return productId;
           });
      }
@@ -255,7 +305,7 @@ export const ProductsTable = (props: any) => {
                          title: title,
                          extension: fileExtension,
                          fileName: selectedFile.name,
-                         manufacturer: currentProductObject!.manufacturer || '',
+                         manufacturer: currentProductObject!.manufacturer_name || '',
                     };
 
                     const response = await fetch(apiUrl, {
@@ -433,8 +483,8 @@ export const ProductsTable = (props: any) => {
                                                   const isCurrent = product.id === currentProductID;
                                                   // const price = numeral(product.price).format(`${product.currency}0,0.00`);
                                                   const quantityColor = (product.quantity ?? 0) >= 10 ? 'success' : 'error';
-                                                  const statusColor = product.isActive === true ? 'success' : 'info';
-                                                  const homeColor = product.displayOnHome ? 'success' : 'info';
+                                                  const statusColor = product.is_active === true ? 'success' : 'info';
+                                                  const homeColor = product.display_on_home ? 'success' : 'info';
                                                   // const hasManyVariants = product.variants > 1;
 
                                                   return (
@@ -473,13 +523,13 @@ export const ProductsTable = (props: any) => {
                                                                                 display: 'flex',
                                                                            }}
                                                                       >
-                                                                           {product.imageURL ? (
+                                                                           {product.image_url ? (
                                                                                 <Box
                                                                                      key={Math.random()}
                                                                                      sx={{
                                                                                           alignItems: 'center',
                                                                                           backgroundColor: 'neutral.50',
-                                                                                          backgroundImage: `url(${product.imageURL})`,
+                                                                                          backgroundImage: `url(${product.image_url})`,
                                                                                           backgroundPosition: 'center',
                                                                                           backgroundSize: 'cover',
                                                                                           borderRadius: 1,
@@ -521,7 +571,14 @@ export const ProductsTable = (props: any) => {
                                                                                      color="text.secondary"
                                                                                      variant="body2"
                                                                                 >
-                                                                                     in {product.mainCategory}
+                                                                                     in {product.main_category}
+                                                                                </Typography>
+                                                                                <Typography
+                                                                                     key={Math.random()}
+                                                                                     color="text.secondary"
+                                                                                     variant="body2"
+                                                                                >
+                                                                                     Proizvođač: {product.manufacturer_name ?? product.manufacturer_id ?? '-'}
                                                                                 </Typography>
                                                                            </Box>
                                                                       </Box>
@@ -542,7 +599,7 @@ export const ProductsTable = (props: any) => {
                                                                            color="text.secondary"
                                                                            variant="body2"
                                                                       >
-                                                                           {product.availableStock} in stock
+                                                                           {product.available_stock} in stock
                                                                            {/* {hasManyVariants && ` in ${product.variants} variants`} */}
                                                                       </Typography>
                                                                  </TableCell>
@@ -552,11 +609,11 @@ export const ProductsTable = (props: any) => {
                                                                       <SeverityPill key={Math.random()} color={statusColor}>{product.discount.toString()}</SeverityPill>
                                                                  </TableCell>
                                                                  <TableCell key={Math.random()}>
-                                                                      <SeverityPill key={Math.random()} color={statusColor}>{product.discountAmount}</SeverityPill>
+                                                                      <SeverityPill key={Math.random()} color={statusColor}>{product.discount_amount}</SeverityPill>
                                                                  </TableCell>
                                                                  <TableCell key={Math.random()}>
                                                                       <SeverityPill key={Math.random()} color={homeColor}>
-                                                                           {product.displayOnHome ? 'Da' : 'Ne'}
+                                                                           {product.display_on_home ? 'Da' : 'Ne'}
                                                                       </SeverityPill>
                                                                  </TableCell>
                                                             </TableRow>
@@ -626,7 +683,7 @@ export const ProductsTable = (props: any) => {
                                                                                                     size={{ md: 6, xs: 12 }}
                                                                                                >
                                                                                                     <TextField key={Math.random()}
-                                                                                                         defaultValue={currentProductObject?.mainCategory}
+                                                                                                         defaultValue={currentProductObject?.main_category}
                                                                                                          fullWidth
                                                                                                          label="Glavna Kategorija"
                                                                                                          select
@@ -634,7 +691,7 @@ export const ProductsTable = (props: any) => {
                                                                                                          onBlur={(e: any) =>
                                                                                                               setCurrentProductObject((previousObject: any) => ({
                                                                                                                    ...previousObject,
-                                                                                                                   mainCategory: e.target.value
+                                                                                                                   main_category: e.target.value
                                                                                                               }))
                                                                                                          }
                                                                                                     >
@@ -652,7 +709,7 @@ export const ProductsTable = (props: any) => {
                                                                                                     size={{ md: 6, xs: 12 }}
                                                                                                >
                                                                                                     <TextField key={Math.random()}
-                                                                                                         defaultValue={currentProductObject?.midCategory}
+                                                                                                         defaultValue={currentProductObject?.mid_category}
                                                                                                          fullWidth
                                                                                                          label="Mid Kategorija"
                                                                                                          select
@@ -661,7 +718,7 @@ export const ProductsTable = (props: any) => {
                                                                                                          onBlur={(e: any) =>
                                                                                                               setCurrentProductObject((previousObject: any) => ({
                                                                                                                    ...previousObject,
-                                                                                                                   midCategory: e.target.value
+                                                                                                                   mid_category: e.target.value
 
                                                                                                               }))
                                                                                                          }
@@ -680,7 +737,7 @@ export const ProductsTable = (props: any) => {
                                                                                                     size={{ md: 6, xs: 12 }}
                                                                                                >
                                                                                                     <TextField key={Math.random()}
-                                                                                                         defaultValue={currentProductObject?.subCategory}
+                                                                                                         defaultValue={currentProductObject?.sub_category}
                                                                                                          fullWidth
                                                                                                          label="Sub Kategorija"
                                                                                                          select
@@ -688,7 +745,7 @@ export const ProductsTable = (props: any) => {
                                                                                                          onBlur={(e: any) =>
                                                                                                               setCurrentProductObject((previousObject: any) => ({
                                                                                                                    ...previousObject,
-                                                                                                                   subCategory: e.target.value
+                                                                                                                   sub_category: e.target.value
 
                                                                                                               }))
                                                                                                          }
@@ -780,7 +837,7 @@ export const ProductsTable = (props: any) => {
                                                                                                     size={{ md: 6, xs: 12 }}
                                                                                                >
                                                                                                     <TextField key={Math.random()}
-                                                                                                         defaultValue={currentProductObject?.promotionText}
+                                                                                                         defaultValue={currentProductObject?.promotion_text}
                                                                                                          fullWidth
                                                                                                          disabled={!currentProductObject?.promoting}
                                                                                                          label="Promo tekst"
@@ -788,7 +845,7 @@ export const ProductsTable = (props: any) => {
                                                                                                          onBlur={(e: any) =>
                                                                                                               setCurrentProductObject((previousObject: any) => ({
                                                                                                                    ...previousObject,
-                                                                                                                   promotionText: e.target.value
+                                                                                                                   promotion_text: e.target.value
 
                                                                                                               }))
                                                                                                          }
@@ -837,13 +894,25 @@ export const ProductsTable = (props: any) => {
                                                                                                     <Autocomplete
                                                                                                          fullWidth
                                                                                                          options={manufacturerOptions}
-                                                                                                         value={
-                                                                                                              manufacturerOptions.find(
-                                                                                                                   (option: any) => option.label === currentProductObject?.manufacturer
-                                                                                                              ) || null
-                                                                                                         }
+                                                                                                         value={getManufacturerOptionFromProduct(currentProductObject)}
                                                                                                          getOptionLabel={(option: any) => option?.label || ''}
-                                                                                                         isOptionEqualToValue={(option: any, value: any) => option?.value === value?.value}
+                                                                                                         isOptionEqualToValue={(option: any, value: any) => {
+                                                                                                              const optionKeys = [
+                                                                                                                   normalizeKey(option?.id),
+                                                                                                                   normalizeKey(option?.value),
+                                                                                                                   normalizeKey(option?.url),
+                                                                                                                   normalizeKey(option?.label)
+                                                                                                              ].filter(Boolean);
+
+                                                                                                              const valueKeys = [
+                                                                                                                   normalizeKey(value?.id),
+                                                                                                                   normalizeKey(value?.value),
+                                                                                                                   normalizeKey(value?.url),
+                                                                                                                   normalizeKey(value?.label)
+                                                                                                              ].filter(Boolean);
+
+                                                                                                              return optionKeys.some((key: string) => valueKeys.includes(key));
+                                                                                                         }}
                                                                                                          onChange={(event, newValue) => {
                                                                                                               setCurrentProductObject((previousObject: any) => {
                                                                                                                    if (!previousObject) {
@@ -853,7 +922,8 @@ export const ProductsTable = (props: any) => {
                                                                                                                    return {
                                                                                                                         ...previousObject,
                                                                                                                         manufacturer: newValue?.label || '',
-                                                                                                                        manufacturerURL: newValue?.value || ''
+                                                                                                                        manufacturerURL: newValue?.value || '',
+                                                                                                                        manufacturer_id: newValue?.id || newValue?.value || ''
                                                                                                                    };
                                                                                                               });
                                                                                                          }}
@@ -878,15 +948,15 @@ export const ProductsTable = (props: any) => {
                                                                                                     size={{ md: 6, xs: 12 }}
                                                                                                >
                                                                                                     <TextField key={Math.random()}
-                                                                                                         defaultValue={currentProductObject?.availableStock}
+                                                                                                         defaultValue={currentProductObject?.available_stock}
                                                                                                          fullWidth
                                                                                                          disabled={loading}
                                                                                                          label="Na stanju"
-                                                                                                         name="availableStock"
+                                                                                                         name="available_stock"
                                                                                                          onBlur={(e: any) =>
                                                                                                               setCurrentProductObject((previousObject: any) => ({
                                                                                                                    ...previousObject,
-                                                                                                                   availableStock: e.target.valueAsNumber
+                                                                                                                   available_stock: e.target.valueAsNumber
 
                                                                                                               }))
                                                                                                          }
@@ -897,11 +967,11 @@ export const ProductsTable = (props: any) => {
                                                                                                     size={{ md: 6, xs: 12 }}
                                                                                                >
                                                                                                     <TextField key={Math.random()}
-                                                                                                         defaultValue={currentProductObject?.discountAmount}
+                                                                                                         defaultValue={currentProductObject?.discount_amount}
                                                                                                          fullWidth
                                                                                                          disabled={!currentProductObject?.discount}
                                                                                                          label="Iznos popusta"
-                                                                                                         name="discountAmount"
+                                                                                                         name="discount_amount"
                                                                                                          onBlur={(e) => {
                                                                                                               const min = 0;
                                                                                                               const max = 100;
@@ -942,7 +1012,7 @@ export const ProductsTable = (props: any) => {
                                                                                                     size={{ md: 6, xs: 12 }}
                                                                                                >
                                                                                                     <TextField key={Math.random()}
-                                                                                                         defaultValue={currentProductObject?.quantityUnit}
+                                                                                                         defaultValue={currentProductObject?.quantity_unit}
                                                                                                          select
                                                                                                          fullWidth
                                                                                                          label="Jedinica mere"
@@ -950,7 +1020,7 @@ export const ProductsTable = (props: any) => {
                                                                                                          onBlur={(e: any) =>
                                                                                                               setCurrentProductObject((previousObject: any) => ({
                                                                                                                    ...previousObject,
-                                                                                                                   quantityUnit: e.target.value
+                                                                                                                   quantity_unit: e.target.value
 
                                                                                                               }))
                                                                                                          }
@@ -972,10 +1042,10 @@ export const ProductsTable = (props: any) => {
                                                                                                          display: 'flex',
                                                                                                     }}
                                                                                                >
-                                                                                                    <Switch key={Math.random()} disabled={loading} checked={currentProductObject!.isActive}
+                                                                                                    <Switch key={Math.random()} disabled={loading} checked={currentProductObject!.is_active}
                                                                                                          onChange={() => setCurrentProductObject((previousObject: any) => ({
                                                                                                               ...previousObject,
-                                                                                                              isActive: !previousObject.isActive
+                                                                                                              is_active: !previousObject.is_active
                                                                                                          }))}
                                                                                                     />
                                                                                                     <Typography key={Math.random()} variant="subtitle2">
@@ -989,10 +1059,10 @@ export const ProductsTable = (props: any) => {
                                                                                                          display: 'flex',
                                                                                                     }}
                                                                                                >
-                                                                                                    <Switch key={Math.random()} disabled={loading} checked={currentProductObject!.newArrival}
+                                                                                                    <Switch key={Math.random()} disabled={loading} checked={currentProductObject!.new_arrival}
                                                                                                          onChange={() => setCurrentProductObject((previousObject: any) => ({
                                                                                                               ...previousObject,
-                                                                                                              newArrival: !previousObject.newArrival
+                                                                                                              new_arrival: !previousObject.new_arrival
                                                                                                          }))}
                                                                                                     />
                                                                                                     <Typography key={Math.random()} variant="subtitle2">
@@ -1007,10 +1077,10 @@ export const ProductsTable = (props: any) => {
                                                                                                     }}
                                                                                                >
                                                                                                     <Switch key={Math.random()} disabled={loading}
-                                                                                                         checked={currentProductObject!.bestSeller}
+                                                                                                         checked={currentProductObject!.best_seller}
                                                                                                          onChange={() => setCurrentProductObject((previousObject: any) => ({
                                                                                                               ...previousObject,
-                                                                                                              bestSeller: !previousObject.bestSeller
+                                                                                                              best_seller: !previousObject.best_seller
 
                                                                                                          }))}
                                                                                                     />
@@ -1060,10 +1130,10 @@ export const ProductsTable = (props: any) => {
                                                                                                     }}
                                                                                                >
                                                                                                     <Switch key={Math.random()} disabled={loading}
-                                                                                                         checked={!!currentProductObject?.displayOnHome}
+                                                                                                         checked={!!currentProductObject?.display_on_home}
                                                                                                          onChange={() => setCurrentProductObject((previousObject: any) => ({
                                                                                                               ...previousObject,
-                                                                                                              displayOnHome: !previousObject.displayOnHome
+                                                                                                              display_on_home: !previousObject.display_on_home
                                                                                                          }))}
                                                                                                     />
                                                                                                     <Typography key={Math.random()} variant="subtitle2">
@@ -1219,9 +1289,9 @@ export const ProductsTable = (props: any) => {
                                                                                                          onChange={async (e: any) => await handleImageChange(e)}
                                                                                                     />
                                                                                                </Button>
-                                                                                               {currentProductObject?.imageURL?.length ? (
+                                                                                               {currentProductObject?.image_url?.length ? (
                                                                                                     <Image
-                                                                                                         src={currentProductObject!.imageURL}
+                                                                                                         src={currentProductObject!.image_url}
                                                                                                          alt='Uploaded Image'
                                                                                                          width={300}
                                                                                                          height={300}

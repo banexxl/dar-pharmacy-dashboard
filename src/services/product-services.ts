@@ -1,10 +1,19 @@
+import 'server-only';
+
 import { fetchRows } from '@/services/supabase';
-import { Product, hydrateProducts } from '../schemas/product';
+import { Product } from '../schemas/product';
+
+type Manufacturer = {
+     id?: string | number;
+     value?: string | null;
+     name?: string | null;
+     url?: string | null;
+};
 
 const sortByUpdatedAtDesc = (products: Product[]) => {
      return [...products].sort((left, right) => {
-          const leftDate = new Date(left.updated_at ?? left.updatedAt ?? 0).getTime();
-          const rightDate = new Date(right.updated_at ?? right.updatedAt ?? 0).getTime();
+          const leftDate = new Date(left.updated_at ?? 0).getTime();
+          const rightDate = new Date(right.updated_at ?? 0).getTime();
 
           return rightDate - leftDate;
      });
@@ -12,7 +21,79 @@ const sortByUpdatedAtDesc = (products: Product[]) => {
 
 const toLowerText = (value: unknown) => String(value ?? '').toLowerCase();
 
+const normalizeKey = (value: unknown) => String(value ?? '').trim().toLowerCase();
+
+const enrichProductsWithManufacturers = (products: Product[], manufacturers: Manufacturer[]) => {
+     const manufacturersById = new Map<string, Manufacturer>();
+     const manufacturersByValue = new Map<string, Manufacturer>();
+     const manufacturersByName = new Map<string, Manufacturer>();
+     const manufacturersByUrl = new Map<string, Manufacturer>();
+
+     manufacturers.forEach((manufacturer) => {
+          const normalizedId = normalizeKey(manufacturer.id);
+          const normalizedValue = normalizeKey(manufacturer.value);
+          const normalizedName = normalizeKey(manufacturer.name);
+          const normalizedUrl = normalizeKey(manufacturer.url);
+
+          if (normalizedId) {
+               manufacturersById.set(normalizedId, manufacturer);
+          }
+
+          if (normalizedValue) {
+               manufacturersByValue.set(normalizedValue, manufacturer);
+          }
+
+          if (normalizedName) {
+               manufacturersByName.set(normalizedName, manufacturer);
+          }
+
+          if (normalizedUrl) {
+               manufacturersByUrl.set(normalizedUrl, manufacturer);
+          }
+     });
+
+     return products.map((product) => {
+          const lookupKeys = [
+               normalizeKey(product.manufacturer_id),
+               normalizeKey(product.manufacturer_value),
+               normalizeKey(product.manufacturer_name),
+               normalizeKey(product.manufacturer_url)
+          ].filter(Boolean);
+
+          const matchedManufacturer = lookupKeys
+               .map((key) => {
+                    return (
+                         manufacturersById.get(key) ||
+                         manufacturersByValue.get(key) ||
+                         manufacturersByUrl.get(key) ||
+                         manufacturersByName.get(key)
+                    );
+               })
+               .find(Boolean);
+
+          if (!matchedManufacturer) {
+               return product;
+          }
+
+          return {
+               ...product,
+               manufacturer_name: matchedManufacturer.name ?? product.manufacturer_name ?? null,
+               manufacturer_value: matchedManufacturer.value ?? product.manufacturer_value ?? null,
+               manufacturer_url: matchedManufacturer.url ?? product.manufacturer_url ?? null,
+          };
+     });
+};
+
 export const productsServices = () => {
+     const fetchProductsWithManufacturers = async () => {
+          const [products, manufacturers] = await Promise.all([
+               fetchRows<Product>(['products']),
+               fetchRows<Manufacturer>(['manufacturers'], { column: 'name', ascending: true })
+          ]);
+
+          return enrichProductsWithManufacturers(products, manufacturers);
+     };
+
      const getProductsByPage = async (page: any, limit: any) => {
           const parsedLimit = parseInt(limit, 10);
 
@@ -22,7 +103,7 @@ export const productsServices = () => {
 
           try {
                const skip = page * parsedLimit;
-               const products = hydrateProducts(await fetchRows<Product>(['products']));
+               const products = await fetchProductsWithManufacturers();
 
                return sortByUpdatedAtDesc(products).slice(skip, skip + parsedLimit);
           } catch (error) {
@@ -42,8 +123,8 @@ export const productsServices = () => {
 
      const getProductsForHomePage = async () => {
           try {
-               const products = hydrateProducts(await fetchRows<Product>(['products']));
-               return products.filter((product) => Boolean(product.display_on_home ?? product.displayOnHome));
+               const products = await fetchProductsWithManufacturers();
+               return products.filter((product) => Boolean(product.display_on_home));
           } catch (error) {
                return { message: error };
           }
@@ -51,7 +132,7 @@ export const productsServices = () => {
 
      const getProductById = async (id: string) => {
           try {
-               const products = hydrateProducts(await fetchRows<Product>(['products']));
+               const products = await fetchProductsWithManufacturers();
                const product = products.find((item) => String(item.id) === id);
                return product ?? null;
           } catch (error) {
@@ -61,8 +142,8 @@ export const productsServices = () => {
 
      const getProductsByManufacturer = async (manufacturer: string) => {
           try {
-               const products = hydrateProducts(await fetchRows<Product>(['products']));
-               return products.filter((product) => product.manufacturer_id === manufacturer || product.manufacturer === manufacturer);
+               const products = await fetchProductsWithManufacturers();
+               return products.filter((product) => product.manufacturer_id === manufacturer || product.manufacturer_name === manufacturer || product.manufacturer_value === manufacturer);
           } catch (error) {
                return { message: error };
           }
@@ -70,12 +151,12 @@ export const productsServices = () => {
 
      const getProductsByNameAndOrManufacturer = async (searchTerm: string) => {
           try {
-               const products = hydrateProducts(await fetchRows<Product>(['products']));
+               const products = await fetchProductsWithManufacturers();
                const searchTerms = searchTerm.split(' ').map((term) => term.trim()).filter(Boolean).map(toLowerText);
 
                return products.filter((product) => {
                     const name = toLowerText(product.name);
-                    const manufacturer = toLowerText(product.manufacturer ?? product.manufacturer_id);
+                    const manufacturer = toLowerText(product.manufacturer_name ?? product.manufacturer_id);
 
                     return searchTerms.some((term) => name.includes(term) || manufacturer.includes(term));
                });
@@ -86,7 +167,7 @@ export const productsServices = () => {
 
      const getProductsByDiscount = async () => {
           try {
-               const products = hydrateProducts(await fetchRows<Product>(['products']));
+               const products = await fetchProductsWithManufacturers();
                return products.filter((product) => Boolean(product.discount));
           } catch (error) {
                return { message: error };
@@ -95,8 +176,8 @@ export const productsServices = () => {
 
      const getProductsByMainCategory = async (mainCategory: string) => {
           try {
-               const products = hydrateProducts(await fetchRows<Product>(['products']));
-               return products.filter((product) => (product.main_category ?? product.mainCategory) === mainCategory);
+               const products = await fetchProductsWithManufacturers();
+               return products.filter((product) => product.main_category === mainCategory);
           } catch (error) {
                return { message: error };
           }
@@ -104,9 +185,9 @@ export const productsServices = () => {
 
      const getProductsByMainCategoryMidCategory = async (mainCategory: string, midCategory: string) => {
           try {
-               const products = hydrateProducts(await fetchRows<Product>(['products']));
+               const products = await fetchProductsWithManufacturers();
                return products
-                    .filter((product) => (product.main_category ?? product.mainCategory) === mainCategory && (product.mid_category ?? product.midCategory) === midCategory)
+                    .filter((product) => product.main_category === mainCategory && product.mid_category === midCategory)
                     ;
           } catch (error) {
                return { message: error };
@@ -115,9 +196,9 @@ export const productsServices = () => {
 
      const getProductsByMainCategoryMidCategorySubCategory = async (mainCategory: string, midCategory: string, subCategory: string) => {
           try {
-               const products = hydrateProducts(await fetchRows<Product>(['products']));
+               const products = await fetchProductsWithManufacturers();
                return products
-                    .filter((product) => (product.main_category ?? product.mainCategory) === mainCategory && (product.mid_category ?? product.midCategory) === midCategory && (product.sub_category ?? product.subCategory) === subCategory)
+                    .filter((product) => product.main_category === mainCategory && product.mid_category === midCategory && product.sub_category === subCategory)
                     ;
           } catch (error) {
                return { message: error };
@@ -135,8 +216,7 @@ export const productsServices = () => {
 
      const getAllProducts = async () => {
           try {
-               const products = await fetchRows<Product>(['products']);
-               return hydrateProducts(products);
+               return await fetchProductsWithManufacturers();
           } catch (error) {
                return { message: error };
           }
@@ -144,7 +224,7 @@ export const productsServices = () => {
 
      const getLastNumberOfProducts = async (numberOfProducts: number) => {
           try {
-               const products = hydrateProducts(await fetchRows<Product>(['products']));
+               const products = await fetchProductsWithManufacturers();
                return sortByUpdatedAtDesc(products).slice(0, numberOfProducts);
           } catch (error) {
                return { message: (error as Error).message };

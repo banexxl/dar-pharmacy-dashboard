@@ -281,14 +281,14 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail, manufacturers = 
                                    <TextField
                                         fullWidth
                                         label="Glavna kategorija"
-                                        name="mainCategory"
+                                        name="main_category"
                                         onBlur={formik.handleBlur}
                                         disabled={loading}
                                         onChange={formik.handleChange}
                                         select
-                                        error={formik.touched.mainCategory && !!formik.errors.mainCategory}
-                                        helperText={formik.touched.mainCategory && formik.errors.mainCategory}
-                                        value={formik.values.mainCategory}
+                                        error={formik.touched.main_category && !!formik.errors.main_category}
+                                        helperText={formik.touched.main_category && formik.errors.main_category}
+                                        value={formik.values.main_category}
                                    >
                                         {mainCategoryOptions.map((option: any) => (
                                              <MenuItem
@@ -303,7 +303,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail, manufacturers = 
                                    <TextField
                                         fullWidth
                                         label="Mid kategorija"
-                                        name="midCategory"
+                                        name="mid_category"
                                         onBlur={formik.handleBlur}
                                         disabled={loading}
                                         onChange={(event) => {
@@ -311,9 +311,9 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail, manufacturers = 
                                              handleMidCategoryChange(event); // Call custom function to handle midCategory change
                                         }}
                                         select
-                                        error={formik.touched.midCategory && !!formik.errors.midCategory}
-                                        helperText={formik.touched.midCategory && formik.errors.midCategory}
-                                        value={formik.values.midCategory}
+                                        error={formik.touched.mid_category && !!formik.errors.mid_category}
+                                        helperText={formik.touched.mid_category && formik.errors.mid_category}
+                                        value={formik.values.mid_category}
                                    >
                                         {midCategoryOptions.map((option) => (
                                              <MenuItem key={option.value} value={option.value}>
@@ -325,13 +325,13 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail, manufacturers = 
                                    <TextField
                                         fullWidth
                                         label="Sub kategorija"
-                                        name="subCategory"
+                                        name="sub_category"
                                         onBlur={formik.handleBlur}
                                         onChange={formik.handleChange}
                                         select
-                                        error={formik.touched.subCategory && !!formik.errors.subCategory}
-                                        helperText={formik.touched.subCategory && formik.errors.subCategory}
-                                        value={formik.values.subCategory}
+                                        error={formik.touched.sub_category && !!formik.errors.sub_category}
+                                        helperText={formik.touched.sub_category && formik.errors.sub_category}
+                                        value={formik.values.sub_category}
                                         disabled={!isSubCategoryEnabled || loading}
                                    >
                                         {subCategoryOptions ?
@@ -350,12 +350,12 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail, manufacturers = 
 
                                    <TextField
                                         label="Na stanju komada"
-                                        name="availableStock"
-                                        value={formik.values.availableStock}
+                                        name="available_stock"
+                                        value={formik.values.available_stock}
                                         disabled={loading}
                                         onChange={formik.handleChange}
-                                        error={formik.touched.availableStock && !!formik.errors.availableStock}
-                                        helperText={formik.touched.availableStock && formik.errors.availableStock}
+                                        error={formik.touched.available_stock && !!formik.errors.available_stock}
+                                        helperText={formik.touched.available_stock && formik.errors.available_stock}
                                         type='number'
                                    />
 
@@ -403,14 +403,14 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail, manufacturers = 
                                    <TextField
                                         fullWidth
                                         label="Jedinica mere"
-                                        name="quantityUnit"
+                                        name="quantity_unit"
                                         onBlur={formik.handleBlur}
                                         disabled={loading}
                                         onChange={formik.handleChange}
                                         select
-                                        error={formik.touched.quantityUnit && !!formik.errors.quantityUnit}
-                                        helperText={formik.touched.quantityUnit && formik.errors.quantityUnit}
-                                        value={formik.values.quantityUnit}
+                                        error={formik.touched.quantity_unit && !!formik.errors.quantity_unit}
+                                        helperText={formik.touched.quantity_unit && formik.errors.quantity_unit}
+                                        value={formik.values.quantity_unit}
                                    >
                                         {quantityUnitOptions.map((option: any) => (
                                              <MenuItem
@@ -427,14 +427,14 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail, manufacturers = 
                                         options={manufacturerOptions}
                                         value={
                                              manufacturerOptions.find(
-                                                  (option: any) => option.label === formik.values.manufacturer
+                                                  (option: any) => option.label === formik.values.manufacturer_name
                                              ) || null
                                         }
                                         getOptionLabel={(option: any) => option?.label || ''}
                                         isOptionEqualToValue={(option: any, value: any) => option?.value === value?.value}
                                         onChange={(event, newValue) => {
-                                             formik.setFieldValue('manufacturer', newValue?.label || '');
-                                             formik.setFieldValue('manufacturerURL', newValue?.value || '');
+                                             formik.setFieldValue('manufacturer_name', newValue?.label || '');
+                                             formik.setFieldValue('manufacturer_url', newValue?.value || '');
                                         }}
                                         disabled={loading}
                                         ListboxProps={{
@@ -447,9 +447,9 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail, manufacturers = 
                                              <TextField
                                                   {...params}
                                                   label="Proizvodjac"
-                                                  name="manufacturer"
-                                                  error={formik.touched.manufacturer && !!formik.errors.manufacturer}
-                                                  helperText={formik.touched.manufacturer && formik.errors.manufacturer}
+                                                  name="manufacturer_name"
+                                                  error={formik.touched.manufacturer_name && !!formik.errors.manufacturer_name}
+                                                  helperText={formik.touched.manufacturer_name && formik.errors.manufacturer_name}
                                              />
                                         )}
                                    />
@@ -487,8 +487,8 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail, manufacturers = 
                                    <FormControlLabel
                                         control={
                                              <Checkbox
-                                                  name="isActive"
-                                                  checked={formik.values.isActive}
+                                                  name="is_active"
+                                                  checked={formik.values.is_active}
                                                   onChange={formik.handleChange}
                                              />
                                         }
@@ -499,8 +499,8 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail, manufacturers = 
                                    <FormControlLabel
                                         control={
                                              <Checkbox
-                                                  name="displayOnHome"
-                                                  checked={formik.values.displayOnHome}
+                                                  name="display_on_home"
+                                                  checked={formik.values.display_on_home}
                                                   onChange={formik.handleChange}
                                              />
                                         }
@@ -511,8 +511,8 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail, manufacturers = 
                                    <FormControlLabel
                                         control={
                                              <Checkbox
-                                                  name="newArrival"
-                                                  checked={formik.values.newArrival}
+                                                  name="new_arrival"
+                                                  checked={formik.values.new_arrival}
                                                   onChange={formik.handleChange}
                                              />
                                         }
@@ -523,8 +523,8 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail, manufacturers = 
                                    <FormControlLabel
                                         control={
                                              <Checkbox
-                                                  name="bestSeller"
-                                                  checked={formik.values.bestSeller}
+                                                  name="best_seller"
+                                                  checked={formik.values.best_seller}
                                                   onChange={formik.handleChange}
                                              />
                                         }
@@ -547,8 +547,8 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail, manufacturers = 
                                    <TextField
                                         label="Iznos popusta"
                                         type='number'
-                                        name="discountAmount"
-                                        value={formik.values.discountAmount}
+                                        name="discount_amount"
+                                        value={formik.values.discount_amount}
                                         onChange={(e) => {
                                              const min = 0;
                                              const max = 100;
@@ -557,7 +557,7 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail, manufacturers = 
                                              if (value > max) value = max;
                                              if (value < min) value = min;
 
-                                             formik.setFieldValue('discountAmount', value);
+                                             formik.setFieldValue('discount_amount', value);
                                         }}
                                         disabled={loading}
                                         InputProps={{ inputProps: { min: 0, max: 100 } }}
