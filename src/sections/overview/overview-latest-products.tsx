@@ -32,7 +32,7 @@ export const OverviewLatestProducts = (props: any) => {
         {products.map((product: Product, index: number) => {
           const hasDivider = index < products.length - 1;
           // Convert updatedAt to a Date object
-          const updatedAtDate = new Date(product.updated_at ?? product.updatedAt ?? 0);
+          const updatedAtDate = new Date(product.updated_at ?? 0);
           const ago = formatDistanceToNow(updatedAtDate);
 
           return (
@@ -42,11 +42,11 @@ export const OverviewLatestProducts = (props: any) => {
             >
               <ListItemAvatar>
                 {
-                  (product.image_url ?? product.imageURL)
+                  product.image_url
                     ? (
                       <Box
                         component="img"
-                        src={product.image_url ?? product.imageURL ?? ''}
+                        src={product.image_url ?? ''}
                         sx={{
                           borderRadius: 1,
                           height: 48,

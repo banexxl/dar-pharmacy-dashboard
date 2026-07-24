@@ -1,3 +1,5 @@
+'use client';
+
 import PropTypes from 'prop-types';
 import NextLink from 'next/link';
 import Image from 'next/image'

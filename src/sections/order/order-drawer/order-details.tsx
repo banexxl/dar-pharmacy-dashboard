@@ -191,7 +191,7 @@ export const OrderDetails = (props: OrderDetailsProps) => {
                       {item.name}
                     </TableCell>
                     {/* <TableCell>{item.billingCycle}</TableCell> */}
-                    <TableCell>{item.quantity}/{item.quantityUnit}</TableCell>
+                    <TableCell>{item.quantity}/{item.quantity_unit}</TableCell>
                     <TableCell>
                       {item.count}
                     </TableCell>

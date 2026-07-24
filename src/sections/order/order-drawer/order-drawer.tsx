@@ -12,7 +12,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { OrderDetails } from './order-details';
 import { OrderEdit } from './order-edit';
 import Swal from 'sweetalert2';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 export const OrderDrawer = (props: any) => {
   const { container, onClose, open, order } = props;
@@ -71,7 +71,7 @@ export const OrderDrawer = (props: any) => {
   }
 
 
-  let content = null;
+  let content: React.ReactNode = null;
 
   if (order) {
     content = (

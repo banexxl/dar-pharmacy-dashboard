@@ -22,7 +22,7 @@ import { ItemIcon } from './item-icon';
 import { ItemMenu } from './item-menu';
 import { Item } from '@/schemas/file-manager';
 import { bytesToSize } from '@/utils/bytes-to-size';
-import { useRouter } from 'next/router';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 interface ItemListCardProps {
   item: Item;
@@ -48,18 +48,18 @@ export const ItemListCard: FC<ItemListCardProps> = (props) => {
   }
 
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams()!;
 
   const handleDoubleClick = (item: any) => {
     if (item.type === 'folder') {
       // Get the current 'putanja' query parameter
-      const currentPath = router.query.putanja || '';
+      const currentPath = searchParams.get('putanja') || '';
       const newPath = currentPath ? `${currentPath}/${item.name}` : item.name; // Append the folder name
 
-      // Navigate to the new path with the updated query
-      router.push({
-        pathname: router.pathname, // Keep the same path
-        query: { ...router.query, putanja: newPath }, // Update the query parameter
-      });
+      const params = new URLSearchParams(searchParams.toString());
+      params.set('putanja', newPath);
+      router.push(`${pathname}?${params.toString()}`);
     } else {
       onOpen?.(item.id); // Open the file
     }

@@ -1,0 +1,28 @@
+'use client';
+
+import { Box, Container, Stack, Typography } from '@mui/material';
+import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
+import { SessionProvider } from 'next-auth/react';
+
+const Page = () => (
+  <SessionProvider>
+    <Box
+      component="main"
+      sx={{
+        flexGrow: 1,
+        py: 8
+      }}
+    >
+      <Container maxWidth="lg">
+        <Stack spacing={3}>
+          <Typography variant="h4">
+            Settings
+          </Typography>
+        </Stack>
+      </Container>
+    </Box>
+  </SessionProvider>
+);
+
+
+export default Page;
