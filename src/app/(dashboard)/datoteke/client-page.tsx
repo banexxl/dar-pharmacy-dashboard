@@ -15,7 +15,6 @@ import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
 import { useDialog } from 'src/hooks/use-dialog';
 import { useMounted } from 'src/hooks/use-mounted';
 // import { useSettings } from 'src/hooks/use-settings';
-import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { ItemSearch } from '@/sections/file-manager/item-search';
 import { ItemList } from '@/sections/file-manager/item-list';
 import { StorageStats } from '@/sections/file-manager/storage-stats';
@@ -25,8 +24,6 @@ import { Item } from '@/schemas/file-manager';
 import { Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material';
 import toast from 'react-hot-toast';
 import { useRouter, useSearchParams } from 'next/navigation';
-
-import { S3Client, ListObjectsV2Command } from '@aws-sdk/client-s3';
 
 type View = 'grid' | 'list';
 

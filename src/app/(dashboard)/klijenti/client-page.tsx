@@ -6,7 +6,6 @@ import ArrowUpOnSquareIcon from '@heroicons/react/24/solid/ArrowUpOnSquareIcon';
 import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
 import { Box, Button, Container, Stack, SvgIcon, TablePagination, Typography } from '@mui/material';
 import { useSelection } from 'src/hooks/use-selection';
-import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { CustomersSearch } from 'src/sections/customer/customers-search';
 import { SessionProvider } from 'next-auth/react';
 import { CustomersTable } from '@/sections/customer/customers-table';

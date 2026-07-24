@@ -1,7 +1,6 @@
 'use client';
 
 import { Box, Container, Grid } from '@mui/material';
-import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { OverviewBudget } from 'src/sections/overview/overview-budget';
 import { OverviewLatestProducts } from 'src/sections/overview/overview-latest-products';
 import { OverviewTotalCustomers } from 'src/sections/overview/overview-total-customers';

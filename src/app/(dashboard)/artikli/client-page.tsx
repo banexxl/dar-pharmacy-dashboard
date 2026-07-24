@@ -7,7 +7,6 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Swal from 'sweetalert2'
 import { Box, Button, Card, Container, IconButton, Input, InputAdornment, OutlinedInput, Stack, SvgIcon, Tab, Tabs, TextField, Theme, Typography, useMediaQuery } from '@mui/material';
 import { useSelection } from 'src/hooks/use-selection';
-import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { ProductsTable } from 'src/sections/products/products-table';
 import { useRouter } from 'next/navigation';
 import { TablePagination } from '@mui/material'
@@ -532,7 +531,7 @@ const Page = (props: any) => {
 
                                                             return (
                                                                  <Box
-                                                                          key={logo.id}
+                                                                      key={logo.id}
                                                                       sx={{
                                                                            display: 'flex',
                                                                            gap: 2,
@@ -559,7 +558,7 @@ const Page = (props: any) => {
                                                                            <TextField
                                                                                 label="Naziv"
                                                                                 value={isEditing ? draft.name : logo.name}
-                                                                                  onChange={(event) => handleLogoDraftChange(logo.id, 'name', event.target.value)}
+                                                                                onChange={(event) => handleLogoDraftChange(logo.id, 'name', event.target.value)}
                                                                                 disabled={!isEditing}
                                                                                 size="small"
                                                                                 sx={{ minWidth: 200 }}
@@ -567,7 +566,7 @@ const Page = (props: any) => {
                                                                            <TextField
                                                                                 label="Value"
                                                                                 value={isEditing ? draft.value : logo.value}
-                                                                                  onChange={(event) => handleLogoDraftChange(logo.id, 'value', event.target.value)}
+                                                                                onChange={(event) => handleLogoDraftChange(logo.id, 'value', event.target.value)}
                                                                                 disabled
                                                                                 size="small"
                                                                                 sx={{ minWidth: 200 }}

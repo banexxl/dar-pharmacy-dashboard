@@ -13,7 +13,6 @@ import { OrderListContainer } from '@/sections/order/order-list-container';
 import { OrderListTable, SortBy, SortDir } from '@/sections/order/order-list-table';
 import { OrderListSearch } from '@/sections/order/order-list-search';
 import { Order } from '@/schemas/order';
-import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { useDialog } from '@/hooks/use-dialog';
 import { useMounted } from '@/hooks/use-mounted';
 import { TablePagination } from '@mui/material'

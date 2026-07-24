@@ -1,12 +1,12 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { styled } from '@mui/material/styles';
-import { withAuthGuard } from 'src/hocs/with-auth-guard';
-import { SideNav } from './side-nav';
-import { TopNav } from './top-nav';
 import { useSession } from 'next-auth/react';
+
+import { TopNav } from '@/components/top-nav';
+import { SideNav } from '@/components/side-nav';
 
 const SIDE_NAV_WIDTH = 280;
 
@@ -14,48 +14,44 @@ const LayoutRoot = styled('div')(({ theme }) => ({
      display: 'flex',
      flex: '1 1 auto',
      maxWidth: '100%',
+
      [theme.breakpoints.up('lg')]: {
-          paddingLeft: SIDE_NAV_WIDTH
-     }
+          paddingLeft: SIDE_NAV_WIDTH,
+     },
 }));
 
 const LayoutContainer = styled('div')({
      display: 'flex',
      flex: '1 1 auto',
      flexDirection: 'column',
-     width: '100%'
+     width: '100%',
 });
 
-export const Layout = withAuthGuard((props: any) => {
-     const { children } = props;
+export default function DashboardLayout({
+     children,
+}: {
+     children: React.ReactNode;
+}) {
      const pathname = usePathname();
      const [openNav, setOpenNav] = useState(false);
      const session = useSession();
 
-     const handlePathnameChange = useCallback(
-          () => {
-               if (openNav) {
-                    setOpenNav(false);
-               }
-          },
-          [openNav]
-     );
-
-     useEffect(
-          () => {
-               handlePathnameChange();
-          },
-          // eslint-disable-next-line react-hooks/exhaustive-deps
-          [pathname]
-     );
+     useEffect(() => {
+          setOpenNav(false);
+     }, [pathname]);
 
      return (
           <>
-               <TopNav onNavOpen={() => setOpenNav(true)} session={session} />
-               <SideNav
-                    onClose={() => setOpenNav(false)}
-                    open={openNav}
+               <TopNav
+                    onNavOpen={() => setOpenNav(true)}
+                    session={session}
                />
+
+               <SideNav
+                    open={openNav}
+                    onClose={() => setOpenNav(false)}
+               />
+
                <LayoutRoot>
                     <LayoutContainer>
                          {children}
@@ -63,4 +59,4 @@ export const Layout = withAuthGuard((props: any) => {
                </LayoutRoot>
           </>
      );
-});
+}

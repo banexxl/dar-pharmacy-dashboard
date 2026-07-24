@@ -1,7 +1,5 @@
 'use client';
 
-import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
-import { format } from 'date-fns';
 import ArrowLeftIcon from '@untitled-ui/icons-react/build/esm/ArrowLeft';
 import CalendarIcon from '@untitled-ui/icons-react/build/esm/Calendar';
 import ChevronDownIcon from '@untitled-ui/icons-react/build/esm/ChevronDown';
