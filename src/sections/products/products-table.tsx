@@ -274,6 +274,7 @@ export const ProductsTable = (props: any) => {
      const handleClearSearch = () => {
           setSearchQuery('');
      };
+
      const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
           setSearchQuery(event.target.value);
      };
@@ -348,7 +349,6 @@ export const ProductsTable = (props: any) => {
           }
      };
 
-
      const visibleRows = useMemo(
           () =>
                [...items]
@@ -368,7 +368,6 @@ export const ProductsTable = (props: any) => {
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
           [searchQuery, items, page, rowsPerPage, booleanFilters],
      );
-
 
      return (
           <Card>

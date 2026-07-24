@@ -30,9 +30,9 @@ export const newProductSchema = () => yup.object().shape({
      quantity_unit: yup
           .string()
           .required('Product quantity unit is required'),
-     manufacturer: yup
+     manufacturer_id: yup
           .string()
-          .required('Product manufacturer is required'),
+          .required('Product manufacturer id is required'),
      warning: yup
           .string()
           .required('Product warning is required'),
@@ -62,15 +62,15 @@ export const initialValues: ProductDraft = {
      main_category: '',
      mid_category: '',
      sub_category: '',
-     available_stock: 0,
+     available_stock: 1,
      ingredients: '',
      instructions: '',
-     quantity: 0,
+     quantity: 1,
      manufacturer_id: '',
      manufacturer_url: '',
      warning: '',
      image_url: '',
-     price: 0,
+     price: 1,
      new_arrival: false,
      best_seller: false,
      discount: false,

@@ -120,6 +120,7 @@ export default async function handler(request: NextApiRequest, response: NextApi
                     return response.status(500).json({ error: 'Error deleting product.' });
                }
           } else if (request.method === 'PUT') {
+
                const slug = generateSlug(request.body.name);
                const rawId = request.body.id;
 
@@ -134,7 +135,9 @@ export default async function handler(request: NextApiRequest, response: NextApi
                          .update(updatePayload)
                          .eq('id', rawId)
                          .select('*')
-                         .maybeSingle();
+                         .single();
+                    console.log('updateresult', updateResult);
+
 
                     if ((!updateResult.data || updateResult.error) && request.body.slug) {
                          updateResult = await supabase

@@ -1,6 +1,6 @@
 "use client"
 import React, { useMemo, useState } from 'react';
-import { Autocomplete, TextField, Button, Checkbox, FormControlLabel, Box, Grid, MenuItem, Stack, Container, IconButton, CardActionArea, colors, useMediaQuery } from '@mui/material';
+import { Autocomplete, TextField, Button, Checkbox, FormControlLabel, Box, Grid, MenuItem, Stack, Container, IconButton, CardActionArea, colors, useMediaQuery, Typography } from '@mui/material';
 import { Form, Formik } from 'formik';
 import { initialValues, mainCategoryOptions, midCategoryOptions, newProductSchema, quantityUnitOptions } from './new-product-schema'
 import { useRouter } from 'next/navigation';
@@ -197,14 +197,16 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail, manufacturers = 
           }
 
           return manufacturers
-               .map((item: any) => ({
-                    label: item?.name || item?.label || '',
-                    value: item?.value || ''
+               .map((manufacturer: any) => ({
+                    id: manufacturer.id,
+                    label: manufacturer.name || '',
                }))
-               .filter((option: any) => option.label);
+               .filter((manufacturer) => manufacturer.id && manufacturer.label);
      }, [manufacturers]);
 
      const handleSubmit = async (values: ProductDraft) => {
+          console.log('aaaaaaaaa');
+
           try {
                const responseValues = await fetch('/api/product-api', {
                     method: 'POST',
@@ -427,29 +429,45 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail, manufacturers = 
                                         options={manufacturerOptions}
                                         value={
                                              manufacturerOptions.find(
-                                                  (option: any) => option.label === formik.values.manufacturer_name
+                                                  (option) => option.id === formik.values.manufacturer_id
                                              ) || null
                                         }
-                                        getOptionLabel={(option: any) => option?.label || ''}
-                                        isOptionEqualToValue={(option: any, value: any) => option?.value === value?.value}
-                                        onChange={(event, newValue) => {
-                                             formik.setFieldValue('manufacturer_name', newValue?.label || '');
-                                             formik.setFieldValue('manufacturer_url', newValue?.value || '');
+                                        getOptionLabel={(option) => option.label}
+                                        isOptionEqualToValue={(option, value) => option.id === value.id}
+                                        onChange={(_, newValue) => {
+                                             formik.setFieldValue(
+                                                  'manufacturer_name',
+                                                  newValue?.label || ''
+                                             );
+
+                                             formik.setFieldValue(
+                                                  'manufacturer_id',
+                                                  newValue?.id || null
+                                             );
+                                        }}
+                                        onBlur={() => {
+                                             formik.setFieldTouched('manufacturer_name', true);
                                         }}
                                         disabled={loading}
                                         ListboxProps={{
                                              style: {
                                                   maxHeight: 48 * 10 + 16,
-                                                  overflow: 'auto'
-                                             }
+                                                  overflow: 'auto',
+                                             },
                                         }}
                                         renderInput={(params) => (
                                              <TextField
                                                   {...params}
-                                                  label="Proizvodjac"
+                                                  label="Proizvođač"
                                                   name="manufacturer_name"
-                                                  error={formik.touched.manufacturer_name && !!formik.errors.manufacturer_name}
-                                                  helperText={formik.touched.manufacturer_name && formik.errors.manufacturer_name}
+                                                  error={
+                                                       formik.touched.manufacturer_name &&
+                                                       Boolean(formik.errors.manufacturer_name)
+                                                  }
+                                                  helperText={
+                                                       formik.touched.manufacturer_name &&
+                                                       formik.errors.manufacturer_name
+                                                  }
                                              />
                                         )}
                                    />
@@ -472,7 +490,11 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail, manufacturers = 
                                         onChange={formik.handleChange}
                                         error={formik.touched.price && !!formik.errors.price}
                                         helperText={formik.touched.price && formik.errors.price}
-                                        inputProps={{ min: 1 }}
+                                        slotProps={{
+                                             htmlInput: {
+                                                  min: 1
+                                             }
+                                        }}
                                         onBlur={(e) => {
                                              const min = 1;
                                              const value = Number(e.target.value);
@@ -572,13 +594,20 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail, manufacturers = 
                                         >
                                              Odustani
                                         </Button>
-                                        <Button type="submit"
+                                        <Button
+                                             type="submit"
                                              variant="contained"
                                              color="primary"
-                                             disabled={Object.keys(formik.errors).length != 0 && loading}
+                                             disabled={Object.keys(formik.errors).length != 0 || loading}
+                                             onClick={() => {
+                                                  formik.validateForm()
+                                             }}
                                         >
                                              Dodaj proizvod
                                         </Button>
+                                        <Typography>
+                                             {Object.keys(formik.errors).length != 0 && JSON.stringify(formik.errors, null, 2)}
+                                        </Typography>
                                    </Box>
                               </Form>
                          )
