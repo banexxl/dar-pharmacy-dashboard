@@ -1,7 +1,7 @@
 'use client';
 
 import { Box, Button, Stack, Typography, Card, CardMedia, useMediaQuery } from '@mui/material';
-import { signIn } from 'next-auth/react';
+import { handleGoogleSignIn } from '../actions';
 
 const Page = () => {
      const mdDown = useMediaQuery((theme: any) => theme.breakpoints.down('md'));
@@ -31,7 +31,7 @@ const Page = () => {
                               </Typography>
                               <Button
                                    variant="contained"
-                                   onClick={() => signIn('google')}
+                                   onClick={() => handleGoogleSignIn()}
                               >
                                    Login
                               </Button>

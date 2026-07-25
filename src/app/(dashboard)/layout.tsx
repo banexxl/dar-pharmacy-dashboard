@@ -3,10 +3,9 @@
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { styled } from '@mui/material/styles';
-import { useSession } from 'next-auth/react';
-
 import { TopNav } from '@/components/top-nav';
 import { SideNav } from '@/components/side-nav';
+import { useAuth } from '@/context/auth-context';
 
 const SIDE_NAV_WIDTH = 280;
 
@@ -36,9 +35,9 @@ export default function DashboardLayout({
      const [openNav, setOpenNav] = useState(false);
 
      const {
-          data: session,
+          viewer: session,
           status,
-     } = useSession();
+     } = useAuth();
 
      useEffect(() => {
           setOpenNav(false);

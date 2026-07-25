@@ -86,8 +86,6 @@ const useCurrentOrder = (orders: Order[], orderId: string | undefined) => {
 };
 
 const Page = (props: any) => {
-  console.log('props', props);
-
   const rootRef = useRef(null);
   const ordersSearch = useOrdersSearch();
   const dialog = useDialog();

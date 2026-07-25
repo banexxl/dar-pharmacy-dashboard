@@ -30,7 +30,6 @@ const statusMap = {
 export const OverviewLatestOrders = (props: any) => {
 
   const { orders = [], sx } = props;
-  console.log('orders', orders);
 
   return (
     <Card sx={sx}>

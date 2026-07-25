@@ -38,11 +38,9 @@ export const ProductsTable = (props: any) => {
           count = 0,
      } = props;
 
-
      const [currentProductID, setCurrentProductID] = useState(null);
      const [currentProductObject, setCurrentProductObject] = useState<Product | null>();
      const router = useRouter();
-     const theme = useTheme()
      const [fileURL, setFileURL] = useState("")
      const [loading, setLoading] = useState(false)
      const [subCategoryOptions, setSubCategoryOptions] = useState<any>([]);
@@ -114,7 +112,7 @@ export const ProductsTable = (props: any) => {
                } ``
                const selectedProduct = getObjectById(productId, items);
                const selectedManufacturer = getManufacturerOptionFromProduct(selectedProduct);
-               console.log('selectedProduct', selectedProduct);
+
                if (selectedProduct) {
 
 

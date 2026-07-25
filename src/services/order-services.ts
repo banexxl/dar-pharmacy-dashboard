@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { Order } from '@/schemas/order';
-import { asDate, fetchRows, supabase } from './supabase';
+import { asDate, fetchRows, supabase } from './supabase-browser';
 import { User } from './user-services';
 
 export type OrderWithClient = Order & {

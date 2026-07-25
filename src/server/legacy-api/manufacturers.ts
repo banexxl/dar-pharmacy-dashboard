@@ -1,6 +1,6 @@
 import { generateSlug } from '@/utils/generate-slug';
 import type { NextApiRequest, NextApiResponse } from 'next/types';
-import { supabase } from '@/services/supabase';
+import { supabase } from '@/services/supabase-browser';
 
 const MANUFACTURER_TABLE_CANDIDATES = ['manufacturers'];
 

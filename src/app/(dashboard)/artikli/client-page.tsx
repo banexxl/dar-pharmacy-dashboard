@@ -11,11 +11,11 @@ import { ProductsTable } from 'src/sections/products/products-table';
 import { useRouter } from 'next/navigation';
 import { TablePagination } from '@mui/material'
 import { AddProductForm } from '@/sections/products/new-product-form';
-import { SessionProvider, useSession } from 'next-auth/react';
 import { useMounted } from '@/hooks/use-mounted';
 import { generateSlug } from '@/utils/generate-slug';
 import MagnifyingGlassIcon from '@heroicons/react/24/solid/MagnifyingGlassIcon';
 import ClearIcon from '@mui/icons-material/Clear';
+import { AuthProvider } from '@/context/auth-context';
 
 
 const useProductSearch = () => {
@@ -421,7 +421,7 @@ const Page = (props: any) => {
      };
 
      return (
-          <SessionProvider>
+          <AuthProvider>
                <Box>
                     <Box
                          component="main"
@@ -683,7 +683,7 @@ const Page = (props: any) => {
                          </DialogContent>
                     </Dialog>
                </Box >
-          </SessionProvider>
+          </AuthProvider>
      );
 };
 

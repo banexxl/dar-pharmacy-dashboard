@@ -2,13 +2,13 @@ import { useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import PropTypes from 'prop-types';
 import { Box, Divider, MenuItem, MenuList, Popover, Typography } from '@mui/material';
-import { signOut, useSession } from 'next-auth/react';
 import Swal from 'sweetalert2';
+import { useAuth } from '@/context/auth-context';
 
 export const AccountPopover = (props: any) => {
      const { anchorEl, onClose, open, deferredPrompt, isInstallable, setDeferredPrompt, setIsInstallable } = props;
      const router = useRouter();
-     const auth = useSession()
+     const auth = useAuth()
      const appUrl = 'https://dar-pharmacy-dashboard.vercel.app';
      const appName = 'DAR Admin';
      const iconUrl = '/dar_icon_only.png';
@@ -16,7 +16,7 @@ export const AccountPopover = (props: any) => {
      const handleSignOut = useCallback(
           () => {
                onClose?.();
-               signOut();
+               auth.refresh();
                window.sessionStorage.setItem('authenticated', 'false')
                router.push('/auth/login');
           },
@@ -127,14 +127,14 @@ export const AccountPopover = (props: any) => {
                          color="text.secondary"
                          variant="body2"
                     >
-                         {auth.data?.user?.name}
+                         {auth.viewer?.name}
 
                     </Typography>
                     <Typography
                          color="text.secondary"
                          variant="body2"
                     >
-                         {auth.data?.user?.email}
+                         {auth.viewer?.email}
                     </Typography>
                </Box>
                <Divider />

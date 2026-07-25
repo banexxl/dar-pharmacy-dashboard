@@ -7,9 +7,9 @@ import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
 import { Box, Button, Container, Stack, SvgIcon, TablePagination, Typography } from '@mui/material';
 import { useSelection } from 'src/hooks/use-selection';
 import { CustomersSearch } from 'src/sections/customer/customers-search';
-import { SessionProvider } from 'next-auth/react';
 import { CustomersTable } from '@/sections/customer/customers-table';
 import { useMounted } from '@/hooks/use-mounted';
+import { AuthProvider } from '@/context/auth-context';
 
 const useClientSearch = () => {
 
@@ -89,7 +89,7 @@ const CustomersPage = (props: any) => {
 
 
      return (
-          <SessionProvider>
+          <AuthProvider>
                <Box
                     component="main"
                     sx={{
@@ -183,7 +183,7 @@ const CustomersPage = (props: any) => {
                          </Stack>
                     </Container>
                </Box>
-          </SessionProvider>
+          </AuthProvider>
      );
 };
 

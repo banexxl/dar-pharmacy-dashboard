@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { fetchRows } from '@/services/supabase';
+import { fetchRows } from '@/services/supabase-browser';
 import { Product } from '../schemas/product';
 
 type Manufacturer = {

@@ -7,8 +7,8 @@ import { OverviewTotalCustomers } from 'src/sections/overview/overview-total-cus
 import { OverviewSales } from '@/sections/overview/overview-sales';
 import { OverviewTotalProfit } from 'src/sections/overview/overview-total-profit';
 import { OverviewTraffic } from 'src/sections/overview/overview-traffic';
-import { SessionProvider } from 'next-auth/react';
 import { OverviewLatestOrders } from '@/sections/overview/overview-latest-orders';
+import { AuthProvider } from '@/context/auth-context';
 
 const calculatePercentageChange = (currentMonthSum: number, lastMonthSum: number): string => {
      if (lastMonthSum === 0) {
@@ -20,12 +20,11 @@ const calculatePercentageChange = (currentMonthSum: number, lastMonthSum: number
 };
 
 const Page = (props: any) => {
-     console.log('props', props);
 
      const percantageChange = calculatePercentageChange(props.sumForCurrentMonth, props.sumOfLastMonthOrders)
 
      return (
-          <SessionProvider>
+          <AuthProvider>
                <Box
                     component="main"
                     sx={{
@@ -118,7 +117,7 @@ const Page = (props: any) => {
                          </Grid>
                     </Container>
                </Box>
-          </SessionProvider>
+          </AuthProvider>
      )
 }
 

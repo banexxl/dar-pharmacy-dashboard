@@ -1,6 +1,6 @@
 import { generateSlug } from '@/utils/generate-slug';
 import type { NextApiRequest, NextApiResponse } from 'next/types';
-import { supabase } from '@/services/supabase';
+import { supabaseBrowser as supabase } from '@/services/supabase-browser';
 import { Product } from '@/schemas/product';
 
 const PRODUCT_TABLE_CANDIDATES = ['products'];
@@ -49,7 +49,6 @@ const mapProductPayload = (payload: Record<string, any>): Partial<Product> => ({
 });
 
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
-     console.log('request', request.body);
 
      try {
 
