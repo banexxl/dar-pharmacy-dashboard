@@ -1,13 +1,16 @@
-export type ICustomer = {
+export type Customer = {
      id: string;
-     avatar: string;
+     user_id: string;
+     full_name: string;
+     phone_number: string | null;
+     street_address: string | null;
+     city: string | null;
+     province_state: string | null;
+     country: string | null;
+     zip_postal_code: string | null;
      email: string;
-     name: string;
-     streetAddress: string;
-     city: string;
-     proviceState?: string;
-     country: string;
-     phoneNumber: string;
-     emailVerified: Date;
-     gender: 'male' | 'female'
+     avatar: string;
+     gender: string;
+     created_at: string;
+     updated_at: string;
 };

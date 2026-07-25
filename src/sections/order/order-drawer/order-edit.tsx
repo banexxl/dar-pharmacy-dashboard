@@ -37,17 +37,17 @@ type OrderEditProps = {
 export const OrderEdit = (props: OrderEditProps) => {
   const { onCancel, onSave, order } = props;
   // Parse and format the createdAt date
-  const createdAtDate = moment(order?.createdAt).toDate();
+  const createdAtDate = moment(order?.created_at).toDate();
   const createdAt = format(createdAtDate, 'dd/MM/yyyy HH:mm');
 
   // Formik setup
   const formik = useFormik({
     initialValues: {
-      address: order?.customer.streetAddress || '',
+      address: order?.customer.street_address || '',
       country: order?.customer.country || '',
       city: order?.customer.city || '',
       status: order?.status || '',
-      orderNumber: order?.orderNumber || '',
+      orderNumber: order?.order_number || '',
     },
     validationSchema: Yup.object({
       address: Yup.string().required('Address is required'),
@@ -81,14 +81,14 @@ export const OrderEdit = (props: OrderEditProps) => {
               fullWidth
               label="ID porudžbenice"
               name="number"
-              value={order?.orderNumber}
+              value={order?.order_number}
             />
             <TextField
               disabled
               fullWidth
               label="Ime"
               name="customer_name"
-              value={order?.customer.name}
+              value={order?.customer.full_name}
             />
             <TextField
               disabled

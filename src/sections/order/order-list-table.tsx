@@ -40,18 +40,6 @@ export function getComparator<SortBy extends string | number | symbol>(
     : (a, b) => -descendingComparator(a, b, sortBy);
 }
 
-// type OrderListTableProps = {
-//   count?: number;
-//   items?: Order[];
-//   onPageChange?: (event: any, page: number) => void;
-//   onRowsPerPageChange?: (event: any) => void;
-//   onSelect?: (orderId: string) => void;
-//   page?: number;
-//   rowsPerPage?: number;
-//   sortBy: SortBy;
-//   sortDir: SortDir;
-// }
-
 export const OrderListTable = (props: any) => {
   const {
     count = 0,
@@ -94,7 +82,7 @@ export const OrderListTable = (props: any) => {
         <TableBody>
           {visibleRows.map((order: Order) => {
 
-            const createdAtDate = new Date(order.createdAt);
+            const createdAtDate = new Date(order.created_at);
 
             if (isNaN(createdAtDate.getTime())) {
               console.error('Invalid date for order:', order);
@@ -132,7 +120,7 @@ export const OrderListTable = (props: any) => {
                   </Box>
                 </TableCell>
                 <TableCell align="left">
-                  <Typography variant="subtitle2">{order.orderNumber}</Typography>
+                  <Typography variant="subtitle2">{order.order_number}</Typography>
                 </TableCell>
                 <TableCell>
                   <Typography color="text.secondary" variant="body2">
@@ -141,14 +129,14 @@ export const OrderListTable = (props: any) => {
                 </TableCell>
                 <TableCell align="left">
                   {
-                    order.paymentMethod == 'cash-on-delivery' ? 'Pouzećem'
-                      : order.paymentMethod == 'cash' ? 'Gotovinom'
-                        : order.paymentMethod == 'check' ? 'Čekom'
-                          : order.paymentMethod == 'credit card' ? 'Kreditnom karticom'
-                            : order.paymentMethod == 'paypal' ? 'PayPal' : 'Nepoznato'
+                    order.payment_method == 'cash-on-delivery' ? 'Pouzećem'
+                      : order.payment_method == 'cash' ? 'Gotovinom'
+                        : order.payment_method == 'check' ? 'Čekom'
+                          : order.payment_method == 'credit card' ? 'Kreditnom karticom'
+                            : order.payment_method == 'paypal' ? 'PayPal' : 'Nepoznato'
                   }
                 </TableCell>
-                <TableCell align="left">{order.customer.name}</TableCell>
+                <TableCell align="left">{order.customer.full_name}</TableCell>
                 <TableCell align="left">{order.customer.email}</TableCell>
                 <TableCell align="left">
                   <SeverityPill color={

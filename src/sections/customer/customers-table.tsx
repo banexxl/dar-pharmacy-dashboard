@@ -17,7 +17,7 @@ import {
 import { Scrollbar } from 'src/components/scrollbar';
 import Image from 'next/image';
 import { useMemo } from 'react';
-import { ICustomer } from '@/schemas/customer';
+import { Customer } from '@/schemas/customer';
 import { getComparator } from '../order/order-list-table';
 import { getInitials } from '@/utils/get-initials';
 
@@ -86,7 +86,7 @@ export const CustomersTable = (props: any) => {
                               </TableHead>
                               <TableBody>
                                    {
-                                        visibleRows.map((customer: ICustomer) => {
+                                        visibleRows.map((customer: Customer) => {
                                              const isSelected = selected.includes(customer.id);
 
                                              return (
@@ -115,11 +115,11 @@ export const CustomersTable = (props: any) => {
                                                                  spacing={2}
                                                             >
                                                                  <Avatar src={customer.avatar || customer.avatar} >
-                                                                      {getInitials(customer.avatar || customer.name)
+                                                                      {getInitials(customer.avatar || customer.full_name)
                                                                       }
                                                                  </Avatar>
                                                                  < Typography variant="subtitle2" >
-                                                                      {customer.name || customer.name}
+                                                                      {customer.full_name}
                                                                  </Typography>
                                                             </Stack>
                                                        </TableCell>

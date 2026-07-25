@@ -17,7 +17,7 @@ import { PropertyList } from 'src/components/property-list';
 import { PropertyListItem } from 'src/components/property-list-item';
 import { SeverityPill } from 'src/components/severity-pill';
 import { Scrollbar } from 'src/components/scrollbar';
-import { ICustomer } from '@/schemas/customer';
+import { Customer } from '@/schemas/customer';
 import { OrderDetailsProps, OrderStatus } from '@/schemas/order';
 import Link from 'next/link';
 
@@ -26,7 +26,7 @@ export const OrderDetails = (props: OrderDetailsProps) => {
   const { onApprove, onEdit, onReject, order } = props;
   const lgUp = useMediaQuery((theme: any) => theme.breakpoints.up('lg'));
   // Ensure createdAt is a valid date
-  const createdAt = order.createdAt ? format(new Date(order.createdAt), 'dd/MM/yyyy HH:mm') : 'Invalid Date';
+  const createdAt = order.created_at ? format(new Date(order.created_at), 'dd/MM/yyyy HH:mm') : 'Invalid Date';
   const totalAmount = numeral(order.total).format(`RSD0,0.00`);
   const align = lgUp ? 'horizontal' : 'vertical';
   const items = order.items || [];
@@ -68,7 +68,7 @@ export const OrderDetails = (props: OrderDetailsProps) => {
             disableGutters
 
             label="Broj porudžbine"
-            value={order.orderNumber}
+            value={order.order_number}
           />
           < PropertyListItem
             align={align}
@@ -79,19 +79,19 @@ export const OrderDetails = (props: OrderDetailsProps) => {
               color="text.secondary"
               variant="body2"
             >
-              {order.customer.name}
+              {order.customer.full_name}
             </Typography>
             <Typography
               color="text.secondary"
               variant="body2"
             >
-              {order.customer.phoneNumber}
+              {order.customer.phone_number}
             </Typography>
             <Typography
               color="text.secondary"
               variant="body2"
             >
-              {order.customer.streetAddress}
+              {order.customer.street_address}
             </Typography>
             <Typography
               color="text.secondary"
@@ -153,13 +153,13 @@ export const OrderDetails = (props: OrderDetailsProps) => {
           justifyContent="flex-end"
           spacing={2}
         >
-          <Link href={`/porudzbenice/${order.orderNumber}`}>
+          <Link href={`/porudzbenice/${order.order_number}`}>
             <Button
               onClick={onApprove}
               size="small"
               variant="contained"
             >
-              Detalji {order.orderNumber}
+              Detalji {order.order_number}
             </Button>
           </Link>
           {/* <Button

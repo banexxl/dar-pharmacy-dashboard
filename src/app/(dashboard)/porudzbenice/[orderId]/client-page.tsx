@@ -60,7 +60,7 @@ const Page = (order: Order) => {
                 spacing={3}
               >
                 <Stack spacing={1}>
-                  <Typography variant="h4">{order.orderNumber}</Typography>
+                  <Typography variant="h4">{order.order_number}</Typography>
                   <Stack
                     alignItems="center"
                     direction="row"
@@ -110,7 +110,6 @@ const Page = (order: Order) => {
             </div>
             <OrderSummary order={order} />
             <OrderItems items={order.items || []} />
-            <OrderLogs logs={order.logs || []} />
           </Stack>
         </Container>
       </Box>

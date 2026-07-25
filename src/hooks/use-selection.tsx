@@ -1,9 +1,10 @@
-import { ICustomer } from '@/schemas/customer';
 import { Order } from '@/schemas/order';
-import { Product } from '../schemas/product';
+import { Product } from '@/schemas/product';
+import { Customer } from '@/schemas/customer';
+
 import { useCallback, useEffect, useState } from 'react';
 
-type ItemType = Product | ICustomer | Order;
+type ItemType = Product | Customer | Order;
 
 export const useSelection = (items: ItemType[] = []) => {
      const [selected, setSelected] = useState<ItemType[]>([]);

@@ -1,7 +1,6 @@
 'use client';
 
 import { Box, Button, Stack, Typography, Card, CardMedia, useMediaQuery } from '@mui/material';
-import { Layout as AuthLayout } from 'src/layouts/auth/layout';
 import { signIn } from 'next-auth/react';
 
 const Page = () => {

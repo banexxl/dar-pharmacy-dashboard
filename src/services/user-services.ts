@@ -5,7 +5,7 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseSecretKey = process.env.NEXT_SUPABASE_SECRET_KEY;
 
-export type UserProfile = {
+export type User = {
      id: string;
      email: string | null;
      full_name: string;
@@ -47,7 +47,7 @@ type AuthUserRecord = {
 
 const getUserMetadata = (user: AuthUserRecord) => user.raw_user_meta_data ?? user.user_metadata ?? {};
 
-const mapAuthUserToProfile = (user: AuthUserRecord): UserProfile => ({
+const mapAuthUserToProfile = (user: AuthUserRecord): User => ({
      id: user.id,
      email: user.email,
      full_name: String(getUserMetadata(user).full_name ?? getUserMetadata(user).name ?? ''),
@@ -136,7 +136,7 @@ export const userServices = () => {
           }
      }
 
-     const getUserByEmail = async (email: string): Promise<UserProfile | null> => {
+     const getUserByEmail = async (email: string): Promise<User | null> => {
           try {
                const users = await fetchAuthUsers();
                const user = users.find((candidate) => candidate.email?.toLowerCase() === email.toLowerCase());
