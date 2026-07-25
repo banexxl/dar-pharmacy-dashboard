@@ -23,8 +23,6 @@ import ClearIcon from '@mui/icons-material/Clear';
 import { getComparator } from '../order/order-list-table';
 import { Product } from '../../schemas/product';
 
-export type IProduct = Product;
-
 export const ProductsTable = (props: any) => {
 
      const {
@@ -42,7 +40,7 @@ export const ProductsTable = (props: any) => {
 
 
      const [currentProductID, setCurrentProductID] = useState(null);
-     const [currentProductObject, setCurrentProductObject] = useState<IProduct | null>();
+     const [currentProductObject, setCurrentProductObject] = useState<Product | null>();
      const router = useRouter();
      const theme = useTheme()
      const [fileURL, setFileURL] = useState("")
@@ -68,7 +66,7 @@ export const ProductsTable = (props: any) => {
                .filter((option: any) => option.label);
      }, [manufacturers]);
 
-     const getManufacturerOptionFromProduct = (product?: IProduct | null) => {
+     const getManufacturerOptionFromProduct = (product?: Product | null) => {
           if (!product || !Array.isArray(manufacturerOptions)) {
                return null;
           }
@@ -352,7 +350,7 @@ export const ProductsTable = (props: any) => {
      const visibleRows = useMemo(
           () =>
                [...items]
-                    .filter((product: IProduct) => {
+                    .filter((product: Product) => {
                          if (!searchQuery) {
                               return true;
                          }
@@ -360,7 +358,7 @@ export const ProductsTable = (props: any) => {
                          const name = (product.name || '').toString().toLowerCase();
                          return name.includes(searchQuery.toLowerCase());
                     })
-                    .filter((product: IProduct) => {
+                    .filter((product: Product) => {
                          if (booleanFilters.length === 0) return true;
                          return booleanFilters.every((key) => Boolean((product as any)[key]) === true);
                     })
@@ -443,7 +441,13 @@ export const ProductsTable = (props: any) => {
                          </Button>
                     </Stack>
                </Card>
-               <Scrollbar>
+               <Box
+                    sx={{
+                         minWidth: 0,
+                         overflowX: 'auto',
+                         width: '100%',
+                    }}
+               >
                     <Box sx={{ minWidth: 800 }}>
                          <Table>
                               <TableHead>
@@ -477,7 +481,7 @@ export const ProductsTable = (props: any) => {
                               <TableBody>
                                    {
                                         visibleRows.length > 0 ?
-                                             visibleRows.map((product: IProduct) => {
+                                             visibleRows.map((product: Product) => {
                                                   //const isSelected = selected.includes(product.id);
                                                   const isCurrent = product.id === currentProductID;
                                                   // const price = numeral(product.price).format(`${product.currency}0,0.00`);
@@ -1366,7 +1370,7 @@ export const ProductsTable = (props: any) => {
                               </TableBody>
                          </Table>
                     </Box>
-               </Scrollbar>
+               </Box>
           </Card >
      );
 };
