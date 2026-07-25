@@ -205,8 +205,6 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail, manufacturers = 
      }, [manufacturers]);
 
      const handleSubmit = async (values: ProductDraft) => {
-          console.log('aaaaaaaaa');
-
           try {
                const responseValues = await fetch('/api/product-api', {
                     method: 'POST',
