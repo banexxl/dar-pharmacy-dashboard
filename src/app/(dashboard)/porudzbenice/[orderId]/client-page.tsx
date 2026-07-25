@@ -14,7 +14,6 @@ import Typography from '@mui/material/Typography';
 import { Order } from '@/schemas/order';
 import { OrderSummary } from '@/sections/order/order-summary';
 import { OrderItems } from '@/sections/order/order-items';
-import { OrderLogs } from '@/sections/order/order-logs';
 
 const Page = (order: Order) => {
 

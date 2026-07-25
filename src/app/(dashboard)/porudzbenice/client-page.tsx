@@ -74,6 +74,7 @@ const useOrdersSearch = () => {
     state,
   };
 };
+
 const useCurrentOrder = (orders: Order[], orderId: string | undefined) => {
   return useMemo(() => {
     if (!orderId) {
@@ -85,6 +86,7 @@ const useCurrentOrder = (orders: Order[], orderId: string | undefined) => {
 };
 
 const Page = (props: any) => {
+  console.log('props', props);
 
   const rootRef = useRef(null);
   const ordersSearch = useOrdersSearch();
@@ -130,87 +132,78 @@ const Page = (props: any) => {
         sx={{
           display: 'flex',
           flex: '1 1 auto',
+          minHeight: 'calc(100vh - 64px)',
+          minWidth: 0,
           overflow: 'hidden',
           position: 'relative',
+          width: '100%',
         }}
       >
-        <Box
-          ref={rootRef}
-          sx={{
-            bottom: 0,
-            display: 'flex',
-            left: 0,
-            position: 'absolute',
-            right: 0,
-            top: 0,
-          }}
-        >
-          <OrderListContainer open={dialog.open}>
-            <Box sx={{ p: 3 }}>
-              <Stack
-                alignItems="flex-start"
-                direction="row"
-                justifyContent="space-between"
-                spacing={4}
-              >
-                <div>
-                  <Typography variant="h4">Porudžbenice</Typography>
-                </div>
-                <div>
-                  <Button
-                    startIcon={
-                      <SvgIcon>
-                        <PlusIcon />
-                      </SvgIcon>
-                    }
-                    variant="contained"
-                  >
-                    Dodaj
-                  </Button>
-                </div>
-              </Stack>
-            </Box>
-            <Divider />
-            <OrderListSearch
-              onQueryChange={ordersSearch.handleQueryChange}
-              onTabChange={ordersSearch.handleTabsChange}
-              onSortChange={ordersSearch.handleSortChange}
-              sortBy={ordersSearch.state.sortBy}
-              sortDir={ordersSearch.state.sortDir}
-              query={ordersSearch.state.query}
-              tab={ordersSearch.state.tab}
-            />
-            <Divider />
-            <TablePagination
-              component="div"
-              count={ordersStore.ordersCount}
-              onPageChange={ordersSearch.handlePageChange}
-              onRowsPerPageChange={ordersSearch.handleRowsPerPageChange}
-              page={ordersSearch.state.page}
-              rowsPerPage={ordersSearch.state.rowsPerPage}
-              rowsPerPageOptions={[5, 10, 25]}
-            />
-            <OrderListTable
-              count={ordersStore.ordersCount}
-              items={ordersStore.orders}
-              onPageChange={ordersSearch.handlePageChange}
-              onRowsPerPageChange={ordersSearch.handleRowsPerPageChange}
-              onSelect={onSelect}
-              page={ordersSearch.state.page}
-              rowsPerPage={ordersSearch.state.rowsPerPage}
-              sortDir={ordersSearch.state.sortDir as SortDir}
-              sortBy={ordersSearch.state.sortBy as SortBy}
-              onTabChange={ordersSearch.handleTabsChange}
-              tab={ordersSearch.state.tab}
-            />
-          </OrderListContainer>
-          <OrderDrawer
-            container={rootRef.current}
-            onClose={dialog.handleClose}
-            open={dialog.open}
-            order={currentOrder}
+        <OrderListContainer open={dialog.open}>
+          <Box sx={{ p: 3 }}>
+            <Stack
+              alignItems="flex-start"
+              direction="row"
+              justifyContent="space-between"
+              spacing={4}
+            >
+              <div>
+                <Typography variant="h4">Porudžbenice</Typography>
+              </div>
+              <div>
+                <Button
+                  startIcon={
+                    <SvgIcon>
+                      <PlusIcon />
+                    </SvgIcon>
+                  }
+                  variant="contained"
+                >
+                  Dodaj
+                </Button>
+              </div>
+            </Stack>
+          </Box>
+          <Divider />
+          <OrderListSearch
+            onQueryChange={ordersSearch.handleQueryChange}
+            onTabChange={ordersSearch.handleTabsChange}
+            onSortChange={ordersSearch.handleSortChange}
+            sortBy={ordersSearch.state.sortBy}
+            sortDir={ordersSearch.state.sortDir}
+            query={ordersSearch.state.query}
+            tab={ordersSearch.state.tab}
           />
-        </Box>
+          <Divider />
+          <TablePagination
+            component="div"
+            count={ordersStore.ordersCount}
+            onPageChange={ordersSearch.handlePageChange}
+            onRowsPerPageChange={ordersSearch.handleRowsPerPageChange}
+            page={ordersSearch.state.page}
+            rowsPerPage={ordersSearch.state.rowsPerPage}
+            rowsPerPageOptions={[5, 10, 25]}
+          />
+          <OrderListTable
+            count={ordersStore.ordersCount}
+            items={ordersStore.orders}
+            onPageChange={ordersSearch.handlePageChange}
+            onRowsPerPageChange={ordersSearch.handleRowsPerPageChange}
+            onSelect={onSelect}
+            page={ordersSearch.state.page}
+            rowsPerPage={ordersSearch.state.rowsPerPage}
+            sortDir={ordersSearch.state.sortDir as SortDir}
+            sortBy={ordersSearch.state.sortBy as SortBy}
+            onTabChange={ordersSearch.handleTabsChange}
+            tab={ordersSearch.state.tab}
+          />
+        </OrderListContainer>
+        <OrderDrawer
+          container={rootRef.current}
+          onClose={dialog.handleClose}
+          open={dialog.open}
+          order={currentOrder}
+        />
       </Box>
     </>
   );

@@ -20,6 +20,7 @@ const calculatePercentageChange = (currentMonthSum: number, lastMonthSum: number
 };
 
 const Page = (props: any) => {
+     console.log('props', props);
 
      const percantageChange = calculatePercentageChange(props.sumForCurrentMonth, props.sumOfLastMonthOrders)
 

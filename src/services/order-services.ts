@@ -69,7 +69,7 @@ export const ordersServices = () => {
                     .from('orders')
                     .select(`
                     *,
-                    user:users!orders_client_id_fkey (
+                    customer:customers!orders_customer_id_fkey (
                          id,
                          user_id,
                          full_name,
@@ -154,12 +154,21 @@ export const ordersServices = () => {
           }
      };
 
-     const getLastNumberOfOrders = async (numberOfOrders: number) => {
+     const getLastNumberOfOrders = async (
+          numberOfOrders: number
+     ): Promise<Order[]> => {
           try {
-               const orders = await fetchRows<Order>(['orders']);
-               return sortOrdersByCreatedAtDesc(orders).slice(0, numberOfOrders);
+               const orders = await getAllOrders();
+
+               if (!Array.isArray(orders)) {
+                    return [];
+               }
+
+               return sortOrdersByCreatedAtDesc(orders)
+                    .slice(0, numberOfOrders);
           } catch (error) {
-               return { message: (error as Error).message };
+               console.error('Failed to fetch latest orders:', error);
+               return [];
           }
      };
 
