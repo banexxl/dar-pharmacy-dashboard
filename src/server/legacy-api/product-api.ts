@@ -48,29 +48,14 @@ const mapProductPayload = (payload: Record<string, any>): Partial<Product> => ({
      updated_at: payload.updated_at ?? new Date().toISOString(),
 });
 
-const getProductsTableName = async () => {
-     for (const tableName of PRODUCT_TABLE_CANDIDATES) {
-          const { error } = await supabase.from(tableName).select('id', { head: true, count: 'exact' }).limit(1);
-
-          if (!error) {
-               return tableName;
-          }
-
-          if (!isMissingRelationError(error)) {
-               throw error;
-          }
-     }
-
-     throw new Error('Products table was not found in Supabase.');
-};
-
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
+     console.log('request', request.body);
+
      try {
-          const productsTable = await getProductsTableName();
 
           if (request.method === 'GET') {
                const { data: allProducts, error } = await supabase
-                    .from(productsTable)
+                    .from('products')
                     .select('*')
                     .order('updated_at', { ascending: false });
 
@@ -87,7 +72,7 @@ export default async function handler(request: NextApiRequest, response: NextApi
                });
 
                const { data, error } = await supabase
-                    .from(productsTable)
+                    .from('products')
                     .insert(newProduct)
                     .select('*')
                     .single();
@@ -102,7 +87,7 @@ export default async function handler(request: NextApiRequest, response: NextApi
                     const currentProductID = request.body.currentProductID;
 
                     const { data, error } = await supabase
-                         .from(productsTable)
+                         .from('products')
                          .delete()
                          .eq('id', currentProductID)
                          .select('id');
@@ -131,17 +116,15 @@ export default async function handler(request: NextApiRequest, response: NextApi
                     });
 
                     let updateResult = await supabase
-                         .from(productsTable)
+                         .from('products')
                          .update(updatePayload)
                          .eq('id', rawId)
                          .select('*')
                          .single();
-                    console.log('updateresult', updateResult);
-
 
                     if ((!updateResult.data || updateResult.error) && request.body.slug) {
                          updateResult = await supabase
-                              .from(productsTable)
+                              .from('products')
                               .update(updatePayload)
                               .eq('slug', request.body.slug)
                               .select('*')
