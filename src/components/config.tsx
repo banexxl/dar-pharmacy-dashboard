@@ -18,7 +18,7 @@ export const items = [
      },
      {
           title: 'Klijenti',
-          path: '/dashboard/klijenti',
+          path: '/klijenti',
           icon: (
                <SvgIcon fontSize="small">
                     <UsersIcon />
@@ -28,7 +28,7 @@ export const items = [
      },
      {
           title: 'Artikli',
-          path: '/dashboard/artikli',
+          path: '/artikli',
           icon: (
                <SvgIcon fontSize="small">
                     <ShoppingBagIcon />
@@ -38,7 +38,7 @@ export const items = [
      },
      {
           title: 'Porudžbenice',
-          path: '/dashboard/porudzbenice',
+          path: '/porudzbenice',
           icon: (
                <SvgIcon fontSize="small">
                     <ShoppingCartIcon />
@@ -48,7 +48,7 @@ export const items = [
      },
      {
           title: 'Datoteke',
-          path: '/dashboard/datoteke',
+          path: '/datoteke',
           icon: (
                <SvgIcon fontSize="small">
                     <StorageIcon />

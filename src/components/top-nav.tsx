@@ -24,21 +24,6 @@ export const TopNav = (props: any) => {
      const lgUp = useMediaQuery((theme: any) => theme.breakpoints.up('lg'));
      const accountPopover = usePopover();
      const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
-     const [isInstallable, setIsInstallable] = useState(false)
-
-     useEffect(() => {
-          const handleBeforeInstallPrompt = (e: Event) => {
-               e.preventDefault()
-               setDeferredPrompt(e)
-               setIsInstallable(true)
-          }
-
-          window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
-
-          return () => {
-               window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
-          }
-     }, [])
 
      return (
           <>
@@ -121,7 +106,10 @@ export const TopNav = (props: any) => {
                                         height: 40,
                                         width: 40
                                    }}
-                                   src={props.session.data.user.avatar}
+                                   src={
+                                        props.session?.user?.avatar ||
+                                        '/dar_icon_only.png'
+                                   }
                               />
                          </Stack>
                     </Stack>
@@ -131,9 +119,7 @@ export const TopNav = (props: any) => {
                     open={accountPopover.open}
                     onClose={accountPopover.handleClose}
                     deferredPrompt={deferredPrompt}
-                    isInstallable={isInstallable}
                     setDeferredPrompt={setDeferredPrompt}
-                    setIsInstallable={setIsInstallable}
                />
           </>
      );
@@ -141,5 +127,6 @@ export const TopNav = (props: any) => {
 
 TopNav.propTypes = {
      onNavOpen: PropTypes.func,
-     session: PropTypes.any
+     session: PropTypes.any,
+     sessionStatus: PropTypes.string
 };

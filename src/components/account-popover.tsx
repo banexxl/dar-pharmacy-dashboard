@@ -12,6 +12,7 @@ export const AccountPopover = (props: any) => {
      const appUrl = 'https://dar-pharmacy-dashboard.vercel.app';
      const appName = 'DAR Admin';
      const iconUrl = '/dar_icon_only.png';
+     console.log('aaaaaaa', auth);
 
      const handleSignOut = useCallback(
           () => {

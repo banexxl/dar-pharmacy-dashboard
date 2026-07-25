@@ -34,7 +34,11 @@ export default function DashboardLayout({
 }) {
      const pathname = usePathname();
      const [openNav, setOpenNav] = useState(false);
-     const session = useSession();
+
+     const {
+          data: session,
+          status,
+     } = useSession();
 
      useEffect(() => {
           setOpenNav(false);
@@ -45,6 +49,7 @@ export default function DashboardLayout({
                <TopNav
                     onNavOpen={() => setOpenNav(true)}
                     session={session}
+                    sessionStatus={status}
                />
 
                <SideNav
