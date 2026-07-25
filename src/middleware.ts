@@ -14,7 +14,7 @@ export const config = {
 };
 
 const ALWAYS_PUBLIC_ROUTES = [
-     '/auth/v1/callback',
+     '/auth/callback',
      '/auth/error',
      '/401',
 ] as const;

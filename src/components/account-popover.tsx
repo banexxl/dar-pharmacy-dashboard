@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { Box, Divider, MenuItem, MenuList, Popover, Typography } from '@mui/material';
 import Swal from 'sweetalert2';
 import { useAuth } from '@/context/auth-context';
+import { supabaseBrowser } from '@/services/supabase-browser';
 
 export const AccountPopover = (props: any) => {
      const { anchorEl, onClose, open, deferredPrompt, isInstallable, setDeferredPrompt, setIsInstallable } = props;
@@ -13,15 +14,35 @@ export const AccountPopover = (props: any) => {
      const appName = 'DAR Admin';
      const iconUrl = '/dar_icon_only.png';
 
-     const handleSignOut = useCallback(
-          () => {
+     const handleSignOut = useCallback(async () => {
+          try {
                onClose?.();
-               auth.refresh();
-               window.sessionStorage.setItem('authenticated', 'false')
-               router.push('/auth/login');
-          },
-          [onClose, auth, router]
-     );
+
+               const { error } =
+                    await supabaseBrowser.auth.signOut();
+
+               if (error) {
+                    throw error;
+               }
+
+               // Only necessary if older code created this value.
+               window.sessionStorage.removeItem('authenticated');
+
+               router.replace('/auth/login');
+               router.refresh();
+          } catch (error) {
+               console.error('Sign-out failed:', error);
+
+               await Swal.fire({
+                    icon: 'error',
+                    title: 'Odjava nije uspela',
+                    text:
+                         error instanceof Error
+                              ? error.message
+                              : 'Došlo je do nepoznate greške.',
+               });
+          }
+     }, [onClose, router]);
 
      const handleRebuild = useCallback(async () => {
           const result = await Swal.fire({
@@ -154,7 +175,7 @@ export const AccountPopover = (props: any) => {
                     <MenuItem onClick={handleRebuild}>
                          Pošalji izmene na sajt
                     </MenuItem>
-                    <MenuItem onClick={handleSignOut}>
+                    <MenuItem onClick={() => handleSignOut()}>
                          Odjavi se
                     </MenuItem>
                </MenuList>
