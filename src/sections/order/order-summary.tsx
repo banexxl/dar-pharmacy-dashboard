@@ -25,7 +25,7 @@ export const OrderSummary = (props: OrderSummaryProps) => {
   const [status, setStatus] = useState(statusOptions[0]);
 
   // Convert order.createdAt to a Date object and validate
-  const createdAtDate = new Date(order.createdAt);
+  const createdAtDate = new Date(order.created_at);
   const formattedCreatedAt = isValid(createdAtDate)
     ? format(createdAtDate, 'dd/MM/yyyy HH:mm')
     : 'Invalid date';
@@ -46,7 +46,7 @@ export const OrderSummary = (props: OrderSummaryProps) => {
           label="Customer"
           key={Math.random()}
         >
-          <Typography variant="subtitle2">{order.customer.name}</Typography>
+          <Typography variant="subtitle2">{order.customer.full_name}</Typography>
           <Typography
             color="text.secondary"
             variant="body2"
@@ -76,7 +76,7 @@ export const OrderSummary = (props: OrderSummaryProps) => {
         <PropertyListItem
           align={align}
           label="Invoice"
-          value={order.orderNumber}
+          value={order.order_number}
         />
         <Divider />
         <PropertyListItem

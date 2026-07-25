@@ -56,18 +56,18 @@ export const OverviewLatestOrders = (props: any) => {
             <TableBody>
               {orders.map((order: Order) => {
                 //const createdAt = format(order.createdAt, 'dd/MM/yyyy');
-                const createdAt = new Date(order.createdAt);
+                const createdAt = new Date(order.created_at);
                 const ago = formatDistanceToNow(createdAt);
                 return (
                   <TableRow
                     hover
-                    key={order.orderNumber}
+                    key={order.order_number}
                   >
                     <TableCell>
-                      {order.orderNumber}
+                      {order.order_number}
                     </TableCell>
                     <TableCell>
-                      {order.customer.name}
+                      {order.customer.full_name}
                     </TableCell>
                     <TableCell>
                       {ago}
