@@ -1,5 +1,6 @@
 'use client';
 
+import { supabaseBrowser } from "@/services/supabase-browser";
 
 export async function handleGoogleSignIn(): Promise<{
      success: boolean;
