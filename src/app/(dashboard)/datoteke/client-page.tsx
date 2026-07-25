@@ -270,7 +270,7 @@ const Page = ({ totalBucketSize }: any) => {
   };
 
   function onOpenFolder(folderName: string): void {
-    router.push(`/dashboard/datoteke?putanja=${folderName}`);
+    router.push(`/datoteke?putanja=${folderName}`);
   }
 
   return (
@@ -367,7 +367,7 @@ const Page = ({ totalBucketSize }: any) => {
                     Nazad
                   </Button>
                   <Button
-                    onClick={() => router.push('/dashboard/datoteke')}
+                    onClick={() => router.push('/datoteke')}
                     sx={{ maxWidth: '150px' }}
                     variant="contained"
                   >

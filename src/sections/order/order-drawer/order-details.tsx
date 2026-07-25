@@ -153,7 +153,7 @@ export const OrderDetails = (props: OrderDetailsProps) => {
           justifyContent="flex-end"
           spacing={2}
         >
-          <Link href={`/dashboard/porudzbenice/${order.orderNumber}`}>
+          <Link href={`/porudzbenice/${order.orderNumber}`}>
             <Button
               onClick={onApprove}
               size="small"

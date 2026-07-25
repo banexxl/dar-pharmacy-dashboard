@@ -73,7 +73,7 @@ export const OverviewLatestProducts = (props: any) => {
                 secondaryTypographyProps={{ variant: 'body2' }}
               />
               <IconButton edge="end">
-                <Link href={'/dashboard/artikli/'} style={{ textDecoration: 'none', color: indigo.main }}>
+                <Link href={'/artikli/'} style={{ textDecoration: 'none', color: indigo.main }}>
                   <SvgIcon>
                     <OpenInNewIcon />
                   </SvgIcon>
@@ -95,7 +95,7 @@ export const OverviewLatestProducts = (props: any) => {
           size="small"
           variant="text"
         >
-          <Link href={'/dashboard/artikli'} style={{ textDecoration: 'none', color: indigo.main }}>
+          <Link href={'/artikli'} style={{ textDecoration: 'none', color: indigo.main }}>
             Pogledaj sve
           </Link>
         </Button>

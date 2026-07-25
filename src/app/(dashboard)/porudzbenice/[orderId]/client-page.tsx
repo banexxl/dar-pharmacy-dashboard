@@ -39,7 +39,7 @@ const Page = (order: Order) => {
               <Link
                 color="text.primary"
                 component={Link}
-                href={'/dashboard/porudzbenice'}
+                href={'/porudzbenice'}
                 sx={{
                   alignItems: 'center',
                   display: 'inline-flex',

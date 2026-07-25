@@ -149,7 +149,7 @@ export const OverviewSales = (props: any) => {
           )}
           size="small"
         >
-          <Link href={'/dashboard/porudzbenice'} style={{ textDecoration: 'none', color: indigo.main }}>
+          <Link href={'/porudzbenice'} style={{ textDecoration: 'none', color: indigo.main }}>
             Porudzbenice
           </Link>
         </Button>

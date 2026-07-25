@@ -38,5 +38,5 @@ export async function GET(request: NextRequest) {
   if (adminError) return errorRedirect(request, 'admin_lookup_failed', adminError.message);
   if (!admin) return errorRedirect(request, 'access_denied', 'Your account is not listed in the admins table.');
 
-  return NextResponse.redirect(new URL('/dashboard', request.url));
+  return NextResponse.redirect(new URL('/', request.url));
 }

@@ -102,7 +102,7 @@ export const OverviewLatestOrders = (props: any) => {
           size="small"
           variant="text"
         >
-          <Link href='/dashboard/porudzbenice' style={{ textDecoration: 'none', color: indigo.main }}>
+          <Link href='/porudzbenice' style={{ textDecoration: 'none', color: indigo.main }}>
             Pogledaj sve
           </Link>
         </Button>

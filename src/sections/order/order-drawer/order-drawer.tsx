@@ -49,7 +49,7 @@ export const OrderDrawer = (props: any) => {
         .then((data) => {
           setIsEditing(false);
           if (data.message === 'Order updated successfully') {
-            router.push('/dashboard/porudzbenice');
+            router.push('/porudzbenice');
             Swal.fire({
               icon: 'success',
               title: 'Porudžbina je uspešno ažurirana!',

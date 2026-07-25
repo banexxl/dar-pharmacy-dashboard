@@ -156,7 +156,7 @@ export default async function handler(request: NextApiRequest, response: NextApi
                          return response.status(404).json({ error: 'Product not found.' });
                     }
 
-                    await response.revalidate('/dashboard/artikli');
+                    await response.revalidate('/artikli');
                     return response.status(200).json({ message: 'Product successfully updated!', data: updateResult.data });
                } catch (error) {
                     return response.status(500).json({ error: 'Error updating product.' });
