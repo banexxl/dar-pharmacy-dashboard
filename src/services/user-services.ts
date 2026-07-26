@@ -5,65 +5,10 @@ import {
      type SupabaseClient,
      type User as SupabaseAuthUser,
 } from '@supabase/supabase-js';
+import type { Customer } from '@/schemas/customer';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseSecretKey = process.env.NEXT_SUPABASE_SECRET_KEY;
-
-export type User = {
-     id: string;
-     user_id: string;
-
-     email: string | null;
-     full_name: string;
-     avatar_url: string | null;
-     gender: string | null;
-
-     email_verified_at: string | null;
-     phone_number: string | null;
-
-     street_address: string | null;
-     city: string | null;
-     province_state: string | null;
-     country: string | null;
-     zip_postal_code: string | null;
-
-     should_create_account: boolean;
-
-     created_at: string;
-     updated_at: string;
-
-     raw_user_meta_data: Record<string, any>;
-};
-
-export type Admin = {
-     id: string;
-     name: string;
-     email: string;
-     created_at: string;
-};
-
-type CustomerRecord = {
-     id: string;
-     user_id: string | null;
-
-     email: string | null;
-     full_name: string | null;
-     avatar?: string | null;
-     avatar_url?: string | null;
-     gender?: string | null;
-
-     phone_number: string | null;
-     street_address: string | null;
-     city: string | null;
-     province_state: string | null;
-     country: string | null;
-     zip_postal_code: string | null;
-
-     should_create_account?: boolean | null;
-
-     created_at: string;
-     updated_at: string;
-};
 
 const getSupabaseAdminClient = (): SupabaseClient => {
      if (!supabaseUrl || !supabaseSecretKey) {
@@ -78,6 +23,16 @@ const getSupabaseAdminClient = (): SupabaseClient => {
                persistSession: false,
           },
      });
+};
+
+const createFullAddress = (
+     streetAddress: string | null,
+     city: string | null
+): string => {
+     return [streetAddress, city]
+          .map((value) => value?.trim())
+          .filter(Boolean)
+          .join(', ');
 };
 
 const fetchAuthUsersPage = async (
@@ -100,13 +55,14 @@ const fetchAuthUsersPage = async (
 
 const fetchAllAuthUsers = async (): Promise<SupabaseAuthUser[]> => {
      const perPage = 1000;
-     const users: SupabaseAuthUser[] = [];
+     const authUsers: SupabaseAuthUser[] = [];
+
      let page = 1;
 
      while (true) {
           const batch = await fetchAuthUsersPage(page, perPage);
 
-          users.push(...batch);
+          authUsers.push(...batch);
 
           if (batch.length < perPage) {
                break;
@@ -115,10 +71,10 @@ const fetchAllAuthUsers = async (): Promise<SupabaseAuthUser[]> => {
           page += 1;
      }
 
-     return users;
+     return authUsers;
 };
 
-const fetchAllCustomers = async (): Promise<CustomerRecord[]> => {
+const fetchAllCustomers = async (): Promise<Customer[]> => {
      const supabaseAdmin = getSupabaseAdminClient();
 
      const { data, error } = await supabaseAdmin
@@ -137,31 +93,44 @@ const fetchAllCustomers = async (): Promise<CustomerRecord[]> => {
                country,
                zip_postal_code,
                created_at,
-               updated_at
+               updated_at,
+               orders:orders!orders_customer_id_fkey(count)
           `)
-          .order('created_at', { ascending: false });
+          .order('created_at', {
+               ascending: false,
+          });
 
      if (error) {
           throw error;
      }
 
-     return (data ?? []) as CustomerRecord[];
+     return (data ?? []) as Customer[];
 };
 
-const mapCustomerToUser = (
-     customer: CustomerRecord,
+const mapCustomer = (
+     customer: Customer,
      authUser: SupabaseAuthUser
-): User => {
+): Customer => {
      const metadata = authUser.user_metadata ?? {};
 
-     return {
-          // Customer table primary key
-          id: customer.id,
+     const streetAddress =
+          customer.street_address ??
+          metadata.street_address ??
+          null;
 
-          // Foreign key referencing auth.users.id
+     const city =
+          customer.city ??
+          metadata.city ??
+          null;
+
+     return {
+          id: customer.id,
           user_id: authUser.id,
 
-          email: customer.email ?? authUser.email ?? null,
+          email:
+               customer.email ??
+               authUser.email ??
+               null,
 
           full_name:
                customer.full_name ??
@@ -169,9 +138,8 @@ const mapCustomerToUser = (
                metadata.name ??
                '',
 
-          avatar_url:
+          avatar:
                customer.avatar ??
-               customer.avatar_url ??
                metadata.avatar_url ??
                metadata.picture ??
                null,
@@ -181,24 +149,13 @@ const mapCustomerToUser = (
                metadata.gender ??
                null,
 
-          email_verified_at:
-               authUser.email_confirmed_at ??
-               null,
-
           phone_number:
                customer.phone_number ??
                authUser.phone ??
                null,
 
-          street_address:
-               customer.street_address ??
-               metadata.street_address ??
-               null,
-
-          city:
-               customer.city ??
-               metadata.city ??
-               null,
+          street_address: streetAddress,
+          city,
 
           province_state:
                customer.province_state ??
@@ -216,34 +173,30 @@ const mapCustomerToUser = (
                metadata.zip_postal_code ??
                null,
 
-          should_create_account:
-               customer.should_create_account ??
-               Boolean(metadata.should_create_account ?? false),
+          orders: customer.orders ?? [],
 
           created_at: customer.created_at,
           updated_at: customer.updated_at,
-
-          raw_user_meta_data: metadata,
      };
 };
 
 /**
- * Loads customers and keeps only those whose user_id exists in auth.users.
+ * Returns customers whose user_id still exists in auth.users.
  */
-const fetchVerifiedCustomers = async (): Promise<User[]> => {
-     const [customers, authUsers] = await Promise.all([
+const fetchVerifiedCustomers = async (): Promise<Customer[]> => {
+     const [Customers, authUsers] = await Promise.all([
           fetchAllCustomers(),
           fetchAllAuthUsers(),
      ]);
 
-     const authUsersById = new Map(
+     const authUsersById = new Map<string, SupabaseAuthUser>(
           authUsers.map((authUser) => [
                authUser.id,
                authUser,
           ])
      );
 
-     return customers.flatMap((customer) => {
+     return Customers.flatMap((customer) => {
           if (!customer.user_id) {
                return [];
           }
@@ -255,16 +208,16 @@ const fetchVerifiedCustomers = async (): Promise<User[]> => {
           }
 
           return [
-               mapCustomerToUser(customer, authUser),
+               mapCustomer(customer, authUser),
           ];
      });
 };
 
-export const userServices = () => {
-     const getUsersByPage = async (
+export const customerServices = () => {
+     const getCustomersByPage = async (
           page: number,
           limit: number | string
-     ): Promise<User[]> => {
+     ): Promise<Customer[]> => {
           const parsedPage = Number(page);
           const parsedLimit = Number(limit);
 
@@ -278,93 +231,115 @@ export const userServices = () => {
           }
 
           try {
-               const users = await fetchVerifiedCustomers();
+               const customers = await fetchVerifiedCustomers();
+
                const start = parsedPage * parsedLimit;
                const end = start + parsedLimit;
 
-               return users.slice(start, end);
+               return customers.slice(start, end);
           } catch (error) {
-               console.error('Error while fetching customers by page:', error);
+               console.error(
+                    'Error while fetching customers by page:',
+                    error
+               );
+
                return [];
           }
      };
 
-     const getUserByEmail = async (
+     const getCustomerByEmail = async (
           email: string
-     ): Promise<User | null> => {
+     ): Promise<Customer | null> => {
           try {
-               const normalizedEmail = email.trim().toLowerCase();
-               const users = await fetchVerifiedCustomers();
+               const normalizedEmail = email
+                    .trim()
+                    .toLowerCase();
+
+               const customers = await fetchVerifiedCustomers();
 
                return (
-                    users.find(
-                         (user) =>
-                              user.email?.trim().toLowerCase() ===
-                              normalizedEmail
+                    customers.find(
+                         (customer) =>
+                              customer.email
+                                   ?.trim()
+                                   .toLowerCase() === normalizedEmail
                     ) ?? null
                );
           } catch (error) {
-               console.error('Error while fetching customer by email:', error);
+               console.error(
+                    'Error while fetching customer by email:',
+                    error
+               );
+
                return null;
           }
      };
 
-     const getUsersCount = async (): Promise<number> => {
+     const getCustomersCount = async (): Promise<number> => {
           try {
-               const users = await fetchVerifiedCustomers();
-               return users.length;
+               const customers = await fetchVerifiedCustomers();
+
+               return customers.length;
           } catch (error) {
-               console.error('Error while fetching customers count:', error);
+               console.error(
+                    'Error while fetching customers count:',
+                    error
+               );
+
                return 0;
           }
      };
 
-     const getAllUsers = async (): Promise<User[]> => {
+     const getAllCustomers = async (): Promise<Customer[]> => {
           try {
                return await fetchVerifiedCustomers();
           } catch (error) {
-               console.error('Error while fetching customers:', error);
+               console.error(
+                    'Error while fetching customers:',
+                    error
+               );
+
                return [];
           }
      };
 
-     const getUsersActiveInWeek = async (
+     const getCustomersCreatedInWeek = async (
           weekOffset: number
-     ): Promise<User[]> => {
+     ): Promise<Customer[]> => {
           try {
                const now = new Date();
 
                const startOfWeek = new Date(
                     now.getFullYear(),
                     now.getMonth(),
-                    now.getDate() - now.getDay() + weekOffset * 7
+                    now.getDate() -
+                    now.getDay() +
+                    weekOffset * 7
                );
 
                startOfWeek.setHours(0, 0, 0, 0);
 
                const endOfWeek = new Date(startOfWeek);
-               endOfWeek.setDate(startOfWeek.getDate() + 7);
+               endOfWeek.setDate(
+                    startOfWeek.getDate() + 7
+               );
 
-               const users = await fetchVerifiedCustomers();
+               const customers = await fetchVerifiedCustomers();
 
-               return users.filter((user) => {
-                    if (!user.email_verified_at) {
-                         return false;
-                    }
-
-                    const verifiedAt = new Date(
-                         user.email_verified_at
+               return customers.filter((customer) => {
+                    const createdAt = new Date(
+                         customer.created_at
                     );
 
                     return (
-                         !Number.isNaN(verifiedAt.getTime()) &&
-                         verifiedAt >= startOfWeek &&
-                         verifiedAt < endOfWeek
+                         !Number.isNaN(createdAt.getTime()) &&
+                         createdAt >= startOfWeek &&
+                         createdAt < endOfWeek
                     );
                });
           } catch (error) {
                console.error(
-                    'Error while fetching customers active in week:',
+                    'Error while fetching customers created in week:',
                     error
                );
 
@@ -373,10 +348,10 @@ export const userServices = () => {
      };
 
      return {
-          getUsersActiveInWeek,
-          getAllUsers,
-          getUsersByPage,
-          getUserByEmail,
-          getUsersCount,
+          getCustomersCreatedInWeek,
+          getAllCustomers,
+          getCustomersByPage,
+          getCustomerByEmail,
+          getCustomersCount,
      };
 };

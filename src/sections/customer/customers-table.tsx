@@ -1,3 +1,5 @@
+'use client';
+
 import PropTypes from 'prop-types';
 import { format } from 'date-fns';
 import {
@@ -5,62 +7,76 @@ import {
      Box,
      Card,
      Checkbox,
+     Chip,
      Stack,
      Table,
      TableBody,
      TableCell,
      TableHead,
-     TablePagination,
      TableRow,
-     Typography
+     Typography,
 } from '@mui/material';
-import { Scrollbar } from 'src/components/scrollbar';
-import Image from 'next/image';
 import { useMemo } from 'react';
+import { Scrollbar } from '@/components/scrollbar';
 import { Customer } from '@/schemas/customer';
 import { getComparator } from '../order/order-list-table';
 import { getInitials } from '@/utils/get-initials';
 
 export const CustomersTable = (props: any) => {
      const {
-          count = 0,
           items = [],
           onDeselectAll,
           onDeselectOne,
-          onPageChange = () => { },
-          onRowsPerPageChange,
           onSelectAll,
           onSelectOne,
           page = 0,
-          rowsPerPage = 0,
+          rowsPerPage = 5,
           selected = [],
           sortDir = 'desc',
-          sortBy = 'name',
+          sortBy = 'full_name',
      } = props;
 
-     const selectedSome = (selected.length > 0) && (selected.length < items.length);
-     const selectedAll = (items.length > 0) && (selected.length === items.length);
+     const selectedSome =
+          selected.length > 0 &&
+          selected.length < items.length;
 
-     const visibleRows = useMemo(
-          () =>
-               [...items]
-                    // .filter((customer: ICustomer) =>
-                    //      !searchQuery || customer.name.toLowerCase().includes(searchQuery.toLowerCase())
-                    // )
-                    .sort(getComparator(sortDir, sortBy))
-                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
-          [items, page, rowsPerPage],
-     );
+     const selectedAll =
+          items.length > 0 &&
+          selected.length === items.length;
+
+     const visibleRows = useMemo(() => {
+          const normalizedSortBy =
+               sortBy === 'name'
+                    ? 'full_name'
+                    : sortBy;
+
+          return [...items]
+               .sort(
+                    getComparator(
+                         sortDir,
+                         normalizedSortBy
+                    )
+               )
+               .slice(
+                    page * rowsPerPage,
+                    page * rowsPerPage + rowsPerPage
+               );
+     }, [
+          items,
+          page,
+          rowsPerPage,
+          sortBy,
+          sortDir,
+     ]);
 
      return (
           <Card>
                <Scrollbar>
-                    <Box sx={{ minWidth: 800 }
-                    }>
+                    <Box sx={{ minWidth: 1200 }}>
                          <Table>
                               <TableHead>
                                    <TableRow>
-                                        <TableCell padding="checkbox" >
+                                        <TableCell padding="checkbox">
                                              <Checkbox
                                                   checked={selectedAll}
                                                   indeterminate={selectedSome}
@@ -73,21 +89,61 @@ export const CustomersTable = (props: any) => {
                                                   }}
                                              />
                                         </TableCell>
+
                                         <TableCell>
-                                             Name
+                                             Klijent
                                         </TableCell>
+
                                         <TableCell>
                                              Email
                                         </TableCell>
+
                                         <TableCell>
-                                             Image
+                                             Telefon
+                                        </TableCell>
+
+                                        <TableCell>
+                                             Adresa
+                                        </TableCell>
+
+                                        <TableCell align="center">
+                                             Broj porudžbina
+                                        </TableCell>
+
+                                        <TableCell>
+                                             Datum registracije
                                         </TableCell>
                                    </TableRow>
                               </TableHead>
+
                               <TableBody>
-                                   {
-                                        visibleRows.map((customer: Customer) => {
-                                             const isSelected = selected.includes(customer.id);
+                                   {visibleRows.map(
+                                        (customer: Customer) => {
+                                             const isSelected =
+                                                  selected.includes(customer.id);
+
+                                             const avatar =
+                                                  customer.avatar ??
+                                                  undefined;
+
+                                             const fullAddress =
+                                                  [
+                                                       customer.street_address,
+                                                       customer.city,
+                                                  ]
+                                                       .filter(Boolean)
+                                                       .join(', ');
+
+                                             const createdAt =
+                                                  customer.created_at
+                                                       ? new Date(customer.created_at)
+                                                       : null;
+
+                                             const validCreatedAt =
+                                                  createdAt &&
+                                                  !Number.isNaN(
+                                                       createdAt.getTime()
+                                                  );
 
                                              return (
                                                   <TableRow
@@ -95,58 +151,125 @@ export const CustomersTable = (props: any) => {
                                                        key={customer.id}
                                                        selected={isSelected}
                                                   >
-                                                       <TableCell padding="checkbox" >
+                                                       <TableCell padding="checkbox">
                                                             <Checkbox
                                                                  checked={isSelected}
                                                                  onChange={(event) => {
-                                                                      if (event.target.checked) {
-                                                                           onSelectOne?.(customer.id);
+                                                                      if (
+                                                                           event.target.checked
+                                                                      ) {
+                                                                           onSelectOne?.(
+                                                                                customer.id
+                                                                           );
                                                                       } else {
-                                                                           onDeselectOne?.(customer.id);
+                                                                           onDeselectOne?.(
+                                                                                customer.id
+                                                                           );
                                                                       }
-                                                                 }
-                                                                 }
+                                                                 }}
                                                             />
                                                        </TableCell>
-                                                       < TableCell >
+
+                                                       <TableCell>
                                                             <Stack
                                                                  alignItems="center"
                                                                  direction="row"
                                                                  spacing={2}
                                                             >
-                                                                 <Avatar src={customer.avatar || customer.avatar} >
-                                                                      {getInitials(customer.avatar || customer.full_name)
+                                                                 <Avatar
+                                                                      src={avatar}
+                                                                      alt={
+                                                                           customer.full_name ||
+                                                                           'Klijent'
                                                                       }
+                                                                 >
+                                                                      {getInitials(
+                                                                           customer.full_name ||
+                                                                           customer.email ||
+                                                                           'K'
+                                                                      )}
                                                                  </Avatar>
-                                                                 < Typography variant="subtitle2" >
-                                                                      {customer.full_name}
+
+                                                                 <Typography variant="subtitle2">
+                                                                      {customer.full_name ||
+                                                                           'Nepoznat klijent'}
                                                                  </Typography>
                                                             </Stack>
                                                        </TableCell>
+
                                                        <TableCell>
-                                                            {customer.email}
+                                                            <Typography variant="body2">
+                                                                 {customer.email || '—'}
+                                                            </Typography>
                                                        </TableCell>
-                                                       < TableCell >
-                                                            <Image
-                                                                 src={
-                                                                      customer.gender == 'male' ? '/assets/avatars/avatar-omar-darboe.png' :
-                                                                           customer.gender == 'female' ? '/assets/avatars/avatar-neha-punita.png' :
-                                                                                '/assets/avatars/avatar-omar-darboe.png'
+
+                                                       <TableCell>
+                                                            <Typography variant="body2">
+                                                                 {customer.phone_number || '—'}
+                                                            </Typography>
+                                                       </TableCell>
+
+                                                       <TableCell>
+                                                            <Typography variant="body2">
+                                                                 {fullAddress ||
+                                                                      'Adresa nije uneta'}
+                                                            </Typography>
+                                                       </TableCell>
+
+                                                       <TableCell align="center">
+                                                            <Chip
+                                                                 label={
+                                                                      customer.orders?.[0]?.count ?? 0
                                                                  }
-                                                                 width={80}
-                                                                 height={80}
-                                                                 alt='image'
-                                                                 style={{ borderRadius: '50%' }}
+                                                                 size="small"
+                                                                 color={
+                                                                      customer.orders?.[0]?.count > 0
+                                                                           ? 'primary'
+                                                                           : 'default'
+                                                                 }
+                                                                 variant={
+                                                                      customer.orders?.[0]?.count > 0
+                                                                           ? 'filled'
+                                                                           : 'outlined'
+                                                                 }
                                                             />
+                                                       </TableCell>
+
+                                                       <TableCell>
+                                                            <Typography variant="body2">
+                                                                 {validCreatedAt
+                                                                      ? format(
+                                                                           createdAt,
+                                                                           'dd.MM.yyyy.'
+                                                                      )
+                                                                      : '—'}
+                                                            </Typography>
                                                        </TableCell>
                                                   </TableRow>
                                              );
-                                        })}
+                                        }
+                                   )}
+
+                                   {visibleRows.length === 0 && (
+                                        <TableRow>
+                                             <TableCell
+                                                  colSpan={7}
+                                                  align="center"
+                                                  sx={{ py: 6 }}
+                                             >
+                                                  <Typography
+                                                       color="text.secondary"
+                                                       variant="body2"
+                                                  >
+                                                       Nema pronađenih klijenata.
+                                                  </Typography>
+                                             </TableCell>
+                                        </TableRow>
+                                   )}
                               </TableBody>
                          </Table>
                     </Box>
                </Scrollbar>
-
           </Card>
      );
 };
@@ -162,5 +285,7 @@ CustomersTable.propTypes = {
      onSelectOne: PropTypes.func,
      page: PropTypes.number,
      rowsPerPage: PropTypes.number,
-     selected: PropTypes.array
+     selected: PropTypes.array,
+     sortBy: PropTypes.string,
+     sortDir: PropTypes.oneOf(['asc', 'desc']),
 };

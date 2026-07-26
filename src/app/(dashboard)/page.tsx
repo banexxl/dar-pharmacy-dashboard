@@ -1,7 +1,7 @@
 import HomeClient from './home-client';
 import { ordersServices } from '@/services/order-services';
 import { productsServices } from '@/services/product-services';
-import { userServices } from '@/services/user-services';
+import { customerServices } from '@/services/user-services';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,8 +14,8 @@ export default async function Page() {
     ordersServices().getLastNumberOfOrders(6),
     ordersServices().getMonthlyOrderSumsForYear(0),
     ordersServices().getMonthlyOrderSumsForYear(-1),
-    userServices().getUsersActiveInWeek(0),
-    userServices().getUsersActiveInWeek(-1),
+    customerServices().getCustomersCreatedInWeek(0),
+    customerServices().getCustomersCreatedInWeek(-1),
   ]);
 
   const data = JSON.parse(JSON.stringify(values));

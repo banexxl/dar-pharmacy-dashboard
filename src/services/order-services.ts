@@ -2,10 +2,10 @@ import 'server-only';
 
 import { Order } from '@/schemas/order';
 import { asDate, fetchRows, supabase } from './supabase-browser';
-import { User } from './user-services';
+import { Customer } from '@/schemas/customer';
 
 export type OrderWithClient = Order & {
-     client: User | null;
+     client: Customer | null;
 };
 
 const sortOrdersByCreatedAtDesc = (orders: Order[]) => {
