@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import { Box, Divider, MenuItem, MenuList, Popover, Typography } from '@mui/material';
 import Swal from 'sweetalert2';
 import { useAuth } from '@/context/auth-context';
-import { supabaseBrowser } from '@/services/supabase-browser';
 
 export const AccountPopover = (props: any) => {
      const { anchorEl, onClose, open, deferredPrompt, isInstallable, setDeferredPrompt, setIsInstallable } = props;
