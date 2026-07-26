@@ -1,10 +1,41 @@
 'use client';
 
 import { Box, Button, Stack, Typography, Card, CardMedia, useMediaQuery } from '@mui/material';
-import { handleGoogleSignIn } from '../actions';
+import { supabaseBrowser } from '@/services/supabase-browser';
 
 const Page = () => {
      const mdDown = useMediaQuery((theme: any) => theme.breakpoints.down('md'));
+
+
+     const handleGoogleSignIn = async (): Promise<{
+          success: boolean;
+          error?: unknown;
+     }> => {
+          const redirectTo =
+               `${window.location.origin}/auth/callback`;
+
+          const { error } =
+               await supabaseBrowser.auth.signInWithOAuth({
+                    provider: 'google',
+
+                    options: {
+                         redirectTo,
+                    },
+               });
+
+          if (error) {
+               console.error('Google sign-in failed:', error);
+
+               return {
+                    success: false,
+                    error,
+               };
+          }
+
+          return {
+               success: true,
+          };
+     }
 
      return (
           <Box sx={{ display: 'flex', flexDirection: 'column', ml: mdDown ? '10px' : '200px', mt: '120px', width: mdDown ? '90dvw' : '70dvw', height: '70dvh' }}>

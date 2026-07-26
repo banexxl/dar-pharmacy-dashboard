@@ -1,33 +1,47 @@
-'use client';
+import { createSupabaseServerClient } from "@/services/supabase-server";
 
-import { supabaseBrowser } from "@/services/supabase-browser";
+export type ErrorType = {
+     code: string;
+     details: string;
+     hint?: string;
+     message?: string;
+}
 
-export async function handleGoogleSignIn(): Promise<{
-     success: boolean;
-     error?: unknown;
-}> {
-     const redirectTo =
-          `${window.location.origin}/auth/callback`;
+export async function checkIfAdmin(email: string): Promise<{ success: boolean; error?: ErrorType }> {
 
-     const { error } =
-          await supabaseBrowser.auth.signInWithOAuth({
-               provider: 'google',
+     try {
+          const supabase = await createSupabaseServerClient();
 
-               options: {
-                    redirectTo,
-               },
-          });
+          const { data } = await supabase
+               .from('admins')
+               .select('email')
+               .eq('email', email)
+               .single();
 
-     if (error) {
-          console.error('Google sign-in failed:', error);
-
+          if (data?.email) {
+               return {
+                    success: true,
+                    error: null
+               };
+          }
           return {
                success: false,
-               error,
+               error: {
+                    code: 'UserNotFound',
+                    details: 'Admin not found',
+                    message: 'Admin not found',
+                    hint: 'Please contact support.',
+               },
+          };
+     } catch (error) {
+          return {
+               success: false,
+               error: {
+                    code: 'ServerError',
+                    details: 'An error occurred while checking user permission',
+                    message: 'An error occurred while checking user permission',
+                    hint: 'Please try again later.',
+               },
           };
      }
-
-     return {
-          success: true,
-     };
 }
