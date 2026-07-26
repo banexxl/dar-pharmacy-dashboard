@@ -133,7 +133,7 @@ export const ProductsTable = (props: any) => {
      const handleFileRemove = () => {
           setCurrentProductObject((previousObject: any) => ({
                ...previousObject,
-               imageURL: ""
+               image_url: ""
           }))
      }
 
@@ -236,7 +236,7 @@ export const ProductsTable = (props: any) => {
                          'Access-Control-Allow-Origin': 'https://dar-pharmacy-dashboard.vercel.app/api/product-api, http://localhost:3000/api/product-api',
                          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS' // Set the content type to JSON
                     },
-                    body: JSON.stringify({ currentProductID: currentProductID, imageID: currentProductObject.imageURL }), // Convert your data to JSON
+                    body: JSON.stringify({ currentProductID: currentProductID, imageID: currentProductObject.image_url }), // Convert your data to JSON
                })
 
                if (response.ok) {
@@ -334,7 +334,7 @@ export const ProductsTable = (props: any) => {
                          setLoading(false)
                          setCurrentProductObject((previousObject: any) => ({
                               ...previousObject,
-                              imageURL: result.imageUrl
+                              image_url: result.imageUrl
                          }))
                     }
                }
