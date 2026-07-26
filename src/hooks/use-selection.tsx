@@ -1,39 +1,44 @@
-import { Order } from '@/schemas/order';
-import { Product } from '@/schemas/product';
-import { Customer } from '@/schemas/customer';
+import {
+     useCallback,
+     useState,
+} from 'react';
 
-import { useCallback, useEffect, useState } from 'react';
-
-type ItemType = Product | Customer | Order;
-
-export const useSelection = (items: ItemType[] = []) => {
-     const [selected, setSelected] = useState<ItemType[]>([]);
-
-     useEffect(() => {
-          setSelected([]);
-     }, [items]);
+export const useSelection = <T,>(
+     items: T[] = []
+) => {
+     const [selected, setSelected] = useState<T[]>([]);
 
      const handleSelectAll = useCallback(() => {
-          setSelected([...items]);
+          setSelected(items);
      }, [items]);
 
-     const handleSelectOne = useCallback((item: ItemType) => {
-          setSelected((prevState) => [...prevState, item]);
+     const handleSelectOne = useCallback((item: T) => {
+          setSelected((previousSelected) => {
+               if (previousSelected.includes(item)) {
+                    return previousSelected;
+               }
+
+               return [...previousSelected, item];
+          });
      }, []);
 
      const handleDeselectAll = useCallback(() => {
           setSelected([]);
      }, []);
 
-     const handleDeselectOne = useCallback((item: ItemType) => {
-          setSelected((prevState) => prevState.filter((_item) => _item !== item));
+     const handleDeselectOne = useCallback((item: T) => {
+          setSelected((previousSelected) =>
+               previousSelected.filter(
+                    (selectedItem) => selectedItem !== item
+               )
+          );
      }, []);
 
      return {
-          handleDeselectAll,
-          handleDeselectOne,
-          handleSelectAll,
-          handleSelectOne,
+          deselectAll: handleDeselectAll,
+          deselectOne: handleDeselectOne,
+          selectAll: handleSelectAll,
+          selectOne: handleSelectOne,
           selected,
      };
 };
