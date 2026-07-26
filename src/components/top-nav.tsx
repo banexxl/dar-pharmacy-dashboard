@@ -107,7 +107,7 @@ export const TopNav = (props: any) => {
                                         width: 40
                                    }}
                                    src={
-                                        props.session?.user?.avatar ||
+                                        props.viewer?.avatar ||
                                         '/dar_icon_only.png'
                                    }
                               />

@@ -35,9 +35,11 @@ export default function DashboardLayout({
      const [openNav, setOpenNav] = useState(false);
 
      const {
-          viewer: session,
+          viewer,
           status,
      } = useAuth();
+     console.log('viewer', viewer);
+     console.log('status', status);
 
      useEffect(() => {
           setOpenNav(false);
@@ -47,7 +49,7 @@ export default function DashboardLayout({
           <>
                <TopNav
                     onNavOpen={() => setOpenNav(true)}
-                    session={session}
+                    viewer={viewer}
                     sessionStatus={status}
                />
 

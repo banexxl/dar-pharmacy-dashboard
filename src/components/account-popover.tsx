@@ -17,32 +17,13 @@ export const AccountPopover = (props: any) => {
      const handleSignOut = useCallback(async () => {
           try {
                onClose?.();
-
-               const { error } =
-                    await supabaseBrowser.auth.signOut();
-
-               if (error) {
-                    throw error;
-               }
-
-               // Only necessary if older code created this value.
-               window.sessionStorage.removeItem('authenticated');
-
+               await auth.signOut();
                router.replace('/auth/login');
                router.refresh();
           } catch (error) {
-               console.error('Sign-out failed:', error);
-
-               await Swal.fire({
-                    icon: 'error',
-                    title: 'Odjava nije uspela',
-                    text:
-                         error instanceof Error
-                              ? error.message
-                              : 'Došlo je do nepoznate greške.',
-               });
+               console.error('Unable to sign out:', error);
           }
-     }, [onClose, router]);
+     }, [auth, onClose, router]);
 
      const handleRebuild = useCallback(async () => {
           const result = await Swal.fire({
