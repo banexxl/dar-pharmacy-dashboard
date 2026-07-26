@@ -225,7 +225,7 @@ export async function POST(
                     }
                );
           }
-          console.log('manufacturer_id', manufacturer_id);
+
           const manufacturerName =
                await getManufacturerName(
                     manufacturer_id

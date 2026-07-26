@@ -38,8 +38,6 @@ export default function DashboardLayout({
           viewer,
           status,
      } = useAuth();
-     console.log('viewer', viewer);
-     console.log('status', status);
 
      useEffect(() => {
           setOpenNav(false);

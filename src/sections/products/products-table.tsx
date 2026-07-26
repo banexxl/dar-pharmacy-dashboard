@@ -291,7 +291,6 @@ export const ProductsTable = (props: any) => {
           // Assuming you have a title for the image
           const title = selectedFile.name.split('.')[0]
           const apiUrl = '/api/aws/aws-s3-image-storage'
-          console.log('currentProductObject', currentProductObject);
 
           try {
                const reader = new FileReader();
