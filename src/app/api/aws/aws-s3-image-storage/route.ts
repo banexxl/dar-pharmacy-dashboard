@@ -4,7 +4,7 @@ import {
      PutObjectCommand,
 } from '@aws-sdk/client-s3';
 import { s3 } from '@/utils/aws/aws-s3';
-
+import { createClient } from '@supabase/supabase-js';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -15,7 +15,7 @@ type UploadBody = {
      title?: string;
      extension: string;
      fileName: string;
-     manufacturer: string;
+     manufacturer_id: string;
 };
 
 type DeleteBody = {
@@ -133,6 +133,63 @@ export const extractKeyFromS3Url = (
      }
 };
 
+const getSupabaseAdminClient = () => {
+     const supabaseUrl =
+          process.env.NEXT_PUBLIC_SUPABASE_URL;
+
+     const serviceRoleKey =
+          process.env.NEXT_SUPABASE_SECRET_KEY;
+
+     if (!supabaseUrl || !serviceRoleKey) {
+          throw new Error(
+               'Missing Supabase server configuration.'
+          );
+     }
+
+     return createClient(
+          supabaseUrl,
+          serviceRoleKey,
+          {
+               auth: {
+                    autoRefreshToken: false,
+                    persistSession: false,
+               },
+          }
+     );
+};
+
+const getManufacturerName = async (
+     manufacturerId: string
+): Promise<string> => {
+     const supabaseAdmin =
+          getSupabaseAdminClient();
+
+     const { data, error } = await supabaseAdmin
+          .from('manufacturers')
+          .select('name')
+          .eq('id', manufacturerId)
+          .maybeSingle();
+
+     if (error) {
+          console.error(
+               '[getManufacturerName]',
+               error
+          );
+
+          throw new Error(
+               'Unable to retrieve manufacturer.'
+          );
+     }
+
+     if (!data?.name) {
+          throw new Error(
+               'Manufacturer was not found.'
+          );
+     }
+
+     return data.name;
+};
+
 // ------------------------------------------------
 // POST – upload image or video
 // ------------------------------------------------
@@ -149,25 +206,30 @@ export async function POST(
                file,
                extension,
                fileName,
-               manufacturer,
+               manufacturer_id,
           } = (await request.json()) as UploadBody;
 
           if (
                !file ||
                !extension ||
                !fileName ||
-               !manufacturer
+               !manufacturer_id
           ) {
                return NextResponse.json(
                     {
                          error:
-                              'Missing file, extension, fileName, or manufacturer.',
+                              'Missing file, extension, fileName, or manufacturer_id.',
                     },
                     {
                          status: 400,
                     }
                );
           }
+          console.log('manufacturer_id', manufacturer_id);
+          const manufacturerName =
+               await getManufacturerName(
+                    manufacturer_id
+               );
 
           const normalizedExtension = extension
                .replace(/^\./, '')
@@ -189,7 +251,8 @@ export async function POST(
                );
           }
 
-          const base64 = stripDataUrlPrefix(file);
+          const base64 =
+               stripDataUrlPrefix(file);
 
           let fileBuffer: Buffer;
 
@@ -220,7 +283,10 @@ export async function POST(
                );
           }
 
-          if (fileBuffer.length > MAX_FILE_SIZE) {
+          if (
+               fileBuffer.length >
+               MAX_FILE_SIZE
+          ) {
                return NextResponse.json(
                     {
                          error:
@@ -233,7 +299,9 @@ export async function POST(
           }
 
           const safeManufacturer =
-               sanitizePathSegment(manufacturer);
+               sanitizePathSegment(
+                    manufacturerName
+               );
 
           const safeFileName =
                getFileBaseName(fileName);
@@ -253,10 +321,11 @@ export async function POST(
                );
           }
 
-          const key =
-               `slike artikla/` +
-               `${safeManufacturer}/` +
-               `${safeFileName}.${normalizedExtension}`;
+          const key = [
+               'slike artikla',
+               safeManufacturer,
+               `${safeFileName}.${normalizedExtension}`,
+          ].join('/');
 
           await s3.send(
                new PutObjectCommand({
@@ -264,14 +333,6 @@ export async function POST(
                     Key: key,
                     Body: fileBuffer,
                     ContentType: contentType,
-
-                    /*
-                     * Do not set ACL when the bucket uses
-                     * Bucket Owner Enforced object ownership.
-                     *
-                     * Public access should be configured through
-                     * a bucket policy or CloudFront.
-                     */
                })
           );
 
@@ -282,6 +343,10 @@ export async function POST(
           return NextResponse.json({
                imageUrl,
                key,
+               manufacturer: {
+                    id: manufacturer_id,
+                    name: manufacturerName,
+               },
           });
      } catch (error) {
           console.error(
@@ -289,15 +354,23 @@ export async function POST(
                error
           );
 
+          const message =
+               error instanceof Error
+                    ? error.message
+                    : 'Failed to upload file to S3.';
+
+          const status =
+               message ===
+                    'Manufacturer was not found.'
+                    ? 404
+                    : 500;
+
           return NextResponse.json(
                {
-                    error:
-                         error instanceof Error
-                              ? error.message
-                              : 'Failed to upload file to S3.',
+                    error: message,
                },
                {
-                    status: 500,
+                    status,
                }
           );
      }
