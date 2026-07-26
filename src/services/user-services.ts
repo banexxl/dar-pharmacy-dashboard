@@ -92,6 +92,8 @@ const fetchAllCustomers = async (): Promise<Customer[]> => {
                province_state,
                country,
                zip_postal_code,
+               is_banned,
+               banned_until,
                created_at,
                updated_at,
                orders:orders!orders_customer_id_fkey(count)
@@ -177,6 +179,9 @@ const mapCustomer = (
 
           created_at: customer.created_at,
           updated_at: customer.updated_at,
+
+          is_banned: customer.is_banned,
+          banned_until: customer.banned_until,
      };
 };
 

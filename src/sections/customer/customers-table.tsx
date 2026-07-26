@@ -5,9 +5,12 @@ import { format } from 'date-fns';
 import {
      Avatar,
      Box,
+     Button,
+     ButtonGroup,
      Card,
      Checkbox,
      Chip,
+     CircularProgress,
      Stack,
      Table,
      TableBody,
@@ -16,11 +19,14 @@ import {
      TableRow,
      Typography,
 } from '@mui/material';
-import { useMemo } from 'react';
+import { useMemo, useState, useTransition } from 'react';
 import { Scrollbar } from '@/components/scrollbar';
 import { Customer } from '@/schemas/customer';
 import { getComparator } from '../order/order-list-table';
 import { getInitials } from '@/utils/get-initials';
+import { banCustomer, deleteCustomer, sendCustomerPasswordReset, unbanCustomer } from '@/app/(dashboard)/klijenti/actions';
+import Swal from 'sweetalert2';
+import { useRouter } from 'next/navigation';
 
 export const CustomersTable = (props: any) => {
      const {
@@ -35,6 +41,11 @@ export const CustomersTable = (props: any) => {
           sortDir = 'desc',
           sortBy = 'full_name',
      } = props;
+
+     const router = useRouter();
+     const [isPending, startTransition] = useTransition();
+     const [activeCustomerId, setActiveCustomerId] =
+          useState<string | null>(null);
 
      const selectedSome =
           selected.length > 0 &&
@@ -68,6 +79,150 @@ export const CustomersTable = (props: any) => {
           sortBy,
           sortDir,
      ]);
+
+     const executeAction = (
+          customerId: string,
+          action: () => Promise<{
+               success: boolean;
+               error?: string;
+          }>,
+          successMessage: string
+     ) => {
+          setActiveCustomerId(customerId);
+
+          startTransition(async () => {
+               try {
+                    const result = await action();
+
+                    if (!result.success) {
+                         await Swal.fire({
+                              icon: 'error',
+                              title: 'Greška',
+                              text:
+                                   result.error ??
+                                   'Akcija nije uspešno izvršena.',
+                         });
+
+                         return;
+                    }
+
+                    await Swal.fire({
+                         icon: 'success',
+                         title: 'Uspešno',
+                         text: successMessage,
+                         timer: 1800,
+                         showConfirmButton: false,
+                    });
+
+                    router.refresh();
+               } finally {
+                    setActiveCustomerId(null);
+               }
+          });
+     };
+
+     const handleDelete = async (customer: Customer) => {
+          const confirmation = await Swal.fire({
+               icon: 'warning',
+               title: 'Obrisati klijenta?',
+               text: `Nalog ${customer.full_name || customer.email} biće trajno obrisan.`,
+               showCancelButton: true,
+               confirmButtonText: 'Obriši',
+               cancelButtonText: 'Odustani',
+               confirmButtonColor: '#d32f2f',
+          });
+
+          if (!confirmation.isConfirmed) {
+               return;
+          }
+
+          executeAction(
+               customer.id,
+               () => deleteCustomer(customer.id),
+               'Klijent je uspešno obrisan.'
+          );
+     };
+
+     const handleBan = async (customer: Customer) => {
+          const customerName =
+               customer.full_name ||
+               customer.email ||
+               'Ovaj klijent';
+
+          const confirmation = await Swal.fire({
+               icon: 'warning',
+               title: 'Blokirati klijenta?',
+               text: `${customerName} neće moći da se prijavi.`,
+               showCancelButton: true,
+               confirmButtonText: 'Blokiraj',
+               cancelButtonText: 'Odustani',
+               confirmButtonColor: '#ed6c02',
+               reverseButtons: true,
+               focusCancel: true,
+          });
+
+          if (!confirmation.isConfirmed) {
+               return;
+          }
+
+          executeAction(
+               customer.id,
+               () => banCustomer(customer.id),
+               'Klijent je uspešno blokiran.'
+          );
+     };
+
+     const handleUnban = async (customer: Customer) => {
+          const customerName =
+               customer.full_name ||
+               customer.email ||
+               'Ovaj klijent';
+
+          const confirmation = await Swal.fire({
+               icon: 'question',
+               title: 'Odblokirati klijenta?',
+               text: `${customerName} će ponovo moći da se prijavi.`,
+               showCancelButton: true,
+               confirmButtonText: 'Odblokiraj',
+               cancelButtonText: 'Odustani',
+               confirmButtonColor: '#2e7d32',
+               reverseButtons: true,
+               focusCancel: true,
+          });
+
+          if (!confirmation.isConfirmed) {
+               return;
+          }
+
+          executeAction(
+               customer.id,
+               () => unbanCustomer(customer.id),
+               'Klijent je uspešno odblokiran.'
+          );
+     };
+
+     const handlePasswordReset = async (
+          customer: Customer
+     ) => {
+          const confirmation = await Swal.fire({
+               icon: 'question',
+               title: 'Poslati email za promenu lozinke?',
+               text: `Email će biti poslat na ${customer.email}.`,
+               showCancelButton: true,
+               confirmButtonText: 'Pošalji',
+               cancelButtonText: 'Odustani',
+          });
+
+          if (!confirmation.isConfirmed) {
+               return;
+          }
+
+          executeAction(
+               customer.id,
+               () => sendCustomerPasswordReset(customer.id),
+               'Email za promenu lozinke je poslat.'
+          );
+     };
 
      return (
           <Card>
@@ -112,6 +267,14 @@ export const CustomersTable = (props: any) => {
 
                                         <TableCell>
                                              Datum registracije
+                                        </TableCell>
+
+                                        <TableCell align="center">
+                                             Upravljanje nalogom
+                                        </TableCell>
+
+                                        <TableCell align="right">
+                                             Brisanje
                                         </TableCell>
                                    </TableRow>
                               </TableHead>
@@ -244,6 +407,61 @@ export const CustomersTable = (props: any) => {
                                                                       )
                                                                       : '—'}
                                                             </Typography>
+                                                       </TableCell>
+                                                       <TableCell align="center">
+                                                            {isPending &&
+                                                                 activeCustomerId === customer.id ? (
+                                                                 <CircularProgress size={24} />
+                                                            ) : (
+                                                                 <ButtonGroup
+                                                                      size="small"
+                                                                      variant="outlined"
+                                                                 >
+                                                                      {customer.is_banned ? (
+                                                                           <Button
+                                                                                color="success"
+                                                                                onClick={() =>
+                                                                                     handleUnban(customer)
+                                                                                }
+                                                                           >
+                                                                                Odblokiraj
+                                                                           </Button>
+                                                                      ) : (
+                                                                           <Button
+                                                                                color="warning"
+                                                                                onClick={() =>
+                                                                                     handleBan(customer)
+                                                                                }
+                                                                           >
+                                                                                Blokiraj
+                                                                           </Button>
+                                                                      )}
+
+                                                                      <Button
+                                                                           onClick={() =>
+                                                                                handlePasswordReset(customer)
+                                                                           }
+                                                                           disabled={!customer.email}
+                                                                      >
+                                                                           Resetuj lozinku
+                                                                      </Button>
+                                                                 </ButtonGroup>
+                                                            )}
+                                                       </TableCell>
+
+                                                       <TableCell align="right">
+                                                            <Button
+                                                                 color="error"
+                                                                 size="small"
+                                                                 variant="outlined"
+                                                                 disabled={
+                                                                      isPending &&
+                                                                      activeCustomerId === customer.id
+                                                                 }
+                                                                 onClick={() => handleDelete(customer)}
+                                                            >
+                                                                 Obriši
+                                                            </Button>
                                                        </TableCell>
                                                   </TableRow>
                                              );

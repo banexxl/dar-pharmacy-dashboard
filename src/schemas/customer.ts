@@ -22,4 +22,6 @@ export type Customer = {
      created_at: string;
      updated_at: string;
 
+     is_banned: boolean;
+     banned_until: string | null;
 };
