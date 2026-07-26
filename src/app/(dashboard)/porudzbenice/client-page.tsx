@@ -1,66 +1,89 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import type { ChangeEvent } from 'react';
 import PlusIcon from '@untitled-ui/icons-react/build/esm/Plus';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import Stack from '@mui/material/Stack';
 import SvgIcon from '@mui/material/SvgIcon';
+import TablePagination from '@mui/material/TablePagination';
 import Typography from '@mui/material/Typography';
-import { OrderDrawer } from '@/sections/order/order-drawer';
-import { OrderListContainer } from '@/sections/order/order-list-container';
-import { OrderListTable, SortBy, SortDir } from '@/sections/order/order-list-table';
-import { OrderListSearch } from '@/sections/order/order-list-search';
-import { Order } from '@/schemas/order';
+
 import { useDialog } from '@/hooks/use-dialog';
 import { useMounted } from '@/hooks/use-mounted';
-import { TablePagination } from '@mui/material'
+import type { Order } from '@/schemas/order';
+import { OrderDrawer } from '@/sections/order/order-drawer';
+import { OrderListContainer } from '@/sections/order/order-list-container';
+import { OrderListSearch } from '@/sections/order/order-list-search';
+import { OrderListTable } from '@/sections/order/order-list-table';
+import type {
+  SortBy,
+  SortDir,
+} from '@/sections/order/order-list-table';
+
+type OrdersPageProps = {
+  allOrders: Order[];
+};
 
 const useOrdersSearch = () => {
-
   const [state, setState] = useState({
     query: '',
     page: 0,
     rowsPerPage: 5,
     sortBy: 'createdAt',
-    sortDir: 'desc',
-    tab: 'all'
-  })
+    sortDir: 'desc' as SortDir,
+    tab: 'all',
+  });
 
-  const handleQueryChange = useCallback((filters: any) => {
-    setState((prevState) => ({
-      ...prevState,
-      filters,
-    }));
-  }, []);
-
-  const handlePageChange = useCallback((event: any, page: any) => {
-    setState((prevState) => ({
-      ...prevState,
-      page,
-    }));
-  }, []);
-
-  const handleRowsPerPageChange = useCallback((event: any) => {
-    setState((prevState) => ({
-      ...prevState,
+  const handleQueryChange = useCallback((query: string) => {
+    setState((previousState) => ({
+      ...previousState,
+      query,
       page: 0,
-      rowsPerPage: parseInt(event.target.value, 10),
     }));
-
   }, []);
 
-  const handleSortChange = useCallback((sortDir: any) => {
-    setState((prevState) => ({
-      ...prevState,
+  const handlePageChange = useCallback(
+    (_event: unknown, page: number) => {
+      setState((previousState) => ({
+        ...previousState,
+        page,
+      }));
+    },
+    []
+  );
+
+  const handleRowsPerPageChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      setState((previousState) => ({
+        ...previousState,
+        page: 0,
+        rowsPerPage: Number.parseInt(event.target.value, 10),
+      }));
+    },
+    []
+  );
+
+  const handleSortChange = useCallback((sortDir: SortDir) => {
+    setState((previousState) => ({
+      ...previousState,
+      page: 0,
       sortDir,
     }));
   }, []);
 
   const handleTabsChange = useCallback((tab: string) => {
-    setState((prevState) => ({
-      ...prevState,
+    setState((previousState) => ({
+      ...previousState,
+      page: 0,
       tab,
     }));
   }, []);
@@ -75,7 +98,10 @@ const useOrdersSearch = () => {
   };
 };
 
-const useCurrentOrder = (orders: Order[], orderId: string | undefined) => {
+const useCurrentOrder = (
+  orders: Order[],
+  orderId: string | undefined
+) => {
   return useMemo(() => {
     if (!orderId) {
       return undefined;
@@ -85,32 +111,139 @@ const useCurrentOrder = (orders: Order[], orderId: string | undefined) => {
   }, [orders, orderId]);
 };
 
-const Page = (props: any) => {
-  const rootRef = useRef(null);
+const Page = ({ allOrders }: OrdersPageProps) => {
+  const rootRef = useRef<HTMLDivElement | null>(null);
   const ordersSearch = useOrdersSearch();
   const dialog = useDialog();
+  const isMounted = useMounted();
 
-  const [ordersStore, setOrderStore] = useState({
+  const [ordersStore, setOrderStore] = useState<{
+    orders: Order[];
+    ordersCount: number;
+  }>({
     orders: [],
     ordersCount: 0,
   });
 
-  const currentOrder = useCurrentOrder(ordersStore.orders, dialog.data);
-
-  const isMounted = useMounted();
-
   useEffect(() => {
     if (isMounted()) {
       setOrderStore({
-        orders: props.allOrders,
-        ordersCount: props.allOrders.length,
+        orders: allOrders ?? [],
+        ordersCount: allOrders?.length ?? 0,
       });
     }
-  }, [isMounted, props.allOrders]);
+  }, [isMounted, allOrders]);
+
+  const filteredOrders = useMemo(() => {
+    const query = ordersSearch.state.query
+      .trim()
+      .toLocaleLowerCase();
+
+    const filtered = ordersStore.orders.filter((order: any) => {
+      const status =
+        order.order_status ??
+        order.orderStatus ??
+        order.status ??
+        'pending';
+
+      const matchesTab =
+        ordersSearch.state.tab === 'all' ||
+        status === ordersSearch.state.tab;
+
+      if (!matchesTab) {
+        return false;
+      }
+
+      if (!query) {
+        return true;
+      }
+
+      const customer =
+        order.customer ??
+        order.customers ??
+        order.client ??
+        {};
+
+      const orderItems =
+        order.order_items ??
+        order.orderItems ??
+        order.items ??
+        [];
+
+      const searchableValues = [
+        order.order_number,
+        order.orderNumber,
+        order.transaction_number,
+        order.transactionNumber,
+        order.payment_method,
+        order.paymentMethod,
+        order.payment_status,
+        order.paymentStatus,
+        order.order_status,
+        order.orderStatus,
+        order.status,
+        order.total,
+        order.created_at,
+        order.createdAt,
+        customer.full_name,
+        customer.name,
+        customer.email,
+        customer.phone_number,
+        customer.phoneNumber,
+        customer.street_address,
+        customer.streetAddress,
+        customer.city,
+        customer.province_state,
+        customer.provinceState,
+        customer.country,
+        customer.zip_postal_code,
+        customer.zipPostalCode,
+        ...orderItems.flatMap((item: any) => [
+          item.name,
+          item.manufacturer,
+          item.main_category,
+          item.mainCategory,
+          item.mid_category,
+          item.midCategory,
+          item.sub_category,
+          item.subCategory,
+        ]),
+      ];
+
+      return searchableValues.some((value) =>
+        String(value ?? '')
+          .toLocaleLowerCase()
+          .includes(query)
+      );
+    });
+
+    return [...filtered].sort((first: any, second: any) => {
+      const firstDate = new Date(
+        first.created_at ?? first.createdAt ?? 0
+      ).getTime();
+
+      const secondDate = new Date(
+        second.created_at ?? second.createdAt ?? 0
+      ).getTime();
+
+      return ordersSearch.state.sortDir === 'asc'
+        ? firstDate - secondDate
+        : secondDate - firstDate;
+    });
+  }, [
+    ordersStore.orders,
+    ordersSearch.state.query,
+    ordersSearch.state.sortDir,
+    ordersSearch.state.tab,
+  ]);
+
+  const currentOrder = useCurrentOrder(
+    ordersStore.orders,
+    dialog.data
+  );
 
   const onSelect = useCallback(
     (orderId: string) => {
-      // Close drawer if is the same order
       if (dialog.open && dialog.data === orderId) {
         dialog.handleClose();
         return;
@@ -124,19 +257,8 @@ const Page = (props: any) => {
   return (
     <>
       <Divider />
-      <Box
-        component="main"
-        ref={rootRef}
-        sx={{
-          display: 'flex',
-          flex: '1 1 auto',
-          minHeight: 'calc(100vh - 64px)',
-          minWidth: 0,
-          overflow: 'hidden',
-          position: 'relative',
-          width: '100%',
-        }}
-      >
+
+      <Box>
         <OrderListContainer open={dialog.open}>
           <Box sx={{ p: 3 }}>
             <Stack
@@ -145,24 +267,25 @@ const Page = (props: any) => {
               justifyContent="space-between"
               spacing={4}
             >
-              <div>
-                <Typography variant="h4">Porudžbenice</Typography>
-              </div>
-              <div>
-                <Button
-                  startIcon={
-                    <SvgIcon>
-                      <PlusIcon />
-                    </SvgIcon>
-                  }
-                  variant="contained"
-                >
-                  Dodaj
-                </Button>
-              </div>
+              <Typography variant="h4">
+                Porudžbenice
+              </Typography>
+
+              <Button
+                startIcon={
+                  <SvgIcon>
+                    <PlusIcon />
+                  </SvgIcon>
+                }
+                variant="contained"
+              >
+                Dodaj
+              </Button>
             </Stack>
           </Box>
+
           <Divider />
+
           <OrderListSearch
             onQueryChange={ordersSearch.handleQueryChange}
             onTabChange={ordersSearch.handleTabsChange}
@@ -172,21 +295,16 @@ const Page = (props: any) => {
             query={ordersSearch.state.query}
             tab={ordersSearch.state.tab}
           />
+
           <Divider />
-          <TablePagination
-            component="div"
-            count={ordersStore.ordersCount}
-            onPageChange={ordersSearch.handlePageChange}
-            onRowsPerPageChange={ordersSearch.handleRowsPerPageChange}
-            page={ordersSearch.state.page}
-            rowsPerPage={ordersSearch.state.rowsPerPage}
-            rowsPerPageOptions={[5, 10, 25]}
-          />
+
           <OrderListTable
-            count={ordersStore.ordersCount}
-            items={ordersStore.orders}
+            count={filteredOrders.length}
+            items={filteredOrders}
             onPageChange={ordersSearch.handlePageChange}
-            onRowsPerPageChange={ordersSearch.handleRowsPerPageChange}
+            onRowsPerPageChange={
+              ordersSearch.handleRowsPerPageChange
+            }
             onSelect={onSelect}
             page={ordersSearch.state.page}
             rowsPerPage={ordersSearch.state.rowsPerPage}
@@ -196,6 +314,7 @@ const Page = (props: any) => {
             tab={ordersSearch.state.tab}
           />
         </OrderListContainer>
+
         <OrderDrawer
           container={rootRef.current}
           onClose={dialog.handleClose}
@@ -208,4 +327,3 @@ const Page = (props: any) => {
 };
 
 export default Page;
-

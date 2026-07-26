@@ -16,11 +16,11 @@ import {
      TableBody,
      TableCell,
      TableHead,
+     TablePagination,
      TableRow,
      Typography,
 } from '@mui/material';
 import { useMemo, useState, useTransition } from 'react';
-import { Scrollbar } from '@/components/scrollbar';
 import { Customer } from '@/schemas/customer';
 import { getComparator } from '../order/order-list-table';
 import { getInitials } from '@/utils/get-initials';
@@ -30,11 +30,14 @@ import { useRouter } from 'next/navigation';
 
 export const CustomersTable = (props: any) => {
      const {
+          count = 0,
           items = [],
           onDeselectAll,
           onDeselectOne,
           onSelectAll,
           onSelectOne,
+          onPageChange,
+          onRowsPerPageChange,
           page = 0,
           rowsPerPage = 5,
           selected = [],
@@ -225,8 +228,8 @@ export const CustomersTable = (props: any) => {
      };
 
      return (
-          <Card>
-               <Scrollbar>
+          <Card sx={{ overflow: 'hidden' }}>
+               <Box sx={{ overflowX: 'auto', width: '100%' }}>
                     <Box sx={{ minWidth: 1200 }}>
                          <Table>
                               <TableHead>
@@ -471,7 +474,7 @@ export const CustomersTable = (props: any) => {
                                    {visibleRows.length === 0 && (
                                         <TableRow>
                                              <TableCell
-                                                  colSpan={7}
+                                                  colSpan={9}
                                                   align="center"
                                                   sx={{ py: 6 }}
                                              >
@@ -487,7 +490,24 @@ export const CustomersTable = (props: any) => {
                               </TableBody>
                          </Table>
                     </Box>
-               </Scrollbar>
+               </Box>
+
+               <TablePagination
+                    component="div"
+                    count={count}
+                    page={page}
+                    rowsPerPage={rowsPerPage}
+                    onPageChange={onPageChange}
+                    onRowsPerPageChange={onRowsPerPageChange}
+                    rowsPerPageOptions={[5, 10, 25, 50, 100]}
+                    showFirstButton
+                    showLastButton
+                    labelRowsPerPage="Broj po stranici"
+                    sx={{
+                         borderTop: 1,
+                         borderColor: 'divider',
+                    }}
+               />
           </Card>
      );
 };

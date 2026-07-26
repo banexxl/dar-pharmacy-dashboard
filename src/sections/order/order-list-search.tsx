@@ -1,4 +1,8 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback } from 'react';
+import type {
+  ChangeEvent,
+  SyntheticEvent,
+} from 'react';
 import PropTypes from 'prop-types';
 import SearchMdIcon from '@untitled-ui/icons-react/build/esm/SearchMd';
 import Box from '@mui/material/Box';
@@ -11,16 +15,27 @@ import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import TextField from '@mui/material/TextField';
 
-import { useUpdateEffect } from 'src/hooks/use-update-effect';
-import { OrderStatus } from '@/schemas/order';
-import { ta } from 'date-fns/locale';
+import type { OrderStatus } from '@/schemas/order';
+import type { SortDir } from '@/sections/order/order-list-table';
 
-type TabOptions = {
+type TabValue = OrderStatus | 'all';
+
+type TabOption = {
   label: string;
-  value: OrderStatus | 'all';
+  value: TabValue;
 };
 
-const tabOptions: TabOptions[] = [
+type OrderListSearchProps = {
+  onQueryChange?: (query: string) => void;
+  onSortChange?: (sortDir: SortDir) => void;
+  onTabChange?: (tab: string) => void;
+  sortBy?: string;
+  sortDir?: SortDir;
+  tab?: string;
+  query?: string;
+};
+
+const tabOptions: TabOption[] = [
   {
     label: 'Sve',
     value: 'all',
@@ -43,57 +58,54 @@ const tabOptions: TabOptions[] = [
   },
 ];
 
-const sortOptions = [
-  {
-    label: 'Najnovije',
-    value: 'desc',
-  },
-  {
-    label: 'Najsatarije',
-    value: 'asc',
-  },
-];
+const sortOptions: Array<{
+  label: string;
+  value: SortDir;
+}> = [
+    {
+      label: 'Najnovije',
+      value: 'desc',
+    },
+    {
+      label: 'Najstarije',
+      value: 'asc',
+    },
+  ];
 
-export const OrderListSearch = (props: any) => {
+export const OrderListSearch = ({
+  onQueryChange,
+  onSortChange,
+  onTabChange,
+  sortDir = 'desc',
+  tab = 'all',
+  query = '',
+}: OrderListSearchProps) => {
+  const handleQueryChange = useCallback(
+    (
+      event: ChangeEvent<
+        HTMLInputElement | HTMLTextAreaElement
+      >
+    ) => {
+      onQueryChange?.(event.target.value);
+    },
+    [onQueryChange]
+  );
 
-  const {
-    onQueryChange,
-    onSortChange,
-    onTabChange,
-    sortBy = 'createdAt',
-    sortDir = 'asc',
-    tab = 'all',
-    query = ''
-  } = props;
-
-  const queryRef = useRef<HTMLInputElement>(null)
-
-  // const handleFiltersUpdate = useCallback(() => {
-  //   onFiltersChange?.(filter);
-  // }, [filter, onFiltersChange]);
-
-  // useUpdateEffect(() => {
-  //   handleFiltersUpdate();
-  // }, []);
-
-  const handleQueryChange = useCallback((event: any) => {
-    event.preventDefault();
-    // const query = queryRef.current?.value || '';
-    const query = event.target.value;
-    onQueryChange?.(query);
-  }, [onQueryChange]);
-
-  const handleSortChange = useCallback((event: any) => {
-    const sortDir = event.target.value;
-    onSortChange?.(sortDir);
-  },
+  const handleSortChange = useCallback(
+    (
+      event: ChangeEvent<
+        HTMLInputElement | HTMLTextAreaElement
+      >
+    ) => {
+      onSortChange?.(event.target.value as SortDir);
+    },
     [onSortChange]
   );
 
-  const handleTabsChange = useCallback((event: any, newValue: string) => {
-    const tab = newValue
-    onTabChange?.(tab);
-  },
+  const handleTabsChange = useCallback(
+    (_event: SyntheticEvent, value: TabValue) => {
+      onTabChange?.(value);
+    },
     [onTabChange]
   );
 
@@ -108,15 +120,17 @@ export const OrderListSearch = (props: any) => {
         value={tab}
         variant="scrollable"
       >
-        {tabOptions.map((tab) => (
+        {tabOptions.map((option) => (
           <Tab
-            key={tab.value}
-            label={tab.label}
-            value={tab.value}
+            key={option.value}
+            label={option.label}
+            value={option.value}
           />
         ))}
       </Tabs>
+
       <Divider />
+
       <Stack
         alignItems="center"
         direction="row"
@@ -124,17 +138,13 @@ export const OrderListSearch = (props: any) => {
         gap={3}
         sx={{ p: 3 }}
       >
-        <Box
-          component="form"
-          onSubmit={handleQueryChange}
-          sx={{ flexGrow: 1 }}
-        >
+        <Box sx={{ flexGrow: 1 }}>
           <OutlinedInput
-            defaultValue=""
+            value={query}
+            onChange={handleQueryChange}
             fullWidth
-            inputProps={{ ref: queryRef }}
-            name="orderNumber"
-            placeholder="Pretraži po broju porudžbenice"
+            name="query"
+            placeholder="Pretraži porudžbenice"
             startAdornment={
               <InputAdornment position="start">
                 <SvgIcon>
@@ -144,6 +154,7 @@ export const OrderListSearch = (props: any) => {
             }
           />
         </Box>
+
         <TextField
           label="Sortiraj po"
           name="sort"
@@ -172,6 +183,12 @@ OrderListSearch.propTypes = {
   onSortChange: PropTypes.func,
   sortBy: PropTypes.string,
   sortDir: PropTypes.oneOf(['asc', 'desc']),
-  tab: PropTypes.oneOf(['all', 'cancelled', 'delivered', 'pending', 'shipped']),
-  query: PropTypes.string
+  tab: PropTypes.oneOf([
+    'all',
+    'cancelled',
+    'delivered',
+    'pending',
+    'shipped',
+  ]),
+  query: PropTypes.string,
 };

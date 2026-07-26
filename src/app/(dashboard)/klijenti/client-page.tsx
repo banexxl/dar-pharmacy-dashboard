@@ -1,25 +1,14 @@
 'use client';
 
-import {
-     useCallback,
-     useEffect,
-     useMemo,
-     useState,
-} from 'react';
-import {
-     Box,
-     Container,
-     Stack,
-     TablePagination,
-     Typography,
-} from '@mui/material';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { ChangeEvent } from 'react';
+import { Box, Stack, Typography } from '@mui/material';
 
-import { useSelection } from 'src/hooks/use-selection';
-import { CustomersSearch } from 'src/sections/customer/customers-search';
-import { CustomersTable } from '@/sections/customer/customers-table';
-import { useMounted } from '@/hooks/use-mounted';
 import { AuthProvider } from '@/context/auth-context';
+import { useMounted } from '@/hooks/use-mounted';
+import { CustomersSearch } from '@/sections/customer/customers-search';
+import { CustomersTable } from '@/sections/customer/customers-table';
+import { useSelection } from 'src/hooks/use-selection';
 
 type Customer = {
      id: string;
@@ -43,7 +32,7 @@ const useClientSearch = () => {
           page: 0,
           rowsPerPage: 5,
           sortBy: 'full_name',
-          sortDir: 'desc',
+          sortDir: 'desc' as 'asc' | 'desc',
      });
 
      const handleQueryChange = useCallback(
@@ -72,21 +61,7 @@ const useClientSearch = () => {
                setState((previousState) => ({
                     ...previousState,
                     page: 0,
-                    rowsPerPage: Number.parseInt(
-                         event.target.value,
-                         10
-                    ),
-               }));
-          },
-          []
-     );
-
-     const handleSortChange = useCallback(
-          (sortDir: 'asc' | 'desc') => {
-               setState((previousState) => ({
-                    ...previousState,
-                    page: 0,
-                    sortDir,
+                    rowsPerPage: Number.parseInt(event.target.value, 10),
                }));
           },
           []
@@ -94,44 +69,32 @@ const useClientSearch = () => {
 
      return {
           handleQueryChange,
-          handleSortChange,
           handlePageChange,
           handleRowsPerPageChange,
           state,
      };
 };
 
-const CustomersPage = ({
-     allClients,
-}: CustomersPageProps) => {
+const CustomersPage = ({ allClients }: CustomersPageProps) => {
      const clientSearch = useClientSearch();
      const isMounted = useMounted();
-
-     const [clientStore, setClientStore] = useState<{
-          allClients: Customer[];
-     }>({
-          allClients: [],
-     });
+     const [clients, setClients] = useState<Customer[]>([]);
 
      useEffect(() => {
           if (isMounted()) {
-               setClientStore({
-                    allClients: allClients ?? [],
-               });
+               setClients(allClients ?? []);
           }
      }, [isMounted, allClients]);
 
      const filteredClients = useMemo(() => {
-          const query = clientSearch.state.query
-               .trim()
-               .toLocaleLowerCase();
+          const query = clientSearch.state.query.trim().toLocaleLowerCase();
 
           if (!query) {
-               return clientStore.allClients;
+               return clients;
           }
 
-          return clientStore.allClients.filter((customer) => {
-               const searchableValues = [
+          return clients.filter((customer) =>
+               [
                     customer.full_name,
                     customer.email,
                     customer.phone_number,
@@ -140,18 +103,11 @@ const CustomersPage = ({
                     customer.province_state,
                     customer.country,
                     customer.zip_postal_code,
-               ];
-
-               return searchableValues.some((value) =>
-                    String(value ?? '')
-                         .toLocaleLowerCase()
-                         .includes(query)
-               );
-          });
-     }, [
-          clientStore.allClients,
-          clientSearch.state.query,
-     ]);
+               ].some((value) =>
+                    String(value ?? '').toLocaleLowerCase().includes(query)
+               )
+          );
+     }, [clients, clientSearch.state.query]);
 
      const customerIDs = useMemo(
           () => filteredClients.map((customer) => customer.id),
@@ -162,95 +118,33 @@ const CustomersPage = ({
 
      return (
           <AuthProvider>
-               <Box
-                    component="main"
-                    sx={{
-                         flexGrow: 1,
-                         py: 8,
-                    }}
-               >
-                    <Container maxWidth="xl">
-                         <Stack spacing={3}>
-                              <Stack
-                                   direction="row"
-                                   justifyContent="space-between"
-                                   spacing={4}
-                              >
-                                   <Typography variant="h4">
-                                        Klijenti
-                                   </Typography>
-                              </Stack>
+               <Box component="main" sx={{ flexGrow: 1, py: 8 }}>
+                    <Stack spacing={3}>
+                         <Typography variant="h4">Klijenti</Typography>
 
-                              <CustomersSearch
-                                   query={clientSearch.state.query}
-                                   onQueryChange={
-                                        clientSearch.handleQueryChange
-                                   }
-                              />
+                         <CustomersSearch
+                              query={clientSearch.state.query}
+                              onQueryChange={clientSearch.handleQueryChange}
+                         />
 
-                              <TablePagination
-                                   component="div"
-                                   count={filteredClients.length}
-                                   page={clientSearch.state.page}
-                                   rowsPerPage={
-                                        clientSearch.state.rowsPerPage
-                                   }
-                                   onPageChange={
-                                        clientSearch.handlePageChange
-                                   }
-                                   onRowsPerPageChange={
-                                        clientSearch.handleRowsPerPageChange
-                                   }
-                                   rowsPerPageOptions={[
-                                        5,
-                                        10,
-                                        25,
-                                        50,
-                                        100,
-                                   ]}
-                                   showFirstButton
-                                   showLastButton
-                                   labelRowsPerPage="Broj po stranici"
-                              />
-
-                              <CustomersTable
-                                   count={filteredClients.length}
-                                   items={filteredClients}
-                                   page={clientSearch.state.page}
-                                   rowsPerPage={
-                                        clientSearch.state.rowsPerPage
-                                   }
-                                   selected={
-                                        customersSelection.selected
-                                   }
-                              />
-
-                              <TablePagination
-                                   component="div"
-                                   count={filteredClients.length}
-                                   page={clientSearch.state.page}
-                                   rowsPerPage={
-                                        clientSearch.state.rowsPerPage
-                                   }
-                                   onPageChange={
-                                        clientSearch.handlePageChange
-                                   }
-                                   onRowsPerPageChange={
-                                        clientSearch.handleRowsPerPageChange
-                                   }
-                                   rowsPerPageOptions={[
-                                        5,
-                                        10,
-                                        25,
-                                        50,
-                                        100,
-                                   ]}
-                                   showFirstButton
-                                   showLastButton
-                                   labelRowsPerPage="Broj po stranici"
-                              />
-                         </Stack>
-                    </Container>
+                         <CustomersTable
+                              count={filteredClients.length}
+                              items={filteredClients}
+                              page={clientSearch.state.page}
+                              rowsPerPage={clientSearch.state.rowsPerPage}
+                              selected={customersSelection.selected}
+                              onSelectAll={customersSelection.selectAll}
+                              onDeselectAll={customersSelection.deselectAll}
+                              onSelectOne={customersSelection.selectOne}
+                              onDeselectOne={customersSelection.deselectOne}
+                              onPageChange={clientSearch.handlePageChange}
+                              onRowsPerPageChange={
+                                   clientSearch.handleRowsPerPageChange
+                              }
+                              sortBy={clientSearch.state.sortBy}
+                              sortDir={clientSearch.state.sortDir}
+                         />
+                    </Stack>
                </Box>
           </AuthProvider>
      );
