@@ -26,7 +26,13 @@ export function descendingComparator<T>(a: T, b: T, sortBy: keyof T) {
 
 export type SortDir = 'asc' | 'desc';
 
-export type SortBy = 'createdAt' | 'orderNumber' | 'total' | 'paymentMethod' | 'customer.name' | 'customer.email' | 'status';
+export type SortBy =
+  | 'created_at'
+  | 'order_number'
+  | 'total'
+  | 'payment_method'
+  | 'payment_status'
+  | 'order_status';
 
 export function getComparator<SortBy extends string | number | symbol>(
   sortDir: SortDir,
@@ -58,7 +64,7 @@ export const OrderListTable = (props: any) => {
   const visibleRows = useMemo(
     () =>
       [...items]
-        .filter(order => tab === 'all' || order.status === tab)
+        .filter(order => tab === 'all' || order.order_status === tab)
         .sort(getComparator(sortDir, sortBy))
         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
     [items, tab, sortDir, sortBy, page, rowsPerPage],
@@ -140,15 +146,15 @@ export const OrderListTable = (props: any) => {
                 <TableCell align="left">{order.customer.email}</TableCell>
                 <TableCell align="left">
                   <SeverityPill color={
-                    order.status == 'pending' ? 'warning' :
-                      order.status == 'shipped' ? 'info' :
-                        order.status == 'delivered' ? 'success' :
-                          order.status == 'cancelled' ? 'error' : 'warning'
+                    order.order_status == 'pending' ? 'warning' :
+                      order.order_status == 'shipped' ? 'info' :
+                        order.order_status == 'delivered' ? 'success' :
+                          order.order_status == 'cancelled' ? 'error' : 'warning'
                   }>{
-                      order.status == 'pending' ? 'Na čekanju' :
-                        order.status == 'shipped' ? 'Poslato' :
-                          order.status == 'delivered' ? 'Dostavljeno' :
-                            order.status == 'cancelled' ? 'Otkazano' : 'Na čekanju'
+                      order.order_status == 'pending' ? 'Na čekanju' :
+                        order.order_status == 'shipped' ? 'Poslato' :
+                          order.order_status == 'delivered' ? 'Dostavljeno' :
+                            order.order_status == 'cancelled' ? 'Otkazano' : 'Na čekanju'
                     }</SeverityPill>
                 </TableCell>
               </TableRow>
