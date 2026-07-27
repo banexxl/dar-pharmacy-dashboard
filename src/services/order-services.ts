@@ -17,7 +17,7 @@ const sortOrdersByCreatedAtDesc = (orders: Order[]) => {
      });
 };
 
-const isCancelled = (order: Order) => order.status === 'cancelled';
+const isCancelled = (order: Order) => order.order_status === 'cancelled';
 
 const isInDateRange = (value: any, start: Date, end: Date) => {
      const date = asDate(value);

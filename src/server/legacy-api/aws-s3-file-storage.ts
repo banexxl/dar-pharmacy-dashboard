@@ -7,33 +7,9 @@ import {
      DeleteObjectsCommand,
      type _Object,
 } from '@aws-sdk/client-s3';
-import { s3 } from '@/utils/aws/aws-s3';
-
-export const config = {
-     api: {
-          bodyParser: {
-               sizeLimit: '5mb',
-          },
-     },
-};
+import { mapS3ObjectToItem, s3 } from '@/utils/aws/aws-s3';
 
 const BUCKET = process.env.AWS_S3_BUCKET_NAME!;
-
-const mapS3ObjectToItem = (obj: _Object): Item => {
-     const key = obj.Key ?? '';
-     const isFolder = key.endsWith('/');
-
-     return {
-          id: key,
-          name: isFolder ? key.split('/').slice(-2, -1)[0] : key.split('/').pop()!,
-          updatedAt: obj.LastModified ? new Date(obj.LastModified).getTime() : null,
-          size: obj.Size ?? 0,
-          type: (isFolder ? 'folder' : 'file') as ItemType,
-          extension: !isFolder ? key.split('.').pop() : undefined,
-          items: undefined,
-          itemsCount: undefined,
-     };
-};
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
      try {

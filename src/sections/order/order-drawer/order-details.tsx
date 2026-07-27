@@ -29,7 +29,7 @@ export const OrderDetails = (props: OrderDetailsProps) => {
   const createdAt = order.created_at ? format(new Date(order.created_at), 'dd/MM/yyyy HH:mm') : 'Invalid Date';
   const totalAmount = numeral(order.total).format(`RSD0,0.00`);
   const align = lgUp ? 'horizontal' : 'vertical';
-  const items = order.items || [];
+  const items = order.order_items || [];
 
   return (
     <Stack spacing={6}>
@@ -43,7 +43,7 @@ export const OrderDetails = (props: OrderDetailsProps) => {
           <Typography variant="h6">Detalji</Typography>
           <Button
             color="inherit"
-            disabled={order.status === 'delivered' || order.status === 'cancelled'}
+            disabled={order.order_status === 'delivered' || order.order_status === 'cancelled'}
             onClick={onEdit}
             size="small"
             startIcon={
@@ -134,15 +134,15 @@ export const OrderDetails = (props: OrderDetailsProps) => {
             label="Status"
           >
             <SeverityPill color={
-              order.status == 'pending' ? 'warning' :
-                order.status == 'shipped' ? 'info' :
-                  order.status == 'delivered' ? 'success' :
-                    order.status == 'cancelled' ? 'error' : 'warning'
+              order.order_status == 'pending' ? 'warning' :
+                order.order_status == 'shipped' ? 'info' :
+                  order.order_status == 'delivered' ? 'success' :
+                    order.order_status == 'cancelled' ? 'error' : 'warning'
             }>{
-                order.status == 'pending' ? 'Na čekanju' :
-                  order.status == 'shipped' ? 'Poslato' :
-                    order.status == 'delivered' ? 'Dostavljeno' :
-                      order.status == 'cancelled' ? 'Otkazano' : 'Na čekanju'
+                order.order_status == 'pending' ? 'Na čekanju' :
+                  order.order_status == 'shipped' ? 'Poslato' :
+                    order.order_status == 'delivered' ? 'Dostavljeno' :
+                      order.order_status == 'cancelled' ? 'Otkazano' : 'Na čekanju'
               }</SeverityPill>
           </PropertyListItem>
         </PropertyList>

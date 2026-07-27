@@ -74,13 +74,13 @@ export const OverviewLatestOrders = (props: any) => {
                     </TableCell>
                     <TableCell>
                       <SeverityPill color={
-                        order.status == 'pending' ? 'warning'
-                          : order.status == 'delivered' ? 'success'
-                            : order.status == 'cancelled' ? 'error'
-                              : order.status == 'shipped' ? 'info'
+                        order.order_status == 'pending' ? 'warning'
+                          : order.order_status == 'delivered' ? 'success'
+                            : order.order_status == 'cancelled' ? 'error'
+                              : order.order_status == 'shipped' ? 'info'
                                 : 'primary'
                       }>
-                        {order.status}
+                        {order.order_status}
                       </SeverityPill>
                     </TableCell>
                   </TableRow>

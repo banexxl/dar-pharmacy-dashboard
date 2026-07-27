@@ -46,7 +46,7 @@ export const OrderEdit = (props: OrderEditProps) => {
       address: order?.customer.street_address || '',
       country: order?.customer.country || '',
       city: order?.customer.city || '',
-      status: order?.status || '',
+      status: order?.order_status || '',
       orderNumber: order?.order_number || '',
     },
     validationSchema: Yup.object({

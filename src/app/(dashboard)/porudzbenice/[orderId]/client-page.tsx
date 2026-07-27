@@ -108,7 +108,7 @@ const Page = (order: Order) => {
               </Stack>
             </div>
             <OrderSummary order={order} />
-            <OrderItems items={order.items || []} />
+            <OrderItems items={order.order_items || []} />
           </Stack>
         </Container>
       </Box>

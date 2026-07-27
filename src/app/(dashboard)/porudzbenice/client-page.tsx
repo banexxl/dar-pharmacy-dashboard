@@ -165,10 +165,7 @@ const Page = ({ allOrders }: OrdersPageProps) => {
         {};
 
       const orderItems =
-        order.order_items ??
-        order.orderItems ??
-        order.items ??
-        [];
+        order.order_items ?? [];
 
       const searchableValues = [
         order.order_number,

@@ -3,10 +3,9 @@ import {
      DeleteObjectCommand,
      PutObjectCommand,
 } from '@aws-sdk/client-s3';
-import { s3 } from '@/utils/aws/aws-s3';
+import { extractKeyFromS3Url, s3 } from '@/utils/aws/aws-s3';
 import { createClient } from '@supabase/supabase-js';
 export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 const MAX_FILE_SIZE = 4 * 1024 * 1024;
 
@@ -108,29 +107,6 @@ const getFileBaseName = (
           0,
           lastDotIndex
      );
-};
-
-export const extractKeyFromS3Url = (
-     url: string
-): string => {
-     try {
-          const parsedUrl = new URL(url);
-
-          const key = parsedUrl.pathname.replace(
-               /^\/+/,
-               ''
-          );
-
-          if (!key) {
-               throw new Error(
-                    'S3 URL does not contain an object key.'
-               );
-          }
-
-          return decodeURIComponent(key);
-     } catch {
-          throw new Error('Invalid S3 URL.');
-     }
 };
 
 const getSupabaseAdminClient = () => {
