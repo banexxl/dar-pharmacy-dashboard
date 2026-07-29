@@ -9,9 +9,13 @@ import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
+import MenuItem from '@mui/material/MenuItem';
+import MenuList from '@mui/material/MenuList';
+import Popover from '@mui/material/Popover';
 import { SeverityPill } from 'src/components/severity-pill';
-import { Order } from '@/schemas/order';
-import { useMemo } from 'react';
+import { Order, OrderStatus } from '@/schemas/order';
+import { useCallback, useMemo, useState } from 'react';
+import toast from 'react-hot-toast';
 
 
 export function descendingComparator<T>(a: T, b: T, sortBy: keyof T) {
@@ -60,6 +64,55 @@ export const OrderListTable = (props: any) => {
     sortDir,
     tab
   } = props;
+
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+  const [orderStatuses, setOrderStatuses] = useState<Record<string, OrderStatus>>({});
+
+  const statusOptions: { value: OrderStatus; label: string }[] = [
+    { value: 'pending', label: 'Na čekanju' },
+    { value: 'shipped', label: 'Poslato' },
+    { value: 'delivered', label: 'Dostavljeno' },
+    { value: 'cancelled', label: 'Otkazano' },
+  ];
+
+  const getOrderStatus = (order: Order): OrderStatus => {
+    return orderStatuses[order.id] ?? order.order_status;
+  };
+
+  const handleStatusClick = useCallback((event: React.MouseEvent<HTMLElement>, orderId: string) => {
+    event.stopPropagation();
+    setAnchorEl(event.currentTarget);
+    setSelectedOrderId(orderId);
+  }, []);
+
+  const handlePopoverClose = useCallback(() => {
+    setAnchorEl(null);
+    setSelectedOrderId(null);
+  }, []);
+
+  const handleStatusChange = useCallback(async (newStatus: OrderStatus) => {
+    if (!selectedOrderId) return;
+
+    handlePopoverClose();
+
+    try {
+      const response = await fetch('/api/orders/status', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId: selectedOrderId, status: newStatus }),
+      });
+
+      if (response.ok) {
+        setOrderStatuses((prev) => ({ ...prev, [selectedOrderId]: newStatus }));
+        toast.success('Status uspešno promenjen.');
+      } else {
+        toast.error('Greška prilikom promene statusa.');
+      }
+    } catch {
+      toast.error('Greška prilikom promene statusa.');
+    }
+  }, [selectedOrderId, handlePopoverClose]);
 
   const visibleRows = useMemo(
     () =>
@@ -144,17 +197,21 @@ export const OrderListTable = (props: any) => {
                 </TableCell>
                 <TableCell align="left">{order.customer ? order.customer.full_name : 'Neregistrovani korisnik'}</TableCell>
                 <TableCell align="left">{order.customer ? order.customer.email : 'Neregistrovani korisnik'}</TableCell>
-                <TableCell align="left">
+                <TableCell
+                  align="left"
+                  onClick={(e) => handleStatusClick(e, order.id)}
+                  sx={{ cursor: 'pointer' }}
+                >
                   <SeverityPill color={
-                    order.order_status == 'pending' ? 'warning' :
-                      order.order_status == 'shipped' ? 'info' :
-                        order.order_status == 'delivered' ? 'success' :
-                          order.order_status == 'cancelled' ? 'error' : 'warning'
+                    getOrderStatus(order) == 'pending' ? 'warning' :
+                      getOrderStatus(order) == 'shipped' ? 'info' :
+                        getOrderStatus(order) == 'delivered' ? 'success' :
+                          getOrderStatus(order) == 'cancelled' ? 'error' : 'warning'
                   }>{
-                      order.order_status == 'pending' ? 'Na čekanju' :
-                        order.order_status == 'shipped' ? 'Poslato' :
-                          order.order_status == 'delivered' ? 'Dostavljeno' :
-                            order.order_status == 'cancelled' ? 'Otkazano' : 'Na čekanju'
+                      getOrderStatus(order) == 'pending' ? 'Na čekanju' :
+                        getOrderStatus(order) == 'shipped' ? 'Poslato' :
+                          getOrderStatus(order) == 'delivered' ? 'Dostavljeno' :
+                            getOrderStatus(order) == 'cancelled' ? 'Otkazano' : 'Na čekanju'
                     }</SeverityPill>
                 </TableCell>
               </TableRow>
@@ -171,6 +228,30 @@ export const OrderListTable = (props: any) => {
         rowsPerPage={rowsPerPage}
         rowsPerPageOptions={[5, 10, 25]}
       />
+      <Popover
+        open={Boolean(anchorEl)}
+        anchorEl={anchorEl}
+        onClose={handlePopoverClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'left',
+        }}
+      >
+        <MenuList dense>
+          {statusOptions.map((option) => (
+            <MenuItem
+              key={option.value}
+              onClick={() => handleStatusChange(option.value)}
+            >
+              {option.label}
+            </MenuItem>
+          ))}
+        </MenuList>
+      </Popover>
     </div >
   );
 };
