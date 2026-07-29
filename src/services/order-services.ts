@@ -1,207 +1,504 @@
 import 'server-only';
 
 import { Order } from '@/schemas/order';
-import { asDate, fetchRows, supabase } from './supabase-browser';
 import { Customer } from '@/schemas/customer';
+import {
+     asDate,
+     fetchRows,
+     supabase,
+} from './supabase-browser';
 
-export type OrderWithClient = Order & {
-     client: Customer | null;
+export type OrderWithCustomer = Order & {
+     customer: Customer | null;
 };
 
-const sortOrdersByCreatedAtDesc = (orders: Order[]) => {
+const sortOrdersByCreatedAtDesc = <T extends Order>(
+     orders: T[]
+): T[] => {
      return [...orders].sort((left, right) => {
-          const leftDate = asDate(left.created_at).getTime();
-          const rightDate = asDate(right.created_at).getTime();
+          const leftDate = asDate(
+               left.created_at
+          ).getTime();
+
+          const rightDate = asDate(
+               right.created_at
+          ).getTime();
 
           return rightDate - leftDate;
      });
 };
 
-const isCancelled = (order: Order) => order.order_status === 'cancelled';
+const isCancelled = (order: Order) =>
+     order.order_status === 'cancelled';
 
-const isInDateRange = (value: any, start: Date, end: Date) => {
+const isInDateRange = (
+     value: unknown,
+     start: Date,
+     end: Date
+) => {
      const date = asDate(value);
+
      return date >= start && date < end;
 };
 
-export const ordersServices = () => {
-     const getOrdersByPage = async (page: any, limit: any) => {
-          const parsedLimit = parseInt(limit, 10);
+const getErrorMessage = (error: unknown): string => {
+     return error instanceof Error
+          ? error.message
+          : 'Došlo je do greške.';
+};
 
-          if (Number.isNaN(parsedLimit) || parsedLimit <= 0) {
+export const ordersServices = () => {
+     /*
+      * Supabase performs a left join here.
+      *
+      * When orders.customer_id contains a valid customer ID,
+      * the customer object is returned.
+      *
+      * When customer_id is null, customer will be null.
+      */
+     const fetchOrdersWithCustomers = async (): Promise<
+          OrderWithCustomer[]
+     > => {
+          const { data, error } = await supabase
+               .from('orders')
+               .select(`
+                    *,
+                    customer:customers!orders_customer_id_fkey (
+                         *
+                    )
+               `)
+               .order('created_at', {
+                    ascending: false,
+               });
+
+          if (error) {
+               throw error;
+          }
+
+          return (data ?? []) as OrderWithCustomer[];
+     };
+
+     const getOrdersByPage = async (
+          page: number | string,
+          limit: number | string
+     ): Promise<
+          OrderWithCustomer[] | { message: string }
+     > => {
+          const parsedPage = Number(page);
+          const parsedLimit = Number(limit);
+
+          if (
+               !Number.isInteger(parsedLimit) ||
+               parsedLimit <= 0
+          ) {
                return [];
           }
 
-          try {
-               const skip = page * parsedLimit;
-               const orders = await fetchRows<Order>(['orders']);
+          const safePage =
+               Number.isInteger(parsedPage) &&
+                    parsedPage >= 0
+                    ? parsedPage
+                    : 0;
 
-               return sortOrdersByCreatedAtDesc(orders).slice(skip, skip + parsedLimit);
+          try {
+               const skip =
+                    safePage * parsedLimit;
+
+               const orders =
+                    await fetchOrdersWithCustomers();
+
+               return sortOrdersByCreatedAtDesc(
+                    orders
+               ).slice(
+                    skip,
+                    skip + parsedLimit
+               );
           } catch (error) {
-               return { message: error };
+               return {
+                    message: getErrorMessage(error),
+               };
           }
      };
 
-     const getOrdersCount = async () => {
-          try {
-               const orders = await fetchRows<Order>(['orders']);
-               return orders.length;
-          } catch (error) {
-               console.error('Error while fetching count:', error);
-               return -1;
-          }
-     };
+     const getOrdersCount =
+          async (): Promise<number> => {
+               try {
+                    const { count, error } =
+                         await supabase
+                              .from('orders')
+                              .select('id', {
+                                   count: 'exact',
+                                   head: true,
+                              });
 
-     const getOrderById = async (orderNumber: string) => {
-          try {
-               const orders = await fetchRows<Order>(['orders']);
-               const order = orders.find((item) => item.order_number === orderNumber);
-               return order ?? null;
-          } catch (error) {
-               return { message: error };
-          }
-     };
+                    if (error) {
+                         throw error;
+                    }
 
+                    return count ?? 0;
+               } catch (error) {
+                    console.error(
+                         'Error while fetching order count:',
+                         error
+                    );
 
-     const getAllOrders = async (): Promise<OrderWithClient[]> => {
+                    return -1;
+               }
+          };
+
+     const getOrderById = async (
+          orderNumber: string
+     ): Promise<
+          | OrderWithCustomer
+          | null
+          | { message: string }
+     > => {
           try {
-               const { data, error } = await supabase
-                    .from('orders')
-                    .select(`
-                    *,
-                    customer:customers!orders_customer_id_fkey (
-                         id,
-                         user_id,
-                         full_name,
-                         email,
-                         phone_number,
-                         street_address,
-                         city,
-                         province_state,
-                         zip_postal_code,
-                         country,
-                         created_at
-                    )
-               `)
-                    .order('created_at', {
-                         ascending: false,
-                    });
+               const { data, error } =
+                    await supabase
+                         .from('orders')
+                         .select(`
+                              *,
+                              customer:customers!orders_customer_id_fkey (
+                                   *
+                              )
+                         `)
+                         .eq(
+                              'order_number',
+                              orderNumber
+                         )
+                         .maybeSingle();
 
                if (error) {
                     throw error;
                }
 
-               return (data ?? []) as OrderWithClient[];
+               return data as OrderWithCustomer | null;
           } catch (error) {
-               console.error('Failed to fetch orders with clients:', error);
-               return [];
+               return {
+                    message: getErrorMessage(error),
+               };
           }
      };
 
-     const getSumOfAllOrders = async (): Promise<number | { message: string }> => {
-          try {
-               const orders = await fetchRows<Order>(['orders']);
-               return orders.filter((order) => !isCancelled(order)).reduce((sum, order) => sum + Number(order.total ?? 0), 0);
-          } catch (error) {
-               return { message: (error as Error).message };
-          }
-     };
+     const getAllOrders =
+          async (): Promise<
+               OrderWithCustomer[]
+          > => {
+               try {
+                    return await fetchOrdersWithCustomers();
+               } catch (error) {
+                    console.error(
+                         'Failed to fetch orders with customers:',
+                         error
+                    );
 
-     const getSumOfLastMonthsOrders = async (months: number): Promise<number | { message: string }> => {
+                    return [];
+               }
+          };
+
+     const getSumOfAllOrders = async (): Promise<
+          number | { message: string }
+     > => {
           try {
-               const orders = await fetchRows<Order>(['orders']);
-               const startDate = new Date(new Date().setMonth(new Date().getMonth() - months));
-               const endDate = new Date();
+               const orders =
+                    await fetchRows<Order>([
+                         'orders',
+                    ]);
 
                return orders
-                    .filter((order) => !isCancelled(order))
-                    .filter((order) => isInDateRange(order.created_at, startDate, endDate))
-                    .reduce((sum, order) => sum + Number(order.total ?? 0), 0);
+                    .filter(
+                         (order) =>
+                              !isCancelled(order)
+                    )
+                    .reduce(
+                         (sum, order) =>
+                              sum +
+                              Number(
+                                   order.total ?? 0
+                              ),
+                         0
+                    );
           } catch (error) {
-               return { message: (error as Error).message };
+               return {
+                    message: getErrorMessage(error),
+               };
           }
      };
 
-     const getSumOfLastMonthOrders = async (): Promise<number | { message: string }> => {
+     const getSumOfLastMonthsOrders = async (
+          months: number
+     ): Promise<
+          number | { message: string }
+     > => {
           try {
+               const orders =
+                    await fetchRows<Order>([
+                         'orders',
+                    ]);
+
                const now = new Date();
-               const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-               const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
-               const orders = await fetchRows<Order>(['orders']);
+
+               const startDate = new Date(
+                    now.getFullYear(),
+                    now.getMonth() - months,
+                    now.getDate(),
+                    now.getHours(),
+                    now.getMinutes(),
+                    now.getSeconds(),
+                    now.getMilliseconds()
+               );
 
                return orders
-                    .filter((order) => !isCancelled(order))
-                    .filter((order) => isInDateRange(order.created_at, startOfLastMonth, endOfLastMonth))
-                    .reduce((sum, order) => sum + Number(order.total ?? 0), 0);
+                    .filter(
+                         (order) =>
+                              !isCancelled(order)
+                    )
+                    .filter((order) =>
+                         isInDateRange(
+                              order.created_at,
+                              startDate,
+                              now
+                         )
+                    )
+                    .reduce(
+                         (sum, order) =>
+                              sum +
+                              Number(
+                                   order.total ?? 0
+                              ),
+                         0
+                    );
           } catch (error) {
-               return { message: (error as Error).message };
+               return {
+                    message: getErrorMessage(error),
+               };
           }
      };
 
-     const getSumOfCurrentMonthOrders = async (): Promise<number | { message: string }> => {
-          try {
-               const now = new Date();
-               const startOfCurrentMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-               const endOfCurrentMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
-               const orders = await fetchRows<Order>(['orders']);
+     const getSumOfLastMonthOrders =
+          async (): Promise<
+               number | { message: string }
+          > => {
+               try {
+                    const now = new Date();
 
-               return orders
-                    .filter((order) => !isCancelled(order))
-                    .filter((order) => isInDateRange(order.created_at, startOfCurrentMonth, endOfCurrentMonth))
-                    .reduce((sum, order) => sum + Number(order.total ?? 0), 0);
-          } catch (error) {
-               return { message: (error as Error).message };
-          }
-     };
+                    const startOfLastMonth =
+                         new Date(
+                              now.getFullYear(),
+                              now.getMonth() - 1,
+                              1
+                         );
+
+                    // Exclusive upper boundary:
+                    // first moment of the current month.
+                    const startOfCurrentMonth =
+                         new Date(
+                              now.getFullYear(),
+                              now.getMonth(),
+                              1
+                         );
+
+                    const orders =
+                         await fetchRows<Order>([
+                              'orders',
+                         ]);
+
+                    return orders
+                         .filter(
+                              (order) =>
+                                   !isCancelled(
+                                        order
+                                   )
+                         )
+                         .filter((order) =>
+                              isInDateRange(
+                                   order.created_at,
+                                   startOfLastMonth,
+                                   startOfCurrentMonth
+                              )
+                         )
+                         .reduce(
+                              (sum, order) =>
+                                   sum +
+                                   Number(
+                                        order.total ??
+                                        0
+                                   ),
+                              0
+                         );
+               } catch (error) {
+                    return {
+                         message:
+                              getErrorMessage(
+                                   error
+                              ),
+                    };
+               }
+          };
+
+     const getSumOfCurrentMonthOrders =
+          async (): Promise<
+               number | { message: string }
+          > => {
+               try {
+                    const now = new Date();
+
+                    const startOfCurrentMonth =
+                         new Date(
+                              now.getFullYear(),
+                              now.getMonth(),
+                              1
+                         );
+
+                    const startOfNextMonth =
+                         new Date(
+                              now.getFullYear(),
+                              now.getMonth() + 1,
+                              1
+                         );
+
+                    const orders =
+                         await fetchRows<Order>([
+                              'orders',
+                         ]);
+
+                    return orders
+                         .filter(
+                              (order) =>
+                                   !isCancelled(
+                                        order
+                                   )
+                         )
+                         .filter((order) =>
+                              isInDateRange(
+                                   order.created_at,
+                                   startOfCurrentMonth,
+                                   startOfNextMonth
+                              )
+                         )
+                         .reduce(
+                              (sum, order) =>
+                                   sum +
+                                   Number(
+                                        order.total ??
+                                        0
+                                   ),
+                              0
+                         );
+               } catch (error) {
+                    return {
+                         message:
+                              getErrorMessage(
+                                   error
+                              ),
+                    };
+               }
+          };
 
      const getLastNumberOfOrders = async (
           numberOfOrders: number
-     ): Promise<Order[]> => {
+     ): Promise<OrderWithCustomer[]> => {
+          if (
+               !Number.isInteger(numberOfOrders) ||
+               numberOfOrders <= 0
+          ) {
+               return [];
+          }
+
           try {
-               const orders = await getAllOrders();
+               const orders =
+                    await fetchOrdersWithCustomers();
 
-               if (!Array.isArray(orders)) {
-                    return [];
-               }
-
-               return sortOrdersByCreatedAtDesc(orders)
-                    .slice(0, numberOfOrders);
+               return sortOrdersByCreatedAtDesc(
+                    orders
+               ).slice(0, numberOfOrders);
           } catch (error) {
-               console.error('Failed to fetch latest orders:', error);
+               console.error(
+                    'Failed to fetch latest orders:',
+                    error
+               );
+
                return [];
           }
      };
 
-     const getMonthlyOrderSumsForYear = async (yearOffset: number) => {
+     const getMonthlyOrderSumsForYear = async (
+          yearOffset: number
+     ) => {
           try {
-               const currentYear = new Date().getFullYear();
-               const targetYear = currentYear + yearOffset;
-               const startOfYear = new Date(`${targetYear}-01-01T00:00:00.000Z`);
-               const startOfNextYear = new Date(`${targetYear + 1}-01-01T00:00:00.000Z`);
-               const orders = await fetchRows<Order>(['orders']);
-               const monthlyTotals = new Map<number, number>();
+               const currentYear =
+                    new Date().getFullYear();
+
+               const targetYear =
+                    currentYear + yearOffset;
+
+               const startOfYear = new Date(
+                    `${targetYear}-01-01T00:00:00.000Z`
+               );
+
+               const startOfNextYear = new Date(
+                    `${targetYear + 1}-01-01T00:00:00.000Z`
+               );
+
+               const orders =
+                    await fetchRows<Order>([
+                         'orders',
+                    ]);
+
+               const monthlyTotals = new Map<
+                    number,
+                    number
+               >();
 
                for (const order of orders) {
                     if (isCancelled(order)) {
                          continue;
                     }
 
-                    const createdAt = asDate(order.created_at);
+                    const createdAt = asDate(
+                         order.created_at
+                    );
 
-                    if (Number.isNaN(createdAt.getTime()) || createdAt < startOfYear || createdAt >= startOfNextYear) {
+                    if (
+                         Number.isNaN(
+                              createdAt.getTime()
+                         ) ||
+                         createdAt < startOfYear ||
+                         createdAt >=
+                         startOfNextYear
+                    ) {
                          continue;
                     }
 
-                    const month = createdAt.getMonth() + 1;
-                    monthlyTotals.set(month, (monthlyTotals.get(month) ?? 0) + Number(order.total ?? 0));
+                    const month =
+                         createdAt.getUTCMonth() + 1;
+
+                    monthlyTotals.set(
+                         month,
+                         (monthlyTotals.get(
+                              month
+                         ) ?? 0) +
+                         Number(
+                              order.total ?? 0
+                         )
+                    );
                }
 
-               return Array.from({ length: 12 }, (_, index) => ({
-                    month: index + 1,
-                    total: monthlyTotals.get(index + 1) ?? 0,
-               }));
+               return Array.from(
+                    { length: 12 },
+                    (_, index) => ({
+                         month: index + 1,
+                         total:
+                              monthlyTotals.get(
+                                   index + 1
+                              ) ?? 0,
+                    })
+               );
           } catch (error) {
-               return { message: (error as Error).message };
+               return {
+                    message: getErrorMessage(error),
+               };
           }
      };
 

@@ -85,7 +85,6 @@ const fetchAllCustomers = async (): Promise<Customer[]> => {
                email,
                full_name,
                avatar,
-               gender,
                phone_number,
                street_address,
                city,
@@ -144,11 +143,6 @@ const mapCustomer = (
                customer.avatar ??
                metadata.avatar_url ??
                metadata.picture ??
-               null,
-
-          gender:
-               customer.gender ??
-               metadata.gender ??
                null,
 
           phone_number:
