@@ -282,9 +282,7 @@ const Page = ({ totalBucketSize }: any) => {
           py: 8,
         }}
       >
-        <Container
-        // maxWidth={settings.stretch ? false : 'xl'}
-        >
+        <Container maxWidth="xl">
 
 
           <Grid

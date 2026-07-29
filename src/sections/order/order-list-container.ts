@@ -5,9 +5,6 @@ export const OrderListContainer = styled('div', { shouldForwardProp: (prop: any)
     flexGrow: 1,
     overflow: 'auto',
     zIndex: 1,
-    [theme.breakpoints.up('lg')]: {
-      marginRight: -500,
-    },
     transition: theme.transitions.create('margin', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,

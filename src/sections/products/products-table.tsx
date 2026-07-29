@@ -259,11 +259,11 @@ export const ProductsTable = (props: any) => {
      const [booleanFilters, setBooleanFilters] = useState<string[]>([]);
 
      const booleanFilterOptions = [
-          { value: 'isActive', label: 'Aktivan' },
-          { value: 'displayOnHome', label: 'Na početnoj' },
+          { value: 'is_active', label: 'Aktivan' },
+          { value: 'display_on_home', label: 'Na početnoj' },
           { value: 'discount', label: 'Popust' },
-          { value: 'newArrival', label: 'Novi proizvod' },
-          { value: 'bestSeller', label: 'Najprodavaniji' },
+          { value: 'new_arrival', label: 'Novi proizvod' },
+          { value: 'best_seller', label: 'Najprodavaniji' },
           { value: 'promoting', label: 'Promocija' }
      ];
 

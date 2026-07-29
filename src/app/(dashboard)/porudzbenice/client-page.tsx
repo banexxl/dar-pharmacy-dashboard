@@ -11,6 +11,7 @@ import type { ChangeEvent } from 'react';
 import PlusIcon from '@untitled-ui/icons-react/build/esm/Plus';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import Container from '@mui/material/Container';
 import Divider from '@mui/material/Divider';
 import Stack from '@mui/material/Stack';
 import SvgIcon from '@mui/material/SvgIcon';
@@ -221,53 +222,59 @@ const Page = ({ allOrders }: OrdersPageProps) => {
 
   return (
     <>
-      <Divider />
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          py: 8,
+        }}
+      >
+        <Container maxWidth="xl">
+          <OrderListContainer>
+            <Box sx={{ p: 3 }}>
+              <Stack
+                alignItems="flex-start"
+                direction="row"
+                justifyContent="space-between"
+                spacing={4}
+              >
+                <Typography variant="h4">
+                  Porudžbenice
+                </Typography>
+              </Stack>
+            </Box>
 
-      <Box>
-        <OrderListContainer>
-          <Box sx={{ p: 3 }}>
-            <Stack
-              alignItems="flex-start"
-              direction="row"
-              justifyContent="space-between"
-              spacing={4}
-            >
-              <Typography variant="h4">
-                Porudžbenice
-              </Typography>
-            </Stack>
-          </Box>
+            <Divider />
 
-          <Divider />
+            <OrderListSearch
+              onQueryChange={ordersSearch.handleQueryChange}
+              onTabChange={ordersSearch.handleTabsChange}
+              onSortChange={ordersSearch.handleSortChange}
+              sortBy={ordersSearch.state.sortBy}
+              sortDir={ordersSearch.state.sortDir}
+              query={ordersSearch.state.query}
+              tab={ordersSearch.state.tab}
+            />
 
-          <OrderListSearch
-            onQueryChange={ordersSearch.handleQueryChange}
-            onTabChange={ordersSearch.handleTabsChange}
-            onSortChange={ordersSearch.handleSortChange}
-            sortBy={ordersSearch.state.sortBy}
-            sortDir={ordersSearch.state.sortDir}
-            query={ordersSearch.state.query}
-            tab={ordersSearch.state.tab}
-          />
+            <Divider />
 
-          <Divider />
-
-          <OrderListTable
-            count={filteredOrders.length}
-            items={filteredOrders}
-            onPageChange={ordersSearch.handlePageChange}
-            onRowsPerPageChange={
-              ordersSearch.handleRowsPerPageChange
-            }
-            onSelect={(orderId) => { router.push(`/porudzbenice/${orderId}`) }}
-            page={ordersSearch.state.page}
-            rowsPerPage={ordersSearch.state.rowsPerPage}
-            sortDir={ordersSearch.state.sortDir as SortDir}
-            sortBy={ordersSearch.state.sortBy as SortBy}
-            onTabChange={ordersSearch.handleTabsChange}
-            tab={ordersSearch.state.tab}
-          />
-        </OrderListContainer>
+            <OrderListTable
+              count={filteredOrders.length}
+              items={filteredOrders}
+              onPageChange={ordersSearch.handlePageChange}
+              onRowsPerPageChange={
+                ordersSearch.handleRowsPerPageChange
+              }
+              onSelect={(orderId) => { router.push(`/porudzbenice/${orderId}`) }}
+              page={ordersSearch.state.page}
+              rowsPerPage={ordersSearch.state.rowsPerPage}
+              sortDir={ordersSearch.state.sortDir as SortDir}
+              sortBy={ordersSearch.state.sortBy as SortBy}
+              onTabChange={ordersSearch.handleTabsChange}
+              tab={ordersSearch.state.tab}
+            />
+          </OrderListContainer>
+        </Container>
       </Box>
     </>
   );

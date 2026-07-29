@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { ChangeEvent } from 'react';
-import { Box, Stack, Typography } from '@mui/material';
+import { Box, Container, Stack, Typography } from '@mui/material';
 
 import { AuthProvider } from '@/context/auth-context';
 import { useMounted } from '@/hooks/use-mounted';
@@ -119,32 +119,34 @@ const CustomersPage = ({ allClients }: CustomersPageProps) => {
      return (
           <AuthProvider>
                <Box component="main" sx={{ flexGrow: 1, py: 8 }}>
-                    <Stack spacing={3}>
-                         <Typography variant="h4">Klijenti</Typography>
+                    <Container maxWidth="xl">
+                         <Stack spacing={3}>
+                              <Typography variant="h4">Klijenti</Typography>
 
-                         <CustomersSearch
-                              query={clientSearch.state.query}
-                              onQueryChange={clientSearch.handleQueryChange}
-                         />
+                              <CustomersSearch
+                                   query={clientSearch.state.query}
+                                   onQueryChange={clientSearch.handleQueryChange}
+                              />
 
-                         <CustomersTable
-                              count={filteredClients.length}
-                              items={filteredClients}
-                              page={clientSearch.state.page}
-                              rowsPerPage={clientSearch.state.rowsPerPage}
-                              selected={customersSelection.selected}
-                              onSelectAll={customersSelection.selectAll}
-                              onDeselectAll={customersSelection.deselectAll}
-                              onSelectOne={customersSelection.selectOne}
-                              onDeselectOne={customersSelection.deselectOne}
-                              onPageChange={clientSearch.handlePageChange}
-                              onRowsPerPageChange={
-                                   clientSearch.handleRowsPerPageChange
-                              }
-                              sortBy={clientSearch.state.sortBy}
-                              sortDir={clientSearch.state.sortDir}
-                         />
-                    </Stack>
+                              <CustomersTable
+                                   count={filteredClients.length}
+                                   items={filteredClients}
+                                   page={clientSearch.state.page}
+                                   rowsPerPage={clientSearch.state.rowsPerPage}
+                                   selected={customersSelection.selected}
+                                   onSelectAll={customersSelection.selectAll}
+                                   onDeselectAll={customersSelection.deselectAll}
+                                   onSelectOne={customersSelection.selectOne}
+                                   onDeselectOne={customersSelection.deselectOne}
+                                   onPageChange={clientSearch.handlePageChange}
+                                   onRowsPerPageChange={
+                                        clientSearch.handleRowsPerPageChange
+                                   }
+                                   sortBy={clientSearch.state.sortBy}
+                                   sortDir={clientSearch.state.sortDir}
+                              />
+                         </Stack>
+                    </Container>
                </Box>
           </AuthProvider>
      );

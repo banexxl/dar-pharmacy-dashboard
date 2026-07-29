@@ -25,6 +25,7 @@ export const AccountPopover = (props: any) => {
      }, [auth, onClose, router]);
 
      const handleRebuild = useCallback(async () => {
+          onClose?.()
           const result = await Swal.fire({
                title: 'Pošalji izmene na sajt?',
                text: 'Ova akcija pokreće deploy. Može potrajati nekoliko minuta.',
