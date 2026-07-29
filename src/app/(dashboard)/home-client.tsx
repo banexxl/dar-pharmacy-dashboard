@@ -111,7 +111,6 @@ const Page = (props: any) => {
                               >
                                    <OverviewLatestOrders
                                         orders={props.lastNOrders}
-                                        sx={{ height: '100%' }}
                                    />
                               </Grid>
                          </Grid>

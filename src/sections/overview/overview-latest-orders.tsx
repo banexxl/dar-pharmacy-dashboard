@@ -34,62 +34,59 @@ export const OverviewLatestOrders = (props: any) => {
   return (
     <Card sx={sx}>
       <CardHeader title="Poslednje porudžbenice" />
-      <Scrollbar sx={{ flexGrow: 1 }}>
-        <Box sx={{ minWidth: 800 }}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>
-                  Order
-                </TableCell>
-                <TableCell>
-                  Customer
-                </TableCell>
-                <TableCell sortDirection="desc">
-                  Date
-                </TableCell>
-                <TableCell>
-                  Status
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {orders.map((order: Order) => {
-                //const createdAt = format(order.createdAt, 'dd/MM/yyyy');
-                const createdAt = new Date(order.created_at);
-                const ago = formatDistanceToNow(createdAt);
-                return (
-                  <TableRow
-                    hover
-                    key={order.order_number}
-                  >
-                    <TableCell>
-                      {order.order_number}
-                    </TableCell>
-                    <TableCell>
-                      {order.customer && order.customer.full_name ? order.customer.full_name : 'Neregistrovani korisnik'}
-                    </TableCell>
-                    <TableCell>
-                      {ago}
-                    </TableCell>
-                    <TableCell>
-                      <SeverityPill color={
-                        order.order_status == 'pending' ? 'warning'
-                          : order.order_status == 'delivered' ? 'success'
-                            : order.order_status == 'cancelled' ? 'error'
-                              : order.order_status == 'shipped' ? 'info'
-                                : 'primary'
-                      }>
-                        {order.order_status}
-                      </SeverityPill>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </Box>
-      </Scrollbar>
+      <Box sx={{ minWidth: 800, overflowX: 'auto' }}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>
+                Order
+              </TableCell>
+              <TableCell>
+                Customer
+              </TableCell>
+              <TableCell sortDirection="desc">
+                Date
+              </TableCell>
+              <TableCell>
+                Status
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {orders.map((order: Order) => {
+              const createdAt = new Date(order.created_at);
+              const ago = formatDistanceToNow(createdAt);
+              return (
+                <TableRow
+                  hover
+                  key={order.order_number}
+                >
+                  <TableCell>
+                    {order.order_number}
+                  </TableCell>
+                  <TableCell>
+                    {order.customer && order.customer.full_name ? order.customer.full_name : 'Neregistrovani korisnik'}
+                  </TableCell>
+                  <TableCell>
+                    {ago}
+                  </TableCell>
+                  <TableCell>
+                    <SeverityPill color={
+                      order.order_status == 'pending' ? 'warning'
+                        : order.order_status == 'delivered' ? 'success'
+                          : order.order_status == 'cancelled' ? 'error'
+                            : order.order_status == 'shipped' ? 'info'
+                              : 'primary'
+                    }>
+                      {order.order_status}
+                    </SeverityPill>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </Box>
       <Divider />
       <CardActions sx={{ justifyContent: 'flex-end' }}>
         <Button

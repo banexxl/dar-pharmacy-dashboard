@@ -11,7 +11,7 @@ export default async function Page() {
     ordersServices().getSumOfLastMonthOrders(),
     ordersServices().getSumOfCurrentMonthOrders(),
     productsServices().getLastNumberOfProducts(5),
-    ordersServices().getLastNumberOfOrders(6),
+    ordersServices().getLastNumberOfOrders(10),
     ordersServices().getMonthlyOrderSumsForYear(0),
     ordersServices().getMonthlyOrderSumsForYear(-1),
     customerServices().getCustomersCreatedInWeek(0),
