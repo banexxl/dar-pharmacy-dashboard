@@ -68,7 +68,7 @@ export const OverviewLatestOrders = (props: any) => {
                       {order.order_number}
                     </TableCell>
                     <TableCell>
-                      {order.customer.full_name}
+                      {order.customer && order.customer.full_name ? order.customer.full_name : 'Neregistrovani korisnik'}
                     </TableCell>
                     <TableCell>
                       {ago}
