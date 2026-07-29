@@ -1,3 +1,5 @@
+'use client';
+
 import { useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
 import { format, isValid } from 'date-fns';
@@ -11,95 +13,145 @@ import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { PropertyList } from 'src/components/property-list';
 import { PropertyListItem } from 'src/components/property-list-item';
-import { Order } from '@/schemas/order'; // Import the correct type for Order
+import { Order, OrderStatus } from '@/schemas/order';
+import toast from 'react-hot-toast';
 
-const statusOptions = ['Canceled', 'Complete', 'Rejected'];
+const statusOptions: { value: OrderStatus; label: string }[] = [
+  { value: 'pending', label: 'Na čekanju' },
+  { value: 'shipped', label: 'Poslato' },
+  { value: 'delivered', label: 'Isporučeno' },
+  { value: 'cancelled', label: 'Otkazano' },
+];
+
+const paymentStatusLabels: Record<string, string> = {
+  pending: 'Na čekanju',
+  paid: 'Plaćeno',
+  failed: 'Neuspelo',
+  refunded: 'Refundirano',
+  cancelled: 'Otkazano',
+};
+
+const paymentMethodLabels: Record<string, string> = {
+  'credit card': 'Kreditna kartica',
+  paypal: 'PayPal',
+  cash: 'Gotovina',
+  check: 'Ček',
+  'cash-on-delivery': 'Pouzećem',
+};
 
 interface OrderSummaryProps {
-  order: Order; // Ensure Order type is correctly defined
+  order: Order;
 }
 
 export const OrderSummary = (props: OrderSummaryProps) => {
   const { order, ...other } = props;
   const mdUp = useMediaQuery((theme: any) => theme.breakpoints.up('md'));
-  const [status, setStatus] = useState(statusOptions[0]);
+  const [status, setStatus] = useState<OrderStatus>(order.order_status);
+  const [saving, setSaving] = useState(false);
 
-  // Convert order.createdAt to a Date object and validate
   const createdAtDate = new Date(order.created_at);
   const formattedCreatedAt = isValid(createdAtDate)
-    ? format(createdAtDate, 'dd/MM/yyyy HH:mm')
-    : 'Invalid date';
+    ? format(createdAtDate, 'dd.MM.yyyy. HH:mm')
+    : '-';
 
-  const handleChange = useCallback((event: React.ChangeEvent<{ value: unknown }>) => {
-    setStatus(event.target.value as string);
+  const handleChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    setStatus(event.target.value as OrderStatus);
   }, []);
+
+  const handleSaveStatus = useCallback(async () => {
+    setSaving(true);
+    try {
+      const response = await fetch('/api/orders/status', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId: order.id, status }),
+      });
+
+      if (response.ok) {
+        toast.success('Status uspešno promenjen.');
+      } else {
+        toast.error('Greška prilikom promene statusa.');
+      }
+    } catch {
+      toast.error('Greška prilikom promene statusa.');
+    } finally {
+      setSaving(false);
+    }
+  }, [order.id, status]);
 
   const align = mdUp ? 'horizontal' : 'vertical';
 
   return (
     <Card {...other}>
-      <CardHeader title="Basic info" />
+      <CardHeader title="Informacije o porudžbenici" />
       <Divider />
       <PropertyList>
         <PropertyListItem
           align={align}
-          label="Customer"
-          key={Math.random()}
+          label="Kupac"
         >
-          <Typography variant="subtitle2">{order.customer ? order.customer.full_name : 'Neregistrovani korisnik'}</Typography>
-          <Typography
-            color="text.secondary"
-            variant="body2"
-          >
-            {order.customer ? order.customer.email : 'Neregistrovani korisnik'}
+          <Typography variant="subtitle2">
+            {order.customer ? order.customer.full_name : 'Neregistrovani korisnik'}
           </Typography>
-          {/* <Typography
-            color="text.secondary"
-            variant="body2"
-          >
-            {order.customer.city}
+          <Typography color="text.secondary" variant="body2">
+            {order.customer ? order.customer.email : '-'}
           </Typography>
-          <Typography
-            color="text.secondary"
-            variant="body2"
-          >
-            {order.customer.country}
-          </Typography> */}
+          {order.customer?.phone_number && (
+            <Typography color="text.secondary" variant="body2">
+              {order.customer.phone_number}
+            </Typography>
+          )}
+          {order.customer?.street_address && (
+            <Typography color="text.secondary" variant="body2">
+              {order.customer.street_address}
+              {order.customer.city ? `, ${order.customer.city}` : ''}
+            </Typography>
+          )}
         </PropertyListItem>
         <Divider />
         <PropertyListItem
           align={align}
-          label="ID"
-          value={order.id}
-        />
-        <Divider />
-        <PropertyListItem
-          align={align}
-          label="Invoice"
+          label="Broj porudžbenice"
           value={order.order_number}
         />
         <Divider />
         <PropertyListItem
           align={align}
-          label="Date"
+          label="Datum"
           value={formattedCreatedAt}
         />
         <Divider />
-        {/* <PropertyListItem
-          align={align}
-          label="Promotion Code"
-          value={order.promotionCode}
-        />
-        <Divider /> */}
         <PropertyListItem
           align={align}
-          label="Total Amount"
-          value={`${'RSD'}${order.total}`}
+          label="Način plaćanja"
+          value={paymentMethodLabels[order.payment_method] || order.payment_method}
         />
         <Divider />
         <PropertyListItem
           align={align}
-          label="Status"
+          label="Status plaćanja"
+          value={paymentStatusLabels[order.payment_status] || order.payment_status}
+        />
+        <Divider />
+        {order.transaction_number && (
+          <>
+            <PropertyListItem
+              align={align}
+              label="Broj transakcije"
+              value={order.transaction_number}
+            />
+            <Divider />
+          </>
+        )}
+        <PropertyListItem
+          align={align}
+          label="Ukupan iznos"
+          value={`${order.total} RSD`}
+        />
+        <Divider />
+        <PropertyListItem
+          align={align}
+          label="Status porudžbenice"
         >
           <Stack
             alignItems={{
@@ -126,36 +178,25 @@ export const OrderSummary = (props: OrderSummaryProps) => {
               value={status}
             >
               {statusOptions.map((option) => (
-                <option
-                  key={option}
-                  value={option}
-                >
-                  {option}
+                <option key={option.value} value={option.value}>
+                  {option.label}
                 </option>
               ))}
             </TextField>
-            <Button variant="contained">Save</Button>
+            <Button
+              variant="contained"
+              onClick={handleSaveStatus}
+              disabled={saving}
+            >
+              {saving ? 'Čuvam...' : 'Sačuvaj'}
+            </Button>
           </Stack>
         </PropertyListItem>
-      </PropertyList >
-    </Card >
+      </PropertyList>
+    </Card>
   );
 };
 
-// Define PropTypes to ensure props are validated at runtime
 OrderSummary.propTypes = {
-  order: PropTypes.shape({
-    createdAt: PropTypes.string.isRequired,
-    customer: PropTypes.shape({
-      name: PropTypes.string.isRequired,
-      address1: PropTypes.string.isRequired,
-      city: PropTypes.string.isRequired,
-      country: PropTypes.string.isRequired,
-    }).isRequired,
-    id: PropTypes.string.isRequired,
-    number: PropTypes.string.isRequired,
-    promotionCode: PropTypes.string,
-    currency: PropTypes.string.isRequired,
-    totalAmount: PropTypes.number.isRequired,
-  }).isRequired,
+  order: PropTypes.object.isRequired,
 };

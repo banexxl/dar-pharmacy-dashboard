@@ -1,5 +1,4 @@
 import type { Customer } from './customer';
-import type { Product } from './product';
 
 export type PaymentMethod =
      | 'credit card'
@@ -44,8 +43,6 @@ export type OrderItem = {
      discount: boolean;
      discount_amount: number;
      final_unit_price: number;
-     line_total: number;
-     product_snapshot: Partial<Product> | null;
      created_at: string;
 };
 

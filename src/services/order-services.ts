@@ -147,7 +147,7 @@ export const ordersServices = () => {
           };
 
      const getOrderById = async (
-          orderNumber: string
+          orderId: string
      ): Promise<
           | OrderWithCustomer
           | null
@@ -161,11 +161,14 @@ export const ordersServices = () => {
                               *,
                               customer:customers!orders_customer_id_fkey (
                                    *
+                              ),
+                              order_items (
+                                   *
                               )
                          `)
                          .eq(
-                              'order_number',
-                              orderNumber
+                              'id',
+                              orderId
                          )
                          .maybeSingle();
 

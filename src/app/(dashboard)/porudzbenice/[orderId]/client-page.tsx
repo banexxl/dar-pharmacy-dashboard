@@ -2,10 +2,7 @@
 
 import ArrowLeftIcon from '@untitled-ui/icons-react/build/esm/ArrowLeft';
 import CalendarIcon from '@untitled-ui/icons-react/build/esm/Calendar';
-import ChevronDownIcon from '@untitled-ui/icons-react/build/esm/ChevronDown';
-import Edit02Icon from '@untitled-ui/icons-react/build/esm/Edit02';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Link from '@mui/material/Link';
 import Stack from '@mui/material/Stack';
@@ -14,14 +11,27 @@ import Typography from '@mui/material/Typography';
 import { Order } from '@/schemas/order';
 import { OrderSummary } from '@/sections/order/order-summary';
 import { OrderItems } from '@/sections/order/order-items';
+import { format, isValid } from 'date-fns';
 
-const Page = (order: Order) => {
+interface Props {
+  order: Order | null;
+}
 
+const Page = ({ order }: Props) => {
   if (!order) {
-    return null;
+    return (
+      <Box component="main" sx={{ flexGrow: 1, py: 8 }}>
+        <Container maxWidth="xl">
+          <Typography variant="h5">Porudžbenica nije pronađena.</Typography>
+        </Container>
+      </Box>
+    );
   }
 
-  // const createdAt = format(order.createdAt, 'dd/MM/yyyy HH:mm');
+  const createdAtDate = new Date(order.created_at);
+  const formattedDate = isValid(createdAtDate)
+    ? format(createdAtDate, 'dd.MM.yyyy. HH:mm')
+    : '';
 
   return (
     <>
@@ -32,12 +42,11 @@ const Page = (order: Order) => {
           py: 8,
         }}
       >
-        <Container maxWidth="lg">
+        <Container maxWidth="xl">
           <Stack spacing={4}>
             <div>
               <Link
                 color="text.primary"
-                component={Link}
                 href={'/porudzbenice'}
                 sx={{
                   alignItems: 'center',
@@ -48,18 +57,13 @@ const Page = (order: Order) => {
                 <SvgIcon sx={{ mr: 1 }}>
                   <ArrowLeftIcon />
                 </SvgIcon>
-                <Typography variant="subtitle2">Orders</Typography>
+                <Typography variant="subtitle2">Porudžbenice</Typography>
               </Link>
             </div>
             <div>
-              <Stack
-                alignItems="flex-start"
-                direction="row"
-                justifyContent="space-between"
-                spacing={3}
-              >
-                <Stack spacing={1}>
-                  <Typography variant="h4">{order.order_number}</Typography>
+              <Stack spacing={1}>
+                <Typography variant="h4">{order.order_number}</Typography>
+                {formattedDate && (
                   <Stack
                     alignItems="center"
                     direction="row"
@@ -69,42 +73,14 @@ const Page = (order: Order) => {
                       color="text.secondary"
                       variant="body2"
                     >
-                      Placed on
+                      Kreirano
                     </Typography>
-                    <SvgIcon color="action">
+                    <SvgIcon color="action" fontSize="small">
                       <CalendarIcon />
                     </SvgIcon>
-                    {/* <Typography variant="body2">{createdAt}</Typography> */}
+                    <Typography variant="body2">{formattedDate}</Typography>
                   </Stack>
-                </Stack>
-                <div>
-                  <Stack
-                    alignItems="center"
-                    direction="row"
-                    spacing={2}
-                  >
-                    <Button
-                      color="inherit"
-                      endIcon={
-                        <SvgIcon>
-                          <Edit02Icon />
-                        </SvgIcon>
-                      }
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      endIcon={
-                        <SvgIcon>
-                          <ChevronDownIcon />
-                        </SvgIcon>
-                      }
-                      variant="contained"
-                    >
-                      Action
-                    </Button>
-                  </Stack>
-                </div>
+                )}
               </Stack>
             </div>
             <OrderSummary order={order} />
@@ -116,6 +92,4 @@ const Page = (order: Order) => {
   );
 };
 
-
 export default Page;
-
