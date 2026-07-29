@@ -205,13 +205,14 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail, manufacturers = 
      }, [manufacturers]);
 
      const handleSubmit = async (values: ProductDraft) => {
+          setLoading(true);
           try {
                const responseValues = await fetch('/api/product-api', {
                     method: 'POST',
                     headers: {
                          'Content-Type': 'application/json',
                          'Access-Control-Allow-Origin': '*',
-                         'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS' // Set the content type to JSON
+                         'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS'
                     },
                     body: JSON.stringify(values),
                });
@@ -227,8 +228,6 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail, manufacturers = 
                     router.refresh()
                } else {
                     onSubmitFail()
-                    // const errorData = await response.json(); // Parse the error response
-                    // console.error(errorData);
                     Swal.fire({
                          icon: 'error',
                          title: 'Oops...',
@@ -243,6 +242,8 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail, manufacturers = 
                     title: 'Oops...',
                     text: 'Nešto ne valja :(',
                })
+          } finally {
+               setLoading(false);
           }
      }
 
