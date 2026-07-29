@@ -142,8 +142,8 @@ export const OrderListTable = (props: any) => {
                             : order.payment_method == 'paypal' ? 'PayPal' : 'Nepoznato'
                   }
                 </TableCell>
-                <TableCell align="left">{order.customer.full_name}</TableCell>
-                <TableCell align="left">{order.customer.email}</TableCell>
+                <TableCell align="left">{order.customer ? order.customer.full_name : 'Neregistrovani korisnik'}</TableCell>
+                <TableCell align="left">{order.customer ? order.customer.email : 'Neregistrovani korisnik'}</TableCell>
                 <TableCell align="left">
                   <SeverityPill color={
                     order.order_status == 'pending' ? 'warning' :
