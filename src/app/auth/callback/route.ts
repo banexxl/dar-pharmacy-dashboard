@@ -77,8 +77,6 @@ export async function GET(request: Request) {
       });
 
       await supabase.auth.signOut();
-      const deleteResult = await supabase.auth.admin.deleteUser(sessionData.session.user.id);
-      console.log('[auth/callback] delete user result', deleteResult);
       const allCookies = cookieStore.getAll();
       allCookies.forEach(cookie => cookieStore.delete(cookie.name));
 

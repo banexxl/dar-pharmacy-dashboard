@@ -109,6 +109,7 @@ const getCustomerAuthUserId = async (
           email: data.email ?? null,
      };
 };
+
 export const banCustomer = async (
      customerId: string
 ): Promise<ActionResult> => {
