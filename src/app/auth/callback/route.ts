@@ -20,8 +20,7 @@ export async function GET(request: Request) {
     const params = new URLSearchParams({
       error: oauthError,
       error_code: errorCode ?? '',
-      error_description:
-        errorDescription ?? 'OAuth authentication failed',
+      error_description: errorDescription ?? 'OAuth authentication failed',
     });
 
     return NextResponse.redirect(
@@ -112,7 +111,7 @@ export async function GET(request: Request) {
       return NextResponse.redirect(redirectUrl);
     }
   }
-
+  console.log('[auth/callback] permission granted', { email });
   return NextResponse.redirect(
     new URL('/', requestUrl.origin)
   );
