@@ -20,7 +20,7 @@ export async function GET(request: Request) {
     const params = new URLSearchParams({
       error: oauthError,
       error_code: errorCode ?? '',
-      error_description: errorDescription ?? 'OAuth authentication failed',
+      error_description: errorDescription ?? 'Authentication failed',
     });
 
     return NextResponse.redirect(
@@ -29,18 +29,19 @@ export async function GET(request: Request) {
   }
 
   const code = requestUrl.searchParams.get('code');
+  const type = requestUrl.searchParams.get('type');
 
   if (!code) {
     return NextResponse.redirect(
       new URL('/auth/error?error=no_code', requestUrl.origin)
     );
   }
+
   const supabase = await createSupabaseServerClient();
-  const { error } =
-    await supabase.auth.exchangeCodeForSession(code);
+  const { error } = await supabase.auth.exchangeCodeForSession(code);
 
   if (error) {
-    console.error('OAuth exchange failed:', error);
+    console.error('Code exchange failed:', error);
 
     return NextResponse.redirect(
       new URL(
@@ -52,16 +53,21 @@ export async function GET(request: Request) {
     );
   }
 
-  // Retrieve the session after OAuth to get the user details
+  // If this is a password recovery flow, redirect to the reset-password page
+  if (type === 'recovery') {
+    return NextResponse.redirect(
+      new URL('/auth/reset-password', requestUrl.origin)
+    );
+  }
+
+  // For regular sign-in, check admin permission
   const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
 
-  // If there's an error retrieving the session, log it and redirect to error page
   if (sessionError) {
     const redirectUrl = `${requestUrl.origin}/auth/error?error=${sessionError.message}`;
     return NextResponse.redirect(redirectUrl);
   }
 
-  // If no session is found, log it and redirect to error page
   if (!sessionData.session) {
     const redirectUrl = `${requestUrl.origin}/auth/error?error=No session found.`;
     return NextResponse.redirect(redirectUrl);
@@ -80,35 +86,17 @@ export async function GET(request: Request) {
       const allCookies = cookieStore.getAll();
       allCookies.forEach(cookie => cookieStore.delete(cookie.name));
 
-      if (permission.error?.code === 'EmailInUse') {
-        console.log('[auth/callback] redirect EmailInUse', {
-          email,
-          error: permission.error,
-        });
-        const errorDescription = encodeURIComponent(permission.error?.message || 'This email is already in use');
-        const redirectUrl = `${requestUrl.origin}/auth/error?error=email_in_use&error_description=${errorDescription}`;
-        return NextResponse.redirect(redirectUrl);
-      }
-
       if (permission.error?.code === 'UserNotFound') {
-        console.log('[auth/callback] redirect UserNotFound', {
-          email,
-          error: permission.error,
-        });
-        const errorDescription = encodeURIComponent('Your account was not found. Please register first, or contact support.');
+        const errorDescription = encodeURIComponent('Your account was not found. Please contact support.');
         const redirectUrl = `${requestUrl.origin}/auth/error?error=user_not_found&error_description=${errorDescription}`;
         return NextResponse.redirect(redirectUrl);
       }
 
-      console.log('[auth/callback] redirect sign_in_required', {
-        email,
-        error: permission.error,
-      });
-
-      const redirectUrl = `${requestUrl.origin}/auth/sign-in?message=sign_in_required`;
+      const redirectUrl = `${requestUrl.origin}/auth/login`;
       return NextResponse.redirect(redirectUrl);
     }
   }
+
   console.log('[auth/callback] permission granted', { email });
   return NextResponse.redirect(
     new URL('/', requestUrl.origin)

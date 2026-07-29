@@ -16,6 +16,8 @@ export const config = {
 const ALWAYS_PUBLIC_ROUTES = [
      '/auth/callback',
      '/auth/error',
+     '/auth/forgot-password',
+     '/auth/reset-password',
      '/401',
 ] as const;
 
