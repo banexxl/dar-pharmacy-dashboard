@@ -1,10 +1,6 @@
 import { styled } from '@mui/material/styles';
 
-interface OrderListContainerProps {
-  open: boolean;
-}
-
-export const OrderListContainer = styled('div', { shouldForwardProp: (prop: any) => prop !== 'open' })<OrderListContainerProps>(
+export const OrderListContainer = styled('div', { shouldForwardProp: (prop: any) => prop !== 'open' })(
   ({ theme, open }: any) => ({
     flexGrow: 1,
     overflow: 'auto',

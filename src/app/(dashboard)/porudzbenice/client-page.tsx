@@ -14,13 +14,10 @@ import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import Stack from '@mui/material/Stack';
 import SvgIcon from '@mui/material/SvgIcon';
-import TablePagination from '@mui/material/TablePagination';
 import Typography from '@mui/material/Typography';
 
-import { useDialog } from '@/hooks/use-dialog';
 import { useMounted } from '@/hooks/use-mounted';
 import type { Order } from '@/schemas/order';
-import { OrderDrawer } from '@/sections/order/order-drawer';
 import { OrderListContainer } from '@/sections/order/order-list-container';
 import { OrderListSearch } from '@/sections/order/order-list-search';
 import { OrderListTable } from '@/sections/order/order-list-table';
@@ -28,6 +25,7 @@ import type {
   SortBy,
   SortDir,
 } from '@/sections/order/order-list-table';
+import { useRouter } from 'next/navigation';
 
 type OrdersPageProps = {
   allOrders: Order[];
@@ -98,23 +96,8 @@ const useOrdersSearch = () => {
   };
 };
 
-const useCurrentOrder = (
-  orders: Order[],
-  orderId: string | undefined
-) => {
-  return useMemo(() => {
-    if (!orderId) {
-      return undefined;
-    }
-
-    return orders.find((order) => order.id === orderId);
-  }, [orders, orderId]);
-};
-
 const Page = ({ allOrders }: OrdersPageProps) => {
-  const rootRef = useRef<HTMLDivElement | null>(null);
   const ordersSearch = useOrdersSearch();
-  const dialog = useDialog();
   const isMounted = useMounted();
 
   const [ordersStore, setOrderStore] = useState<{
@@ -124,6 +107,8 @@ const Page = ({ allOrders }: OrdersPageProps) => {
     orders: [],
     ordersCount: 0,
   });
+
+  const router = useRouter();
 
   useEffect(() => {
     if (isMounted()) {
@@ -234,29 +219,12 @@ const Page = ({ allOrders }: OrdersPageProps) => {
     ordersSearch.state.tab,
   ]);
 
-  const currentOrder = useCurrentOrder(
-    ordersStore.orders,
-    dialog.data
-  );
-
-  const onSelect = useCallback(
-    (orderId: string) => {
-      if (dialog.open && dialog.data === orderId) {
-        dialog.handleClose();
-        return;
-      }
-
-      dialog.handleOpen(orderId);
-    },
-    [dialog]
-  );
-
   return (
     <>
       <Divider />
 
       <Box>
-        <OrderListContainer open={dialog.open}>
+        <OrderListContainer>
           <Box sx={{ p: 3 }}>
             <Stack
               alignItems="flex-start"
@@ -267,17 +235,6 @@ const Page = ({ allOrders }: OrdersPageProps) => {
               <Typography variant="h4">
                 Porudžbenice
               </Typography>
-
-              <Button
-                startIcon={
-                  <SvgIcon>
-                    <PlusIcon />
-                  </SvgIcon>
-                }
-                variant="contained"
-              >
-                Dodaj
-              </Button>
             </Stack>
           </Box>
 
@@ -302,7 +259,7 @@ const Page = ({ allOrders }: OrdersPageProps) => {
             onRowsPerPageChange={
               ordersSearch.handleRowsPerPageChange
             }
-            onSelect={onSelect}
+            onSelect={(orderId) => { router.push(`/porudzbenice/${orderId}`) }}
             page={ordersSearch.state.page}
             rowsPerPage={ordersSearch.state.rowsPerPage}
             sortDir={ordersSearch.state.sortDir as SortDir}
@@ -311,13 +268,6 @@ const Page = ({ allOrders }: OrdersPageProps) => {
             tab={ordersSearch.state.tab}
           />
         </OrderListContainer>
-
-        <OrderDrawer
-          container={rootRef.current}
-          onClose={dialog.handleClose}
-          open={dialog.open}
-          order={currentOrder}
-        />
       </Box>
     </>
   );

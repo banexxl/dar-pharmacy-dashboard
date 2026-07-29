@@ -46,12 +46,12 @@ export const OrderSummary = (props: OrderSummaryProps) => {
           label="Customer"
           key={Math.random()}
         >
-          <Typography variant="subtitle2">{order.customer.full_name}</Typography>
+          <Typography variant="subtitle2">{order.customer ? order.customer.full_name : 'Neregistrovani korisnik'}</Typography>
           <Typography
             color="text.secondary"
             variant="body2"
           >
-            {order.customer.email}
+            {order.customer ? order.customer.email : 'Neregistrovani korisnik'}
           </Typography>
           {/* <Typography
             color="text.secondary"
