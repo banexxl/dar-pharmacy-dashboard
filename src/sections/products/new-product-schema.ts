@@ -4,44 +4,41 @@ import { ProductDraft } from '../../schemas/product';
 export const newProductSchema = () => yup.object().shape({
      name: yup
           .string()
-          .required('Product name is required'),
+          .required('Naziv proizvoda je obavezan'),
      description: yup
           .string()
-          .required('Product description is required'),
+          .required('Opis proizvoda je obavezan'),
      main_category: yup
           .string()
-          .required('Main category is required'),
+          .required('Glavna kategorija je obavezna'),
      mid_category: yup
           .string(),
      sub_category: yup
           .string(),
      available_stock: yup
           .number()
-          .required('Available stock is required'),
+          .required('Stanje na lageru je obavezno'),
      ingredients: yup
           .string()
-          .required('Product ingedients is required'),
+          .required('Sastojci su obavezni'),
      instructions: yup
           .string()
-          .required('Product instructions is required'),
+          .required('Instrukcije su obavezne'),
      quantity: yup
           .string()
-          .required('Product quantity is required'),
+          .required('Količina je obavezna'),
      quantity_unit: yup
           .string()
-          .required('Product quantity unit is required'),
+          .required('Jedinica mere je obavezna'),
      manufacturer_id: yup
           .string()
-          .required('Product manufacturer id is required'),
+          .required('Proizvođač je obavezan'),
      warning: yup
           .string()
-          .required('Product warning is required'),
-     // imageURL: yup
-     //           .string()
-     //           .required('Product imageURL is required'),
+          .required('Upozorenje je obavezno'),
      price: yup
           .number()
-          .required('Product price is required'),
+          .required('Cena je obavezna'),
      newArrival: yup
           .boolean(),
      isActive: yup

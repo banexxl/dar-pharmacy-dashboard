@@ -583,29 +583,42 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail, manufacturers = 
                                         InputProps={{ inputProps: { min: 0, max: 100 } }}
                                    />
 
-                                   <Box sx={{ gap: '10px', display: 'flex', maxWidth: '300px', justifyContent: 'space-between', flexDirection: isScreentoMedium ? 'column' : 'row' }}>
-                                        <Button
-                                             variant="contained"
-                                             color="primary"
-                                             onClick={() => onSubmitFail()}
-                                             disabled={loading}
-                                        >
-                                             Odustani
-                                        </Button>
-                                        <Button
-                                             type="submit"
-                                             variant="contained"
-                                             color="primary"
-                                             disabled={Object.keys(formik.errors).length != 0 || loading}
-                                             onClick={() => {
-                                                  formik.validateForm()
-                                             }}
-                                        >
-                                             Dodaj proizvod
-                                        </Button>
-                                        <Typography>
-                                             {Object.keys(formik.errors).length != 0 && JSON.stringify(formik.errors, null, 2)}
-                                        </Typography>
+                                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                        <Box sx={{ display: 'flex', gap: '10px', maxWidth: '300px', flexDirection: isScreentoMedium ? 'column' : 'row' }}>
+                                             <Button
+                                                  variant="contained"
+                                                  color="primary"
+                                                  onClick={() => onSubmitFail()}
+                                                  disabled={loading}
+                                             >
+                                                  Odustani
+                                             </Button>
+                                             <Button
+                                                  type="submit"
+                                                  variant="contained"
+                                                  color="primary"
+                                                  disabled={Object.keys(formik.errors).length != 0 || loading}
+                                                  onClick={() => {
+                                                       formik.validateForm()
+                                                  }}
+                                             >
+                                                  Dodaj proizvod
+                                             </Button>
+                                        </Box>
+                                        {Object.keys(formik.errors).length > 0 && (
+                                             <Box sx={{ mt: 1 }}>
+                                                  {Object.values(formik.errors).map((error, index) => (
+                                                       <Typography
+                                                            key={index}
+                                                            variant="caption"
+                                                            color="error"
+                                                            display="block"
+                                                       >
+                                                            {error as string}
+                                                       </Typography>
+                                                  ))}
+                                             </Box>
+                                        )}
                                    </Box>
                               </Form>
                          )

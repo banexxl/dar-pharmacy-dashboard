@@ -637,7 +637,7 @@ export const ProductsTable = (props: any) => {
                                                                                 },
                                                                            }}
                                                                       >
-                                                                           <CardContent key={Math.random()}>
+                                                                           <CardContent key={Math.random()} sx={{ width: { xs: 'calc(100vw - 64px)', md: 'auto' }, overflowX: 'hidden', boxSizing: 'border-box' }}>
                                                                                 <Grid key={Math.random()}
                                                                                      container
                                                                                      spacing={3}
@@ -1144,7 +1144,7 @@ export const ProductsTable = (props: any) => {
                                                                                           </Grid>
                                                                                      </Grid>
                                                                                 </Grid>
-                                                                                <Card sx={{ width: '50%', marginTop: '20px' }}>
+                                                                                <Card sx={{ width: { xs: '100%', md: '50%' }, marginTop: '20px' }}>
                                                                                      <CardContent>
                                                                                           <Box
                                                                                                sx={{

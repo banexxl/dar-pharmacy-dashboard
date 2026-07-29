@@ -115,6 +115,7 @@ export const OrderListSearch = ({
         indicatorColor="primary"
         onChange={handleTabsChange}
         scrollButtons="auto"
+        allowScrollButtonsMobile
         sx={{ px: 3 }}
         textColor="primary"
         value={tab}
@@ -135,10 +136,10 @@ export const OrderListSearch = ({
         alignItems="center"
         direction="row"
         flexWrap="wrap"
-        gap={3}
+        gap={2}
         sx={{ p: 3 }}
       >
-        <Box sx={{ flexGrow: 1 }}>
+        <Box sx={{ flexGrow: 1, minWidth: { xs: '100%', sm: 'auto' } }}>
           <OutlinedInput
             value={query}
             onChange={handleQueryChange}
@@ -162,6 +163,7 @@ export const OrderListSearch = ({
           select
           SelectProps={{ native: true }}
           value={sortDir}
+          sx={{ minWidth: { xs: '100%', sm: 160 } }}
         >
           {sortOptions.map((option) => (
             <option
