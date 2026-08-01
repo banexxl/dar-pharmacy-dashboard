@@ -8,6 +8,8 @@ import {
      Card,
      CardMedia,
      CircularProgress,
+     IconButton,
+     InputAdornment,
      Link as MuiLink,
      Stack,
      TextField,
@@ -15,6 +17,8 @@ import {
      Alert,
      useMediaQuery,
 } from '@mui/material';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import NextLink from 'next/link';
 import { supabaseBrowser } from '@/services/supabase-browser';
 
@@ -24,6 +28,7 @@ const Page = () => {
 
      const [email, setEmail] = useState('');
      const [password, setPassword] = useState('');
+     const [showPassword, setShowPassword] = useState(false);
      const [error, setError] = useState<string | null>(null);
      const [loading, setLoading] = useState(false);
 
@@ -129,11 +134,23 @@ const Page = () => {
                                    <TextField
                                         fullWidth
                                         label="Password"
-                                        type="password"
+                                        type={showPassword ? 'text' : 'password'}
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
                                         required
                                         autoComplete="current-password"
+                                        InputProps={{
+                                             endAdornment: (
+                                                  <InputAdornment position="end">
+                                                       <IconButton
+                                                            onClick={() => setShowPassword((prev) => !prev)}
+                                                            edge="end"
+                                                       >
+                                                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                                                       </IconButton>
+                                                  </InputAdornment>
+                                             ),
+                                        }}
                                    />
 
                                    <Button

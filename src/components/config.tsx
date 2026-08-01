@@ -3,6 +3,7 @@ import ShoppingBagIcon from '@heroicons/react/24/solid/ShoppingBagIcon';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import UsersIcon from '@heroicons/react/24/solid/UsersIcon';
 import StorageIcon from '@mui/icons-material/Storage';
+import ArticleIcon from '@mui/icons-material/Article';
 import { SvgIcon } from '@mui/material';
 
 export const items = [
@@ -54,5 +55,15 @@ export const items = [
                     <StorageIcon />
                </SvgIcon>
           ),
+     },
+     {
+          title: 'Blog',
+          path: '/blog',
+          icon: (
+               <SvgIcon fontSize="small">
+                    <ArticleIcon />
+               </SvgIcon>
+          ),
+          disabled: false
      },
 ];
