@@ -208,7 +208,7 @@ const BlogClientPage = ({ initialBlogs }: BlogClientPageProps) => {
                                    >
                                         <MenuItem value="">Svi statusi</MenuItem>
                                         <MenuItem value="published">Objavljeno</MenuItem>
-                                        <MenuItem value="draft">Draft</MenuItem>
+                                        <MenuItem value="draft">Priprema</MenuItem>
                                    </Select>
                               </Stack>
                          </Card>
@@ -243,7 +243,7 @@ const BlogClientPage = ({ initialBlogs }: BlogClientPageProps) => {
                                                             <TableCell>{blog.author}</TableCell>
                                                             <TableCell>
                                                                  <Chip
-                                                                      label={blog.is_published ? 'Objavljeno' : 'Draft'}
+                                                                      label={blog.is_published ? 'Objavljeno' : 'Priprema'}
                                                                       size="small"
                                                                       color={blog.is_published ? 'success' : 'default'}
                                                                  />
