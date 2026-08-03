@@ -322,7 +322,7 @@ const BlogFormClient = ({ id, initialData }: BlogFormClientProps) => {
                                                   label="Slug"
                                                   value={blog.slug}
                                                   onChange={(e) => handleSlugChange(e.target.value)}
-                                                  disabled={saving}
+                                                  disabled
                                                   required
                                                   helperText="Auto-generiše se iz naslova"
                                              />
