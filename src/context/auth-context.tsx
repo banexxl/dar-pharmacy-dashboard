@@ -17,7 +17,6 @@ type AuthStatus = 'loading' | 'authenticated' | 'unauthenticated';
 export type AuthViewer = {
      id: string;
      email: string;
-     name: string;
      avatar: string | null;
 };
 
@@ -46,11 +45,6 @@ function mapUserToViewer(user: User): AuthViewer {
      return {
           id: user.id,
           email: user.email ?? '',
-          name:
-               metadata.full_name ??
-               metadata.name ??
-               user.email?.split('@')[0] ??
-               '',
           avatar:
                metadata.avatar_url ??
                metadata.picture ??
