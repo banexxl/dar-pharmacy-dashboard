@@ -482,7 +482,6 @@ export const ProductsTable = (props: any) => {
                                              visibleRows.map((product: Product) => {
                                                   //const isSelected = selected.includes(product.id);
                                                   const isCurrent = product.id === currentProductID;
-                                                  // const price = numeral(product.price).format(`${product.currency}0,0.00`);
                                                   const quantityColor = (product.quantity ?? 0) >= 10 ? 'success' : 'error';
                                                   const statusColor = product.is_active === true ? 'success' : 'info';
                                                   const homeColor = product.display_on_home ? 'success' : 'info';

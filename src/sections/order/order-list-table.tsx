@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types';
 import { format } from 'date-fns';
-import numeral from 'numeral';
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -16,6 +15,7 @@ import { SeverityPill } from 'src/components/severity-pill';
 import { Order, OrderStatus } from '@/schemas/order';
 import { useCallback, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
+import { formatCurrency } from '@/utils/format-currency';
 
 
 export function descendingComparator<T>(a: T, b: T, sortBy: keyof T) {
@@ -150,7 +150,7 @@ export const OrderListTable = (props: any) => {
 
             const createdAtMonth = format(createdAtDate, 'LLL').toUpperCase();
             const createdAtDay = format(createdAtDate, 'd');
-            const totalAmount = numeral(order.total).format(`${'RSD'}0,0.00`);
+            const totalAmount = formatCurrency(order.total, 'RSD');
 
             return (
               <TableRow
