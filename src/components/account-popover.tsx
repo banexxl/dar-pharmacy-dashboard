@@ -129,13 +129,6 @@ export const AccountPopover = (props: any) => {
                          color="text.secondary"
                          variant="body2"
                     >
-                         {auth.viewer?.name}
-
-                    </Typography>
-                    <Typography
-                         color="text.secondary"
-                         variant="body2"
-                    >
                          {auth.viewer?.email}
                     </Typography>
                </Box>
