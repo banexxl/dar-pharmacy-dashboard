@@ -1,196 +1,93 @@
 "use client"
-import React, { useMemo, useState } from 'react';
-import { Autocomplete, TextField, Button, Checkbox, FormControlLabel, Box, Grid, MenuItem, Stack, Container, IconButton, CardActionArea, colors, useMediaQuery, Typography } from '@mui/material';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Autocomplete, TextField, Button, Checkbox, FormControlLabel, Box, MenuItem, Typography, useMediaQuery } from '@mui/material';
 import { Form, Formik } from 'formik';
-import { initialValues, mainCategoryOptions, midCategoryOptions, newProductSchema, quantityUnitOptions } from './new-product-schema'
+import { initialValues, newProductSchema, quantityUnitOptions } from './new-product-schema'
 import { useRouter } from 'next/navigation';
 import Swal from 'sweetalert2'
 
 import { Theme } from '@mui/material/styles';
 import { ProductDraft } from '../../schemas/product';
 
-export const fetchSubCategoryOptions = async (selectedMidCategory: any) => {
-
-     switch (selectedMidCategory) {
-          case 'alergije':
-               return [
-                    { option: 'kapsule-i-tablete', label: 'Kapsule i tablete' },
-                    { option: 'sprejevi-za-nos', label: 'Sprejevi za nos' },
-                    { option: 'irigacioni-set', label: 'Irigacioni set' },
-                    { option: 'masti-gelovi', label: 'Masti i gelovi' }
-               ];
-          case 'anemija':
-               return [
-                    { value: 'folna-kiselina-i-vitamini', label: 'Folna kiselina i vitamini' },
-                    { value: 'biljni-preparati', label: 'Biljni preparati' },
-                    { value: 'preparati-gvozdja', label: 'Preparati gvožđa' }
-               ];
-          case 'bol':
-               return [
-                    { value: 'bol-u-grlu', label: 'Bol u grlu' },
-                    { value: 'menstrualni-bolovi', label: 'Menstrualni bolovi' },
-                    { value: 'bolovi-u-zglobovima-i-misicima', label: 'Bolovi u zglobovima i mišićima' }
-               ];
-          case 'hemoroidi':
-               return [
-                    { value: 'oralni-preparati', label: 'Oralni preparati' },
-                    { value: 'lokalna-primena', label: 'Lokalna primena' },
-                    { value: 'platforma', label: 'Platforma' }
-               ];
-          case 'holesterol-i-trigliceridi':
-               return [
-                    { value: 'omega-masne-kiseline', label: 'Omega masne kiseline' },
-                    { value: 'ostalo', label: 'Ostalo' }
-               ];
-          case 'imunitet-prehlada':
-               return [
-                    { value: 'deca', label: 'Deca' },
-                    { value: 'vitemini-i-minerali', label: 'Vitamini i minerali' },
-                    { value: 'sprejevi-za-nos', label: 'Sprejevi za nos' },
-                    { value: 'sprejevi-za-grlo', label: 'Sprejevi za grlo' },
-                    { value: 'irigacioni-set', label: 'Irigacioni set' },
-                    { value: 'masti-gelovi', label: 'Masti i gelovi' },
-                    { value: 'biljne-kapi', label: 'Biljne kapi' },
-                    { value: 'med-maticni-mlec-i-propolis', label: 'Med, matični mleč i propolis' },
-                    { value: 'pastile-za-grlo', label: 'Pastile za grlo' },
-                    { value: 'aloja-ehinacea-noni-aronija', label: 'Aloja, ehinacea, noni, aronija' },
-                    { value: 'probiotici', label: 'Probiotici' },
-                    { value: 'omega-masne-kiseline', label: 'Omega masne kiseline' },
-                    { value: 'ostalo', label: 'Ostalo' }
-               ];
-          case 'kosa-koza-i-nokti':
-               return [
-                    { value: 'oralni-preparati', label: 'Oralni preparati' },
-                    { value: 'lokalna-primena', label: 'Lokalna primena' }
-               ];
-          case 'kosti-i-zglobovi':
-               return [
-                    { value: 'oralni-preparati', label: 'Oralni preparati' },
-                    { value: 'primena-na-kozi', label: 'Primena na koži' }
-               ];
-          case 'mrsavljenje-celulit':
-               return [
-                    { value: 'oralni-preparati', label: 'Oralni preparati' },
-                    { value: 'primena-na-kozi', label: 'Primena na koži' }
-               ];
-          case 'posebna-ishrana':
-               return [
-                    { value: 'kase', label: 'Kase' },
-                    { value: 'sejkovi', label: 'Sejkovi' },
-                    { value: 'sportisti', label: 'Sportisti' },
-                    { value: 'zasladjivaci', label: 'Zaslađivači' },
-                    { value: 'bombone', label: 'Bombone' }
-               ];
-          case 'putna-apoteka':
-               return [
-                    { value: 'dehidratacija', label: 'Dehidratacija' },
-                    { value: 'dijareja', label: 'Dijareja' },
-                    { value: 'mucnina', label: 'Mučnina' },
-                    { value: 'auto-apoteka', label: 'Auto-apoteka' }
-               ];
-          case 'stomacne-tegobe':
-               return [
-                    { value: 'nadutost-i-gasovi', label: 'Nadutost i gasovi' },
-                    { value: 'zatvor', label: 'Zatvor' },
-                    { value: 'dijareja', label: 'Dijareja' },
-                    { value: 'iritabilni-kolon', label: 'Iritabilni kolon' },
-                    { value: 'otezano-varenje-i-gorusica', label: 'Otežano varenje i gorušica' }
-               ];
-          case 'zdravo-srce-i-cirkulacija':
-               return [
-                    { value: 'oralni-preparati', label: 'Oralni preparati' },
-                    { value: 'primena-na-kozi', label: 'Primena na koži' }
-               ];
-          case 'vitamini-i-minerali':
-               return [
-                    { value: 'vitamin-a', label: 'Vitamin A' },
-                    { value: 'vitamin-b', label: 'Vitamin B' },
-                    { value: 'vitamin-c', label: 'Vitamin C' },
-                    { value: 'vitamin-d', label: 'Vitamin D' },
-                    { value: 'vitamin-k', label: 'Vitamin K' },
-                    { value: 'cink', label: 'Cink' },
-                    { value: 'kalijum', label: 'Kalijum' },
-                    { value: 'kalcijum', label: 'Kalcijum' },
-                    { value: 'hrom', label: 'Hrom' },
-                    { value: 'magnezijum', label: 'Magnezijum' },
-                    { value: 'selen', label: 'Selen' },
-                    { value: 'gvozdje', label: 'Gvožđe' },
-                    { value: 'bakar', label: 'Bakar' },
-                    { value: 'bor', label: 'Bor' },
-                    { value: 'fluor', label: 'Fluor' },
-                    { value: 'fosfor', label: 'Fosfor' },
-                    { value: 'kompleksi-vitamina-i-minerala', label: 'Kompleksi vitamina i minerala' },
-                    { value: 'riblja-ulja', label: 'Riblja ulja' },
-                    { value: 'deca', label: 'Deca' },
-                    { value: 'sportisiti', label: 'Sportisti' },
-                    { value: 'trudnice', label: 'Trudnice' },
-                    { value: 'stariji', label: 'Stariji' }
-               ];
-          case 'preparati-za-primenu-na-kozi':
-               return [
-                    { value: 'iritacije', label: 'Iritacije' },
-                    { value: 'oziljci-i-strije', label: 'Ožiljci i strije' },
-                    { value: 'hemoroidi', label: 'Hemoroidi' },
-                    { value: 'problemi-sa-cirkulacijom', label: 'Problemi sa cirkulacijom' },
-                    { value: 'intimna-nega', label: 'Intimna nega' },
-                    { value: 'opekotine', label: 'Opekotine' },
-                    { value: 'sportske-povrede', label: 'Sportske povrede' },
-                    { value: 'reuma', label: 'Reuma' },
-                    { value: 'antiseptici', label: 'Antiseptici' },
-                    { value: 'gljivice', label: 'Gljivice' },
-                    { value: 'rozacea', label: 'Rozacea' },
-                    { value: 'vitiligo', label: 'Vitiligo' },
-                    { value: 'boginje', label: 'Boginje' },
-                    { value: 'herpes', label: 'Herpes' },
-                    { value: 'seboreicni-dermatitis', label: 'Seboreični dermatitis' },
-                    { value: 'zuljevi-kurje-oci-bradavice', label: 'Žuljevi, kurje oči, bradavice' },
-                    { value: 'ekcem-psorijaza', label: 'Ekcem, psorijaza' },
-                    { value: 'suva-atopijska-koza', label: 'Suva, atopijska koža' },
-                    { value: 'lokalni-anestetici', label: 'Lokalni anestetici' },
-                    { value: 'povrsinske-rane', label: 'Površinske rane' }
-               ];
-          case 'oci-i-usi':
-               return [
-                    { value: 'tablete-kapsule-rastvori', label: 'Tablete, kapsule, rastvori' },
-                    { value: 'higijena-nega', label: 'Higijena i nega' },
-                    { value: 'kapi', label: 'Kapi' },
-                    { value: 'masti', label: 'Masti' },
-                    { value: 'naocare', label: 'Naočare' },
-                    { value: 'tecnosti-i-kutije-za-sociva', label: 'Tečnosti i kutije za sočiva' },
-                    { value: 'cepovi-za-usi', label: 'Čepovi za uši' },
-                    { value: 'sprejevi', label: 'Sprejevi' }
-               ];
-          case 'prva-pomoc':
-               return [
-               ];
-          default:
-               return [];
-     }
-};
+// ─── Types ──────────────────────────────────────────────────────────────────────
+interface CategoryOption {
+     id: string;
+     label: string;
+     value: string;
+     main_category_id?: string;
+     mid_category_id?: string;
+}
 
 export const AddProductForm = ({ onSubmitSuccess, onSubmitFail, manufacturers = [] }: any) => {
 
      const router = useRouter();
-     //const [selectedFile, setSelectedFile] = useState(null);
      const [fileURL, setFileURL] = useState("")
      const [loading, setLoading] = useState(false)
-     const [subCategoryOptions, setSubCategoryOptions] = useState<any>([]);
-     const [isSubCategoryEnabled, setIsSubCategoryEnabled] = useState(false);
      const isScreentoMedium = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'));
 
-     const handleMidCategoryChange = async (event: any) => {
-          const selectedMidCategory = event.target.value;
+     // ─── Category state from DB ─────────────────────────────────────────────────
+     const [mainCategories, setMainCategories] = useState<CategoryOption[]>([]);
+     const [midCategories, setMidCategories] = useState<CategoryOption[]>([]);
+     const [subCategories, setSubCategories] = useState<CategoryOption[]>([]);
+     const [categoriesLoading, setCategoriesLoading] = useState(true);
 
-          // Fetch subcategory options based on the selected midCategory
-          const subCategories = await fetchSubCategoryOptions(selectedMidCategory);
+     const [selectedMainValue, setSelectedMainValue] = useState('');
+     const [selectedMidValue, setSelectedMidValue] = useState('');
 
-          setSubCategoryOptions(subCategories);
+     // Fetch categories from DB on mount
+     useEffect(() => {
+          const fetchCategories = async () => {
+               try {
+                    setCategoriesLoading(true);
+                    const res = await fetch('/api/categories');
+                    if (!res.ok) return;
+                    const json = await res.json();
+                    setMainCategories(json.data.main ?? []);
+                    setMidCategories(json.data.mid ?? []);
+                    setSubCategories(json.data.sub ?? []);
+               } catch {
+                    // silent fail — dropdowns will be empty
+               } finally {
+                    setCategoriesLoading(false);
+               }
+          };
+          fetchCategories();
+     }, []);
 
-          // Enable/disable subCategory field based on midCategory selection
-          setIsSubCategoryEnabled(!!selectedMidCategory);
+     // ─── Filtered options based on parent selection ─────────────────────────────
+     const mainOptions = useMemo(() => {
+          return [{ id: '', label: 'Obriši polje', value: '' }, ...mainCategories];
+     }, [mainCategories]);
 
-     };
+     const filteredMidCategories = useMemo(() => {
+          if (!selectedMainValue) return [];
+          const selectedMain = mainCategories.find((c) => c.value === selectedMainValue);
+          if (!selectedMain) return [];
+          return midCategories.filter((m) => m.main_category_id === selectedMain.id);
+     }, [midCategories, mainCategories, selectedMainValue]);
 
+     const midOptions = useMemo(() => {
+          if (filteredMidCategories.length === 0) return [];
+          return [{ id: '', label: 'Obriši polje', value: '' }, ...filteredMidCategories];
+     }, [filteredMidCategories]);
+
+     const filteredSubCategories = useMemo(() => {
+          if (!selectedMidValue) return [];
+          const selectedMid = midCategories.find((c) => c.value === selectedMidValue);
+          if (!selectedMid) return [];
+          return subCategories.filter((s) => s.mid_category_id === selectedMid.id);
+     }, [subCategories, midCategories, selectedMidValue]);
+
+     const subOptions = useMemo(() => {
+          if (filteredSubCategories.length === 0) return [];
+          return [{ id: '', label: 'Obriši polje', value: '' }, ...filteredSubCategories];
+     }, [filteredSubCategories]);
+
+     // ─── Derived disabled states ────────────────────────────────────────────────
+     const isMidDisabled = !selectedMainValue || filteredMidCategories.length === 0;
+     const isSubDisabled = !selectedMidValue || filteredSubCategories.length === 0;
+
+     // ─── Manufacturer options ───────────────────────────────────────────────────
      const manufacturerOptions = useMemo(() => {
           if (!Array.isArray(manufacturers)) {
                return [];
@@ -201,9 +98,10 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail, manufacturers = 
                     id: manufacturer.id,
                     label: manufacturer.name || '',
                }))
-               .filter((manufacturer) => manufacturer.id && manufacturer.label);
+               .filter((manufacturer: any) => manufacturer.id && manufacturer.label);
      }, [manufacturers]);
 
+     // ─── Submit ─────────────────────────────────────────────────────────────────
      const handleSubmit = async (values: ProductDraft) => {
           setLoading(true);
           try {
@@ -279,74 +177,94 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail, manufacturers = 
                                         helperText={formik.touched.description && formik.errors.description}
                                    />
 
+                                   {/* ─── Main Category (from DB) ─────────────────────── */}
                                    <TextField
                                         fullWidth
                                         label="Glavna kategorija"
                                         name="main_category"
                                         onBlur={formik.handleBlur}
-                                        disabled={loading}
-                                        onChange={formik.handleChange}
+                                        disabled={loading || categoriesLoading}
+                                        onChange={(event) => {
+                                             const value = event.target.value;
+                                             formik.handleChange(event);
+                                             setSelectedMainValue(value);
+                                             // Reset mid & sub when main changes
+                                             setSelectedMidValue('');
+                                             formik.setFieldValue('mid_category', '');
+                                             formik.setFieldValue('sub_category', '');
+                                        }}
                                         select
                                         error={formik.touched.main_category && !!formik.errors.main_category}
                                         helperText={formik.touched.main_category && formik.errors.main_category}
                                         value={formik.values.main_category}
                                    >
-                                        {mainCategoryOptions.map((option: any) => (
-                                             <MenuItem
-                                                  key={option.value}
-                                                  value={option.value}
-                                             >
+                                        {mainOptions.map((option) => (
+                                             <MenuItem key={option.value || '__empty'} value={option.value}>
                                                   {option.label}
                                              </MenuItem>
                                         ))}
                                    </TextField>
 
+                                   {/* ─── Mid Category (from DB, filtered by main) ────── */}
                                    <TextField
                                         fullWidth
-                                        label="Mid kategorija"
+                                        label="Srednja kategorija"
                                         name="mid_category"
                                         onBlur={formik.handleBlur}
-                                        disabled={loading}
+                                        disabled={loading || isMidDisabled}
                                         onChange={(event) => {
-                                             formik.handleChange(event); // Update formik values
-                                             handleMidCategoryChange(event); // Call custom function to handle midCategory change
+                                             const value = event.target.value;
+                                             formik.handleChange(event);
+                                             setSelectedMidValue(value);
+                                             // Reset sub when mid changes
+                                             formik.setFieldValue('sub_category', '');
                                         }}
                                         select
                                         error={formik.touched.mid_category && !!formik.errors.mid_category}
-                                        helperText={formik.touched.mid_category && formik.errors.mid_category}
+                                        helperText={
+                                             isMidDisabled && selectedMainValue
+                                                  ? 'Nema srednjih kategorija za izabranu glavnu.'
+                                                  : formik.touched.mid_category && formik.errors.mid_category
+                                        }
                                         value={formik.values.mid_category}
                                    >
-                                        {midCategoryOptions.map((option) => (
-                                             <MenuItem key={option.value} value={option.value}>
-                                                  {option.label}
-                                             </MenuItem>
-                                        ))}
+                                        {midOptions.length > 0 ? (
+                                             midOptions.map((option) => (
+                                                  <MenuItem key={option.value || '__empty'} value={option.value}>
+                                                       {option.label}
+                                                  </MenuItem>
+                                             ))
+                                        ) : (
+                                             <MenuItem disabled>Nema kategorija</MenuItem>
+                                        )}
                                    </TextField>
 
+                                   {/* ─── Sub Category (from DB, filtered by mid) ─────── */}
                                    <TextField
                                         fullWidth
-                                        label="Sub kategorija"
+                                        label="Podkategorija"
                                         name="sub_category"
                                         onBlur={formik.handleBlur}
                                         onChange={formik.handleChange}
                                         select
                                         error={formik.touched.sub_category && !!formik.errors.sub_category}
-                                        helperText={formik.touched.sub_category && formik.errors.sub_category}
+                                        helperText={
+                                             isSubDisabled && selectedMidValue
+                                                  ? 'Nema podkategorija za izabranu srednju.'
+                                                  : formik.touched.sub_category && formik.errors.sub_category
+                                        }
                                         value={formik.values.sub_category}
-                                        disabled={!isSubCategoryEnabled || loading}
+                                        disabled={loading || isSubDisabled}
                                    >
-                                        {subCategoryOptions ?
-                                             subCategoryOptions.map((option: any) =>
-                                             (
-                                                  <MenuItem key={option.value} value={option.value}>
+                                        {subOptions.length > 0 ? (
+                                             subOptions.map((option) => (
+                                                  <MenuItem key={option.value || '__empty'} value={option.value}>
                                                        {option.label}
                                                   </MenuItem>
                                              ))
-                                             :
-                                             <MenuItem key={'no-category'}>
-                                                  Nema sub kategorije
-                                             </MenuItem>
-                                        }
+                                        ) : (
+                                             <MenuItem disabled>Nema kategorija</MenuItem>
+                                        )}
                                    </TextField>
 
                                    <TextField
@@ -428,12 +346,12 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail, manufacturers = 
                                         options={manufacturerOptions}
                                         value={
                                              manufacturerOptions.find(
-                                                  (option) => option.id === formik.values.manufacturer_id
+                                                  (option: any) => option.id === formik.values.manufacturer_id
                                              ) || null
                                         }
-                                        getOptionLabel={(option) => option.label}
-                                        isOptionEqualToValue={(option, value) => option.id === value.id}
-                                        onChange={(_, newValue) => {
+                                        getOptionLabel={(option: any) => option.label}
+                                        isOptionEqualToValue={(option: any, value: any) => option.id === value.id}
+                                        onChange={(_, newValue: any) => {
                                              formik.setFieldValue(
                                                   'manufacturer_name',
                                                   newValue?.label || ''

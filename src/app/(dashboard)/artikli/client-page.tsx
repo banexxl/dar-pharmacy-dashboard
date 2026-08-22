@@ -16,6 +16,7 @@ import { generateSlug } from '@/utils/generate-slug';
 import MagnifyingGlassIcon from '@heroicons/react/24/solid/MagnifyingGlassIcon';
 import ClearIcon from '@mui/icons-material/Clear';
 import { AuthProvider } from '@/context/auth-context';
+import { CategoriesTab } from '@/sections/products/categories-tab';
 
 
 const useProductSearch = () => {
@@ -71,7 +72,7 @@ const Page = (props: any) => {
 
      const productSearch = useProductSearch();
      const isScreentoMedium = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'));
-     const [activeTab, setActiveTab] = useState<'products' | 'manufacturers'>('products');
+     const [activeTab, setActiveTab] = useState<'products' | 'manufacturers' | 'categories'>('products');
 
      const productsIds = useMemo(() => {
           if (!Array.isArray(props.products)) {
@@ -450,6 +451,7 @@ const Page = (props: any) => {
                                    >
                                         <Tab label="Proizvodi" value="products" />
                                         <Tab label="Proizvođači" value="manufacturers" />
+                                        <Tab label="Kategorije" value="categories" />
                                    </Tabs>
 
                                    {activeTab === 'products' && (
@@ -642,6 +644,10 @@ const Page = (props: any) => {
                                                   />
                                              </Stack>
                                         </Card>
+                                   )}
+
+                                   {activeTab === 'categories' && (
+                                        <CategoriesTab />
                                    )}
                               </Stack>
                          </Container>
