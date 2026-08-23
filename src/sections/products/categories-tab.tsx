@@ -226,7 +226,7 @@ export const CategoriesTab = () => {
                <Box
                     sx={{
                          display: 'grid',
-                         gridTemplateColumns: { xs: '1fr', md: '1fr 1fr 1fr' },
+                         gridTemplateColumns: { xs: '1fr', sm: '1fr', md: '1fr 1fr 1fr' },
                          gap: 2,
                     }}
                >
@@ -304,7 +304,7 @@ export const CategoriesTab = () => {
                     </Card>
 
                     {/* ─── Column 2: Mid Categories ──────────────────────────── */}
-                    <Card sx={{ p: 2, height: 'fit-content', opacity: selectedMainId ? 1 : 0.4 }}>
+                    <Card sx={{ p: 2, height: 'fit-content', opacity: selectedMainId ? 1 : 0.4, display: { xs: selectedMainId ? 'block' : 'none', md: 'block' } }}>
                          <Stack spacing={2}>
                               <Stack direction="row" alignItems="center" justifyContent="space-between">
                                    <Box>
@@ -391,7 +391,7 @@ export const CategoriesTab = () => {
                     </Card>
 
                     {/* ─── Column 3: Sub Categories ──────────────────────────── */}
-                    <Card sx={{ p: 2, height: 'fit-content', opacity: selectedMidId ? 1 : 0.4 }}>
+                    <Card sx={{ p: 2, height: 'fit-content', opacity: selectedMidId ? 1 : 0.4, display: { xs: selectedMidId ? 'block' : 'none', md: 'block' } }}>
                          <Stack spacing={2}>
                               <Stack direction="row" alignItems="center" justifyContent="space-between">
                                    <Box>
