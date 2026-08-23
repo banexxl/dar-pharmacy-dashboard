@@ -85,11 +85,25 @@ export async function proxy(request: NextRequest) {
       * Do not place logic between createServerClient() and getUser().
       * Calling getUser() validates the current Supabase session and may
       * refresh its cookies.
+      *
+      * AbortSignal.timeout ensures this doesn't hang indefinitely on the edge.
       */
-     const {
-          data: { user },
-          error: userError,
-     } = await supabase.auth.getUser();
+     let user = null;
+     let userError: any = null;
+
+     try {
+          const result = await Promise.race([
+               supabase.auth.getUser(),
+               new Promise<never>((_, reject) =>
+                    setTimeout(() => reject(new Error('Auth timeout')), 10000)
+               ),
+          ]);
+          user = result.data?.user ?? null;
+          userError = result.error;
+     } catch (e) {
+          // Auth call timed out or failed — treat as not logged in
+          userError = e;
+     }
 
      const { pathname, search } = request.nextUrl;
      const isApiRoute = pathname.startsWith('/api/');
