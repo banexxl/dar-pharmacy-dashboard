@@ -10,14 +10,13 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import PropTypes from 'prop-types';
 import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
 import Image from 'next/image';
-import { Fragment, useMemo, useState } from 'react';
+import { Fragment, useEffect, useMemo, useState } from 'react';
 import { Scrollbar } from 'src/components/scrollbar';
 import { SeverityPill } from '@/components/severity-pill';
-import { fetchSubCategoryOptions } from './new-product-form';
 import Swal from 'sweetalert2';
 import { useRouter } from 'next/navigation';
 
-import { mainCategoryOptions, midCategoryOptions, quantityUnitOptions } from './new-product-schema';
+import { quantityUnitOptions } from './new-product-schema';
 import MagnifyingGlassIcon from '@heroicons/react/24/solid/MagnifyingGlassIcon';
 import ClearIcon from '@mui/icons-material/Clear';
 import { getComparator } from '../order/order-list-table';
@@ -43,9 +42,61 @@ export const ProductsTable = (props: any) => {
      const router = useRouter();
      const [fileURL, setFileURL] = useState("")
      const [loading, setLoading] = useState(false)
-     const [subCategoryOptions, setSubCategoryOptions] = useState<any>([]);
-     const [isSubCategoryEnabled, setIsSubCategoryEnabled] = useState(false);
-     const [selectedMidCategory, setSelectedMidCategory] = useState('');
+
+     // ─── Category state from DB ─────────────────────────────────────────────────
+     const [mainCategoriesDB, setMainCategoriesDB] = useState<any[]>([]);
+     const [midCategoriesDB, setMidCategoriesDB] = useState<any[]>([]);
+     const [subCategoriesDB, setSubCategoriesDB] = useState<any[]>([]);
+
+     const [editMainValue, setEditMainValue] = useState('');
+     const [editMidValue, setEditMidValue] = useState('');
+
+     useEffect(() => {
+          const fetchCategories = async () => {
+               try {
+                    const res = await fetch('/api/categories');
+                    if (!res.ok) return;
+                    const json = await res.json();
+                    setMainCategoriesDB(json.data.main ?? []);
+                    setMidCategoriesDB(json.data.mid ?? []);
+                    setSubCategoriesDB(json.data.sub ?? []);
+               } catch {
+                    // silent
+               }
+          };
+          fetchCategories();
+     }, []);
+
+     const mainCategoryOptions = useMemo(() => {
+          return [{ id: '', label: 'Obriši polje', value: '' }, ...mainCategoriesDB];
+     }, [mainCategoriesDB]);
+
+     const filteredMidOptions = useMemo(() => {
+          if (!editMainValue) return [];
+          const selectedMain = mainCategoriesDB.find((c: any) => c.value === editMainValue);
+          if (!selectedMain) return [];
+          return midCategoriesDB.filter((m: any) => m.main_category_id === selectedMain.id);
+     }, [midCategoriesDB, mainCategoriesDB, editMainValue]);
+
+     const midCategoryOptions = useMemo(() => {
+          if (filteredMidOptions.length === 0) return [];
+          return [{ id: '', label: 'Obriši polje', value: '' }, ...filteredMidOptions];
+     }, [filteredMidOptions]);
+
+     const filteredSubOptions = useMemo(() => {
+          if (!editMidValue) return [];
+          const selectedMid = midCategoriesDB.find((c: any) => c.value === editMidValue);
+          if (!selectedMid) return [];
+          return subCategoriesDB.filter((s: any) => s.mid_category_id === selectedMid.id);
+     }, [subCategoriesDB, midCategoriesDB, editMidValue]);
+
+     const subCategoryOptions = useMemo(() => {
+          if (filteredSubOptions.length === 0) return [];
+          return [{ id: '', label: 'Obriši polje', value: '' }, ...filteredSubOptions];
+     }, [filteredSubOptions]);
+
+     const isMidDisabled = !editMainValue || filteredMidOptions.length === 0;
+     const isSubDisabled = !editMidValue || filteredSubOptions.length === 0;
 
      const normalizeKey = (value: unknown) => String(value ?? '').trim().toLowerCase();
 
@@ -108,13 +159,16 @@ export const ProductsTable = (props: any) => {
           setCurrentProductID((prevProductId: any) => {
                if (prevProductId === productId) {
                     setCurrentProductObject(null)
+                    setEditMainValue('');
+                    setEditMidValue('');
                     return null;
-               } ``
+               }
                const selectedProduct = getObjectById(productId, items);
                const selectedManufacturer = getManufacturerOptionFromProduct(selectedProduct);
 
                if (selectedProduct) {
-
+                    setEditMainValue(selectedProduct.main_category || '');
+                    setEditMidValue(selectedProduct.mid_category || '');
 
                     setCurrentProductObject({
                          ...selectedProduct,
@@ -124,6 +178,8 @@ export const ProductsTable = (props: any) => {
                     });
                } else {
                     setCurrentProductObject(null);
+                    setEditMainValue('');
+                    setEditMidValue('');
                }
 
                return productId;
@@ -174,7 +230,17 @@ export const ProductsTable = (props: any) => {
                if (response.ok) {
                     const result = await response.json();
                     if (result?.data) {
-                         onProductUpdated(result.data);
+                         // Enrich with manufacturer name from the local list
+                         const updatedProduct = result.data;
+                         const matchedManufacturer = manufacturerOptions.find(
+                              (m: any) => m.id === updatedProduct.manufacturer_id
+                         );
+                         if (matchedManufacturer) {
+                              updatedProduct.manufacturer_name = matchedManufacturer.label;
+                              updatedProduct.manufacturer_value = matchedManufacturer.value;
+                              updatedProduct.manufacturer_url = matchedManufacturer.url;
+                         }
+                         onProductUpdated(updatedProduct);
                     }
                     handleProductClose()
                     setCurrentProductObject(null)
@@ -193,18 +259,34 @@ export const ProductsTable = (props: any) => {
           }
      }
 
-     const handleMidCategoryChange = async (event: any) => {
-          const selectedMidCategory = event.target.value;
-          setSelectedMidCategory(selectedMidCategory);
+     const handleMainCategoryChangeEdit = (event: any) => {
+          const value = event.target.value;
+          setEditMainValue(value);
+          setEditMidValue('');
+          setCurrentProductObject((prev: any) => ({
+               ...prev,
+               main_category: value,
+               mid_category: '',
+               sub_category: '',
+          }));
+     };
 
-          // Fetch subcategory options based on the selected midCategory
-          const subCategories = await fetchSubCategoryOptions(selectedMidCategory);
-          setSubCategoryOptions(subCategories);
+     const handleMidCategoryChangeEdit = (event: any) => {
+          const value = event.target.value;
+          setEditMidValue(value);
+          setCurrentProductObject((prev: any) => ({
+               ...prev,
+               mid_category: value,
+               sub_category: '',
+          }));
+     };
 
-          // Enable/disable subCategory field based on midCategory selection
-          setIsSubCategoryEnabled(!!selectedMidCategory);
-
-
+     const handleSubCategoryChangeEdit = (event: any) => {
+          const value = event.target.value;
+          setCurrentProductObject((prev: any) => ({
+               ...prev,
+               sub_category: value,
+          }));
      };
 
      const handleDeleteButtonClick = () => {
@@ -683,21 +765,16 @@ export const ProductsTable = (props: any) => {
                                                                                                     size={{ md: 6, xs: 12 }}
                                                                                                >
                                                                                                     <TextField key={Math.random()}
-                                                                                                         defaultValue={currentProductObject?.main_category}
+                                                                                                         value={currentProductObject?.main_category || ''}
                                                                                                          fullWidth
                                                                                                          label="Glavna Kategorija"
                                                                                                          select
                                                                                                          disabled={loading}
-                                                                                                         onBlur={(e: any) =>
-                                                                                                              setCurrentProductObject((previousObject: any) => ({
-                                                                                                                   ...previousObject,
-                                                                                                                   main_category: e.target.value
-                                                                                                              }))
-                                                                                                         }
+                                                                                                         onChange={handleMainCategoryChangeEdit}
                                                                                                     >
                                                                                                          {mainCategoryOptions.map((option: any) => (
                                                                                                               <MenuItem
-                                                                                                                   key={Math.random()}
+                                                                                                                   key={option.value || '__empty'}
                                                                                                                    value={option.value}
                                                                                                               >
                                                                                                                    {option.label}
@@ -709,55 +786,50 @@ export const ProductsTable = (props: any) => {
                                                                                                     size={{ md: 6, xs: 12 }}
                                                                                                >
                                                                                                     <TextField key={Math.random()}
-                                                                                                         defaultValue={currentProductObject?.mid_category}
+                                                                                                         value={currentProductObject?.mid_category || ''}
                                                                                                          fullWidth
-                                                                                                         label="Mid Kategorija"
+                                                                                                         label="Srednja Kategorija"
                                                                                                          select
-                                                                                                         disabled={loading}
-                                                                                                         onChange={(e) => handleMidCategoryChange(e)}
-                                                                                                         onBlur={(e: any) =>
-                                                                                                              setCurrentProductObject((previousObject: any) => ({
-                                                                                                                   ...previousObject,
-                                                                                                                   mid_category: e.target.value
-
-                                                                                                              }))
-                                                                                                         }
+                                                                                                         disabled={loading || isMidDisabled}
+                                                                                                         onChange={handleMidCategoryChangeEdit}
                                                                                                     >
-                                                                                                         {midCategoryOptions.map((option: any) => (
-                                                                                                              <MenuItem
-                                                                                                                   key={Math.random()}
-                                                                                                                   value={option.value}
-                                                                                                              >
-                                                                                                                   {option.label}
-                                                                                                              </MenuItem>
-                                                                                                         ))}
+                                                                                                         {midCategoryOptions.length > 0 ? (
+                                                                                                              midCategoryOptions.map((option: any) => (
+                                                                                                                   <MenuItem
+                                                                                                                        key={option.value || '__empty'}
+                                                                                                                        value={option.value}
+                                                                                                                   >
+                                                                                                                        {option.label}
+                                                                                                                   </MenuItem>
+                                                                                                              ))
+                                                                                                         ) : (
+                                                                                                              <MenuItem disabled>Nema kategorija</MenuItem>
+                                                                                                         )}
                                                                                                     </TextField>
                                                                                                </Grid>
                                                                                                <Grid key={Math.random()}
                                                                                                     size={{ md: 6, xs: 12 }}
                                                                                                >
                                                                                                     <TextField key={Math.random()}
-                                                                                                         defaultValue={currentProductObject?.sub_category}
+                                                                                                         value={currentProductObject?.sub_category || ''}
                                                                                                          fullWidth
-                                                                                                         label="Sub Kategorija"
+                                                                                                         label="Podkategorija"
                                                                                                          select
-                                                                                                         disabled={!isSubCategoryEnabled || loading}
-                                                                                                         onBlur={(e: any) =>
-                                                                                                              setCurrentProductObject((previousObject: any) => ({
-                                                                                                                   ...previousObject,
-                                                                                                                   sub_category: e.target.value
-
-                                                                                                              }))
-                                                                                                         }
+                                                                                                         disabled={loading || isSubDisabled}
+                                                                                                         onChange={handleSubCategoryChangeEdit}
                                                                                                     >
-                                                                                                         {subCategoryOptions.map((option: any) => (
-                                                                                                              <MenuItem
-                                                                                                                   key={Math.random()}
-                                                                                                                   value={option.value}
-                                                                                                              >
-                                                                                                                   {option.label}
-                                                                                                              </MenuItem>
-                                                                                                         ))}
+                                                                                                         {subCategoryOptions.length > 0 ? (
+                                                                                                              subCategoryOptions.map((option: any) => (
+                                                                                                                   <MenuItem
+                                                                                                                        key={option.value || '__empty'}
+                                                                                                                        value={option.value}
+                                                                                                                   >
+                                                                                                                        {option.label}
+                                                                                                                   </MenuItem>
+                                                                                                              ))
+                                                                                                         ) : (
+                                                                                                              <MenuItem disabled>Nema kategorija</MenuItem>
+                                                                                                         )}
                                                                                                     </TextField>
                                                                                                </Grid>
 
