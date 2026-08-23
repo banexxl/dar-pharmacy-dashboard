@@ -4,7 +4,7 @@ import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
 import {
      Autocomplete, Box, Button, Card, CardContent, Checkbox, Divider, Grid, IconButton, Input, InputAdornment, LinearProgress, ListItemText, MenuItem,
      OutlinedInput,
-     Select, Stack, SvgIcon, Switch, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography, useTheme
+     Select, Stack, SvgIcon, Switch, Table, TableBody, TableCell, TableHead, TablePagination, TableRow, TextField, Typography, useTheme
 } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import PropTypes from 'prop-types';
@@ -339,6 +339,8 @@ export const ProductsTable = (props: any) => {
 
      const [searchQuery, setSearchQuery] = useState('');
      const [booleanFilters, setBooleanFilters] = useState<string[]>([]);
+     const [internalPage, setInternalPage] = useState(0);
+     const [internalRowsPerPage, setInternalRowsPerPage] = useState(rowsPerPage || 10);
 
      const booleanFilterOptions = [
           { value: 'is_active', label: 'Aktivan' },
@@ -351,10 +353,12 @@ export const ProductsTable = (props: any) => {
 
      const handleClearSearch = () => {
           setSearchQuery('');
+          setInternalPage(0);
      };
 
      const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
           setSearchQuery(event.target.value);
+          setInternalPage(0);
      };
 
      const handleImageChange = async (event: any) => {
@@ -427,7 +431,7 @@ export const ProductsTable = (props: any) => {
           }
      };
 
-     const visibleRows = useMemo(
+     const filteredRows = useMemo(
           () =>
                [...items]
                     .filter((product: Product) => {
@@ -442,9 +446,13 @@ export const ProductsTable = (props: any) => {
                          if (booleanFilters.length === 0) return true;
                          return booleanFilters.every((key) => Boolean((product as any)[key]) === true);
                     })
-                    .sort(getComparator(sortDir, sortBy))
-                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
-          [searchQuery, items, page, rowsPerPage, booleanFilters],
+                    .sort(getComparator(sortDir, sortBy)),
+          [searchQuery, items, booleanFilters],
+     );
+
+     const visibleRows = useMemo(
+          () => filteredRows.slice(internalPage * internalRowsPerPage, internalPage * internalRowsPerPage + internalRowsPerPage),
+          [filteredRows, internalPage, internalRowsPerPage],
      );
 
      return (
@@ -1441,6 +1449,21 @@ export const ProductsTable = (props: any) => {
                     </Box>
                </Box>
           </Card >
+          <TablePagination
+               component="div"
+               count={filteredRows.length}
+               onPageChange={(event, newPage) => setInternalPage(newPage)}
+               onRowsPerPageChange={(event) => {
+                    setInternalRowsPerPage(parseInt(event.target.value, 10));
+                    setInternalPage(0);
+               }}
+               page={internalPage}
+               rowsPerPage={internalRowsPerPage}
+               rowsPerPageOptions={[5, 10, 25, 50, 100, 200]}
+               showFirstButton
+               showLastButton
+               labelRowsPerPage={'Broj po stranici'}
+          />
      );
 };
 

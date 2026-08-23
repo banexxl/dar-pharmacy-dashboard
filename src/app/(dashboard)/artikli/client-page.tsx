@@ -466,19 +466,6 @@ const Page = (props: any) => {
                                                   rowsPerPage={productSearch.state.rowsPerPage}
                                                   selected={productsSelection.selected}
                                              />
-                                             <TablePagination
-                                                  component="div"
-                                                  count={productStore.allProducts.length}
-                                                  onPageChange={productSearch.handlePageChange}
-                                                  onRowsPerPageChange={productSearch.handleRowsPerPageChange}
-                                                  page={productSearch.state.page}
-                                                  rowsPerPage={productSearch.state.rowsPerPage}
-                                                  rowsPerPageOptions={[5, 10, 25, 50, 100, 200]}
-                                                  showFirstButton
-                                                  showLastButton
-                                                  labelRowsPerPage={'Broj po stranici'}
-                                             //labelDisplayedRows={({ from, to, count }) => { return `${ from }–${ to } od ${ count !== -1 ? count : `više od ${ to }` }`; }}
-                                             />
                                         </>
                                    )}
 
