@@ -595,6 +595,9 @@ export const ProductsTable = (props: any) => {
                                              <TableCell>
                                                   Na početnoj
                                              </TableCell>
+                                             <TableCell>
+                                                  Aktivan
+                                             </TableCell>
                                         </TableRow>
                                    </TableHead>
                                    <TableBody>
@@ -737,12 +740,17 @@ export const ProductsTable = (props: any) => {
                                                                                 {product.display_on_home ? 'Da' : 'Ne'}
                                                                            </SeverityPill>
                                                                       </TableCell>
+                                                                      <TableCell key={Math.random()}>
+                                                                           <SeverityPill key={Math.random()} color={statusColor}>
+                                                                                {product.is_active ? 'Da' : 'Ne'}
+                                                                           </SeverityPill>
+                                                                      </TableCell>
                                                                  </TableRow>
                                                                  {isCurrent && (
                                                                       <TableRow key={Math.random()}>
                                                                            <TableCell
                                                                                 key={Math.random()}
-                                                                                colSpan={8}
+                                                                                colSpan={9}
                                                                                 sx={{
                                                                                      p: 0,
                                                                                      position: 'relative',
@@ -1078,24 +1086,24 @@ export const ProductsTable = (props: any) => {
                                                                                                          size={{ md: 6, xs: 12 }}
                                                                                                     >
                                                                                                          <TextField key={Math.random()}
-                                                                                                              defaultValue={currentProductObject?.discount_amount}
+                                                                                                              value={currentProductObject?.discount_amount ?? 0}
                                                                                                               fullWidth
                                                                                                               disabled={!currentProductObject?.discount}
                                                                                                               label="Iznos popusta"
                                                                                                               name="discount_amount"
-                                                                                                              onBlur={(e) => {
+                                                                                                              onChange={(e) => {
                                                                                                                    const min = 0;
                                                                                                                    const max = 100;
-                                                                                                                   var value = parseInt(e.target.value, 10);
+                                                                                                                   let value = parseInt(e.target.value, 10);
 
+                                                                                                                   if (isNaN(value)) value = 0;
                                                                                                                    if (value > max) value = max;
                                                                                                                    if (value < min) value = min;
 
                                                                                                                    setCurrentProductObject((previousObject: any) => ({
                                                                                                                         ...previousObject,
-                                                                                                                        discountAmount: value
-                                                                                                                   }))
-
+                                                                                                                        discount_amount: value
+                                                                                                                   }));
                                                                                                               }}
                                                                                                               type="number"
                                                                                                          />
@@ -1209,7 +1217,8 @@ export const ProductsTable = (props: any) => {
                                                                                                          <Switch key={Math.random()} disabled={loading} checked={currentProductObject!.discount}
                                                                                                               onChange={() => setCurrentProductObject((previousObject: any) => ({
                                                                                                                    ...previousObject,
-                                                                                                                   discount: !previousObject.discount
+                                                                                                                   discount: !previousObject.discount,
+                                                                                                                   discount_amount: !previousObject.discount ? previousObject.discount_amount : 0
                                                                                                               }))}
                                                                                                          />
                                                                                                          <Typography key={Math.random()} variant="subtitle2">
@@ -1470,7 +1479,7 @@ export const ProductsTable = (props: any) => {
                                                   })
                                                   :
                                                   <TableRow>
-                                                       <TableCell colSpan={8} align="center">
+                                                       <TableCell colSpan={9} align="center">
                                                             Nije pronađen nijedan proizvod...
                                                        </TableCell>
                                                   </TableRow>
