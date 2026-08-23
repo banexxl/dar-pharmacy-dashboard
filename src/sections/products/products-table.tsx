@@ -198,6 +198,16 @@ export const ProductsTable = (props: any) => {
      }
 
      const handleProductUpdateClick = () => {
+          // Category child validation
+          if (filteredMidOptions.length > 0 && !currentProductObject?.mid_category) {
+               Swal.fire({ icon: 'warning', title: 'Izaberite srednju kategoriju', text: 'Glavna kategorija ima podkategorije — morate izabrati srednju.' });
+               return;
+          }
+          if (filteredSubOptions.length > 0 && !currentProductObject?.sub_category) {
+               Swal.fire({ icon: 'warning', title: 'Izaberite podkategoriju', text: 'Srednja kategorija ima podkategorije — morate izabrati pod.' });
+               return;
+          }
+
           Swal.fire({
                title: 'Da li ste sigurni?',
                text: "Možete izmeniti artikl u svakom momentu...",
@@ -456,784 +466,785 @@ export const ProductsTable = (props: any) => {
      );
 
      return (
-          <Card>
-               <Card sx={{ p: 2 }}>
-                    <Stack direction="row" spacing={2} useFlexGap flexWrap="wrap" alignItems="center" justifyContent="space-between">
-                         <Stack direction="row" spacing={2} useFlexGap flexWrap="wrap" alignItems="center" sx={{ flexGrow: 1 }}>
-                              <OutlinedInput
-                                   value={searchQuery}
-                                   onChange={handleSearchChange}
-                                   fullWidth
-                                   placeholder="Pronađi proizvod po nazivu..."
-                                   startAdornment={(
-                                        <InputAdornment position="start">
-                                             <SvgIcon
-                                                  color="action"
-                                                  fontSize="small"
-                                             >
-                                                  <MagnifyingGlassIcon />
-                                             </SvgIcon>
-                                        </InputAdornment>
-                                   )}
-                                   endAdornment={(
-                                        <InputAdornment position="end">
-                                             <IconButton
-                                                  onClick={handleClearSearch}
-                                             >
+          <>
+               <Card>
+                    <Card sx={{ p: 2 }}>
+                         <Stack direction="row" spacing={2} useFlexGap flexWrap="wrap" alignItems="center" justifyContent="space-between">
+                              <Stack direction="row" spacing={2} useFlexGap flexWrap="wrap" alignItems="center" sx={{ flexGrow: 1 }}>
+                                   <OutlinedInput
+                                        value={searchQuery}
+                                        onChange={handleSearchChange}
+                                        fullWidth
+                                        placeholder="Pronađi proizvod po nazivu..."
+                                        startAdornment={(
+                                             <InputAdornment position="start">
                                                   <SvgIcon
                                                        color="action"
                                                        fontSize="small"
                                                   >
-                                                       <ClearIcon />
+                                                       <MagnifyingGlassIcon />
                                                   </SvgIcon>
-                                             </IconButton>
-                                        </InputAdornment>
+                                             </InputAdornment>
+                                        )}
+                                        endAdornment={(
+                                             <InputAdornment position="end">
+                                                  <IconButton
+                                                       onClick={handleClearSearch}
+                                                  >
+                                                       <SvgIcon
+                                                            color="action"
+                                                            fontSize="small"
+                                                       >
+                                                            <ClearIcon />
+                                                       </SvgIcon>
+                                                  </IconButton>
+                                             </InputAdornment>
+                                        )}
+                                        sx={{ maxWidth: 500 }}
+                                   />
+                                   <Select
+                                        multiple
+                                        displayEmpty
+                                        value={booleanFilters}
+                                        onChange={(event) => setBooleanFilters(event.target.value as string[])}
+                                        renderValue={(selected) => {
+                                             if (selected.length === 0) {
+                                                  return 'Svi filteri';
+                                             }
+                                             return booleanFilterOptions
+                                                  .filter((option) => selected.includes(option.value))
+                                                  .map((option) => option.label)
+                                                  .join(', ');
+                                        }}
+                                        sx={{ minWidth: 240 }}
+                                   >
+                                        {booleanFilterOptions.map((option) => (
+                                             <MenuItem key={option.value} value={option.value}>
+                                                  <Checkbox checked={booleanFilters.includes(option.value)} />
+                                                  <ListItemText primary={option.label} />
+                                             </MenuItem>
+                                        ))}
+                                   </Select>
+                              </Stack>
+                              <Button
+                                   size="small"
+                                   startIcon={(
+                                        <SvgIcon fontSize="small">
+                                             <PlusIcon />
+                                        </SvgIcon>
                                    )}
-                                   sx={{ maxWidth: 500 }}
-                              />
-                              <Select
-                                   multiple
-                                   displayEmpty
-                                   value={booleanFilters}
-                                   onChange={(event) => setBooleanFilters(event.target.value as string[])}
-                                   renderValue={(selected) => {
-                                        if (selected.length === 0) {
-                                             return 'Svi filteri';
-                                        }
-                                        return booleanFilterOptions
-                                             .filter((option) => selected.includes(option.value))
-                                             .map((option) => option.label)
-                                             .join(', ');
-                                   }}
-                                   sx={{ minWidth: 240 }}
+                                   variant="contained"
+                                   onClick={onAddProductClick}
                               >
-                                   {booleanFilterOptions.map((option) => (
-                                        <MenuItem key={option.value} value={option.value}>
-                                             <Checkbox checked={booleanFilters.includes(option.value)} />
-                                             <ListItemText primary={option.label} />
-                                        </MenuItem>
-                                   ))}
-                              </Select>
+                                   Dodaj proizvod
+                              </Button>
                          </Stack>
-                         <Button
-                              size="small"
-                              startIcon={(
-                                   <SvgIcon fontSize="small">
-                                        <PlusIcon />
-                                   </SvgIcon>
-                              )}
-                              variant="contained"
-                              onClick={onAddProductClick}
-                         >
-                              Dodaj proizvod
-                         </Button>
-                    </Stack>
-               </Card>
-               <Box
-                    sx={{
-                         minWidth: 0,
-                         overflowX: 'auto',
-                         width: '100%',
-                    }}
-               >
-                    <Box sx={{ minWidth: 800 }}>
-                         <Table>
-                              <TableHead>
-                                   <TableRow>
-                                        <TableCell>
+                    </Card>
+                    <Box
+                         sx={{
+                              minWidth: 0,
+                              overflowX: 'auto',
+                              width: '100%',
+                         }}
+                    >
+                         <Box sx={{ minWidth: 800 }}>
+                              <Table>
+                                   <TableHead>
+                                        <TableRow>
+                                             <TableCell>
 
-                                        </TableCell>
-                                        <TableCell>
-                                             Naziv
-                                        </TableCell>
-                                        <TableCell>
-                                             Na stanju
-                                        </TableCell>
-                                        <TableCell>
-                                             Cena
-                                        </TableCell>
-                                        <TableCell>
-                                             Šifra
-                                        </TableCell>
-                                        <TableCell>
-                                             Na popustu
-                                        </TableCell>
-                                        <TableCell>
-                                             Popust %
-                                        </TableCell>
-                                        <TableCell>
-                                             Na početnoj
-                                        </TableCell>
-                                   </TableRow>
-                              </TableHead>
-                              <TableBody>
-                                   {
-                                        visibleRows.length > 0 ?
-                                             visibleRows.map((product: Product) => {
-                                                  //const isSelected = selected.includes(product.id);
-                                                  const isCurrent = product.id === currentProductID;
-                                                  const quantityColor = (product.quantity ?? 0) >= 10 ? 'success' : 'error';
-                                                  const statusColor = product.is_active === true ? 'success' : 'info';
-                                                  const homeColor = product.display_on_home ? 'success' : 'info';
-                                                  // const hasManyVariants = product.variants > 1;
+                                             </TableCell>
+                                             <TableCell>
+                                                  Naziv
+                                             </TableCell>
+                                             <TableCell>
+                                                  Na stanju
+                                             </TableCell>
+                                             <TableCell>
+                                                  Cena
+                                             </TableCell>
+                                             <TableCell>
+                                                  Šifra
+                                             </TableCell>
+                                             <TableCell>
+                                                  Na popustu
+                                             </TableCell>
+                                             <TableCell>
+                                                  Popust %
+                                             </TableCell>
+                                             <TableCell>
+                                                  Na početnoj
+                                             </TableCell>
+                                        </TableRow>
+                                   </TableHead>
+                                   <TableBody>
+                                        {
+                                             visibleRows.length > 0 ?
+                                                  visibleRows.map((product: Product) => {
+                                                       //const isSelected = selected.includes(product.id);
+                                                       const isCurrent = product.id === currentProductID;
+                                                       const quantityColor = (product.quantity ?? 0) >= 10 ? 'success' : 'error';
+                                                       const statusColor = product.is_active === true ? 'success' : 'info';
+                                                       const homeColor = product.display_on_home ? 'success' : 'info';
+                                                       // const hasManyVariants = product.variants > 1;
 
-                                                  return (
-                                                       <Fragment key={Math.random()}>
-                                                            <TableRow
-                                                                 hover
-                                                                 key={Math.random()}
-                                                            >
-                                                                 <TableCell
+                                                       return (
+                                                            <Fragment key={Math.random()}>
+                                                                 <TableRow
+                                                                      hover
                                                                       key={Math.random()}
-                                                                      padding="checkbox"
-                                                                      sx={{
-                                                                           ...(isCurrent && {
-                                                                                position: 'relative',
-                                                                                '&:after': {
-                                                                                     position: 'absolute',
-                                                                                     content: '" "',
-                                                                                     top: 0,
-                                                                                     left: 0,
-                                                                                     backgroundColor: 'primary.main',
-                                                                                     width: 3,
-                                                                                     height: 'calc(100% + 1px)',
-                                                                                },
-                                                                           }),
-                                                                      }}
-                                                                      width="25%"
                                                                  >
-                                                                      <IconButton key={Math.random()} onClick={() => handleProductToggle(product.id)}>
-                                                                           <SvgIcon key={Math.random()}>{isCurrent ? <ChevronDownIcon key={Math.random()} /> : <ChevronRightIcon key={Math.random()} />}</SvgIcon >
-                                                                      </IconButton>
-                                                                 </TableCell>
-                                                                 <TableCell width="25%" key={Math.random()}>
-                                                                      <Box key={Math.random()}
-                                                                           sx={{
-                                                                                alignItems: 'center',
-                                                                                display: 'flex',
-                                                                           }}
-                                                                      >
-                                                                           {product.image_url ? (
-                                                                                <Box
-                                                                                     key={Math.random()}
-                                                                                     sx={{
-                                                                                          alignItems: 'center',
-                                                                                          backgroundColor: 'neutral.50',
-                                                                                          backgroundImage: `url(${product.image_url})`,
-                                                                                          backgroundPosition: 'center',
-                                                                                          backgroundSize: 'cover',
-                                                                                          borderRadius: 1,
-                                                                                          display: 'flex',
-                                                                                          height: 80,
-                                                                                          justifyContent: 'center',
-                                                                                          overflow: 'hidden',
-                                                                                          width: 80,
-                                                                                     }}
-                                                                                />
-                                                                           ) : (
-                                                                                <Box
-                                                                                     key={Math.random()}
-                                                                                     sx={{
-                                                                                          alignItems: 'center',
-                                                                                          backgroundColor: 'neutral.50',
-                                                                                          borderRadius: 1,
-                                                                                          display: 'flex',
-                                                                                          height: 80,
-                                                                                          justifyContent: 'center',
-                                                                                          width: 80,
-                                                                                     }}
-                                                                                >
-                                                                                     <SvgIcon key={Math.random()} >
-
-                                                                                     </SvgIcon>
-                                                                                </Box>
-                                                                           )}
-                                                                           <Box
-                                                                                key={Math.random()}
-                                                                                sx={{
-                                                                                     cursor: 'pointer',
-                                                                                     ml: 2,
-                                                                                }}
-                                                                           >
-                                                                                <Typography key={Math.random()} variant="subtitle2">{product.name}</Typography>
-                                                                                <Typography
-                                                                                     key={Math.random()}
-                                                                                     color="text.secondary"
-                                                                                     variant="body2"
-                                                                                >
-                                                                                     in {product.main_category}
-                                                                                </Typography>
-                                                                                <Typography
-                                                                                     key={Math.random()}
-                                                                                     color="text.secondary"
-                                                                                     variant="body2"
-                                                                                >
-                                                                                     Proizvođač: {product.manufacturer_name ?? product.manufacturer_id ?? '-'}
-                                                                                </Typography>
-                                                                           </Box>
-                                                                      </Box>
-                                                                 </TableCell>
-                                                                 <TableCell width="25%" key={Math.random()}>
-                                                                      <LinearProgress
-                                                                           key={Math.random()}
-                                                                           value={product.quantity ?? 0}
-                                                                           variant="determinate"
-                                                                           color={quantityColor}
-                                                                           sx={{
-                                                                                height: 8,
-                                                                                width: 40,
-                                                                           }}
-                                                                      />
-                                                                      <Typography
-                                                                           key={Math.random()}
-                                                                           color="text.secondary"
-                                                                           variant="body2"
-                                                                      >
-                                                                           {product.available_stock} in stock
-                                                                           {/* {hasManyVariants && ` in ${product.variants} variants`} */}
-                                                                      </Typography>
-                                                                 </TableCell>
-                                                                 <TableCell key={Math.random()}>{product.price}</TableCell>
-                                                                 <TableCell key={Math.random()}>{product.id?.slice(-8)}</TableCell>
-                                                                 <TableCell key={Math.random()}>
-                                                                      <SeverityPill key={Math.random()} color={statusColor}>{product.discount.toString()}</SeverityPill>
-                                                                 </TableCell>
-                                                                 <TableCell key={Math.random()}>
-                                                                      <SeverityPill key={Math.random()} color={statusColor}>{product.discount_amount}</SeverityPill>
-                                                                 </TableCell>
-                                                                 <TableCell key={Math.random()}>
-                                                                      <SeverityPill key={Math.random()} color={homeColor}>
-                                                                           {product.display_on_home ? 'Da' : 'Ne'}
-                                                                      </SeverityPill>
-                                                                 </TableCell>
-                                                            </TableRow>
-                                                            {isCurrent && (
-                                                                 <TableRow key={Math.random()}>
                                                                       <TableCell
                                                                            key={Math.random()}
-                                                                           colSpan={8}
+                                                                           padding="checkbox"
                                                                            sx={{
-                                                                                p: 0,
-                                                                                position: 'relative',
-                                                                                '&:after': {
-                                                                                     position: 'absolute',
-                                                                                     content: '" "',
-                                                                                     top: 0,
-                                                                                     left: 0,
-                                                                                     backgroundColor: 'primary.main',
-                                                                                     width: 3,
-                                                                                     height: 'calc(100% + 1px)',
-                                                                                },
+                                                                                ...(isCurrent && {
+                                                                                     position: 'relative',
+                                                                                     '&:after': {
+                                                                                          position: 'absolute',
+                                                                                          content: '" "',
+                                                                                          top: 0,
+                                                                                          left: 0,
+                                                                                          backgroundColor: 'primary.main',
+                                                                                          width: 3,
+                                                                                          height: 'calc(100% + 1px)',
+                                                                                     },
+                                                                                }),
                                                                            }}
+                                                                           width="25%"
                                                                       >
-                                                                           <CardContent key={Math.random()} sx={{ width: { xs: 'calc(100vw - 64px)', md: 'auto' }, overflowX: 'hidden', boxSizing: 'border-box' }}>
-                                                                                <Grid key={Math.random()}
-                                                                                     container
-                                                                                     spacing={3}
-                                                                                >
-                                                                                     <Grid key={Math.random()}
-                                                                                          size={{ md: 6, xs: 12 }}
-                                                                                     >
-                                                                                          <Typography key={Math.random()} variant="h6">Osnovni detalji</Typography>
-                                                                                          <Divider key={Math.random()} sx={{ my: 2 }} />
-                                                                                          <Grid key={Math.random()}
-                                                                                               container
-                                                                                               spacing={3}
-                                                                                          >
-                                                                                               <Grid key={Math.random()}
-                                                                                                    size={{ md: 6, xs: 12 }}
-                                                                                               >
-                                                                                                    <TextField key={Math.random()}
-                                                                                                         defaultValue={currentProductObject?.name}
-                                                                                                         fullWidth
-                                                                                                         label="Naziv"
-                                                                                                         name="name"
-                                                                                                         disabled={loading}
-                                                                                                         onBlur={(e: any) =>
-                                                                                                              setCurrentProductObject((previousObject: any) => ({
-                                                                                                                   ...previousObject,
-                                                                                                                   name: e.target.value
-
-                                                                                                              }))
-                                                                                                         }
-                                                                                                    />
-                                                                                               </Grid>
-                                                                                               <Grid key={Math.random()}
-                                                                                                    size={{ md: 6, xs: 12 }}
-                                                                                               >
-                                                                                                    <TextField key={Math.random()}
-                                                                                                         defaultValue={currentProductObject?.id?.slice(-8)}
-                                                                                                         disabled
-                                                                                                         fullWidth
-                                                                                                         label="Šifra proizvoda"
-                                                                                                         name={product.id?.slice(-8)}
-                                                                                                    />
-                                                                                               </Grid>
-                                                                                               <Grid key={Math.random()}
-                                                                                                    size={{ md: 6, xs: 12 }}
-                                                                                               >
-                                                                                                    <TextField key={Math.random()}
-                                                                                                         value={currentProductObject?.main_category || ''}
-                                                                                                         fullWidth
-                                                                                                         label="Glavna Kategorija"
-                                                                                                         select
-                                                                                                         disabled={loading}
-                                                                                                         onChange={handleMainCategoryChangeEdit}
-                                                                                                    >
-                                                                                                         {mainCategoryOptions.map((option: any) => (
-                                                                                                              <MenuItem
-                                                                                                                   key={option.value || '__empty'}
-                                                                                                                   value={option.value}
-                                                                                                              >
-                                                                                                                   {option.label}
-                                                                                                              </MenuItem>
-                                                                                                         ))}
-                                                                                                    </TextField>
-                                                                                               </Grid>
-                                                                                               <Grid key={Math.random()}
-                                                                                                    size={{ md: 6, xs: 12 }}
-                                                                                               >
-                                                                                                    <TextField key={Math.random()}
-                                                                                                         value={currentProductObject?.mid_category || ''}
-                                                                                                         fullWidth
-                                                                                                         label="Srednja Kategorija"
-                                                                                                         select
-                                                                                                         disabled={loading || isMidDisabled}
-                                                                                                         onChange={handleMidCategoryChangeEdit}
-                                                                                                    >
-                                                                                                         {midCategoryOptions.length > 0 ? (
-                                                                                                              midCategoryOptions.map((option: any) => (
-                                                                                                                   <MenuItem
-                                                                                                                        key={option.value || '__empty'}
-                                                                                                                        value={option.value}
-                                                                                                                   >
-                                                                                                                        {option.label}
-                                                                                                                   </MenuItem>
-                                                                                                              ))
-                                                                                                         ) : (
-                                                                                                              <MenuItem disabled>Nema kategorija</MenuItem>
-                                                                                                         )}
-                                                                                                    </TextField>
-                                                                                               </Grid>
-                                                                                               <Grid key={Math.random()}
-                                                                                                    size={{ md: 6, xs: 12 }}
-                                                                                               >
-                                                                                                    <TextField key={Math.random()}
-                                                                                                         value={currentProductObject?.sub_category || ''}
-                                                                                                         fullWidth
-                                                                                                         label="Podkategorija"
-                                                                                                         select
-                                                                                                         disabled={loading || isSubDisabled}
-                                                                                                         onChange={handleSubCategoryChangeEdit}
-                                                                                                    >
-                                                                                                         {subCategoryOptions.length > 0 ? (
-                                                                                                              subCategoryOptions.map((option: any) => (
-                                                                                                                   <MenuItem
-                                                                                                                        key={option.value || '__empty'}
-                                                                                                                        value={option.value}
-                                                                                                                   >
-                                                                                                                        {option.label}
-                                                                                                                   </MenuItem>
-                                                                                                              ))
-                                                                                                         ) : (
-                                                                                                              <MenuItem disabled>Nema kategorija</MenuItem>
-                                                                                                         )}
-                                                                                                    </TextField>
-                                                                                               </Grid>
-
-                                                                                               <Grid
-                                                                                                    size={{ md: 6, xs: 12 }}
-                                                                                               >
-                                                                                                    <TextField key={Math.random()}
-                                                                                                         defaultValue={currentProductObject?.description}
-                                                                                                         fullWidth
-                                                                                                         label="Opis"
-                                                                                                         disabled={loading}
-                                                                                                         name="description"
-                                                                                                         onBlur={(e: any) =>
-                                                                                                              setCurrentProductObject((previousObject: any) => ({
-                                                                                                                   ...previousObject,
-                                                                                                                   description: e.target.value
-
-                                                                                                              }))
-                                                                                                         }
-                                                                                                    />
-                                                                                               </Grid>
-                                                                                               <Grid key={Math.random()}
-                                                                                                    size={{ md: 6, xs: 12 }}
-                                                                                               >
-                                                                                                    <TextField key={Math.random()}
-                                                                                                         defaultValue={currentProductObject?.instructions}
-                                                                                                         fullWidth
-                                                                                                         label="Instrukcije"
-                                                                                                         disabled={loading}
-                                                                                                         name="instructions"
-                                                                                                         onBlur={(e: any) =>
-                                                                                                              setCurrentProductObject((previousObject: any) => ({
-                                                                                                                   ...previousObject,
-                                                                                                                   instructions: e.target.value
-
-                                                                                                              }))
-                                                                                                         }
-                                                                                                    />
-                                                                                               </Grid>
-                                                                                               <Grid key={Math.random()}
-                                                                                                    size={{ md: 6, xs: 12 }}
-                                                                                               >
-                                                                                                    <TextField key={Math.random()}
-                                                                                                         defaultValue={currentProductObject?.warning}
-                                                                                                         fullWidth
-                                                                                                         label="Upozorenje"
-                                                                                                         disabled={loading}
-                                                                                                         name="warning"
-                                                                                                         onBlur={(e: any) =>
-                                                                                                              setCurrentProductObject((previousObject: any) => ({
-                                                                                                                   ...previousObject,
-                                                                                                                   warning: e.target.value
-
-                                                                                                              }))
-                                                                                                         }
-                                                                                                    />
-                                                                                               </Grid>
-                                                                                               <Grid key={Math.random()}
-                                                                                                    size={{ md: 6, xs: 12 }}
-                                                                                               >
-                                                                                                    <TextField key={Math.random()}
-                                                                                                         defaultValue={currentProductObject?.ingredients}
-                                                                                                         fullWidth
-                                                                                                         disabled={loading}
-                                                                                                         label="Sastav"
-                                                                                                         name="ingredients"
-                                                                                                         onBlur={(e: any) =>
-                                                                                                              setCurrentProductObject((previousObject: any) => ({
-                                                                                                                   ...previousObject,
-                                                                                                                   ingredients: e.target.value
-
-                                                                                                              }))
-                                                                                                         }
-                                                                                                    />
-                                                                                               </Grid>
-                                                                                               <Grid key={Math.random()}
-                                                                                                    size={{ md: 6, xs: 12 }}
-                                                                                               >
-                                                                                                    <TextField key={Math.random()}
-                                                                                                         defaultValue={currentProductObject?.promotion_text}
-                                                                                                         fullWidth
-                                                                                                         disabled={!currentProductObject?.promoting}
-                                                                                                         label="Promo tekst"
-                                                                                                         name="promotion_text"
-                                                                                                         onBlur={(e: any) =>
-                                                                                                              setCurrentProductObject((previousObject: any) => ({
-                                                                                                                   ...previousObject,
-                                                                                                                   promotion_text: e.target.value
-
-                                                                                                              }))
-                                                                                                         }
-                                                                                                    />
-                                                                                               </Grid>
-                                                                                          </Grid>
-                                                                                     </Grid>
-                                                                                     <Grid
+                                                                           <IconButton key={Math.random()} onClick={() => handleProductToggle(product.id)}>
+                                                                                <SvgIcon key={Math.random()}>{isCurrent ? <ChevronDownIcon key={Math.random()} /> : <ChevronRightIcon key={Math.random()} />}</SvgIcon >
+                                                                           </IconButton>
+                                                                      </TableCell>
+                                                                      <TableCell width="25%" key={Math.random()}>
+                                                                           <Box key={Math.random()}
+                                                                                sx={{
+                                                                                     alignItems: 'center',
+                                                                                     display: 'flex',
+                                                                                }}
+                                                                           >
+                                                                                {product.image_url ? (
+                                                                                     <Box
                                                                                           key={Math.random()}
-                                                                                          size={{ md: 6, xs: 12 }}
+                                                                                          sx={{
+                                                                                               alignItems: 'center',
+                                                                                               backgroundColor: 'neutral.50',
+                                                                                               backgroundImage: `url(${product.image_url})`,
+                                                                                               backgroundPosition: 'center',
+                                                                                               backgroundSize: 'cover',
+                                                                                               borderRadius: 1,
+                                                                                               display: 'flex',
+                                                                                               height: 80,
+                                                                                               justifyContent: 'center',
+                                                                                               overflow: 'hidden',
+                                                                                               width: 80,
+                                                                                          }}
+                                                                                     />
+                                                                                ) : (
+                                                                                     <Box
+                                                                                          key={Math.random()}
+                                                                                          sx={{
+                                                                                               alignItems: 'center',
+                                                                                               backgroundColor: 'neutral.50',
+                                                                                               borderRadius: 1,
+                                                                                               display: 'flex',
+                                                                                               height: 80,
+                                                                                               justifyContent: 'center',
+                                                                                               width: 80,
+                                                                                          }}
                                                                                      >
-                                                                                          <Typography key={Math.random()} variant="h6">Napredni podaci</Typography>
-                                                                                          <Divider key={Math.random()} sx={{ my: 2 }} />
+                                                                                          <SvgIcon key={Math.random()} >
+
+                                                                                          </SvgIcon>
+                                                                                     </Box>
+                                                                                )}
+                                                                                <Box
+                                                                                     key={Math.random()}
+                                                                                     sx={{
+                                                                                          cursor: 'pointer',
+                                                                                          ml: 2,
+                                                                                     }}
+                                                                                >
+                                                                                     <Typography key={Math.random()} variant="subtitle2">{product.name}</Typography>
+                                                                                     <Typography
+                                                                                          key={Math.random()}
+                                                                                          color="text.secondary"
+                                                                                          variant="body2"
+                                                                                     >
+                                                                                          in {product.main_category}
+                                                                                     </Typography>
+                                                                                     <Typography
+                                                                                          key={Math.random()}
+                                                                                          color="text.secondary"
+                                                                                          variant="body2"
+                                                                                     >
+                                                                                          Proizvođač: {product.manufacturer_name ?? product.manufacturer_id ?? '-'}
+                                                                                     </Typography>
+                                                                                </Box>
+                                                                           </Box>
+                                                                      </TableCell>
+                                                                      <TableCell width="25%" key={Math.random()}>
+                                                                           <LinearProgress
+                                                                                key={Math.random()}
+                                                                                value={product.quantity ?? 0}
+                                                                                variant="determinate"
+                                                                                color={quantityColor}
+                                                                                sx={{
+                                                                                     height: 8,
+                                                                                     width: 40,
+                                                                                }}
+                                                                           />
+                                                                           <Typography
+                                                                                key={Math.random()}
+                                                                                color="text.secondary"
+                                                                                variant="body2"
+                                                                           >
+                                                                                {product.available_stock} in stock
+                                                                                {/* {hasManyVariants && ` in ${product.variants} variants`} */}
+                                                                           </Typography>
+                                                                      </TableCell>
+                                                                      <TableCell key={Math.random()}>{product.price}</TableCell>
+                                                                      <TableCell key={Math.random()}>{product.id?.slice(-8)}</TableCell>
+                                                                      <TableCell key={Math.random()}>
+                                                                           <SeverityPill key={Math.random()} color={statusColor}>{product.discount.toString()}</SeverityPill>
+                                                                      </TableCell>
+                                                                      <TableCell key={Math.random()}>
+                                                                           <SeverityPill key={Math.random()} color={statusColor}>{product.discount_amount}</SeverityPill>
+                                                                      </TableCell>
+                                                                      <TableCell key={Math.random()}>
+                                                                           <SeverityPill key={Math.random()} color={homeColor}>
+                                                                                {product.display_on_home ? 'Da' : 'Ne'}
+                                                                           </SeverityPill>
+                                                                      </TableCell>
+                                                                 </TableRow>
+                                                                 {isCurrent && (
+                                                                      <TableRow key={Math.random()}>
+                                                                           <TableCell
+                                                                                key={Math.random()}
+                                                                                colSpan={8}
+                                                                                sx={{
+                                                                                     p: 0,
+                                                                                     position: 'relative',
+                                                                                     '&:after': {
+                                                                                          position: 'absolute',
+                                                                                          content: '" "',
+                                                                                          top: 0,
+                                                                                          left: 0,
+                                                                                          backgroundColor: 'primary.main',
+                                                                                          width: 3,
+                                                                                          height: 'calc(100% + 1px)',
+                                                                                     },
+                                                                                }}
+                                                                           >
+                                                                                <CardContent key={Math.random()} sx={{ width: { xs: 'calc(100vw - 64px)', md: 'auto' }, overflowX: 'hidden', boxSizing: 'border-box' }}>
+                                                                                     <Grid key={Math.random()}
+                                                                                          container
+                                                                                          spacing={3}
+                                                                                     >
                                                                                           <Grid key={Math.random()}
-                                                                                               container
-                                                                                               spacing={3}
+                                                                                               size={{ md: 6, xs: 12 }}
                                                                                           >
+                                                                                               <Typography key={Math.random()} variant="h6">Osnovni detalji</Typography>
+                                                                                               <Divider key={Math.random()} sx={{ my: 2 }} />
                                                                                                <Grid key={Math.random()}
-                                                                                                    size={{ md: 6, xs: 12 }}
+                                                                                                    container
+                                                                                                    spacing={3}
                                                                                                >
-                                                                                                    <TextField key={Math.random()}
-                                                                                                         defaultValue={currentProductObject?.price}
-                                                                                                         fullWidth
-                                                                                                         disabled={loading}
-                                                                                                         label="Nova cena"
-                                                                                                         name="price"
-                                                                                                         onBlur={(e: any) =>
-                                                                                                              setCurrentProductObject((previousObject: any) => ({
-                                                                                                                   ...previousObject,
-                                                                                                                   price: e.target.valueAsNumber
-
-                                                                                                              }))
-                                                                                                         }
-                                                                                                         InputProps={{
-                                                                                                              startAdornment: (
-                                                                                                                   <InputAdornment key={Math.random()} position="start">RSD</InputAdornment>
-                                                                                                              ),
-                                                                                                         }}
-                                                                                                         type="number"
-                                                                                                    />
-                                                                                               </Grid>
-
-                                                                                               <Grid key={Math.random()}
-                                                                                                    size={{ md: 6, xs: 12 }}
-                                                                                               >
-                                                                                                    <Autocomplete
-                                                                                                         fullWidth
-                                                                                                         options={manufacturerOptions}
-                                                                                                         value={getManufacturerOptionFromProduct(currentProductObject)}
-                                                                                                         getOptionLabel={(option: any) => option?.label || ''}
-                                                                                                         isOptionEqualToValue={(option: any, value: any) => {
-                                                                                                              const optionKeys = [
-                                                                                                                   normalizeKey(option?.id),
-                                                                                                                   normalizeKey(option?.value),
-                                                                                                                   normalizeKey(option?.url),
-                                                                                                                   normalizeKey(option?.label)
-                                                                                                              ].filter(Boolean);
-
-                                                                                                              const valueKeys = [
-                                                                                                                   normalizeKey(value?.id),
-                                                                                                                   normalizeKey(value?.value),
-                                                                                                                   normalizeKey(value?.url),
-                                                                                                                   normalizeKey(value?.label)
-                                                                                                              ].filter(Boolean);
-
-                                                                                                              return optionKeys.some((key: string) => valueKeys.includes(key));
-                                                                                                         }}
-                                                                                                         onChange={(event, newValue) => {
-                                                                                                              setCurrentProductObject((previousObject: any) => {
-                                                                                                                   if (!previousObject) {
-                                                                                                                        return previousObject;
-                                                                                                                   }
-
-                                                                                                                   return {
-                                                                                                                        ...previousObject,
-                                                                                                                        manufacturer: newValue?.label || '',
-                                                                                                                        manufacturerURL: newValue?.value || '',
-                                                                                                                        manufacturer_id: newValue?.id || newValue?.value || ''
-                                                                                                                   };
-                                                                                                              });
-                                                                                                         }}
-                                                                                                         disabled={loading}
-                                                                                                         ListboxProps={{
-                                                                                                              style: {
-                                                                                                                   maxHeight: 48 * 10 + 16,
-                                                                                                                   overflow: 'auto'
-                                                                                                              }
-                                                                                                         }}
-                                                                                                         renderInput={(params) => (
-                                                                                                              <TextField
-                                                                                                                   {...params}
-                                                                                                                   label="Proizvođač"
-                                                                                                                   name="manufacturer"
-                                                                                                              />
-                                                                                                         )}
-                                                                                                    />
-                                                                                               </Grid>
-
-                                                                                               <Grid key={Math.random()}
-                                                                                                    size={{ md: 6, xs: 12 }}
-                                                                                               >
-                                                                                                    <TextField key={Math.random()}
-                                                                                                         defaultValue={currentProductObject?.available_stock}
-                                                                                                         fullWidth
-                                                                                                         disabled={loading}
-                                                                                                         label="Na stanju"
-                                                                                                         name="available_stock"
-                                                                                                         onBlur={(e: any) =>
-                                                                                                              setCurrentProductObject((previousObject: any) => ({
-                                                                                                                   ...previousObject,
-                                                                                                                   available_stock: e.target.valueAsNumber
-
-                                                                                                              }))
-                                                                                                         }
-                                                                                                         type="number"
-                                                                                                    />
-                                                                                               </Grid>
-                                                                                               <Grid key={Math.random()}
-                                                                                                    size={{ md: 6, xs: 12 }}
-                                                                                               >
-                                                                                                    <TextField key={Math.random()}
-                                                                                                         defaultValue={currentProductObject?.discount_amount}
-                                                                                                         fullWidth
-                                                                                                         disabled={!currentProductObject?.discount}
-                                                                                                         label="Iznos popusta"
-                                                                                                         name="discount_amount"
-                                                                                                         onBlur={(e) => {
-                                                                                                              const min = 0;
-                                                                                                              const max = 100;
-                                                                                                              var value = parseInt(e.target.value, 10);
-
-                                                                                                              if (value > max) value = max;
-                                                                                                              if (value < min) value = min;
-
-                                                                                                              setCurrentProductObject((previousObject: any) => ({
-                                                                                                                   ...previousObject,
-                                                                                                                   discountAmount: value
-                                                                                                              }))
-
-                                                                                                         }}
-                                                                                                         type="number"
-                                                                                                    />
-                                                                                               </Grid>
-                                                                                               <Grid
-                                                                                                    size={{ md: 6, xs: 12 }}
-                                                                                               >
-                                                                                                    <TextField
-                                                                                                         key={Math.random()}
-                                                                                                         defaultValue={currentProductObject?.quantity}
-                                                                                                         type="number"
-                                                                                                         fullWidth
-                                                                                                         label="Količina"
-                                                                                                         disabled={loading}
-                                                                                                         onBlur={(e: any) =>
-                                                                                                              setCurrentProductObject((previousObject: any) => ({
-                                                                                                                   ...previousObject,
-                                                                                                                   quantity: e.target.value
-
-                                                                                                              }))
-                                                                                                         }
-                                                                                                    />
-                                                                                               </Grid>
-                                                                                               <Grid
-                                                                                                    size={{ md: 6, xs: 12 }}
-                                                                                               >
-                                                                                                    <TextField key={Math.random()}
-                                                                                                         defaultValue={currentProductObject?.quantity_unit}
-                                                                                                         select
-                                                                                                         fullWidth
-                                                                                                         label="Jedinica mere"
-                                                                                                         disabled={loading}
-                                                                                                         onBlur={(e: any) =>
-                                                                                                              setCurrentProductObject((previousObject: any) => ({
-                                                                                                                   ...previousObject,
-                                                                                                                   quantity_unit: e.target.value
-
-                                                                                                              }))
-                                                                                                         }
+                                                                                                    <Grid key={Math.random()}
+                                                                                                         size={{ md: 6, xs: 12 }}
                                                                                                     >
-                                                                                                         {quantityUnitOptions.map((option: any) => (
-                                                                                                              <MenuItem
-                                                                                                                   key={option.value}
-                                                                                                                   value={option.value}
-                                                                                                              >
-                                                                                                                   {option.label}
-                                                                                                              </MenuItem>
-                                                                                                         ))}
-                                                                                                    </TextField>
-                                                                                               </Grid>
-                                                                                               <Grid key={Math.random()}
-                                                                                                    size={{ md: 6, xs: 12 }}
-                                                                                                    sx={{
-                                                                                                         alignItems: 'center',
-                                                                                                         display: 'flex',
-                                                                                                    }}
-                                                                                               >
-                                                                                                    <Switch key={Math.random()} disabled={loading} checked={currentProductObject!.is_active}
-                                                                                                         onChange={() => setCurrentProductObject((previousObject: any) => ({
-                                                                                                              ...previousObject,
-                                                                                                              is_active: !previousObject.is_active
-                                                                                                         }))}
-                                                                                                    />
-                                                                                                    <Typography key={Math.random()} variant="subtitle2">
-                                                                                                         Aktivan
-                                                                                                    </Typography>
-                                                                                               </Grid>
-                                                                                               <Grid key={Math.random()}
-                                                                                                    size={{ md: 6, xs: 12 }}
-                                                                                                    sx={{
-                                                                                                         alignItems: 'center',
-                                                                                                         display: 'flex',
-                                                                                                    }}
-                                                                                               >
-                                                                                                    <Switch key={Math.random()} disabled={loading} checked={currentProductObject!.new_arrival}
-                                                                                                         onChange={() => setCurrentProductObject((previousObject: any) => ({
-                                                                                                              ...previousObject,
-                                                                                                              new_arrival: !previousObject.new_arrival
-                                                                                                         }))}
-                                                                                                    />
-                                                                                                    <Typography key={Math.random()} variant="subtitle2">
-                                                                                                         Novi proizvod
-                                                                                                    </Typography>
-                                                                                               </Grid>
-                                                                                               <Grid key={Math.random()}
-                                                                                                    size={{ md: 6, xs: 12 }}
-                                                                                                    sx={{
-                                                                                                         alignItems: 'center',
-                                                                                                         display: 'flex',
-                                                                                                    }}
-                                                                                               >
-                                                                                                    <Switch key={Math.random()} disabled={loading}
-                                                                                                         checked={currentProductObject!.best_seller}
-                                                                                                         onChange={() => setCurrentProductObject((previousObject: any) => ({
-                                                                                                              ...previousObject,
-                                                                                                              best_seller: !previousObject.best_seller
+                                                                                                         <TextField key={Math.random()}
+                                                                                                              defaultValue={currentProductObject?.name}
+                                                                                                              fullWidth
+                                                                                                              label="Naziv"
+                                                                                                              name="name"
+                                                                                                              disabled={loading}
+                                                                                                              onBlur={(e: any) =>
+                                                                                                                   setCurrentProductObject((previousObject: any) => ({
+                                                                                                                        ...previousObject,
+                                                                                                                        name: e.target.value
 
-                                                                                                         }))}
-                                                                                                    />
-                                                                                                    <Typography key={Math.random()} variant="subtitle2">
-                                                                                                         Najprodavaniji
-                                                                                                    </Typography>
+                                                                                                                   }))
+                                                                                                              }
+                                                                                                         />
+                                                                                                    </Grid>
+                                                                                                    <Grid key={Math.random()}
+                                                                                                         size={{ md: 6, xs: 12 }}
+                                                                                                    >
+                                                                                                         <TextField key={Math.random()}
+                                                                                                              defaultValue={currentProductObject?.id?.slice(-8)}
+                                                                                                              disabled
+                                                                                                              fullWidth
+                                                                                                              label="Šifra proizvoda"
+                                                                                                              name={product.id?.slice(-8)}
+                                                                                                         />
+                                                                                                    </Grid>
+                                                                                                    <Grid key={Math.random()}
+                                                                                                         size={{ md: 6, xs: 12 }}
+                                                                                                    >
+                                                                                                         <TextField key={Math.random()}
+                                                                                                              value={currentProductObject?.main_category || ''}
+                                                                                                              fullWidth
+                                                                                                              label="Glavna Kategorija"
+                                                                                                              select
+                                                                                                              disabled={loading}
+                                                                                                              onChange={handleMainCategoryChangeEdit}
+                                                                                                         >
+                                                                                                              {mainCategoryOptions.map((option: any) => (
+                                                                                                                   <MenuItem
+                                                                                                                        key={option.value || '__empty'}
+                                                                                                                        value={option.value}
+                                                                                                                   >
+                                                                                                                        {option.label}
+                                                                                                                   </MenuItem>
+                                                                                                              ))}
+                                                                                                         </TextField>
+                                                                                                    </Grid>
+                                                                                                    <Grid key={Math.random()}
+                                                                                                         size={{ md: 6, xs: 12 }}
+                                                                                                    >
+                                                                                                         <TextField key={Math.random()}
+                                                                                                              value={currentProductObject?.mid_category || ''}
+                                                                                                              fullWidth
+                                                                                                              label="Srednja Kategorija"
+                                                                                                              select
+                                                                                                              disabled={loading || isMidDisabled}
+                                                                                                              onChange={handleMidCategoryChangeEdit}
+                                                                                                         >
+                                                                                                              {midCategoryOptions.length > 0 ? (
+                                                                                                                   midCategoryOptions.map((option: any) => (
+                                                                                                                        <MenuItem
+                                                                                                                             key={option.value || '__empty'}
+                                                                                                                             value={option.value}
+                                                                                                                        >
+                                                                                                                             {option.label}
+                                                                                                                        </MenuItem>
+                                                                                                                   ))
+                                                                                                              ) : (
+                                                                                                                   <MenuItem disabled>Nema kategorija</MenuItem>
+                                                                                                              )}
+                                                                                                         </TextField>
+                                                                                                    </Grid>
+                                                                                                    <Grid key={Math.random()}
+                                                                                                         size={{ md: 6, xs: 12 }}
+                                                                                                    >
+                                                                                                         <TextField key={Math.random()}
+                                                                                                              value={currentProductObject?.sub_category || ''}
+                                                                                                              fullWidth
+                                                                                                              label="Podkategorija"
+                                                                                                              select
+                                                                                                              disabled={loading || isSubDisabled}
+                                                                                                              onChange={handleSubCategoryChangeEdit}
+                                                                                                         >
+                                                                                                              {subCategoryOptions.length > 0 ? (
+                                                                                                                   subCategoryOptions.map((option: any) => (
+                                                                                                                        <MenuItem
+                                                                                                                             key={option.value || '__empty'}
+                                                                                                                             value={option.value}
+                                                                                                                        >
+                                                                                                                             {option.label}
+                                                                                                                        </MenuItem>
+                                                                                                                   ))
+                                                                                                              ) : (
+                                                                                                                   <MenuItem disabled>Nema kategorija</MenuItem>
+                                                                                                              )}
+                                                                                                         </TextField>
+                                                                                                    </Grid>
+
+                                                                                                    <Grid
+                                                                                                         size={{ md: 6, xs: 12 }}
+                                                                                                    >
+                                                                                                         <TextField key={Math.random()}
+                                                                                                              defaultValue={currentProductObject?.description}
+                                                                                                              fullWidth
+                                                                                                              label="Opis"
+                                                                                                              disabled={loading}
+                                                                                                              name="description"
+                                                                                                              onBlur={(e: any) =>
+                                                                                                                   setCurrentProductObject((previousObject: any) => ({
+                                                                                                                        ...previousObject,
+                                                                                                                        description: e.target.value
+
+                                                                                                                   }))
+                                                                                                              }
+                                                                                                         />
+                                                                                                    </Grid>
+                                                                                                    <Grid key={Math.random()}
+                                                                                                         size={{ md: 6, xs: 12 }}
+                                                                                                    >
+                                                                                                         <TextField key={Math.random()}
+                                                                                                              defaultValue={currentProductObject?.instructions}
+                                                                                                              fullWidth
+                                                                                                              label="Instrukcije"
+                                                                                                              disabled={loading}
+                                                                                                              name="instructions"
+                                                                                                              onBlur={(e: any) =>
+                                                                                                                   setCurrentProductObject((previousObject: any) => ({
+                                                                                                                        ...previousObject,
+                                                                                                                        instructions: e.target.value
+
+                                                                                                                   }))
+                                                                                                              }
+                                                                                                         />
+                                                                                                    </Grid>
+                                                                                                    <Grid key={Math.random()}
+                                                                                                         size={{ md: 6, xs: 12 }}
+                                                                                                    >
+                                                                                                         <TextField key={Math.random()}
+                                                                                                              defaultValue={currentProductObject?.warning}
+                                                                                                              fullWidth
+                                                                                                              label="Upozorenje"
+                                                                                                              disabled={loading}
+                                                                                                              name="warning"
+                                                                                                              onBlur={(e: any) =>
+                                                                                                                   setCurrentProductObject((previousObject: any) => ({
+                                                                                                                        ...previousObject,
+                                                                                                                        warning: e.target.value
+
+                                                                                                                   }))
+                                                                                                              }
+                                                                                                         />
+                                                                                                    </Grid>
+                                                                                                    <Grid key={Math.random()}
+                                                                                                         size={{ md: 6, xs: 12 }}
+                                                                                                    >
+                                                                                                         <TextField key={Math.random()}
+                                                                                                              defaultValue={currentProductObject?.ingredients}
+                                                                                                              fullWidth
+                                                                                                              disabled={loading}
+                                                                                                              label="Sastav"
+                                                                                                              name="ingredients"
+                                                                                                              onBlur={(e: any) =>
+                                                                                                                   setCurrentProductObject((previousObject: any) => ({
+                                                                                                                        ...previousObject,
+                                                                                                                        ingredients: e.target.value
+
+                                                                                                                   }))
+                                                                                                              }
+                                                                                                         />
+                                                                                                    </Grid>
+                                                                                                    <Grid key={Math.random()}
+                                                                                                         size={{ md: 6, xs: 12 }}
+                                                                                                    >
+                                                                                                         <TextField key={Math.random()}
+                                                                                                              defaultValue={currentProductObject?.promotion_text}
+                                                                                                              fullWidth
+                                                                                                              disabled={!currentProductObject?.promoting}
+                                                                                                              label="Promo tekst"
+                                                                                                              name="promotion_text"
+                                                                                                              onBlur={(e: any) =>
+                                                                                                                   setCurrentProductObject((previousObject: any) => ({
+                                                                                                                        ...previousObject,
+                                                                                                                        promotion_text: e.target.value
+
+                                                                                                                   }))
+                                                                                                              }
+                                                                                                         />
+                                                                                                    </Grid>
                                                                                                </Grid>
+                                                                                          </Grid>
+                                                                                          <Grid
+                                                                                               key={Math.random()}
+                                                                                               size={{ md: 6, xs: 12 }}
+                                                                                          >
+                                                                                               <Typography key={Math.random()} variant="h6">Napredni podaci</Typography>
+                                                                                               <Divider key={Math.random()} sx={{ my: 2 }} />
                                                                                                <Grid key={Math.random()}
-                                                                                                    size={{ md: 6, xs: 12 }}
-                                                                                                    sx={{
-                                                                                                         alignItems: 'center',
-                                                                                                         display: 'flex',
-                                                                                                    }}
+                                                                                                    container
+                                                                                                    spacing={3}
                                                                                                >
-                                                                                                    <Switch key={Math.random()} disabled={loading} checked={currentProductObject!.discount}
-                                                                                                         onChange={() => setCurrentProductObject((previousObject: any) => ({
-                                                                                                              ...previousObject,
-                                                                                                              discount: !previousObject.discount
-                                                                                                         }))}
-                                                                                                    />
-                                                                                                    <Typography key={Math.random()} variant="subtitle2">
-                                                                                                         Popust
-                                                                                                    </Typography>
-                                                                                               </Grid>
-                                                                                               <Grid key={Math.random()}
-                                                                                                    size={{ md: 6, xs: 12 }}
-                                                                                                    sx={{
-                                                                                                         alignItems: 'center',
-                                                                                                         display: 'flex',
-                                                                                                    }}
-                                                                                               >
-                                                                                                    <Switch key={Math.random()} disabled={loading} checked={currentProductObject!.promoting}
-                                                                                                         onChange={() => setCurrentProductObject((previousObject: any) => ({
-                                                                                                              ...previousObject,
-                                                                                                              promoting: !previousObject.promoting
-                                                                                                         }))}
-                                                                                                    />
-                                                                                                    <Typography key={Math.random()} variant="subtitle2">
-                                                                                                         Promocija
-                                                                                                    </Typography>
-                                                                                               </Grid>
-                                                                                               <Grid key={Math.random()}
-                                                                                                    size={{ md: 6, xs: 12 }}
-                                                                                                    sx={{
-                                                                                                         alignItems: 'center',
-                                                                                                         display: 'flex',
-                                                                                                    }}
-                                                                                               >
-                                                                                                    <Switch key={Math.random()} disabled={loading}
-                                                                                                         checked={!!currentProductObject?.display_on_home}
-                                                                                                         onChange={() => setCurrentProductObject((previousObject: any) => ({
-                                                                                                              ...previousObject,
-                                                                                                              display_on_home: !previousObject.display_on_home
-                                                                                                         }))}
-                                                                                                    />
-                                                                                                    <Typography key={Math.random()} variant="subtitle2">
-                                                                                                         Na početnoj
-                                                                                                    </Typography>
+                                                                                                    <Grid key={Math.random()}
+                                                                                                         size={{ md: 6, xs: 12 }}
+                                                                                                    >
+                                                                                                         <TextField key={Math.random()}
+                                                                                                              defaultValue={currentProductObject?.price}
+                                                                                                              fullWidth
+                                                                                                              disabled={loading}
+                                                                                                              label="Nova cena"
+                                                                                                              name="price"
+                                                                                                              onBlur={(e: any) =>
+                                                                                                                   setCurrentProductObject((previousObject: any) => ({
+                                                                                                                        ...previousObject,
+                                                                                                                        price: e.target.valueAsNumber
+
+                                                                                                                   }))
+                                                                                                              }
+                                                                                                              InputProps={{
+                                                                                                                   startAdornment: (
+                                                                                                                        <InputAdornment key={Math.random()} position="start">RSD</InputAdornment>
+                                                                                                                   ),
+                                                                                                              }}
+                                                                                                              type="number"
+                                                                                                         />
+                                                                                                    </Grid>
+
+                                                                                                    <Grid key={Math.random()}
+                                                                                                         size={{ md: 6, xs: 12 }}
+                                                                                                    >
+                                                                                                         <Autocomplete
+                                                                                                              fullWidth
+                                                                                                              options={manufacturerOptions}
+                                                                                                              value={getManufacturerOptionFromProduct(currentProductObject)}
+                                                                                                              getOptionLabel={(option: any) => option?.label || ''}
+                                                                                                              isOptionEqualToValue={(option: any, value: any) => {
+                                                                                                                   const optionKeys = [
+                                                                                                                        normalizeKey(option?.id),
+                                                                                                                        normalizeKey(option?.value),
+                                                                                                                        normalizeKey(option?.url),
+                                                                                                                        normalizeKey(option?.label)
+                                                                                                                   ].filter(Boolean);
+
+                                                                                                                   const valueKeys = [
+                                                                                                                        normalizeKey(value?.id),
+                                                                                                                        normalizeKey(value?.value),
+                                                                                                                        normalizeKey(value?.url),
+                                                                                                                        normalizeKey(value?.label)
+                                                                                                                   ].filter(Boolean);
+
+                                                                                                                   return optionKeys.some((key: string) => valueKeys.includes(key));
+                                                                                                              }}
+                                                                                                              onChange={(event, newValue) => {
+                                                                                                                   setCurrentProductObject((previousObject: any) => {
+                                                                                                                        if (!previousObject) {
+                                                                                                                             return previousObject;
+                                                                                                                        }
+
+                                                                                                                        return {
+                                                                                                                             ...previousObject,
+                                                                                                                             manufacturer: newValue?.label || '',
+                                                                                                                             manufacturerURL: newValue?.value || '',
+                                                                                                                             manufacturer_id: newValue?.id || newValue?.value || ''
+                                                                                                                        };
+                                                                                                                   });
+                                                                                                              }}
+                                                                                                              disabled={loading}
+                                                                                                              ListboxProps={{
+                                                                                                                   style: {
+                                                                                                                        maxHeight: 48 * 10 + 16,
+                                                                                                                        overflow: 'auto'
+                                                                                                                   }
+                                                                                                              }}
+                                                                                                              renderInput={(params) => (
+                                                                                                                   <TextField
+                                                                                                                        {...params}
+                                                                                                                        label="Proizvođač"
+                                                                                                                        name="manufacturer"
+                                                                                                                   />
+                                                                                                              )}
+                                                                                                         />
+                                                                                                    </Grid>
+
+                                                                                                    <Grid key={Math.random()}
+                                                                                                         size={{ md: 6, xs: 12 }}
+                                                                                                    >
+                                                                                                         <TextField key={Math.random()}
+                                                                                                              defaultValue={currentProductObject?.available_stock}
+                                                                                                              fullWidth
+                                                                                                              disabled={loading}
+                                                                                                              label="Na stanju"
+                                                                                                              name="available_stock"
+                                                                                                              onBlur={(e: any) =>
+                                                                                                                   setCurrentProductObject((previousObject: any) => ({
+                                                                                                                        ...previousObject,
+                                                                                                                        available_stock: e.target.valueAsNumber
+
+                                                                                                                   }))
+                                                                                                              }
+                                                                                                              type="number"
+                                                                                                         />
+                                                                                                    </Grid>
+                                                                                                    <Grid key={Math.random()}
+                                                                                                         size={{ md: 6, xs: 12 }}
+                                                                                                    >
+                                                                                                         <TextField key={Math.random()}
+                                                                                                              defaultValue={currentProductObject?.discount_amount}
+                                                                                                              fullWidth
+                                                                                                              disabled={!currentProductObject?.discount}
+                                                                                                              label="Iznos popusta"
+                                                                                                              name="discount_amount"
+                                                                                                              onBlur={(e) => {
+                                                                                                                   const min = 0;
+                                                                                                                   const max = 100;
+                                                                                                                   var value = parseInt(e.target.value, 10);
+
+                                                                                                                   if (value > max) value = max;
+                                                                                                                   if (value < min) value = min;
+
+                                                                                                                   setCurrentProductObject((previousObject: any) => ({
+                                                                                                                        ...previousObject,
+                                                                                                                        discountAmount: value
+                                                                                                                   }))
+
+                                                                                                              }}
+                                                                                                              type="number"
+                                                                                                         />
+                                                                                                    </Grid>
+                                                                                                    <Grid
+                                                                                                         size={{ md: 6, xs: 12 }}
+                                                                                                    >
+                                                                                                         <TextField
+                                                                                                              key={Math.random()}
+                                                                                                              defaultValue={currentProductObject?.quantity}
+                                                                                                              type="number"
+                                                                                                              fullWidth
+                                                                                                              label="Količina"
+                                                                                                              disabled={loading}
+                                                                                                              onBlur={(e: any) =>
+                                                                                                                   setCurrentProductObject((previousObject: any) => ({
+                                                                                                                        ...previousObject,
+                                                                                                                        quantity: e.target.value
+
+                                                                                                                   }))
+                                                                                                              }
+                                                                                                         />
+                                                                                                    </Grid>
+                                                                                                    <Grid
+                                                                                                         size={{ md: 6, xs: 12 }}
+                                                                                                    >
+                                                                                                         <TextField key={Math.random()}
+                                                                                                              defaultValue={currentProductObject?.quantity_unit}
+                                                                                                              select
+                                                                                                              fullWidth
+                                                                                                              label="Jedinica mere"
+                                                                                                              disabled={loading}
+                                                                                                              onBlur={(e: any) =>
+                                                                                                                   setCurrentProductObject((previousObject: any) => ({
+                                                                                                                        ...previousObject,
+                                                                                                                        quantity_unit: e.target.value
+
+                                                                                                                   }))
+                                                                                                              }
+                                                                                                         >
+                                                                                                              {quantityUnitOptions.map((option: any) => (
+                                                                                                                   <MenuItem
+                                                                                                                        key={option.value}
+                                                                                                                        value={option.value}
+                                                                                                                   >
+                                                                                                                        {option.label}
+                                                                                                                   </MenuItem>
+                                                                                                              ))}
+                                                                                                         </TextField>
+                                                                                                    </Grid>
+                                                                                                    <Grid key={Math.random()}
+                                                                                                         size={{ md: 6, xs: 12 }}
+                                                                                                         sx={{
+                                                                                                              alignItems: 'center',
+                                                                                                              display: 'flex',
+                                                                                                         }}
+                                                                                                    >
+                                                                                                         <Switch key={Math.random()} disabled={loading} checked={currentProductObject!.is_active}
+                                                                                                              onChange={() => setCurrentProductObject((previousObject: any) => ({
+                                                                                                                   ...previousObject,
+                                                                                                                   is_active: !previousObject.is_active
+                                                                                                              }))}
+                                                                                                         />
+                                                                                                         <Typography key={Math.random()} variant="subtitle2">
+                                                                                                              Aktivan
+                                                                                                         </Typography>
+                                                                                                    </Grid>
+                                                                                                    <Grid key={Math.random()}
+                                                                                                         size={{ md: 6, xs: 12 }}
+                                                                                                         sx={{
+                                                                                                              alignItems: 'center',
+                                                                                                              display: 'flex',
+                                                                                                         }}
+                                                                                                    >
+                                                                                                         <Switch key={Math.random()} disabled={loading} checked={currentProductObject!.new_arrival}
+                                                                                                              onChange={() => setCurrentProductObject((previousObject: any) => ({
+                                                                                                                   ...previousObject,
+                                                                                                                   new_arrival: !previousObject.new_arrival
+                                                                                                              }))}
+                                                                                                         />
+                                                                                                         <Typography key={Math.random()} variant="subtitle2">
+                                                                                                              Novi proizvod
+                                                                                                         </Typography>
+                                                                                                    </Grid>
+                                                                                                    <Grid key={Math.random()}
+                                                                                                         size={{ md: 6, xs: 12 }}
+                                                                                                         sx={{
+                                                                                                              alignItems: 'center',
+                                                                                                              display: 'flex',
+                                                                                                         }}
+                                                                                                    >
+                                                                                                         <Switch key={Math.random()} disabled={loading}
+                                                                                                              checked={currentProductObject!.best_seller}
+                                                                                                              onChange={() => setCurrentProductObject((previousObject: any) => ({
+                                                                                                                   ...previousObject,
+                                                                                                                   best_seller: !previousObject.best_seller
+
+                                                                                                              }))}
+                                                                                                         />
+                                                                                                         <Typography key={Math.random()} variant="subtitle2">
+                                                                                                              Najprodavaniji
+                                                                                                         </Typography>
+                                                                                                    </Grid>
+                                                                                                    <Grid key={Math.random()}
+                                                                                                         size={{ md: 6, xs: 12 }}
+                                                                                                         sx={{
+                                                                                                              alignItems: 'center',
+                                                                                                              display: 'flex',
+                                                                                                         }}
+                                                                                                    >
+                                                                                                         <Switch key={Math.random()} disabled={loading} checked={currentProductObject!.discount}
+                                                                                                              onChange={() => setCurrentProductObject((previousObject: any) => ({
+                                                                                                                   ...previousObject,
+                                                                                                                   discount: !previousObject.discount
+                                                                                                              }))}
+                                                                                                         />
+                                                                                                         <Typography key={Math.random()} variant="subtitle2">
+                                                                                                              Popust
+                                                                                                         </Typography>
+                                                                                                    </Grid>
+                                                                                                    <Grid key={Math.random()}
+                                                                                                         size={{ md: 6, xs: 12 }}
+                                                                                                         sx={{
+                                                                                                              alignItems: 'center',
+                                                                                                              display: 'flex',
+                                                                                                         }}
+                                                                                                    >
+                                                                                                         <Switch key={Math.random()} disabled={loading} checked={currentProductObject!.promoting}
+                                                                                                              onChange={() => setCurrentProductObject((previousObject: any) => ({
+                                                                                                                   ...previousObject,
+                                                                                                                   promoting: !previousObject.promoting
+                                                                                                              }))}
+                                                                                                         />
+                                                                                                         <Typography key={Math.random()} variant="subtitle2">
+                                                                                                              Promocija
+                                                                                                         </Typography>
+                                                                                                    </Grid>
+                                                                                                    <Grid key={Math.random()}
+                                                                                                         size={{ md: 6, xs: 12 }}
+                                                                                                         sx={{
+                                                                                                              alignItems: 'center',
+                                                                                                              display: 'flex',
+                                                                                                         }}
+                                                                                                    >
+                                                                                                         <Switch key={Math.random()} disabled={loading}
+                                                                                                              checked={!!currentProductObject?.display_on_home}
+                                                                                                              onChange={() => setCurrentProductObject((previousObject: any) => ({
+                                                                                                                   ...previousObject,
+                                                                                                                   display_on_home: !previousObject.display_on_home
+                                                                                                              }))}
+                                                                                                         />
+                                                                                                         <Typography key={Math.random()} variant="subtitle2">
+                                                                                                              Na početnoj
+                                                                                                         </Typography>
+                                                                                                    </Grid>
                                                                                                </Grid>
                                                                                           </Grid>
                                                                                      </Grid>
-                                                                                </Grid>
-                                                                                <Card sx={{ width: { xs: '100%', md: '50%' }, marginTop: '20px' }}>
-                                                                                     <CardContent>
-                                                                                          <Box
-                                                                                               sx={{
-                                                                                                    display: 'flex',
-                                                                                                    flexDirection: 'column',
-                                                                                                    alignItems: 'center',
-                                                                                                    gap: '10px'
-                                                                                               }}
-                                                                                          >
-                                                                                               {/* {
+                                                                                     <Card sx={{ width: { xs: '100%', md: '50%' }, marginTop: '20px' }}>
+                                                                                          <CardContent>
+                                                                                               <Box
+                                                                                                    sx={{
+                                                                                                         display: 'flex',
+                                                                                                         flexDirection: 'column',
+                                                                                                         alignItems: 'center',
+                                                                                                         gap: '10px'
+                                                                                                    }}
+                                                                                               >
+                                                                                                    {/* {
                                                                                                     currentProductObject?.imageURL ?
                                                                                                          <Image src={currentProductObject.imageURL}
                                                                                                               alt='sds'
@@ -1295,7 +1306,7 @@ export const ProductsTable = (props: any) => {
                                                                                                     />
                                                                                                </Button> */}
 
-                                                                                               {/* <UploadButton
+                                                                                                    {/* <UploadButton
                                                                                                     endpoint="imageUploader"
                                                                                                     onUploadProgress={() => setLoading(true)}
                                                                                                     onClientUploadComplete={(res) => {
@@ -1346,124 +1357,125 @@ export const ProductsTable = (props: any) => {
                                                                                                          },
                                                                                                     }}
                                                                                                /> */}
-                                                                                               <Button component="label"
-                                                                                                    variant="contained"
-                                                                                                    startIcon={<CloudUploadIcon />}
-                                                                                                    sx={{ maxWidth: '200px' }}
-                                                                                               >
-                                                                                                    Učitaj sliku
-                                                                                                    <Input
-                                                                                                         type="file"
-                                                                                                         inputProps={{ accept: 'image/*' }}
-                                                                                                         sx={{
-                                                                                                              clip: 'rect(0 0 0 0)',
-                                                                                                              clipPath: 'inset(50%)',
-                                                                                                              height: 1,
-                                                                                                              overflow: 'hidden',
-                                                                                                              position: 'absolute',
-                                                                                                              bottom: 0,
-                                                                                                              left: 0,
-                                                                                                              whiteSpace: 'nowrap',
-                                                                                                              width: 1,
-                                                                                                         }}
-                                                                                                         onChange={async (e: any) => await handleImageChange(e)}
-                                                                                                    />
-                                                                                               </Button>
-                                                                                               {currentProductObject?.image_url?.length ? (
-                                                                                                    <Image
-                                                                                                         src={currentProductObject!.image_url}
-                                                                                                         alt='Uploaded Image'
-                                                                                                         width={300}
-                                                                                                         height={300}
-                                                                                                         style={{
-                                                                                                              borderRadius: '10px',
-                                                                                                              cursor: 'pointer'
-                                                                                                         }}
-                                                                                                         onClick={handleFileRemove}
-                                                                                                    />
-                                                                                               ) : (
-                                                                                                    <InsertPhotoIcon
-                                                                                                         color='primary'
-                                                                                                         sx={{ width: '300px', height: '300px' }}
-                                                                                                    />
-                                                                                               )}
+                                                                                                    <Button component="label"
+                                                                                                         variant="contained"
+                                                                                                         startIcon={<CloudUploadIcon />}
+                                                                                                         sx={{ maxWidth: '200px' }}
+                                                                                                    >
+                                                                                                         Učitaj sliku
+                                                                                                         <Input
+                                                                                                              type="file"
+                                                                                                              inputProps={{ accept: 'image/*' }}
+                                                                                                              sx={{
+                                                                                                                   clip: 'rect(0 0 0 0)',
+                                                                                                                   clipPath: 'inset(50%)',
+                                                                                                                   height: 1,
+                                                                                                                   overflow: 'hidden',
+                                                                                                                   position: 'absolute',
+                                                                                                                   bottom: 0,
+                                                                                                                   left: 0,
+                                                                                                                   whiteSpace: 'nowrap',
+                                                                                                                   width: 1,
+                                                                                                              }}
+                                                                                                              onChange={async (e: any) => await handleImageChange(e)}
+                                                                                                         />
+                                                                                                    </Button>
+                                                                                                    {currentProductObject?.image_url?.length ? (
+                                                                                                         <Image
+                                                                                                              src={currentProductObject!.image_url}
+                                                                                                              alt='Uploaded Image'
+                                                                                                              width={300}
+                                                                                                              height={300}
+                                                                                                              style={{
+                                                                                                                   borderRadius: '10px',
+                                                                                                                   cursor: 'pointer'
+                                                                                                              }}
+                                                                                                              onClick={handleFileRemove}
+                                                                                                         />
+                                                                                                    ) : (
+                                                                                                         <InsertPhotoIcon
+                                                                                                              color='primary'
+                                                                                                              sx={{ width: '300px', height: '300px' }}
+                                                                                                         />
+                                                                                                    )}
 
-                                                                                          </Box>
-                                                                                     </CardContent>
-                                                                                </Card>
-                                                                           </CardContent>
-                                                                           <Divider />
-                                                                           <Stack key={Math.random()}
-                                                                                alignItems="center"
-                                                                                direction="row"
-                                                                                justifyContent="space-between"
-                                                                                sx={{ p: 2 }}
-                                                                           >
+                                                                                               </Box>
+                                                                                          </CardContent>
+                                                                                     </Card>
+                                                                                </CardContent>
+                                                                                <Divider />
                                                                                 <Stack key={Math.random()}
                                                                                      alignItems="center"
                                                                                      direction="row"
-                                                                                     spacing={2}
+                                                                                     justifyContent="space-between"
+                                                                                     sx={{ p: 2 }}
                                                                                 >
-                                                                                     <Button
-                                                                                          onClick={handleProductUpdateClick}
-                                                                                          type="submit"
-                                                                                          variant="contained"
-                                                                                          disabled={loading}
+                                                                                     <Stack key={Math.random()}
+                                                                                          alignItems="center"
+                                                                                          direction="row"
+                                                                                          spacing={2}
                                                                                      >
-                                                                                          Izmeni
-                                                                                     </Button>
-                                                                                     <Button key={Math.random()}
-                                                                                          color="inherit"
-                                                                                          onClick={handleProductClose}
-                                                                                          disabled={loading}
-                                                                                     >
-                                                                                          Odustani
-                                                                                     </Button>
+                                                                                          <Button
+                                                                                               onClick={handleProductUpdateClick}
+                                                                                               type="submit"
+                                                                                               variant="contained"
+                                                                                               disabled={loading}
+                                                                                          >
+                                                                                               Izmeni
+                                                                                          </Button>
+                                                                                          <Button key={Math.random()}
+                                                                                               color="inherit"
+                                                                                               onClick={handleProductClose}
+                                                                                               disabled={loading}
+                                                                                          >
+                                                                                               Odustani
+                                                                                          </Button>
+                                                                                     </Stack>
+                                                                                     <div>
+                                                                                          <Button key={Math.random()}
+                                                                                               onClick={handleDeleteButtonClick}
+                                                                                               color="error"
+                                                                                               disabled={loading}
+                                                                                          >
+                                                                                               Obrisi proizvod
+                                                                                          </Button>
+                                                                                     </div>
                                                                                 </Stack>
-                                                                                <div>
-                                                                                     <Button key={Math.random()}
-                                                                                          onClick={handleDeleteButtonClick}
-                                                                                          color="error"
-                                                                                          disabled={loading}
-                                                                                     >
-                                                                                          Obrisi proizvod
-                                                                                     </Button>
-                                                                                </div>
-                                                                           </Stack>
-                                                                      </TableCell>
-                                                                 </TableRow>
-                                                            )
-                                                            }
-                                                       </Fragment>
-                                                  );
-                                             })
-                                             :
-                                             <TableRow>
-                                                  <TableCell colSpan={8} align="center">
-                                                       Nije pronađen nijedan proizvod...
-                                                  </TableCell>
-                                             </TableRow>
-                                   }
-                              </TableBody>
-                         </Table>
+                                                                           </TableCell>
+                                                                      </TableRow>
+                                                                 )
+                                                                 }
+                                                            </Fragment>
+                                                       );
+                                                  })
+                                                  :
+                                                  <TableRow>
+                                                       <TableCell colSpan={8} align="center">
+                                                            Nije pronađen nijedan proizvod...
+                                                       </TableCell>
+                                                  </TableRow>
+                                        }
+                                   </TableBody>
+                              </Table>
+                         </Box>
                     </Box>
-               </Box>
-          </Card >
-          <TablePagination
-               component="div"
-               count={filteredRows.length}
-               onPageChange={(event, newPage) => setInternalPage(newPage)}
-               onRowsPerPageChange={(event) => {
-                    setInternalRowsPerPage(parseInt(event.target.value, 10));
-                    setInternalPage(0);
-               }}
-               page={internalPage}
-               rowsPerPage={internalRowsPerPage}
-               rowsPerPageOptions={[5, 10, 25, 50, 100, 200]}
-               showFirstButton
-               showLastButton
-               labelRowsPerPage={'Broj po stranici'}
-          />
+               </Card >
+               <TablePagination
+                    component="div"
+                    count={filteredRows.length}
+                    onPageChange={(event, newPage) => setInternalPage(newPage)}
+                    onRowsPerPageChange={(event) => {
+                         setInternalRowsPerPage(parseInt(event.target.value, 10));
+                         setInternalPage(0);
+                    }}
+                    page={internalPage}
+                    rowsPerPage={internalRowsPerPage}
+                    rowsPerPageOptions={[5, 10, 25, 50, 100, 200]}
+                    showFirstButton
+                    showLastButton
+                    labelRowsPerPage={'Broj po stranici'}
+               />
+          </>
      );
 };
 
