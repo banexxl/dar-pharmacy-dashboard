@@ -38,11 +38,16 @@ const Page = () => {
           setLoading(true);
 
           try {
+               console.log('[login] attempting signInWithPassword...');
+               const signInStart = Date.now();
+
                // Attempt sign in first
-               const { error: signInError } = await supabaseBrowser.auth.signInWithPassword({
+               const { data: signInData, error: signInError } = await supabaseBrowser.auth.signInWithPassword({
                     email: email.trim(),
                     password,
                });
+
+               console.log(`[login] signInWithPassword resolved in ${Date.now() - signInStart}ms | user=${signInData?.user?.email ?? 'null'} | error=${signInError?.message ?? 'none'}`);
 
                if (signInError) {
                     setError(signInError.message);
@@ -51,11 +56,16 @@ const Page = () => {
                }
 
                // After successful login, verify the user is in the admins table
+               console.log('[login] checking admins table...');
+               const adminStart = Date.now();
+
                const { data: adminData, error: adminError } = await supabaseBrowser
                     .from('admins')
                     .select('email')
                     .eq('email', email.trim().toLowerCase())
                     .single();
+
+               console.log(`[login] admins check resolved in ${Date.now() - adminStart}ms | admin=${adminData?.email ?? 'null'} | error=${adminError?.message ?? 'none'}`);
 
                if (adminError || !adminData?.email) {
                     // Not an admin — sign out and block access
@@ -65,9 +75,11 @@ const Page = () => {
                     return;
                }
 
+               console.log('[login] success, navigating to /');
                router.push('/');
                router.refresh();
-          } catch (err) {
+          } catch (err: any) {
+               console.error(`[login] unexpected error:`, err?.message ?? err);
                setError('An unexpected error occurred. Please try again.');
                setLoading(false);
           }
