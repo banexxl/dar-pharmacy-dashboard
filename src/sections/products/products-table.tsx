@@ -1493,7 +1493,7 @@ export const ProductsTable = (props: any) => {
                     rowsPerPageOptions={[5, 10, 25, 50, 100, 200]}
                     showFirstButton
                     showLastButton
-                    labelRowsPerPage={'Broj po stranici'}
+                    labelRowsPerPage={'Broj po stranici.'}
                />
           </>
      );
