@@ -16,7 +16,7 @@ import { SeverityPill } from '@/components/severity-pill';
 import Swal from 'sweetalert2';
 import { useRouter } from 'next/navigation';
 
-import { quantityUnitOptions } from './new-product-schema';
+import { newProductSchema, quantityUnitOptions } from './new-product-schema';
 import MagnifyingGlassIcon from '@heroicons/react/24/solid/MagnifyingGlassIcon';
 import ClearIcon from '@mui/icons-material/Clear';
 import { getComparator } from '../order/order-list-table';
@@ -197,14 +197,34 @@ export const ProductsTable = (props: any) => {
           setCurrentProductID(null);
      }
 
-     const handleProductUpdateClick = () => {
+     const handleProductUpdateClick = async () => {
+          const errors: string[] = [];
+
+          // Run yup schema validation
+          try {
+               await newProductSchema().validate(currentProductObject, { abortEarly: false });
+          } catch (validationError: any) {
+               if (validationError?.inner) {
+                    validationError.inner.forEach((err: any) => {
+                         if (err.message) errors.push(err.message);
+                    });
+               }
+          }
+
           // Category child validation
           if (filteredMidOptions.length > 0 && !currentProductObject?.mid_category) {
-               Swal.fire({ icon: 'warning', title: 'Izaberite srednju kategoriju', text: 'Glavna kategorija ima podkategorije — morate izabrati srednju.' });
-               return;
+               errors.push('Srednja kategorija je obavezna za izabranu glavnu kategoriju.');
           }
           if (filteredSubOptions.length > 0 && !currentProductObject?.sub_category) {
-               Swal.fire({ icon: 'warning', title: 'Izaberite podkategoriju', text: 'Srednja kategorija ima podkategorije — morate izabrati pod.' });
+               errors.push('Podkategorija je obavezna za izabranu srednju kategoriju.');
+          }
+
+          if (errors.length > 0) {
+               Swal.fire({
+                    icon: 'error',
+                    title: 'Greške u validaciji',
+                    html: `<ul style="text-align:left;margin:0;padding-left:20px;">${errors.map((e) => `<li>${e}</li>`).join('')}</ul>`,
+               });
                return;
           }
 
