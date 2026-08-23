@@ -96,9 +96,37 @@ export async function proxy(request: NextRequest) {
           user = result.data?.user ?? null;
           userError = result.error;
           console.log(`[proxy] auth.getUser() resolved in ${Date.now() - authStart}ms | user=${user?.email ?? 'null'} | error=${userError?.message ?? 'none'}`);
+
+          // If session is invalid but cookies exist, clear them to prevent future refresh hangs
+          if (userError && !user) {
+               const allCookies = request.cookies.getAll();
+               const supabaseCookies = allCookies.filter(
+                    (c) => c.name.startsWith('sb-') || c.name.includes('supabase')
+               );
+               if (supabaseCookies.length > 0) {
+                    console.log(`[proxy] session invalid, clearing ${supabaseCookies.length} stale supabase cookie(s)`);
+                    response = NextResponse.next({ request });
+                    supabaseCookies.forEach((cookie) => {
+                         response.cookies.set(cookie.name, '', { maxAge: 0, path: '/' });
+                    });
+               }
+          }
      } catch (e: any) {
           userError = e;
           console.error(`[proxy] auth.getUser() FAILED: ${e.message} | elapsed=${Date.now() - startTime}ms`);
+
+          // Clear stale cookies on timeout to prevent repeated hangs
+          const allCookies = request.cookies.getAll();
+          const supabaseCookies = allCookies.filter(
+               (c) => c.name.startsWith('sb-') || c.name.includes('supabase')
+          );
+          if (supabaseCookies.length > 0) {
+               console.log(`[proxy] timeout/error, clearing ${supabaseCookies.length} stale supabase cookie(s)`);
+               response = NextResponse.next({ request });
+               supabaseCookies.forEach((cookie) => {
+                    response.cookies.set(cookie.name, '', { maxAge: 0, path: '/' });
+               });
+          }
      }
 
      const isApiRoute = pathname.startsWith('/api/');
