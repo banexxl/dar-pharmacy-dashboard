@@ -36,6 +36,11 @@ const isMatchingRoute = (
 };
 
 export async function proxy(request: NextRequest) {
+     const startTime = Date.now();
+     const { pathname, search } = request.nextUrl;
+
+     console.log(`[proxy] → ${request.method} ${pathname}${search}`);
+
      let response = NextResponse.next({
           request,
      });
@@ -50,10 +55,6 @@ export async function proxy(request: NextRequest) {
                     },
 
                     setAll(cookiesToSet) {
-                         /*
-                          * Update the request cookies so Server Components
-                          * in this request can see the refreshed session.
-                          */
                          cookiesToSet.forEach(
                               ({ name, value }) => {
                                    request.cookies.set(name, value);
@@ -64,9 +65,6 @@ export async function proxy(request: NextRequest) {
                               request,
                          });
 
-                         /*
-                          * Send refreshed cookies back to the browser.
-                          */
                          cookiesToSet.forEach(
                               ({ name, value, options }) => {
                                    response.cookies.set(
@@ -82,53 +80,44 @@ export async function proxy(request: NextRequest) {
      );
 
      /*
-      * Do not place logic between createServerClient() and getUser().
-      * Calling getUser() validates the current Supabase session and may
-      * refresh its cookies.
-      *
-      * AbortSignal.timeout ensures this doesn't hang indefinitely on the edge.
+      * Validate session with a timeout to avoid edge hangs.
       */
      let user = null;
      let userError: any = null;
 
      try {
+          const authStart = Date.now();
           const result = await Promise.race([
                supabase.auth.getUser(),
                new Promise<never>((_, reject) =>
-                    setTimeout(() => reject(new Error('Auth timeout')), 10000)
+                    setTimeout(() => reject(new Error('Auth timeout after 10s')), 10000)
                ),
           ]);
           user = result.data?.user ?? null;
           userError = result.error;
-     } catch (e) {
-          // Auth call timed out or failed — treat as not logged in
+          console.log(`[proxy] auth.getUser() resolved in ${Date.now() - authStart}ms | user=${user?.email ?? 'null'} | error=${userError?.message ?? 'none'}`);
+     } catch (e: any) {
           userError = e;
+          console.error(`[proxy] auth.getUser() FAILED: ${e.message} | elapsed=${Date.now() - startTime}ms`);
      }
 
-     const { pathname, search } = request.nextUrl;
      const isApiRoute = pathname.startsWith('/api/');
      const isLoggedIn = Boolean(user) && !userError;
 
-     /*
-      * The callback must remain accessible because this route exchanges
-      * the OAuth code for a Supabase session.
-      */
+     console.log(`[proxy] isLoggedIn=${isLoggedIn} | isApiRoute=${isApiRoute} | pathname=${pathname}`);
+
      if (isMatchingRoute(pathname, ALWAYS_PUBLIC_ROUTES)) {
+          console.log(`[proxy] ← public route, passing through | ${Date.now() - startTime}ms`);
           return response;
      }
 
-     /*
-      * Logged-in users should not return to the login page.
-      */
      if (pathname === LOGIN_ROUTE) {
           if (isLoggedIn) {
+               console.log(`[proxy] ← logged-in user on login page, redirecting to / | ${Date.now() - startTime}ms`);
                const redirectResponse = NextResponse.redirect(
                     new URL('/', request.url)
                );
 
-               /*
-                * Preserve any session cookies refreshed above.
-                */
                response.cookies.getAll().forEach((cookie) => {
                     redirectResponse.cookies.set(cookie);
                });
@@ -136,14 +125,13 @@ export async function proxy(request: NextRequest) {
                return redirectResponse;
           }
 
+          console.log(`[proxy] ← login page, passing through | ${Date.now() - startTime}ms`);
           return response;
      }
 
-     /*
-      * Every remaining matched page and API endpoint is protected.
-      */
      if (!isLoggedIn) {
           if (isApiRoute) {
+               console.log(`[proxy] ← unauthorized API request, returning 401 | ${Date.now() - startTime}ms`);
                return NextResponse.json(
                     {
                          error: 'Unauthorized',
@@ -158,18 +146,15 @@ export async function proxy(request: NextRequest) {
           }
 
           const loginUrl = new URL(LOGIN_ROUTE, request.url);
-
           loginUrl.searchParams.set(
                'redirect',
                `${pathname}${search}`
           );
 
+          console.log(`[proxy] ← not logged in, redirecting to ${loginUrl.pathname} | ${Date.now() - startTime}ms`);
           return NextResponse.redirect(loginUrl);
      }
 
-     /*
-      * Avoid caching authenticated pages.
-      */
      if (!isApiRoute) {
           response.headers.set(
                'Cache-Control',
@@ -179,5 +164,6 @@ export async function proxy(request: NextRequest) {
           response.headers.set('Expires', '0');
      }
 
+     console.log(`[proxy] ← authenticated, passing through | ${Date.now() - startTime}ms`);
      return response;
 }
