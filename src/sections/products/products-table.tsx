@@ -612,13 +612,13 @@ export const ProductsTable = (props: any) => {
                                                        // const hasManyVariants = product.variants > 1;
 
                                                        return (
-                                                            <Fragment key={Math.random()}>
+                                                            <Fragment key={product.id}>
                                                                  <TableRow
                                                                       hover
-                                                                      key={Math.random()}
+
                                                                  >
                                                                       <TableCell
-                                                                           key={Math.random()}
+
                                                                            padding="checkbox"
                                                                            sx={{
                                                                                 ...(isCurrent && {
@@ -636,12 +636,12 @@ export const ProductsTable = (props: any) => {
                                                                            }}
                                                                            width="25%"
                                                                       >
-                                                                           <IconButton key={Math.random()} onClick={() => handleProductToggle(product.id)}>
-                                                                                <SvgIcon key={Math.random()}>{isCurrent ? <ChevronDownIcon key={Math.random()} /> : <ChevronRightIcon key={Math.random()} />}</SvgIcon >
+                                                                           <IconButton onClick={() => handleProductToggle(product.id)}>
+                                                                                <SvgIcon>{isCurrent ? <ChevronDownIcon /> : <ChevronRightIcon />}</SvgIcon >
                                                                            </IconButton>
                                                                       </TableCell>
-                                                                      <TableCell width="25%" key={Math.random()}>
-                                                                           <Box key={Math.random()}
+                                                                      <TableCell width="25%">
+                                                                           <Box
                                                                                 sx={{
                                                                                      alignItems: 'center',
                                                                                      display: 'flex',
@@ -649,7 +649,7 @@ export const ProductsTable = (props: any) => {
                                                                            >
                                                                                 {product.image_url ? (
                                                                                      <Box
-                                                                                          key={Math.random()}
+
                                                                                           sx={{
                                                                                                alignItems: 'center',
                                                                                                backgroundColor: 'neutral.50',
@@ -666,7 +666,7 @@ export const ProductsTable = (props: any) => {
                                                                                      />
                                                                                 ) : (
                                                                                      <Box
-                                                                                          key={Math.random()}
+
                                                                                           sx={{
                                                                                                alignItems: 'center',
                                                                                                backgroundColor: 'neutral.50',
@@ -677,28 +677,28 @@ export const ProductsTable = (props: any) => {
                                                                                                width: 80,
                                                                                           }}
                                                                                      >
-                                                                                          <SvgIcon key={Math.random()} >
+                                                                                          <SvgIcon >
 
                                                                                           </SvgIcon>
                                                                                      </Box>
                                                                                 )}
                                                                                 <Box
-                                                                                     key={Math.random()}
+
                                                                                      sx={{
                                                                                           cursor: 'pointer',
                                                                                           ml: 2,
                                                                                      }}
                                                                                 >
-                                                                                     <Typography key={Math.random()} variant="subtitle2">{product.name}</Typography>
+                                                                                     <Typography variant="subtitle2">{product.name}</Typography>
                                                                                      <Typography
-                                                                                          key={Math.random()}
+
                                                                                           color="text.secondary"
                                                                                           variant="body2"
                                                                                      >
                                                                                           in {product.main_category}
                                                                                      </Typography>
                                                                                      <Typography
-                                                                                          key={Math.random()}
+
                                                                                           color="text.secondary"
                                                                                           variant="body2"
                                                                                      >
@@ -707,9 +707,9 @@ export const ProductsTable = (props: any) => {
                                                                                 </Box>
                                                                            </Box>
                                                                       </TableCell>
-                                                                      <TableCell width="25%" key={Math.random()}>
+                                                                      <TableCell width="25%">
                                                                            <LinearProgress
-                                                                                key={Math.random()}
+
                                                                                 value={product.quantity ?? 0}
                                                                                 variant="determinate"
                                                                                 color={quantityColor}
@@ -719,7 +719,7 @@ export const ProductsTable = (props: any) => {
                                                                                 }}
                                                                            />
                                                                            <Typography
-                                                                                key={Math.random()}
+
                                                                                 color="text.secondary"
                                                                                 variant="body2"
                                                                            >
@@ -727,29 +727,29 @@ export const ProductsTable = (props: any) => {
                                                                                 {/* {hasManyVariants && ` in ${product.variants} variants`} */}
                                                                            </Typography>
                                                                       </TableCell>
-                                                                      <TableCell key={Math.random()}>{product.price}</TableCell>
-                                                                      <TableCell key={Math.random()}>{product.id?.slice(-8)}</TableCell>
-                                                                      <TableCell key={Math.random()}>
-                                                                           <SeverityPill key={Math.random()} color={statusColor}>{product.discount.toString()}</SeverityPill>
+                                                                      <TableCell>{product.price}</TableCell>
+                                                                      <TableCell>{product.id?.slice(-8)}</TableCell>
+                                                                      <TableCell>
+                                                                           <SeverityPill color={statusColor}>{product.discount.toString()}</SeverityPill>
                                                                       </TableCell>
-                                                                      <TableCell key={Math.random()}>
-                                                                           <SeverityPill key={Math.random()} color={statusColor}>{product.discount_amount}</SeverityPill>
+                                                                      <TableCell>
+                                                                           <SeverityPill color={statusColor}>{product.discount_amount}</SeverityPill>
                                                                       </TableCell>
-                                                                      <TableCell key={Math.random()}>
-                                                                           <SeverityPill key={Math.random()} color={homeColor}>
+                                                                      <TableCell>
+                                                                           <SeverityPill color={homeColor}>
                                                                                 {product.display_on_home ? 'Da' : 'Ne'}
                                                                            </SeverityPill>
                                                                       </TableCell>
-                                                                      <TableCell key={Math.random()}>
-                                                                           <SeverityPill key={Math.random()} color={statusColor}>
+                                                                      <TableCell>
+                                                                           <SeverityPill color={statusColor}>
                                                                                 {product.is_active ? 'Da' : 'Ne'}
                                                                            </SeverityPill>
                                                                       </TableCell>
                                                                  </TableRow>
                                                                  {isCurrent && (
-                                                                      <TableRow key={Math.random()}>
+                                                                      <TableRow>
                                                                            <TableCell
-                                                                                key={Math.random()}
+
                                                                                 colSpan={9}
                                                                                 sx={{
                                                                                      p: 0,
@@ -765,24 +765,24 @@ export const ProductsTable = (props: any) => {
                                                                                      },
                                                                                 }}
                                                                            >
-                                                                                <CardContent key={Math.random()} sx={{ width: { xs: 'calc(100vw - 64px)', md: 'auto' }, overflowX: 'hidden', boxSizing: 'border-box' }}>
-                                                                                     <Grid key={Math.random()}
+                                                                                <CardContent sx={{ width: { xs: 'calc(100vw - 64px)', md: 'auto' }, overflowX: 'hidden', boxSizing: 'border-box' }}>
+                                                                                     <Grid
                                                                                           container
                                                                                           spacing={3}
                                                                                      >
-                                                                                          <Grid key={Math.random()}
+                                                                                          <Grid
                                                                                                size={{ md: 6, xs: 12 }}
                                                                                           >
-                                                                                               <Typography key={Math.random()} variant="h6">Osnovni detalji</Typography>
-                                                                                               <Divider key={Math.random()} sx={{ my: 2 }} />
-                                                                                               <Grid key={Math.random()}
+                                                                                               <Typography variant="h6">Osnovni detalji</Typography>
+                                                                                               <Divider sx={{ my: 2 }} />
+                                                                                               <Grid
                                                                                                     container
                                                                                                     spacing={3}
                                                                                                >
-                                                                                                    <Grid key={Math.random()}
+                                                                                                    <Grid
                                                                                                          size={{ md: 6, xs: 12 }}
                                                                                                     >
-                                                                                                         <TextField key={Math.random()}
+                                                                                                         <TextField
                                                                                                               defaultValue={currentProductObject?.name}
                                                                                                               fullWidth
                                                                                                               label="Naziv"
@@ -797,10 +797,10 @@ export const ProductsTable = (props: any) => {
                                                                                                               }
                                                                                                          />
                                                                                                     </Grid>
-                                                                                                    <Grid key={Math.random()}
+                                                                                                    <Grid
                                                                                                          size={{ md: 6, xs: 12 }}
                                                                                                     >
-                                                                                                         <TextField key={Math.random()}
+                                                                                                         <TextField
                                                                                                               defaultValue={currentProductObject?.id?.slice(-8)}
                                                                                                               disabled
                                                                                                               fullWidth
@@ -808,10 +808,10 @@ export const ProductsTable = (props: any) => {
                                                                                                               name={product.id?.slice(-8)}
                                                                                                          />
                                                                                                     </Grid>
-                                                                                                    <Grid key={Math.random()}
+                                                                                                    <Grid
                                                                                                          size={{ md: 6, xs: 12 }}
                                                                                                     >
-                                                                                                         <TextField key={Math.random()}
+                                                                                                         <TextField
                                                                                                               value={currentProductObject?.main_category || ''}
                                                                                                               fullWidth
                                                                                                               label="Glavna Kategorija"
@@ -829,10 +829,10 @@ export const ProductsTable = (props: any) => {
                                                                                                               ))}
                                                                                                          </TextField>
                                                                                                     </Grid>
-                                                                                                    <Grid key={Math.random()}
+                                                                                                    <Grid
                                                                                                          size={{ md: 6, xs: 12 }}
                                                                                                     >
-                                                                                                         <TextField key={Math.random()}
+                                                                                                         <TextField
                                                                                                               value={currentProductObject?.mid_category || ''}
                                                                                                               fullWidth
                                                                                                               label="Srednja Kategorija"
@@ -854,10 +854,10 @@ export const ProductsTable = (props: any) => {
                                                                                                               )}
                                                                                                          </TextField>
                                                                                                     </Grid>
-                                                                                                    <Grid key={Math.random()}
+                                                                                                    <Grid
                                                                                                          size={{ md: 6, xs: 12 }}
                                                                                                     >
-                                                                                                         <TextField key={Math.random()}
+                                                                                                         <TextField
                                                                                                               value={currentProductObject?.sub_category || ''}
                                                                                                               fullWidth
                                                                                                               label="Podkategorija"
@@ -883,7 +883,7 @@ export const ProductsTable = (props: any) => {
                                                                                                     <Grid
                                                                                                          size={{ md: 6, xs: 12 }}
                                                                                                     >
-                                                                                                         <TextField key={Math.random()}
+                                                                                                         <TextField
                                                                                                               defaultValue={currentProductObject?.description}
                                                                                                               fullWidth
                                                                                                               label="Opis"
@@ -898,10 +898,10 @@ export const ProductsTable = (props: any) => {
                                                                                                               }
                                                                                                          />
                                                                                                     </Grid>
-                                                                                                    <Grid key={Math.random()}
+                                                                                                    <Grid
                                                                                                          size={{ md: 6, xs: 12 }}
                                                                                                     >
-                                                                                                         <TextField key={Math.random()}
+                                                                                                         <TextField
                                                                                                               defaultValue={currentProductObject?.instructions}
                                                                                                               fullWidth
                                                                                                               label="Instrukcije"
@@ -916,10 +916,10 @@ export const ProductsTable = (props: any) => {
                                                                                                               }
                                                                                                          />
                                                                                                     </Grid>
-                                                                                                    <Grid key={Math.random()}
+                                                                                                    <Grid
                                                                                                          size={{ md: 6, xs: 12 }}
                                                                                                     >
-                                                                                                         <TextField key={Math.random()}
+                                                                                                         <TextField
                                                                                                               defaultValue={currentProductObject?.warning}
                                                                                                               fullWidth
                                                                                                               label="Upozorenje"
@@ -934,10 +934,10 @@ export const ProductsTable = (props: any) => {
                                                                                                               }
                                                                                                          />
                                                                                                     </Grid>
-                                                                                                    <Grid key={Math.random()}
+                                                                                                    <Grid
                                                                                                          size={{ md: 6, xs: 12 }}
                                                                                                     >
-                                                                                                         <TextField key={Math.random()}
+                                                                                                         <TextField
                                                                                                               defaultValue={currentProductObject?.ingredients}
                                                                                                               fullWidth
                                                                                                               disabled={loading}
@@ -952,10 +952,10 @@ export const ProductsTable = (props: any) => {
                                                                                                               }
                                                                                                          />
                                                                                                     </Grid>
-                                                                                                    <Grid key={Math.random()}
+                                                                                                    <Grid
                                                                                                          size={{ md: 6, xs: 12 }}
                                                                                                     >
-                                                                                                         <TextField key={Math.random()}
+                                                                                                         <TextField
                                                                                                               defaultValue={currentProductObject?.promotion_text}
                                                                                                               fullWidth
                                                                                                               disabled={!currentProductObject?.promoting}
@@ -973,19 +973,19 @@ export const ProductsTable = (props: any) => {
                                                                                                </Grid>
                                                                                           </Grid>
                                                                                           <Grid
-                                                                                               key={Math.random()}
+
                                                                                                size={{ md: 6, xs: 12 }}
                                                                                           >
-                                                                                               <Typography key={Math.random()} variant="h6">Napredni podaci</Typography>
-                                                                                               <Divider key={Math.random()} sx={{ my: 2 }} />
-                                                                                               <Grid key={Math.random()}
+                                                                                               <Typography variant="h6">Napredni podaci</Typography>
+                                                                                               <Divider sx={{ my: 2 }} />
+                                                                                               <Grid
                                                                                                     container
                                                                                                     spacing={3}
                                                                                                >
-                                                                                                    <Grid key={Math.random()}
+                                                                                                    <Grid
                                                                                                          size={{ md: 6, xs: 12 }}
                                                                                                     >
-                                                                                                         <TextField key={Math.random()}
+                                                                                                         <TextField
                                                                                                               defaultValue={currentProductObject?.price}
                                                                                                               fullWidth
                                                                                                               disabled={loading}
@@ -1000,14 +1000,14 @@ export const ProductsTable = (props: any) => {
                                                                                                               }
                                                                                                               InputProps={{
                                                                                                                    startAdornment: (
-                                                                                                                        <InputAdornment key={Math.random()} position="start">RSD</InputAdornment>
+                                                                                                                        <InputAdornment position="start">RSD</InputAdornment>
                                                                                                                    ),
                                                                                                               }}
                                                                                                               type="number"
                                                                                                          />
                                                                                                     </Grid>
 
-                                                                                                    <Grid key={Math.random()}
+                                                                                                    <Grid
                                                                                                          size={{ md: 6, xs: 12 }}
                                                                                                     >
                                                                                                          <Autocomplete
@@ -1063,10 +1063,10 @@ export const ProductsTable = (props: any) => {
                                                                                                          />
                                                                                                     </Grid>
 
-                                                                                                    <Grid key={Math.random()}
+                                                                                                    <Grid
                                                                                                          size={{ md: 6, xs: 12 }}
                                                                                                     >
-                                                                                                         <TextField key={Math.random()}
+                                                                                                         <TextField
                                                                                                               defaultValue={currentProductObject?.available_stock}
                                                                                                               fullWidth
                                                                                                               disabled={loading}
@@ -1082,10 +1082,10 @@ export const ProductsTable = (props: any) => {
                                                                                                               type="number"
                                                                                                          />
                                                                                                     </Grid>
-                                                                                                    <Grid key={Math.random()}
+                                                                                                    <Grid
                                                                                                          size={{ md: 6, xs: 12 }}
                                                                                                     >
-                                                                                                         <TextField key={Math.random()}
+                                                                                                         <TextField
                                                                                                               value={currentProductObject?.discount_amount ?? 0}
                                                                                                               fullWidth
                                                                                                               disabled={!currentProductObject?.discount}
@@ -1112,7 +1112,7 @@ export const ProductsTable = (props: any) => {
                                                                                                          size={{ md: 6, xs: 12 }}
                                                                                                     >
                                                                                                          <TextField
-                                                                                                              key={Math.random()}
+
                                                                                                               defaultValue={currentProductObject?.quantity}
                                                                                                               type="number"
                                                                                                               fullWidth
@@ -1130,7 +1130,7 @@ export const ProductsTable = (props: any) => {
                                                                                                     <Grid
                                                                                                          size={{ md: 6, xs: 12 }}
                                                                                                     >
-                                                                                                         <TextField key={Math.random()}
+                                                                                                         <TextField
                                                                                                               defaultValue={currentProductObject?.quantity_unit}
                                                                                                               select
                                                                                                               fullWidth
@@ -1154,48 +1154,48 @@ export const ProductsTable = (props: any) => {
                                                                                                               ))}
                                                                                                          </TextField>
                                                                                                     </Grid>
-                                                                                                    <Grid key={Math.random()}
+                                                                                                    <Grid
                                                                                                          size={{ md: 6, xs: 12 }}
                                                                                                          sx={{
                                                                                                               alignItems: 'center',
                                                                                                               display: 'flex',
                                                                                                          }}
                                                                                                     >
-                                                                                                         <Switch key={Math.random()} disabled={loading} checked={currentProductObject!.is_active}
+                                                                                                         <Switch disabled={loading} checked={currentProductObject!.is_active}
                                                                                                               onChange={() => setCurrentProductObject((previousObject: any) => ({
                                                                                                                    ...previousObject,
                                                                                                                    is_active: !previousObject.is_active
                                                                                                               }))}
                                                                                                          />
-                                                                                                         <Typography key={Math.random()} variant="subtitle2">
+                                                                                                         <Typography variant="subtitle2">
                                                                                                               Aktivan
                                                                                                          </Typography>
                                                                                                     </Grid>
-                                                                                                    <Grid key={Math.random()}
+                                                                                                    <Grid
                                                                                                          size={{ md: 6, xs: 12 }}
                                                                                                          sx={{
                                                                                                               alignItems: 'center',
                                                                                                               display: 'flex',
                                                                                                          }}
                                                                                                     >
-                                                                                                         <Switch key={Math.random()} disabled={loading} checked={currentProductObject!.new_arrival}
+                                                                                                         <Switch disabled={loading} checked={currentProductObject!.new_arrival}
                                                                                                               onChange={() => setCurrentProductObject((previousObject: any) => ({
                                                                                                                    ...previousObject,
                                                                                                                    new_arrival: !previousObject.new_arrival
                                                                                                               }))}
                                                                                                          />
-                                                                                                         <Typography key={Math.random()} variant="subtitle2">
+                                                                                                         <Typography variant="subtitle2">
                                                                                                               Novi proizvod
                                                                                                          </Typography>
                                                                                                     </Grid>
-                                                                                                    <Grid key={Math.random()}
+                                                                                                    <Grid
                                                                                                          size={{ md: 6, xs: 12 }}
                                                                                                          sx={{
                                                                                                               alignItems: 'center',
                                                                                                               display: 'flex',
                                                                                                          }}
                                                                                                     >
-                                                                                                         <Switch key={Math.random()} disabled={loading}
+                                                                                                         <Switch disabled={loading}
                                                                                                               checked={currentProductObject!.best_seller}
                                                                                                               onChange={() => setCurrentProductObject((previousObject: any) => ({
                                                                                                                    ...previousObject,
@@ -1203,60 +1203,60 @@ export const ProductsTable = (props: any) => {
 
                                                                                                               }))}
                                                                                                          />
-                                                                                                         <Typography key={Math.random()} variant="subtitle2">
+                                                                                                         <Typography variant="subtitle2">
                                                                                                               Najprodavaniji
                                                                                                          </Typography>
                                                                                                     </Grid>
-                                                                                                    <Grid key={Math.random()}
+                                                                                                    <Grid
                                                                                                          size={{ md: 6, xs: 12 }}
                                                                                                          sx={{
                                                                                                               alignItems: 'center',
                                                                                                               display: 'flex',
                                                                                                          }}
                                                                                                     >
-                                                                                                         <Switch key={Math.random()} disabled={loading} checked={currentProductObject!.discount}
+                                                                                                         <Switch disabled={loading} checked={currentProductObject!.discount}
                                                                                                               onChange={() => setCurrentProductObject((previousObject: any) => ({
                                                                                                                    ...previousObject,
                                                                                                                    discount: !previousObject.discount,
                                                                                                                    discount_amount: !previousObject.discount ? previousObject.discount_amount : 0
                                                                                                               }))}
                                                                                                          />
-                                                                                                         <Typography key={Math.random()} variant="subtitle2">
+                                                                                                         <Typography variant="subtitle2">
                                                                                                               Popust
                                                                                                          </Typography>
                                                                                                     </Grid>
-                                                                                                    <Grid key={Math.random()}
+                                                                                                    <Grid
                                                                                                          size={{ md: 6, xs: 12 }}
                                                                                                          sx={{
                                                                                                               alignItems: 'center',
                                                                                                               display: 'flex',
                                                                                                          }}
                                                                                                     >
-                                                                                                         <Switch key={Math.random()} disabled={loading} checked={currentProductObject!.promoting}
+                                                                                                         <Switch disabled={loading} checked={currentProductObject!.promoting}
                                                                                                               onChange={() => setCurrentProductObject((previousObject: any) => ({
                                                                                                                    ...previousObject,
                                                                                                                    promoting: !previousObject.promoting
                                                                                                               }))}
                                                                                                          />
-                                                                                                         <Typography key={Math.random()} variant="subtitle2">
+                                                                                                         <Typography variant="subtitle2">
                                                                                                               Promocija
                                                                                                          </Typography>
                                                                                                     </Grid>
-                                                                                                    <Grid key={Math.random()}
+                                                                                                    <Grid
                                                                                                          size={{ md: 6, xs: 12 }}
                                                                                                          sx={{
                                                                                                               alignItems: 'center',
                                                                                                               display: 'flex',
                                                                                                          }}
                                                                                                     >
-                                                                                                         <Switch key={Math.random()} disabled={loading}
+                                                                                                         <Switch disabled={loading}
                                                                                                               checked={!!currentProductObject?.display_on_home}
                                                                                                               onChange={() => setCurrentProductObject((previousObject: any) => ({
                                                                                                                    ...previousObject,
                                                                                                                    display_on_home: !previousObject.display_on_home
                                                                                                               }))}
                                                                                                          />
-                                                                                                         <Typography key={Math.random()} variant="subtitle2">
+                                                                                                         <Typography variant="subtitle2">
                                                                                                               Na početnoj
                                                                                                          </Typography>
                                                                                                     </Grid>
@@ -1433,13 +1433,13 @@ export const ProductsTable = (props: any) => {
                                                                                      </Card>
                                                                                 </CardContent>
                                                                                 <Divider />
-                                                                                <Stack key={Math.random()}
+                                                                                <Stack
                                                                                      alignItems="center"
                                                                                      direction="row"
                                                                                      justifyContent="space-between"
                                                                                      sx={{ p: 2 }}
                                                                                 >
-                                                                                     <Stack key={Math.random()}
+                                                                                     <Stack
                                                                                           alignItems="center"
                                                                                           direction="row"
                                                                                           spacing={2}
@@ -1452,7 +1452,7 @@ export const ProductsTable = (props: any) => {
                                                                                           >
                                                                                                Izmeni
                                                                                           </Button>
-                                                                                          <Button key={Math.random()}
+                                                                                          <Button
                                                                                                color="inherit"
                                                                                                onClick={handleProductClose}
                                                                                                disabled={loading}
@@ -1461,7 +1461,7 @@ export const ProductsTable = (props: any) => {
                                                                                           </Button>
                                                                                      </Stack>
                                                                                      <div>
-                                                                                          <Button key={Math.random()}
+                                                                                          <Button
                                                                                                onClick={handleDeleteButtonClick}
                                                                                                color="error"
                                                                                                disabled={loading}
