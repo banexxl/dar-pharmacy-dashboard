@@ -78,7 +78,11 @@ export const OverviewLatestOrders = (props: any) => {
                             : order.order_status == 'shipped' ? 'info'
                               : 'primary'
                     }>
-                      {order.order_status}
+                      {order.order_status == 'pending' ? 'Na čekanju'
+                        : order.order_status == 'delivered' ? 'Dostavljeno'
+                          : order.order_status == 'cancelled' ? 'Otkazano'
+                            : order.order_status == 'shipped' ? 'Poslato'
+                              : 'U obradi'}
                     </SeverityPill>
                   </TableCell>
                 </TableRow>
