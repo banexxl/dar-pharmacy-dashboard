@@ -53,41 +53,48 @@ export const OverviewLatestOrders = (props: any) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {orders.map((order: Order) => {
-              const createdAt = new Date(order.created_at);
-              const ago = formatDistanceToNow(createdAt);
-              return (
-                <TableRow
-                  hover
-                  key={order.order_number}
-                >
-                  <TableCell>
-                    {order.order_number}
-                  </TableCell>
-                  <TableCell>
-                    {order.customer && order.customer.full_name ? order.customer.full_name : 'Neregistrovani korisnik'}
-                  </TableCell>
-                  <TableCell>
-                    {ago}
-                  </TableCell>
-                  <TableCell>
-                    <SeverityPill color={
-                      order.order_status == 'pending' ? 'warning'
-                        : order.order_status == 'delivered' ? 'success'
-                          : order.order_status == 'cancelled' ? 'error'
-                            : order.order_status == 'shipped' ? 'info'
-                              : 'primary'
-                    }>
-                      {order.order_status == 'pending' ? 'Na čekanju'
-                        : order.order_status == 'delivered' ? 'Dostavljeno'
-                          : order.order_status == 'cancelled' ? 'Otkazano'
-                            : order.order_status == 'shipped' ? 'Poslato'
-                              : 'U obradi'}
-                    </SeverityPill>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
+            {orders && orders.length > 0 ?
+              orders.map((order: Order) => {
+                const createdAt = new Date(order.created_at);
+                const ago = formatDistanceToNow(createdAt);
+                return (
+                  <TableRow
+                    hover
+                    key={order.order_number}
+                  >
+                    <TableCell>
+                      {order.order_number}
+                    </TableCell>
+                    <TableCell>
+                      {order.customer && order.customer.full_name ? order.customer.full_name : 'Neregistrovani korisnik'}
+                    </TableCell>
+                    <TableCell>
+                      {ago}
+                    </TableCell>
+                    <TableCell>
+                      <SeverityPill color={
+                        order.order_status == 'pending' ? 'warning'
+                          : order.order_status == 'delivered' ? 'success'
+                            : order.order_status == 'cancelled' ? 'error'
+                              : order.order_status == 'shipped' ? 'info'
+                                : 'primary'
+                      }>
+                        {order.order_status == 'pending' ? 'Na čekanju'
+                          : order.order_status == 'delivered' ? 'Dostavljeno'
+                            : order.order_status == 'cancelled' ? 'Otkazano'
+                              : order.order_status == 'shipped' ? 'Poslato'
+                                : 'U obradi'}
+                      </SeverityPill>
+                    </TableCell>
+                  </TableRow>
+                );
+              }) :
+              <TableRow>
+                <TableCell colSpan={4} align="center">
+                  Nema porudžbenica
+                </TableCell>
+              </TableRow>
+            }
           </TableBody>
         </Table>
       </Box>
