@@ -49,9 +49,9 @@ export const OrderItems = ({ items, ...other }: OrderItemsProps & Record<string,
                     <TableRow key={item.id}>
                       <TableCell>
                         <Typography variant="subtitle2">{item.name}</Typography>
-                        {item.manufacturer && (
+                        {item.manufacturer_name && (
                           <Typography color="text.secondary" variant="body2">
-                            {item.manufacturer}
+                            {item.manufacturer_name}
                           </Typography>
                         )}
                       </TableCell>
