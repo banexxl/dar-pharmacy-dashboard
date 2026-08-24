@@ -19,6 +19,10 @@ import {
 } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Swal from 'sweetalert2';
 import { generateSlug } from '@/utils/generate-slug';
 import { createBlog, updateBlog, type BlogPost, type BlogPayload } from '../actions';
@@ -39,14 +43,14 @@ interface BlogFormData {
 }
 
 const CATEGORIES = [
-     'Zdravlje',
-     'Lepota',
-     'Ishrana',
-     'Saveti',
-     'Biljni preparati',
-     'Aromaterapija',
-     'Vitamini i suplementi',
-     'Prirodna kozmetika',
+     { value: 'zdravlje', label: 'Zdravlje' },
+     { value: 'lepota', label: 'Lepota' },
+     { value: 'ishrana', label: 'Ishrana' },
+     { value: 'saveti', label: 'Saveti' },
+     { value: 'biljni_preparati', label: 'Biljni preparati' },
+     { value: 'aromaterapija', label: 'Aromaterapija' },
+     { value: 'vitamini_i_suplementi', label: 'Vitamini i suplementi' },
+     { value: 'prirodna_kozmetika', label: 'Prirodna kozmetika' },
 ];
 
 const EMPTY_BLOG: BlogFormData = {
@@ -56,7 +60,7 @@ const EMPTY_BLOG: BlogFormData = {
      content: '',
      cover_image: null,
      author: '',
-     category: CATEGORIES[0],
+     category: CATEGORIES[0].value,
      reading_time_minutes: 1,
      is_published: false,
      featured: false,
@@ -368,8 +372,8 @@ const BlogFormClient = ({ id, initialData }: BlogFormClientProps) => {
                                                   required
                                              >
                                                   {CATEGORIES.map((cat) => (
-                                                       <MenuItem key={cat} value={cat}>
-                                                            {cat}
+                                                       <MenuItem key={cat.value} value={cat.value}>
+                                                            {cat.label}
                                                        </MenuItem>
                                                   ))}
                                              </TextField>
@@ -488,6 +492,65 @@ const BlogFormClient = ({ id, initialData }: BlogFormClientProps) => {
                                              <Typography variant="subtitle2" sx={{ mb: 1 }}>
                                                   Sadržaj
                                              </Typography>
+
+                                             {/* Markdown Instructions */}
+                                             <Accordion sx={{ mb: 2 }}>
+                                                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                                                       <Typography variant="body2" fontWeight={600}>
+                                                            Uputstvo za pisanje sadržaja (Markdown)
+                                                       </Typography>
+                                                  </AccordionSummary>
+                                                  <AccordionDetails>
+                                                       <Stack spacing={1.5}>
+                                                            <Typography variant="body2" fontWeight={600}>Naslovi</Typography>
+                                                            <Typography variant="body2" component="div" sx={{ fontFamily: 'monospace', bgcolor: 'grey.100', p: 1, borderRadius: 1 }}>
+                                                                 # Glavni naslov (koristi samo jednom)<br />
+                                                                 ## Naslov sekcije<br />
+                                                                 ### Podnaslov
+                                                            </Typography>
+
+                                                            <Typography variant="body2" fontWeight={600}>Paragrafi</Typography>
+                                                            <Typography variant="body2">
+                                                                 Piši slobodan tekst. Za novi paragraf, ostavi jedan prazan red između.
+                                                            </Typography>
+
+                                                            <Typography variant="body2" fontWeight={600}>Podebljano i kurziv</Typography>
+                                                            <Typography variant="body2" component="div" sx={{ fontFamily: 'monospace', bgcolor: 'grey.100', p: 1, borderRadius: 1 }}>
+                                                                 **podebljano** — za isticanje ili nazive proizvoda<br />
+                                                                 *kurziv* — za blaže naglašavanje
+                                                            </Typography>
+
+                                                            <Typography variant="body2" fontWeight={600}>Liste sa tačkama</Typography>
+                                                            <Typography variant="body2" component="div" sx={{ fontFamily: 'monospace', bgcolor: 'grey.100', p: 1, borderRadius: 1 }}>
+                                                                 - Prva stavka<br />
+                                                                 - Druga stavka<br />
+                                                                 - Treća stavka
+                                                            </Typography>
+
+                                                            <Typography variant="body2" fontWeight={600}>Numerisane liste</Typography>
+                                                            <Typography variant="body2" component="div" sx={{ fontFamily: 'monospace', bgcolor: 'grey.100', p: 1, borderRadius: 1 }}>
+                                                                 1. Prvi korak<br />
+                                                                 2. Drugi korak<br />
+                                                                 3. Treći korak
+                                                            </Typography>
+
+                                                            <Typography variant="body2" fontWeight={600}>Citati</Typography>
+                                                            <Typography variant="body2" component="div" sx={{ fontFamily: 'monospace', bgcolor: 'grey.100', p: 1, borderRadius: 1 }}>
+                                                                 {'> Ovo je citat ili istaknuta informacija.'}
+                                                            </Typography>
+
+                                                            <Typography variant="body2" fontWeight={600}>Linkovi</Typography>
+                                                            <Typography variant="body2" component="div" sx={{ fontFamily: 'monospace', bgcolor: 'grey.100', p: 1, borderRadius: 1 }}>
+                                                                 [tekst linka](https://primer.com)
+                                                            </Typography>
+
+                                                            <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
+                                                                 Napomena: Uvek ostavi prazan red pre i posle liste ili citata.
+                                                            </Typography>
+                                                       </Stack>
+                                                  </AccordionDetails>
+                                             </Accordion>
+
                                              <Box
                                                   ref={editorRef}
                                                   sx={{
