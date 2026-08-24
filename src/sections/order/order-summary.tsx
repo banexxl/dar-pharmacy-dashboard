@@ -91,20 +91,27 @@ export const OrderSummary = (props: OrderSummaryProps) => {
           label="Kupac"
         >
           <Typography variant="subtitle2">
-            {order.customer ? order.customer.full_name : 'Neregistrovani korisnik'}
+            {order.full_name || order.customer?.full_name || 'Neregistrovani korisnik'}
           </Typography>
           <Typography color="text.secondary" variant="body2">
-            {order.customer ? order.customer.email : '-'}
+            {order.email || order.customer?.email || '-'}
           </Typography>
-          {order.customer?.phone_number && (
+          {(order.phone_number || order.customer?.phone_number) && (
             <Typography color="text.secondary" variant="body2">
-              {order.customer.phone_number}
+              {order.phone_number || order.customer?.phone_number}
             </Typography>
           )}
-          {order.customer?.street_address && (
+          {(order.street_address || order.customer?.street_address) && (
             <Typography color="text.secondary" variant="body2">
-              {order.customer.street_address}
-              {order.customer.city ? `, ${order.customer.city}` : ''}
+              {order.street_address || order.customer?.street_address}
+              {(order.city || order.customer?.city) ? `, ${order.city || order.customer?.city}` : ''}
+              {(order.zip_postal_code || order.customer?.zip_postal_code) ? ` ${order.zip_postal_code || order.customer?.zip_postal_code}` : ''}
+            </Typography>
+          )}
+          {(order.province_state || order.customer?.province_state) && (
+            <Typography color="text.secondary" variant="body2">
+              {order.province_state || order.customer?.province_state}
+              {(order.country || order.customer?.country) ? `, ${order.country || order.customer?.country}` : ''}
             </Typography>
           )}
         </PropertyListItem>

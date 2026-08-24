@@ -134,6 +134,8 @@ export const OrderListTable = (props: any) => {
             <TableCell align="left">Način plaćanja</TableCell>
             <TableCell align="left">Ime</TableCell>
             <TableCell align="left">Email</TableCell>
+            <TableCell align="left">Telefon</TableCell>
+            <TableCell align="left">Grad</TableCell>
             <TableCell align="left">Status</TableCell>
           </TableRow>
         </TableHead>
@@ -195,8 +197,10 @@ export const OrderListTable = (props: any) => {
                             : order.payment_method == 'paypal' ? 'PayPal' : 'Nepoznato'
                   }
                 </TableCell>
-                <TableCell align="left">{order.customer ? order.customer.full_name : 'Neregistrovani korisnik'}</TableCell>
-                <TableCell align="left">{order.customer ? order.customer.email : 'Neregistrovani korisnik'}</TableCell>
+                <TableCell align="left">{order.full_name || order.customer?.full_name || 'Neregistrovani korisnik'}</TableCell>
+                <TableCell align="left">{order.email || order.customer?.email || '-'}</TableCell>
+                <TableCell align="left">{order.phone_number || order.customer?.phone_number || '-'}</TableCell>
+                <TableCell align="left">{order.city || order.customer?.city || '-'}</TableCell>
                 <TableCell
                   align="left"
                   onClick={(e) => handleStatusClick(e, order.id)}
