@@ -20,6 +20,7 @@ type Customer = {
      province_state?: string | null;
      country?: string | null;
      zip_postal_code?: string | null;
+     created_at?: string | null;
 };
 
 type CustomersPageProps = {
@@ -31,8 +32,6 @@ const useClientSearch = () => {
           query: '',
           page: 0,
           rowsPerPage: 5,
-          sortBy: 'full_name',
-          sortDir: 'desc' as 'asc' | 'desc',
      });
 
      const handleQueryChange = useCallback(
@@ -45,6 +44,14 @@ const useClientSearch = () => {
           },
           []
      );
+
+     const handleClearSearch = useCallback(() => {
+          setState((previousState) => ({
+               ...previousState,
+               query: '',
+               page: 0,
+          }));
+     }, []);
 
      const handlePageChange = useCallback(
           (_event: unknown, page: number) => {
@@ -69,6 +76,7 @@ const useClientSearch = () => {
 
      return {
           handleQueryChange,
+          handleClearSearch,
           handlePageChange,
           handleRowsPerPageChange,
           state,
@@ -93,8 +101,15 @@ const CustomersPage = ({ allClients }: CustomersPageProps) => {
                return clients;
           }
 
-          return clients.filter((customer) =>
-               [
+          return clients.filter((customer) => {
+               const createdDate = customer.created_at
+                    ? new Date(customer.created_at)
+                    : null;
+               const formattedDate = createdDate && !isNaN(createdDate.getTime())
+                    ? `${createdDate.getDate().toString().padStart(2, '0')}.${(createdDate.getMonth() + 1).toString().padStart(2, '0')}.${createdDate.getFullYear()}.`
+                    : '';
+
+               return [
                     customer.full_name,
                     customer.email,
                     customer.phone_number,
@@ -103,10 +118,11 @@ const CustomersPage = ({ allClients }: CustomersPageProps) => {
                     customer.province_state,
                     customer.country,
                     customer.zip_postal_code,
+                    formattedDate,
                ].some((value) =>
                     String(value ?? '').toLocaleLowerCase().includes(query)
-               )
-          );
+               );
+          });
      }, [clients, clientSearch.state.query]);
 
      const customerIDs = useMemo(
@@ -126,6 +142,7 @@ const CustomersPage = ({ allClients }: CustomersPageProps) => {
                               <CustomersSearch
                                    query={clientSearch.state.query}
                                    onQueryChange={clientSearch.handleQueryChange}
+                                   onClear={clientSearch.handleClearSearch}
                               />
 
                               <CustomersTable

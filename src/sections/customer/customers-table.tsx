@@ -18,6 +18,7 @@ import {
      TableHead,
      TablePagination,
      TableRow,
+     TableSortLabel,
      Typography,
 } from '@mui/material';
 import { useMemo, useState, useTransition } from 'react';
@@ -27,6 +28,8 @@ import { getInitials } from '@/utils/get-initials';
 import { banCustomer, deleteCustomer, sendCustomerPasswordReset, unbanCustomer } from '@/app/(dashboard)/klijenti/actions';
 import Swal from 'sweetalert2';
 import { useRouter } from 'next/navigation';
+
+type SortableColumn = 'full_name' | 'email' | 'phone_number' | 'address' | 'orders' | 'created_at';
 
 export const CustomersTable = (props: any) => {
      const {
@@ -41,14 +44,23 @@ export const CustomersTable = (props: any) => {
           page = 0,
           rowsPerPage = 5,
           selected = [],
-          sortDir = 'desc',
-          sortBy = 'full_name',
      } = props;
 
      const router = useRouter();
      const [isPending, startTransition] = useTransition();
      const [activeCustomerId, setActiveCustomerId] =
           useState<string | null>(null);
+     const [sortBy, setSortBy] = useState<SortableColumn>('full_name');
+     const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+
+     const handleSortChange = (column: SortableColumn) => {
+          if (sortBy === column) {
+               setSortDir((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+          } else {
+               setSortBy(column);
+               setSortDir('asc');
+          }
+     };
 
      const selectedSome =
           selected.length > 0 &&
@@ -59,29 +71,35 @@ export const CustomersTable = (props: any) => {
           selected.length === items.length;
 
      const visibleRows = useMemo(() => {
-          const normalizedSortBy =
-               sortBy === 'name'
-                    ? 'full_name'
-                    : sortBy;
-
           return [...items]
-               .sort(
-                    getComparator(
-                         sortDir,
-                         normalizedSortBy
-                    )
-               )
-               .slice(
-                    page * rowsPerPage,
-                    page * rowsPerPage + rowsPerPage
-               );
-     }, [
-          items,
-          page,
-          rowsPerPage,
-          sortBy,
-          sortDir,
-     ]);
+               .sort((a: Customer, b: Customer) => {
+                    let aVal: any;
+                    let bVal: any;
+
+                    if (sortBy === 'orders') {
+                         aVal = a.orders?.[0]?.count ?? 0;
+                         bVal = b.orders?.[0]?.count ?? 0;
+                    } else if (sortBy === 'address') {
+                         aVal = [a.street_address, a.city].filter(Boolean).join(', ');
+                         bVal = [b.street_address, b.city].filter(Boolean).join(', ');
+                    } else {
+                         aVal = (a as any)[sortBy] ?? '';
+                         bVal = (b as any)[sortBy] ?? '';
+                    }
+
+                    if (typeof aVal === 'number' && typeof bVal === 'number') {
+                         return sortDir === 'asc' ? aVal - bVal : bVal - aVal;
+                    }
+
+                    const aStr = String(aVal).toLowerCase();
+                    const bStr = String(bVal).toLowerCase();
+
+                    if (aStr < bStr) return sortDir === 'asc' ? -1 : 1;
+                    if (aStr > bStr) return sortDir === 'asc' ? 1 : -1;
+                    return 0;
+               })
+               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+     }, [items, page, rowsPerPage, sortBy, sortDir]);
 
      const executeAction = (
           customerId: string,
@@ -248,28 +266,64 @@ export const CustomersTable = (props: any) => {
                                              />
                                         </TableCell>
 
-                                        <TableCell>
-                                             Klijent
+                                        <TableCell sortDirection={sortBy === 'full_name' ? sortDir : false}>
+                                             <TableSortLabel
+                                                  active={sortBy === 'full_name'}
+                                                  direction={sortBy === 'full_name' ? sortDir : 'asc'}
+                                                  onClick={() => handleSortChange('full_name')}
+                                             >
+                                                  Klijent
+                                             </TableSortLabel>
                                         </TableCell>
 
-                                        <TableCell>
-                                             Email
+                                        <TableCell sortDirection={sortBy === 'email' ? sortDir : false}>
+                                             <TableSortLabel
+                                                  active={sortBy === 'email'}
+                                                  direction={sortBy === 'email' ? sortDir : 'asc'}
+                                                  onClick={() => handleSortChange('email')}
+                                             >
+                                                  Email
+                                             </TableSortLabel>
                                         </TableCell>
 
-                                        <TableCell>
-                                             Telefon
+                                        <TableCell sortDirection={sortBy === 'phone_number' ? sortDir : false}>
+                                             <TableSortLabel
+                                                  active={sortBy === 'phone_number'}
+                                                  direction={sortBy === 'phone_number' ? sortDir : 'asc'}
+                                                  onClick={() => handleSortChange('phone_number')}
+                                             >
+                                                  Telefon
+                                             </TableSortLabel>
                                         </TableCell>
 
-                                        <TableCell>
-                                             Adresa
+                                        <TableCell sortDirection={sortBy === 'address' ? sortDir : false}>
+                                             <TableSortLabel
+                                                  active={sortBy === 'address'}
+                                                  direction={sortBy === 'address' ? sortDir : 'asc'}
+                                                  onClick={() => handleSortChange('address')}
+                                             >
+                                                  Adresa
+                                             </TableSortLabel>
                                         </TableCell>
 
-                                        <TableCell align="center">
-                                             Broj porudžbina
+                                        <TableCell align="center" sortDirection={sortBy === 'orders' ? sortDir : false}>
+                                             <TableSortLabel
+                                                  active={sortBy === 'orders'}
+                                                  direction={sortBy === 'orders' ? sortDir : 'asc'}
+                                                  onClick={() => handleSortChange('orders')}
+                                             >
+                                                  Broj porudžbina
+                                             </TableSortLabel>
                                         </TableCell>
 
-                                        <TableCell>
-                                             Datum registracije
+                                        <TableCell sortDirection={sortBy === 'created_at' ? sortDir : false}>
+                                             <TableSortLabel
+                                                  active={sortBy === 'created_at'}
+                                                  direction={sortBy === 'created_at' ? sortDir : 'asc'}
+                                                  onClick={() => handleSortChange('created_at')}
+                                             >
+                                                  Datum registracije
+                                             </TableSortLabel>
                                         </TableCell>
 
                                         <TableCell align="center">
