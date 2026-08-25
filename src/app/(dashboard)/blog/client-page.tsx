@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
+     Alert,
      Box,
      Button,
      Card,
@@ -21,6 +22,7 @@ import {
      TableHead,
      TablePagination,
      TableRow,
+     TableSortLabel,
      Typography,
 } from '@mui/material';
 import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
@@ -58,6 +60,17 @@ const BlogClientPage = ({ initialBlogs }: BlogClientPageProps) => {
      const [publishedFilter, setPublishedFilter] = useState<string>('');
      const [page, setPage] = useState(0);
      const [rowsPerPage, setRowsPerPage] = useState(10);
+     const [sortBy, setSortBy] = useState<string>('published_at');
+     const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
+
+     const handleSortChange = (column: string) => {
+          if (sortBy === column) {
+               setSortDir((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+          } else {
+               setSortBy(column);
+               setSortDir('asc');
+          }
+     };
 
      const filteredBlogs = useMemo(() => {
           return blogs.filter((blog) => {
@@ -84,8 +97,41 @@ const BlogClientPage = ({ initialBlogs }: BlogClientPageProps) => {
      }, [blogs, searchQuery, categoryFilter, publishedFilter]);
 
      const visibleBlogs = useMemo(() => {
-          return filteredBlogs.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
-     }, [filteredBlogs, page, rowsPerPage]);
+          const sorted = [...filteredBlogs].sort((a: any, b: any) => {
+               let aVal = a[sortBy] ?? '';
+               let bVal = b[sortBy] ?? '';
+
+               // Handle numeric columns
+               if (sortBy === 'views_count') {
+                    aVal = Number(aVal) || 0;
+                    bVal = Number(bVal) || 0;
+                    return sortDir === 'asc' ? aVal - bVal : bVal - aVal;
+               }
+
+               // Handle date columns
+               if (sortBy === 'published_at' || sortBy === 'created_at') {
+                    aVal = aVal ? new Date(aVal).getTime() : 0;
+                    bVal = bVal ? new Date(bVal).getTime() : 0;
+                    return sortDir === 'asc' ? aVal - bVal : bVal - aVal;
+               }
+
+               // Handle boolean columns
+               if (sortBy === 'is_published' || sortBy === 'featured') {
+                    aVal = aVal ? 1 : 0;
+                    bVal = bVal ? 1 : 0;
+                    return sortDir === 'asc' ? aVal - bVal : bVal - aVal;
+               }
+
+               // String comparison
+               const aStr = String(aVal).toLowerCase();
+               const bStr = String(bVal).toLowerCase();
+               if (aStr < bStr) return sortDir === 'asc' ? -1 : 1;
+               if (aStr > bStr) return sortDir === 'asc' ? 1 : -1;
+               return 0;
+          });
+
+          return sorted.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+     }, [filteredBlogs, page, rowsPerPage, sortBy, sortDir]);
 
      const handleTogglePublish = async (blog: BlogPost) => {
           const result = await toggleBlogPublish(blog.id, blog.is_published, blog.published_at);
@@ -168,7 +214,7 @@ const BlogClientPage = ({ initialBlogs }: BlogClientPageProps) => {
                                    <OutlinedInput
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        placeholder="Pretraži po naslovu ili autoru..."
+                                        placeholder="Pretraži blogove..."
                                         startAdornment={
                                              <InputAdornment position="start">
                                                   <SvgIcon color="action" fontSize="small">
@@ -210,6 +256,9 @@ const BlogClientPage = ({ initialBlogs }: BlogClientPageProps) => {
                                         <MenuItem value="published">Objavljeno</MenuItem>
                                         <MenuItem value="draft">Priprema</MenuItem>
                                    </Select>
+                                   <Alert severity="info" sx={{ py: 0.5 }}>
+                                        Pretraga pretražuje po naslovu i autoru. Koristite filtere za kategoriju i status.
+                                   </Alert>
                               </Stack>
                          </Card>
 
@@ -218,13 +267,69 @@ const BlogClientPage = ({ initialBlogs }: BlogClientPageProps) => {
                                    <Table sx={{ minWidth: 900 }}>
                                         <TableHead>
                                              <TableRow>
-                                                  <TableCell>Naslov</TableCell>
-                                                  <TableCell>Kategorija</TableCell>
-                                                  <TableCell>Autor</TableCell>
-                                                  <TableCell>Status</TableCell>
-                                                  <TableCell>Istaknuto</TableCell>
-                                                  <TableCell>Pregledi</TableCell>
-                                                  <TableCell>Datum</TableCell>
+                                                  <TableCell sortDirection={sortBy === 'title' ? sortDir : false}>
+                                                       <TableSortLabel
+                                                            active={sortBy === 'title'}
+                                                            direction={sortBy === 'title' ? sortDir : 'asc'}
+                                                            onClick={() => handleSortChange('title')}
+                                                       >
+                                                            Naslov
+                                                       </TableSortLabel>
+                                                  </TableCell>
+                                                  <TableCell sortDirection={sortBy === 'category' ? sortDir : false}>
+                                                       <TableSortLabel
+                                                            active={sortBy === 'category'}
+                                                            direction={sortBy === 'category' ? sortDir : 'asc'}
+                                                            onClick={() => handleSortChange('category')}
+                                                       >
+                                                            Kategorija
+                                                       </TableSortLabel>
+                                                  </TableCell>
+                                                  <TableCell sortDirection={sortBy === 'author' ? sortDir : false}>
+                                                       <TableSortLabel
+                                                            active={sortBy === 'author'}
+                                                            direction={sortBy === 'author' ? sortDir : 'asc'}
+                                                            onClick={() => handleSortChange('author')}
+                                                       >
+                                                            Autor
+                                                       </TableSortLabel>
+                                                  </TableCell>
+                                                  <TableCell sortDirection={sortBy === 'is_published' ? sortDir : false}>
+                                                       <TableSortLabel
+                                                            active={sortBy === 'is_published'}
+                                                            direction={sortBy === 'is_published' ? sortDir : 'asc'}
+                                                            onClick={() => handleSortChange('is_published')}
+                                                       >
+                                                            Status
+                                                       </TableSortLabel>
+                                                  </TableCell>
+                                                  <TableCell sortDirection={sortBy === 'featured' ? sortDir : false}>
+                                                       <TableSortLabel
+                                                            active={sortBy === 'featured'}
+                                                            direction={sortBy === 'featured' ? sortDir : 'asc'}
+                                                            onClick={() => handleSortChange('featured')}
+                                                       >
+                                                            Istaknuto
+                                                       </TableSortLabel>
+                                                  </TableCell>
+                                                  <TableCell sortDirection={sortBy === 'views_count' ? sortDir : false}>
+                                                       <TableSortLabel
+                                                            active={sortBy === 'views_count'}
+                                                            direction={sortBy === 'views_count' ? sortDir : 'asc'}
+                                                            onClick={() => handleSortChange('views_count')}
+                                                       >
+                                                            Pregledi
+                                                       </TableSortLabel>
+                                                  </TableCell>
+                                                  <TableCell sortDirection={sortBy === 'published_at' ? sortDir : false}>
+                                                       <TableSortLabel
+                                                            active={sortBy === 'published_at'}
+                                                            direction={sortBy === 'published_at' ? sortDir : 'asc'}
+                                                            onClick={() => handleSortChange('published_at')}
+                                                       >
+                                                            Datum
+                                                       </TableSortLabel>
+                                                  </TableCell>
                                                   <TableCell align="right">Akcije</TableCell>
                                              </TableRow>
                                         </TableHead>

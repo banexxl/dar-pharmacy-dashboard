@@ -7,10 +7,12 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
+import TableSortLabel from '@mui/material/TableSortLabel';
 import Typography from '@mui/material/Typography';
 import MenuItem from '@mui/material/MenuItem';
 import MenuList from '@mui/material/MenuList';
 import Popover from '@mui/material/Popover';
+import Alert from '@mui/material/Alert';
 import { SeverityPill } from 'src/components/severity-pill';
 import { Order, OrderStatus } from '@/schemas/order';
 import { useCallback, useMemo, useState } from 'react';
@@ -68,6 +70,17 @@ export const OrderListTable = (props: any) => {
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [orderStatuses, setOrderStatuses] = useState<Record<string, OrderStatus>>({});
+  const [internalSortBy, setInternalSortBy] = useState<string>(sortBy || 'created_at');
+  const [internalSortDir, setInternalSortDir] = useState<'asc' | 'desc'>(sortDir || 'desc');
+
+  const handleSortChange = (column: string) => {
+    if (internalSortBy === column) {
+      setInternalSortDir((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setInternalSortBy(column);
+      setInternalSortDir('asc');
+    }
+  };
 
   const statusOptions: { value: OrderStatus; label: string }[] = [
     { value: 'pending', label: 'Na čekanju' },
@@ -118,25 +131,94 @@ export const OrderListTable = (props: any) => {
     () =>
       [...items]
         .filter(order => tab === 'all' || order.order_status === tab)
-        .sort(getComparator(sortDir, sortBy))
+        .sort(getComparator(internalSortDir, internalSortBy as any))
         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
-    [items, tab, sortDir, sortBy, page, rowsPerPage],
+    [items, tab, internalSortDir, internalSortBy, page, rowsPerPage],
   );
 
   return (
     <div>
+      <Box sx={{ p: 2 }}>
+        <Alert severity="info" sx={{ py: 0.5 }}>
+          Kliknite na zaglavlje kolone za sortiranje. Kliknite na status porudžbine da ga promenite.
+        </Alert>
+      </Box>
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell align="center">Datum</TableCell>
-            <TableCell align="left">Broj porudžbenice</TableCell>
-            <TableCell align='left'>Suma</TableCell>
-            <TableCell align="left">Način plaćanja</TableCell>
-            <TableCell align="left">Ime</TableCell>
-            <TableCell align="left">Email</TableCell>
+            <TableCell align="center" sortDirection={internalSortBy === 'created_at' ? internalSortDir : false}>
+              <TableSortLabel
+                active={internalSortBy === 'created_at'}
+                direction={internalSortBy === 'created_at' ? internalSortDir : 'asc'}
+                onClick={() => handleSortChange('created_at')}
+              >
+                Datum
+              </TableSortLabel>
+            </TableCell>
+            <TableCell align="left" sortDirection={internalSortBy === 'order_number' ? internalSortDir : false}>
+              <TableSortLabel
+                active={internalSortBy === 'order_number'}
+                direction={internalSortBy === 'order_number' ? internalSortDir : 'asc'}
+                onClick={() => handleSortChange('order_number')}
+              >
+                Broj porudžbenice
+              </TableSortLabel>
+            </TableCell>
+            <TableCell align="left" sortDirection={internalSortBy === 'total' ? internalSortDir : false}>
+              <TableSortLabel
+                active={internalSortBy === 'total'}
+                direction={internalSortBy === 'total' ? internalSortDir : 'asc'}
+                onClick={() => handleSortChange('total')}
+              >
+                Suma
+              </TableSortLabel>
+            </TableCell>
+            <TableCell align="left" sortDirection={internalSortBy === 'payment_method' ? internalSortDir : false}>
+              <TableSortLabel
+                active={internalSortBy === 'payment_method'}
+                direction={internalSortBy === 'payment_method' ? internalSortDir : 'asc'}
+                onClick={() => handleSortChange('payment_method')}
+              >
+                Način plaćanja
+              </TableSortLabel>
+            </TableCell>
+            <TableCell align="left" sortDirection={internalSortBy === 'full_name' ? internalSortDir : false}>
+              <TableSortLabel
+                active={internalSortBy === 'full_name'}
+                direction={internalSortBy === 'full_name' ? internalSortDir : 'asc'}
+                onClick={() => handleSortChange('full_name')}
+              >
+                Ime
+              </TableSortLabel>
+            </TableCell>
+            <TableCell align="left" sortDirection={internalSortBy === 'email' ? internalSortDir : false}>
+              <TableSortLabel
+                active={internalSortBy === 'email'}
+                direction={internalSortBy === 'email' ? internalSortDir : 'asc'}
+                onClick={() => handleSortChange('email')}
+              >
+                Email
+              </TableSortLabel>
+            </TableCell>
             <TableCell align="left">Telefon</TableCell>
-            <TableCell align="left">Grad</TableCell>
-            <TableCell align="left">Status</TableCell>
+            <TableCell align="left" sortDirection={internalSortBy === 'city' ? internalSortDir : false}>
+              <TableSortLabel
+                active={internalSortBy === 'city'}
+                direction={internalSortBy === 'city' ? internalSortDir : 'asc'}
+                onClick={() => handleSortChange('city')}
+              >
+                Grad
+              </TableSortLabel>
+            </TableCell>
+            <TableCell align="left" sortDirection={internalSortBy === 'order_status' ? internalSortDir : false}>
+              <TableSortLabel
+                active={internalSortBy === 'order_status'}
+                direction={internalSortBy === 'order_status' ? internalSortDir : 'asc'}
+                onClick={() => handleSortChange('order_status')}
+              >
+                Status
+              </TableSortLabel>
+            </TableCell>
           </TableRow>
         </TableHead>
 

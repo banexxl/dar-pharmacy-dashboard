@@ -2,7 +2,7 @@ import ChevronRightIcon from '@untitled-ui/icons-react/build/esm/ChevronRight';
 import ChevronDownIcon from '@untitled-ui/icons-react/build/esm/ChevronDown';
 import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
 import {
-     Autocomplete, Box, Button, Card, CardContent, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Grid, IconButton, Input, InputAdornment, LinearProgress, ListItemText, MenuItem,
+     Alert, Autocomplete, Box, Button, Card, CardContent, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Grid, IconButton, Input, InputAdornment, LinearProgress, ListItemText, MenuItem,
      OutlinedInput,
      Select, Stack, SvgIcon, Switch, Table, TableBody, TableCell, TableHead, TablePagination, TableRow, TextField, Typography, useTheme
 } from '@mui/material';
@@ -574,6 +574,9 @@ export const ProductsTable = (props: any) => {
                                         ))}
                                    </Select>
                               </Stack>
+                              <Alert severity="info" sx={{ py: 0.5, mt: 1 }}>
+                                   Pretraga pretražuje po nazivu proizvoda. Koristite filtere za dodatne opcije.
+                              </Alert>
                               <Button
                                    size="small"
                                    startIcon={(
