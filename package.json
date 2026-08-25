@@ -7,7 +7,7 @@
   "private": false,
   "scripts": {
     "dev": "next",
-    "build": "next build & vitest run",
+    "build": "vitest run & next build",
     "start": "next start",
     "export": "next export",
     "lint": "next lint",
