@@ -2,7 +2,7 @@ import ChevronRightIcon from '@untitled-ui/icons-react/build/esm/ChevronRight';
 import ChevronDownIcon from '@untitled-ui/icons-react/build/esm/ChevronDown';
 import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
 import {
-     Autocomplete, Box, Button, Card, CardContent, Checkbox, Divider, Grid, IconButton, Input, InputAdornment, LinearProgress, ListItemText, MenuItem,
+     Autocomplete, Box, Button, Card, CardContent, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Grid, IconButton, Input, InputAdornment, LinearProgress, ListItemText, MenuItem,
      OutlinedInput,
      Select, Stack, SvgIcon, Switch, Table, TableBody, TableCell, TableHead, TablePagination, TableRow, TextField, Typography, useTheme
 } from '@mui/material';
@@ -228,6 +228,20 @@ export const ProductsTable = (props: any) => {
                return;
           }
 
+          // Detect inactive → active transition
+          const originalProduct = getObjectById(currentProductID, items);
+          const wasInactive = originalProduct && !originalProduct.is_active;
+          const isNowActive = currentProductObject?.is_active === true;
+
+          if (wasInactive && isNowActive) {
+               setActivationDialogOpen(true);
+               return;
+          }
+
+          proceedWithUpdate();
+     }
+
+     const proceedWithUpdate = () => {
           Swal.fire({
                title: 'Da li ste sigurni?',
                text: "Možete izmeniti artikl u svakom momentu...",
@@ -242,6 +256,19 @@ export const ProductsTable = (props: any) => {
                     handleUpdateProduct(currentProductObject)
                }
           })
+     }
+
+     const handleActivationConfirm = () => {
+          setActivationDialogOpen(false);
+          proceedWithUpdate();
+     }
+
+     const handleActivationCancel = () => {
+          setActivationDialogOpen(false);
+          setCurrentProductObject((prev: any) => ({
+               ...prev,
+               is_active: false,
+          }));
      }
 
      const handleUpdateProduct = async (currentProductObject: any) => {
@@ -371,6 +398,7 @@ export const ProductsTable = (props: any) => {
      const [booleanFilters, setBooleanFilters] = useState<string[]>([]);
      const [internalPage, setInternalPage] = useState(0);
      const [internalRowsPerPage, setInternalRowsPerPage] = useState(rowsPerPage || 10);
+     const [activationDialogOpen, setActivationDialogOpen] = useState(false);
 
      const booleanFilterOptions = [
           { value: 'is_active', label: 'Aktivan' },
@@ -1504,6 +1532,25 @@ export const ProductsTable = (props: any) => {
                     showLastButton
                     labelRowsPerPage={'Broj po stranici.'}
                />
+
+               {/* Activation Confirmation Dialog */}
+               <Dialog open={activationDialogOpen} onClose={handleActivationCancel}>
+                    <DialogTitle>Da li želiš da objaviš proizvod?</DialogTitle>
+                    <DialogContent>
+                         <Typography variant="body1">
+                              Ovaj proizvod će postati vidljiv kupcima u online prodavnici odmah nakon objavljivanja.
+                              Proverite da li su informacije, cena, slike i stanje na lageru spremni pre nego što nastavite.
+                         </Typography>
+                    </DialogContent>
+                    <DialogActions>
+                         <Button onClick={handleActivationCancel} variant="outlined">
+                              Odustani
+                         </Button>
+                         <Button onClick={handleActivationConfirm} variant="contained">
+                              Objavi proizvod
+                         </Button>
+                    </DialogActions>
+               </Dialog>
           </>
      );
 };
