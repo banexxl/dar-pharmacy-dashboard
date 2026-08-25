@@ -2,6 +2,7 @@
 
 import { createSupabaseServerClient } from '@/services/supabase-server';
 import { revalidatePath } from 'next/cache';
+import { submitSitemapIfProduction } from '@/lib/google/search-console';
 
 type ActionResult = {
      success: boolean;
@@ -113,6 +114,16 @@ export async function createBlog(payload: BlogPayload): Promise<ActionResult> {
           }
 
           revalidatePath('/blog');
+
+          // Submit sitemap on initial publish
+          if (payload.is_published) {
+               try {
+                    await submitSitemapIfProduction();
+               } catch {
+                    // Never fail the action due to sitemap submission
+               }
+          }
+
           return { success: true, data };
      } catch (error) {
           return {
@@ -129,6 +140,13 @@ export async function updateBlog(id: string, payload: BlogPayload): Promise<Acti
      try {
           const supabase = await createSupabaseServerClient();
 
+          // Fetch current state to detect publish transition
+          const { data: existing } = await supabase
+               .from('blogs')
+               .select('is_published')
+               .eq('id', id)
+               .maybeSingle();
+
           const { data, error } = await supabase
                .from('blogs')
                .update(payload)
@@ -144,6 +162,19 @@ export async function updateBlog(id: string, payload: BlogPayload): Promise<Acti
           }
 
           revalidatePath('/blog');
+
+          // Submit sitemap on unpublished → published transition
+          const wasUnpublished = existing && !existing.is_published;
+          const isNowPublished = payload.is_published === true;
+
+          if (wasUnpublished && isNowPublished) {
+               try {
+                    await submitSitemapIfProduction();
+               } catch {
+                    // Never fail the action due to sitemap submission
+               }
+          }
+
           return { success: true, data };
      } catch (error) {
           return {
@@ -205,6 +236,16 @@ export async function toggleBlogPublish(id: string, currentlyPublished: boolean,
           }
 
           revalidatePath('/blog');
+
+          // Submit sitemap when publishing (not unpublishing)
+          if (newPublished) {
+               try {
+                    await submitSitemapIfProduction();
+               } catch {
+                    // Never fail the action due to sitemap submission
+               }
+          }
+
           return { success: true, data };
      } catch (error) {
           return {

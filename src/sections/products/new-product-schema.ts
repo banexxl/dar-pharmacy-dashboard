@@ -39,18 +39,6 @@ export const newProductSchema = () => yup.object().shape({
      price: yup
           .number()
           .required('Cena je obavezna'),
-     newArrival: yup
-          .boolean(),
-     isActive: yup
-          .boolean(),
-     bestSeller: yup
-          .boolean(),
-     discount: yup
-          .boolean(),
-     discountAmmount: yup
-          .number(),
-     displayOnHome: yup
-          .boolean()
 });
 
 export const initialValues: ProductDraft = {
@@ -68,12 +56,6 @@ export const initialValues: ProductDraft = {
      warning: '',
      image_url: '',
      price: 1,
-     new_arrival: false,
-     best_seller: false,
-     discount: false,
-     is_active: true,
-     display_on_home: false,
-     discount_amount: 0,
      quantity_unit: ''
 };
 

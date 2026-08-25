@@ -1,6 +1,6 @@
 "use client"
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Autocomplete, TextField, Button, Checkbox, FormControlLabel, Box, MenuItem, Typography, useMediaQuery } from '@mui/material';
+import { Autocomplete, TextField, Button, Box, MenuItem, Typography, useMediaQuery } from '@mui/material';
 import { Form, Formik } from 'formik';
 import { initialValues, newProductSchema, quantityUnitOptions } from './new-product-schema'
 import { useRouter } from 'next/navigation';
@@ -448,85 +448,6 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail, manufacturers = 
                                                   formik.handleBlur(e);
                                              }
                                         }}
-                                   />
-
-                                   <FormControlLabel
-                                        control={
-                                             <Checkbox
-                                                  name="is_active"
-                                                  checked={formik.values.is_active}
-                                                  onChange={formik.handleChange}
-                                             />
-                                        }
-                                        disabled={loading}
-                                        label="Aktivan"
-                                   />
-
-                                   <FormControlLabel
-                                        control={
-                                             <Checkbox
-                                                  name="display_on_home"
-                                                  checked={formik.values.display_on_home}
-                                                  onChange={formik.handleChange}
-                                             />
-                                        }
-                                        disabled={loading}
-                                        label="Na početnoj"
-                                   />
-
-                                   <FormControlLabel
-                                        control={
-                                             <Checkbox
-                                                  name="new_arrival"
-                                                  checked={formik.values.new_arrival}
-                                                  onChange={formik.handleChange}
-                                             />
-                                        }
-                                        disabled={loading}
-                                        label="Novi proizvod"
-                                   />
-
-                                   <FormControlLabel
-                                        control={
-                                             <Checkbox
-                                                  name="best_seller"
-                                                  checked={formik.values.best_seller}
-                                                  onChange={formik.handleChange}
-                                             />
-                                        }
-                                        disabled={loading}
-                                        label="Najprodavaniji"
-                                   />
-
-                                   <FormControlLabel
-                                        control={
-                                             <Checkbox
-                                                  name="discount"
-                                                  checked={formik.values.discount}
-                                                  onChange={formik.handleChange}
-                                             />
-                                        }
-                                        disabled={loading}
-                                        label="Popust"
-                                   />
-
-                                   <TextField
-                                        label="Iznos popusta"
-                                        type='number'
-                                        name="discount_amount"
-                                        value={formik.values.discount_amount}
-                                        onChange={(e) => {
-                                             const min = 0;
-                                             const max = 100;
-                                             var value = parseInt(e.target.value, 10);
-
-                                             if (value > max) value = max;
-                                             if (value < min) value = min;
-
-                                             formik.setFieldValue('discount_amount', value);
-                                        }}
-                                        disabled={loading}
-                                        InputProps={{ inputProps: { min: 0, max: 100 } }}
                                    />
 
                                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
