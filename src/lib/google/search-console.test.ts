@@ -4,6 +4,10 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 const mockFetch = vi.fn();
 vi.stubGlobal('fetch', mockFetch);
 
+// Suppress console.error in tests (the service logs errors intentionally)
+const mockConsoleError = vi.spyOn(console, 'error').mockImplementation(() => { });
+const mockConsoleLog = vi.spyOn(console, 'log').mockImplementation(() => { });
+
 describe('submitSitemapIfProduction', () => {
      const originalEnv = { ...process.env };
 
@@ -20,6 +24,8 @@ describe('submitSitemapIfProduction', () => {
                }
           });
           Object.assign(process.env, originalEnv);
+          mockConsoleError.mockClear();
+          mockConsoleLog.mockClear();
      });
 
      it('does nothing when NODE_ENV is not production', async () => {
