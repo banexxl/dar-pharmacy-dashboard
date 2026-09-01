@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { CacheProvider } from '@emotion/react';
 import { CssBaseline } from '@mui/material';
 import { ThemeProvider } from '@mui/material/styles';
@@ -14,6 +15,14 @@ const emotionCache = createEmotionCache();
 const theme = createCustomTheme();
 
 export function Providers({ children }: { children: React.ReactNode }) {
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch((error) => {
+        console.error('Service worker registration failed:', error);
+      });
+    }
+  }, []);
+
   return (
     <AuthProvider>
       <CacheProvider value={emotionCache}>
@@ -28,3 +37,4 @@ export function Providers({ children }: { children: React.ReactNode }) {
     </AuthProvider>
   );
 }
+
