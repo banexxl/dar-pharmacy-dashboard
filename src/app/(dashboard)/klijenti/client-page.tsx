@@ -159,8 +159,6 @@ const CustomersPage = ({ allClients }: CustomersPageProps) => {
                                    onRowsPerPageChange={
                                         clientSearch.handleRowsPerPageChange
                                    }
-                                   sortBy={clientSearch.state.sortBy}
-                                   sortDir={clientSearch.state.sortDir}
                               />
                          </Stack>
                     </Container>
