@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Box, Button, Card, CardContent, Stack, Typography } from '@mui/material';
+import Loading from '@/app/(dashboard)/loading';
 
 function ErrorContent() {
   const searchParams = useSearchParams();
@@ -31,7 +32,7 @@ function ErrorContent() {
 
 export default function Page() {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<Loading />}>
       <ErrorContent />
     </Suspense>
   );
