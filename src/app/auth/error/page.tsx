@@ -1,10 +1,11 @@
 'use client';
 
 import Link from 'next/link';
+import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Box, Button, Card, CardContent, Stack, Typography } from '@mui/material';
 
-export default function Page() {
+function ErrorContent() {
   const searchParams = useSearchParams();
   const error = searchParams.get('error') || 'auth_error';
   const errorCode = searchParams.get('error_code') || '';
@@ -27,4 +28,13 @@ export default function Page() {
     </Box>
   );
 }
+
+export default function Page() {
+  return (
+    <Suspense fallback={null}>
+      <ErrorContent />
+    </Suspense>
+  );
+}
+
 
