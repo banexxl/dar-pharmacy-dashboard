@@ -48,7 +48,7 @@ const Page = () => {
                const { error: resetError } = await supabaseBrowser.auth.resetPasswordForEmail(
                     email.trim(),
                     {
-                         redirectTo: `https://dar-pharmacy-dashboard.vercel.app/auth/callback?type=recovery`,
+                         redirectTo: `${window.location.origin}/auth/callback?type=recovery`,
                     }
                );
 

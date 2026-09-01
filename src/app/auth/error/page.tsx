@@ -1,18 +1,14 @@
+'use client';
+
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { Box, Button, Card, CardContent, Stack, Typography } from '@mui/material';
 
-export const metadata = { title: 'Auth Error' };
-
-export default async function Page({
-  searchParams,
-}: {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-}) {
-  const query = await searchParams;
-  const single = (value: string | string[] | undefined) => Array.isArray(value) ? value[0] : value;
-  const error = single(query.error) || 'auth_error';
-  const errorCode = single(query.error_code) || '';
-  const description = single(query.error_description) || 'Something went wrong during sign-in.';
+export default function Page() {
+  const searchParams = useSearchParams();
+  const error = searchParams.get('error') || 'auth_error';
+  const errorCode = searchParams.get('error_code') || '';
+  const description = searchParams.get('error_description') || 'Something went wrong during sign-in.';
 
   return (
     <Box sx={{ alignItems: 'center', display: 'flex', minHeight: '100vh', px: 3, py: 8 }}>
@@ -31,3 +27,4 @@ export default async function Page({
     </Box>
   );
 }
+
