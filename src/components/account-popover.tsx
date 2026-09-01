@@ -100,9 +100,32 @@ export const AccountPopover = (props: any) => {
                     setDeferredPrompt(null)
                     setIsInstallable(false)
                }
-          } else {
-               handleDesktopShortcut()
+               return
           }
+
+          const ua = navigator.userAgent;
+          const isIOS = /iphone|ipad|ipod/i.test(ua);
+          const isAndroid = /android/i.test(ua);
+
+          if (isIOS) {
+               Swal.fire({
+                    icon: 'info',
+                    title: 'Instaliraj aplikaciju',
+                    html: 'Dodirni dugme za deljenje <strong>Share</strong> u Safari-ju, zatim izaberi <strong>"Add to Home Screen"</strong>.',
+               });
+               return;
+          }
+
+          if (isAndroid) {
+               Swal.fire({
+                    icon: 'info',
+                    title: 'Instaliraj aplikaciju',
+                    html: 'Otvori meni pregledača (⋮) i izaberi <strong>"Add to Home screen"</strong> ili <strong>"Install app"</strong>.',
+               });
+               return;
+          }
+
+          handleDesktopShortcut()
      }, [deferredPrompt, setDeferredPrompt, setIsInstallable]);
 
      return (
@@ -144,7 +167,7 @@ export const AccountPopover = (props: any) => {
                     }}
                >
                     <MenuItem onClick={handleInstall}>
-                         {isInstallable ? 'Dodaj na početni ekran' : 'Preuzmi prečicu'}
+                         {isInstallable ? 'Dodaj na početni ekran' : 'Instaliraj aplikaciju'}
                     </MenuItem>
                     <MenuItem onClick={handleRebuild}>
                          Pošalji izmene na sajt

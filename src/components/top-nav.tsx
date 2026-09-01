@@ -24,6 +24,28 @@ export const TopNav = (props: any) => {
      const lgUp = useMediaQuery((theme: any) => theme.breakpoints.up('lg'));
      const accountPopover = usePopover();
      const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+     const [isInstallable, setIsInstallable] = useState(false);
+
+     useEffect(() => {
+          const handleBeforeInstallPrompt = (event: any) => {
+               event.preventDefault();
+               setDeferredPrompt(event);
+               setIsInstallable(true);
+          };
+
+          const handleAppInstalled = () => {
+               setDeferredPrompt(null);
+               setIsInstallable(false);
+          };
+
+          window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+          window.addEventListener('appinstalled', handleAppInstalled);
+
+          return () => {
+               window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+               window.removeEventListener('appinstalled', handleAppInstalled);
+          };
+     }, []);
 
      return (
           <>
@@ -120,6 +142,8 @@ export const TopNav = (props: any) => {
                     onClose={accountPopover.handleClose}
                     deferredPrompt={deferredPrompt}
                     setDeferredPrompt={setDeferredPrompt}
+                    isInstallable={isInstallable}
+                    setIsInstallable={setIsInstallable}
                />
           </>
      );
