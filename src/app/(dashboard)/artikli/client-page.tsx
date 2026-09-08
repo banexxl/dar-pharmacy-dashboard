@@ -646,13 +646,21 @@ const Page = (props: any) => {
                          </Container>
                     </Box>
                     <Dialog open={open}
+                         onClose={() => setOpen(false)}
                          PaperProps={{
                               sx: {
                                    width: '600px'
                               }
                          }}
                     >
-                         <DialogTitle>Dodaj proizvod</DialogTitle>
+                         <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                              Dodaj proizvod
+                              <IconButton onClick={() => setOpen(false)} size="small">
+                                   <SvgIcon fontSize="small">
+                                        <ClearIcon />
+                                   </SvgIcon>
+                              </IconButton>
+                         </DialogTitle>
                          <DialogContent dividers >
                               <AddProductForm
                                    onSubmitSuccess={handleSubmitSuccess}
