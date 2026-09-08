@@ -239,7 +239,7 @@ const Page = (props: any) => {
                reader.readAsDataURL(file);
           });
 
-     const uploadLogoImage = async (file: File, manufacturer: string) => {
+     const uploadLogoImage = async (file: File, manufacturerId: string) => {
           const fileExtension = file.name.split('.').pop() || '';
           const title = file.name.split('.')[0] || 'logo';
 
@@ -254,15 +254,17 @@ const Page = (props: any) => {
                     title,
                     extension: fileExtension,
                     fileName: file.name,
-                    manufacturer
+                    manufacturer_id: manufacturerId
                })
           });
 
+          const result = await response.json().catch(() => null);
+
           if (!response.ok) {
-               throw new Error('Upload failed');
+               console.error('Logo upload failed:', result?.error || response.statusText);
+               throw new Error(result?.error || 'Upload failed');
           }
 
-          const result = await response.json();
           return result.imageUrl as string;
      };
 
@@ -350,10 +352,11 @@ const Page = (props: any) => {
                          text: 'Proizvođač dodat.'
                     });
                } else {
+                    const result = await response.json().catch(() => null);
                     Swal.fire({
                          icon: 'error',
                          title: 'Oops...',
-                         text: 'Dodavanje nije uspelo.'
+                         text: result?.error || 'Dodavanje nije uspelo.'
                     });
                }
           } catch (error) {
@@ -379,7 +382,7 @@ const Page = (props: any) => {
 
           try {
                setLogoUploadId(logo.id);
-               const imageUrl = await uploadLogoImage(file, manufacturerKey);
+               const imageUrl = await uploadLogoImage(file, logo.id);
                const response = await fetch('/api/manufacturers', {
                     method: 'PUT',
                     headers: {
@@ -404,17 +407,20 @@ const Page = (props: any) => {
                          text: 'Logo je uploadovan.'
                     });
                } else {
+                    const result = await response.json().catch(() => null);
+                    console.error('Failed to save logo url:', result?.error);
                     Swal.fire({
                          icon: 'error',
                          title: 'Oops...',
-                         text: 'Upload nije uspeo.'
+                         text: result?.error || 'Upload nije uspeo.'
                     });
                }
           } catch (error) {
+               console.error('Logo upload/save threw:', error);
                Swal.fire({
                     icon: 'error',
                     title: 'Oops...',
-                    text: 'Upload nije uspeo.'
+                    text: error instanceof Error ? error.message : 'Upload nije uspeo.'
                });
           } finally {
                setLogoUploadId(null);

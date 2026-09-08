@@ -13,11 +13,13 @@ export async function GET() {
             .order('name', { ascending: true });
 
         if (error) {
-            return NextResponse.json({ error: 'Failed to fetch manufacturers.' }, { status: 500 });
+            console.error('GET /api/manufacturers failed:', error);
+            return NextResponse.json({ error: 'Failed to fetch manufacturers.', details: error }, { status: 500 });
         }
 
         return NextResponse.json({ message: 'Manufacturers found!', data: manufacturers });
-    } catch {
+    } catch (error) {
+        console.error('GET /api/manufacturers threw:', error);
         return NextResponse.json({ error: 'Internal server error!' }, { status: 500 });
     }
 }
@@ -40,11 +42,16 @@ export async function POST(request: NextRequest) {
             .single();
 
         if (error) {
-            return NextResponse.json({ error: 'Failed to create manufacturer.' }, { status: 500 });
+            console.error('POST /api/manufacturers failed:', error);
+            if (error.code === '23505') {
+                return NextResponse.json({ error: 'Proizvođač sa ovim nazivom već postoji.', details: error }, { status: 409 });
+            }
+            return NextResponse.json({ error: 'Failed to create manufacturer.', details: error }, { status: 500 });
         }
 
         return NextResponse.json({ message: 'Manufacturer successfully created!', data: createdManufacturer });
-    } catch {
+    } catch (error) {
+        console.error('POST /api/manufacturers threw:', error);
         return NextResponse.json({ error: 'Internal server error!' }, { status: 500 });
     }
 }
@@ -75,7 +82,11 @@ export async function PUT(request: NextRequest) {
             .maybeSingle();
 
         if (error) {
-            return NextResponse.json({ error: 'Failed to update manufacturer.' }, { status: 500 });
+            console.error('PUT /api/manufacturers failed:', error);
+            if (error.code === '23505') {
+                return NextResponse.json({ error: 'Proizvođač sa ovim nazivom već postoji.', details: error }, { status: 409 });
+            }
+            return NextResponse.json({ error: 'Failed to update manufacturer.', details: error }, { status: 500 });
         }
 
         if (!updatedManufacturer) {
@@ -83,7 +94,8 @@ export async function PUT(request: NextRequest) {
         }
 
         return NextResponse.json({ message: 'Manufacturer successfully updated!', data: updatedManufacturer });
-    } catch {
+    } catch (error) {
+        console.error('PUT /api/manufacturers threw:', error);
         return NextResponse.json({ error: 'Internal server error!' }, { status: 500 });
     }
 }
@@ -104,7 +116,8 @@ export async function DELETE(request: NextRequest) {
             .select('id');
 
         if (error) {
-            return NextResponse.json({ error: 'Failed to delete manufacturer.' }, { status: 500 });
+            console.error('DELETE /api/manufacturers failed:', error);
+            return NextResponse.json({ error: 'Failed to delete manufacturer.', details: error }, { status: 500 });
         }
 
         if (!deletedRows || deletedRows.length === 0) {
@@ -112,7 +125,8 @@ export async function DELETE(request: NextRequest) {
         }
 
         return NextResponse.json({ message: 'Manufacturer successfully deleted!' });
-    } catch {
+    } catch (error) {
+        console.error('DELETE /api/manufacturers threw:', error);
         return NextResponse.json({ error: 'Internal server error!' }, { status: 500 });
     }
 }
