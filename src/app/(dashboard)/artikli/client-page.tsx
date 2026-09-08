@@ -5,10 +5,11 @@ import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Swal from 'sweetalert2'
-import { Box, Button, Card, Container, IconButton, Input, InputAdornment, OutlinedInput, Stack, SvgIcon, Tab, Tabs, TextField, Theme, Typography, useMediaQuery } from '@mui/material';
+import { Box, Button, Card, Container, DialogActions, IconButton, Input, InputAdornment, List, ListItemButton, ListItemText, OutlinedInput, Stack, SvgIcon, Tab, Tabs, TextField, Theme, Typography, useMediaQuery } from '@mui/material';
 import { useSelection } from 'src/hooks/use-selection';
 import { ProductsTable } from 'src/sections/products/products-table';
 import { useRouter } from 'next/navigation';
+import NextLink from 'next/link';
 import { TablePagination } from '@mui/material'
 import { AddProductForm } from '@/sections/products/new-product-form';
 import { useMounted } from '@/hooks/use-mounted';
@@ -98,6 +99,7 @@ const Page = (props: any) => {
      const [logoUploadId, setLogoUploadId] = useState<string | null>(null);
      const [logoPage, setLogoPage] = useState(0);
      const [logoRowsPerPage, setLogoRowsPerPage] = useState(10);
+     const [blockedDeleteLogo, setBlockedDeleteLogo] = useState<{ name: string; products: { id: string; name: string }[] } | null>(null);
 
      const isMounted = useMounted();
 
@@ -268,7 +270,7 @@ const Page = (props: any) => {
           return result.imageUrl as string;
      };
 
-     const handleLogoDelete = async (logoId: string) => {
+     const handleLogoDelete = async (logo: any) => {
           const result = await Swal.fire({
                title: 'Da li ste sigurni?',
                text: 'Brisanje je trajno.',
@@ -288,18 +290,24 @@ const Page = (props: any) => {
                     headers: {
                          'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ id: logoId })
+                    body: JSON.stringify({ id: logo.id })
                });
 
                if (response.ok) {
                     setLogoStore((prev: any) => ({
                          ...prev,
-                         allLogos: prev.allLogos.filter((logo: any) => logo.id !== logoId)
+                         allLogos: prev.allLogos.filter((item: any) => item.id !== logo.id)
                     }));
                     Swal.fire({
                          icon: 'success',
                          title: 'OK',
                          text: 'Proizvođač obrisan.'
+                    });
+               } else if (response.status === 409) {
+                    const result = await response.json().catch(() => null);
+                    setBlockedDeleteLogo({
+                         name: logo.name,
+                         products: Array.isArray(result?.products) ? result.products : []
                     });
                } else {
                     Swal.fire({
@@ -610,7 +618,7 @@ const Page = (props: any) => {
                                                                                                }}
                                                                                           />
                                                                                      </Button>
-                                                                                     <Button color="error" onClick={() => handleLogoDelete(logo.id)}>
+                                                                                     <Button color="error" onClick={() => handleLogoDelete(logo)}>
                                                                                           Obriši
                                                                                      </Button>
                                                                                 </>
@@ -688,6 +696,56 @@ const Page = (props: any) => {
                                    </Stack>
                               </Stack>
                          </DialogContent>
+                    </Dialog>
+                    <Dialog
+                         open={Boolean(blockedDeleteLogo)}
+                         onClose={() => setBlockedDeleteLogo(null)}
+                         PaperProps={{
+                              sx: {
+                                   width: '480px'
+                              }
+                         }}
+                    >
+                         <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                              Proizvođač se ne može obrisati
+                              <IconButton onClick={() => setBlockedDeleteLogo(null)} size="small">
+                                   <SvgIcon fontSize="small">
+                                        <ClearIcon />
+                                   </SvgIcon>
+                              </IconButton>
+                         </DialogTitle>
+                         <DialogContent dividers>
+                              <Typography variant="body2" sx={{ mb: 2 }}>
+                                   Proizvođač &quot;{blockedDeleteLogo?.name}&quot; ima dodeljene proizvode. Uklonite ili premestite ove proizvode pre brisanja proizvođača:
+                              </Typography>
+                              <List
+                                   dense
+                                   sx={{
+                                        maxHeight: 320,
+                                        overflowY: 'auto',
+                                        border: '1px solid',
+                                        borderColor: 'divider',
+                                        borderRadius: 1
+                                   }}
+                              >
+                                   {blockedDeleteLogo?.products.map((product) => (
+                                        <ListItemButton
+                                             key={product.id}
+                                             divider
+                                             component={NextLink}
+                                             href={`/artikli/${product.id}`}
+                                             onClick={() => setBlockedDeleteLogo(null)}
+                                        >
+                                             <ListItemText primary={product.name} />
+                                        </ListItemButton>
+                                   ))}
+                              </List>
+                         </DialogContent>
+                         <DialogActions>
+                              <Button variant="contained" onClick={() => setBlockedDeleteLogo(null)}>
+                                   U redu
+                              </Button>
+                         </DialogActions>
                     </Dialog>
                </Box >
           </AuthProvider>

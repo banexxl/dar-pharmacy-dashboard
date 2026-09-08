@@ -109,6 +109,27 @@ export async function DELETE(request: NextRequest) {
             return NextResponse.json({ error: 'Missing id.' }, { status: 400 });
         }
 
+        const { data: assignedProducts, error: assignedProductsError } = await supabase
+            .from('products')
+            .select('id, name')
+            .eq('manufacturer_id', id)
+            .order('name', { ascending: true });
+
+        if (assignedProductsError) {
+            console.error('DELETE /api/manufacturers failed checking assigned products:', assignedProductsError);
+            return NextResponse.json({ error: 'Failed to delete manufacturer.', details: assignedProductsError }, { status: 500 });
+        }
+
+        if (assignedProducts && assignedProducts.length > 0) {
+            return NextResponse.json(
+                {
+                    error: 'Proizvođač ima dodeljene proizvode i ne može biti obrisan.',
+                    products: assignedProducts
+                },
+                { status: 409 }
+            );
+        }
+
         const { data: deletedRows, error } = await supabase
             .from(MANUFACTURERS_TABLE)
             .delete()

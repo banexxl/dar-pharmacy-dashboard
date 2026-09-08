@@ -127,7 +127,8 @@ describe('Manufacturers API Route', () => {
 
      describe('DELETE', () => {
           it('deletes a manufacturer', async () => {
-               chain.select.mockReturnValue({ data: [{ id: '1' }], error: null });
+               chain.order.mockReturnValue({ data: [], error: null });
+               chain.select.mockReturnValueOnce(chain).mockReturnValueOnce({ data: [{ id: '1' }], error: null });
 
                const request = makeRequest('DELETE', { id: '1' });
                const response = await DELETE(request);
@@ -147,7 +148,8 @@ describe('Manufacturers API Route', () => {
           });
 
           it('returns 404 when manufacturer not found', async () => {
-               chain.select.mockReturnValue({ data: [], error: null });
+               chain.order.mockReturnValue({ data: [], error: null });
+               chain.select.mockReturnValueOnce(chain).mockReturnValueOnce({ data: [], error: null });
 
                const request = makeRequest('DELETE', { id: 'nonexistent' });
                const response = await DELETE(request);
@@ -155,6 +157,31 @@ describe('Manufacturers API Route', () => {
 
                expect(response.status).toBe(404);
                expect(json.error).toBe('Manufacturer not found.');
+          });
+
+          it('returns 409 with the assigned products when manufacturer has products', async () => {
+               const assignedProducts = [{ id: 'p1', name: 'Product A' }, { id: 'p2', name: 'Product B' }];
+               chain.order.mockReturnValue({ data: assignedProducts, error: null });
+
+               const request = makeRequest('DELETE', { id: '1' });
+               const response = await DELETE(request);
+               const json = await response.json();
+
+               expect(response.status).toBe(409);
+               expect(json.error).toBe('Proizvođač ima dodeljene proizvode i ne može biti obrisan.');
+               expect(json.products).toEqual(assignedProducts);
+               expect(chain.delete).not.toHaveBeenCalled();
+          });
+
+          it('returns 500 when checking assigned products fails', async () => {
+               chain.order.mockReturnValue({ data: null, error: { message: 'fail' } });
+
+               const request = makeRequest('DELETE', { id: '1' });
+               const response = await DELETE(request);
+               const json = await response.json();
+
+               expect(response.status).toBe(500);
+               expect(json.error).toBe('Failed to delete manufacturer.');
           });
      });
 });
