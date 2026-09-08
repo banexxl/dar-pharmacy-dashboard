@@ -10,10 +10,13 @@ import {
      DialogTitle,
      Divider,
      IconButton,
+     InputAdornment,
+     MenuItem,
      Stack,
      TextField,
      Typography,
 } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Swal from 'sweetalert2';
@@ -52,6 +55,7 @@ export const CategoriesTab = () => {
 
      const [selectedMainId, setSelectedMainId] = useState<string | null>(null);
      const [selectedMidId, setSelectedMidId] = useState<string | null>(null);
+     const [selectedSubId, setSelectedSubId] = useState<string | null>(null);
 
      const [loading, setLoading] = useState(true);
 
@@ -92,6 +96,28 @@ export const CategoriesTab = () => {
           if (!selectedMidId) return [];
           return subCategories.filter((s) => s.mid_category_id === selectedMidId);
      }, [subCategories, selectedMidId]);
+
+     const isMidSelectDisabled = !selectedMainId || filteredMid.length === 0;
+     const isSubSelectDisabled = !selectedMidId || filteredSub.length === 0;
+
+     // ── Cascading select handlers ───────────────────────────────────────────────
+     const handleMainSelectChange = (event: any) => {
+          const value = event.target.value || null;
+          setSelectedMainId(value);
+          setSelectedMidId(null);
+          setSelectedSubId(null);
+     };
+
+     const handleMidSelectChange = (event: any) => {
+          const value = event.target.value || null;
+          setSelectedMidId(value);
+          setSelectedSubId(null);
+     };
+
+     const handleSubSelectChange = (event: any) => {
+          const value = event.target.value || null;
+          setSelectedSubId(value);
+     };
 
      // ── Open dialog ─────────────────────────────────────────────────────────────
      const openCreateDialog = (level: CategoryLevel) => {
@@ -190,15 +216,20 @@ export const CategoriesTab = () => {
                     if (selectedMainId === id) {
                          setSelectedMainId(null);
                          setSelectedMidId(null);
+                         setSelectedSubId(null);
                     }
                } else if (level === 'mid') {
                     setMidCategories((prev) => prev.filter((c) => c.id !== id));
                     setSubCategories((prev) => prev.filter((s) => s.mid_category_id !== id));
                     if (selectedMidId === id) {
                          setSelectedMidId(null);
+                         setSelectedSubId(null);
                     }
                } else {
                     setSubCategories((prev) => prev.filter((c) => c.id !== id));
+                    if (selectedSubId === id) {
+                         setSelectedSubId(null);
+                    }
                }
 
                Swal.fire({ icon: 'success', title: 'OK', text: 'Kategorija obrisana.' });
@@ -216,159 +247,132 @@ export const CategoriesTab = () => {
           );
      }
 
-     const selectedMainLabel = mainCategories.find((c) => c.id === selectedMainId)?.label;
-     const selectedMidLabel = midCategories.find((c) => c.id === selectedMidId)?.label;
-
      const levelLabel = dialogLevel === 'main' ? 'glavnu' : dialogLevel === 'mid' ? 'srednju' : 'pod';
 
      return (
           <>
-               <Box
-                    sx={{
-                         display: 'grid',
-                         gridTemplateColumns: { xs: '1fr', sm: '1fr', md: '1fr 1fr 1fr' },
-                         gap: 2,
-                    }}
-               >
-                    {/* ─── Column 1: Main Categories ─────────────────────────── */}
-                    <Card sx={{ p: 2, height: 'fit-content' }}>
-                         <Stack spacing={2}>
-                              <Stack direction="row" alignItems="center" justifyContent="space-between">
-                                   <Typography variant="h6">Glavne kategorije</Typography>
-                                   <Button variant="contained" size="small" onClick={() => openCreateDialog('main')}>
-                                        Dodaj
-                                   </Button>
-                              </Stack>
-                              <Divider />
-                              <Stack spacing={1}>
-                                   {mainCategories.length === 0 && (
-                                        <Typography variant="body2" color="text.secondary">
-                                             Nema kategorija.
-                                        </Typography>
-                                   )}
+               <Card sx={{ p: 2 }}>
+                    <Stack spacing={2}>
+                         {/* ─── Main category ─────────────────────────────────────── */}
+                         <TextField
+                              select
+                              fullWidth
+                              label="Glavna kategorija"
+                              value={selectedMainId ?? ''}
+                              onChange={handleMainSelectChange}
+                              size="small"
+                              helperText={mainCategories.length === 0 ? 'Nema kategorija.' : ' '}
+                              slotProps={{
+                                   select: {
+                                        renderValue: (value: unknown) => mainCategories.find((c) => c.id === value)?.label ?? '',
+                                   },
+                                   input: {
+                                        endAdornment: (
+                                             <InputAdornment position="end" sx={{ mr: 2 }}>
+                                                  <IconButton
+                                                       size="small"
+                                                       color="primary"
+                                                       onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            openCreateDialog('main');
+                                                       }}
+                                                       onMouseDown={(e) => e.stopPropagation()}
+                                                       title="Dodaj glavnu kategoriju"
+                                                  >
+                                                       <AddIcon fontSize="small" />
+                                                  </IconButton>
+                                             </InputAdornment>
+                                        ),
+                                   },
+                              }}
+                         >
+                                   <MenuItem value="">
+                                        <em>Izaberite...</em>
+                                   </MenuItem>
                                    {mainCategories.map((cat) => (
-                                        <Box
-                                             key={cat.id}
-                                             onClick={() => {
-                                                  setSelectedMainId(cat.id);
-                                                  setSelectedMidId(null);
-                                             }}
-                                             sx={{
-                                                  display: 'flex',
-                                                  alignItems: 'center',
-                                                  justifyContent: 'space-between',
-                                                  border: '1px solid',
-                                                  borderColor: selectedMainId === cat.id ? 'primary.main' : 'divider',
-                                                  backgroundColor: selectedMainId === cat.id ? 'primary.50' : 'transparent',
-                                                  borderRadius: 1,
-                                                  px: 1.5,
-                                                  py: 1,
-                                                  cursor: 'pointer',
-                                                  transition: 'all 0.15s',
-                                                  '&:hover': {
-                                                       borderColor: 'primary.main',
-                                                  },
-                                             }}
-                                        >
-                                             <Box>
-                                                  <Typography variant="subtitle2">{cat.label}</Typography>
-                                                  <Typography variant="caption" color="text.secondary">
-                                                       {cat.value}
-                                                  </Typography>
+                                        <MenuItem key={cat.id} value={cat.id}>
+                                             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: 1 }}>
+                                                  <Typography variant="body2" noWrap>{cat.label}</Typography>
+                                                  <Stack direction="row" spacing={0.5} flexShrink={0}>
+                                                       <IconButton
+                                                            size="small"
+                                                            onClick={(e) => {
+                                                                 e.stopPropagation();
+                                                                 openEditDialog('main', cat.id, cat.label);
+                                                            }}
+                                                            title="Izmeni"
+                                                       >
+                                                            <EditIcon fontSize="small" />
+                                                       </IconButton>
+                                                       <IconButton
+                                                            size="small"
+                                                            color="error"
+                                                            onClick={(e) => {
+                                                                 e.stopPropagation();
+                                                                 handleDelete('main', cat.id);
+                                                            }}
+                                                            title="Obriši"
+                                                       >
+                                                            <DeleteIcon fontSize="small" />
+                                                       </IconButton>
+                                                  </Stack>
                                              </Box>
-                                             <Stack direction="row" spacing={0.5}>
-                                                  <IconButton
-                                                       size="small"
-                                                       onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            openEditDialog('main', cat.id, cat.label);
-                                                       }}
-                                                  >
-                                                       <EditIcon fontSize="small" />
-                                                  </IconButton>
-                                                  <IconButton
-                                                       size="small"
-                                                       color="error"
-                                                       onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            handleDelete('main', cat.id);
-                                                       }}
-                                                  >
-                                                       <DeleteIcon fontSize="small" />
-                                                  </IconButton>
-                                             </Stack>
-                                        </Box>
+                                        </MenuItem>
                                    ))}
-                              </Stack>
-                         </Stack>
-                    </Card>
+                         </TextField>
 
-                    {/* ─── Column 2: Mid Categories ──────────────────────────── */}
-                    <Card sx={{ p: 2, height: 'fit-content', opacity: selectedMainId ? 1 : 0.4, display: { xs: selectedMainId ? 'block' : 'none', md: 'block' } }}>
-                         <Stack spacing={2}>
-                              <Stack direction="row" alignItems="center" justifyContent="space-between">
-                                   <Box>
-                                        <Typography variant="h6">Srednje kategorije</Typography>
-                                        {selectedMainLabel && (
-                                             <Typography variant="caption" color="text.secondary">
-                                                  za: {selectedMainLabel}
-                                             </Typography>
-                                        )}
-                                   </Box>
-                                   <Button
-                                        variant="contained"
-                                        size="small"
-                                        disabled={!selectedMainId}
-                                        onClick={() => openCreateDialog('mid')}
-                                   >
-                                        Dodaj
-                                   </Button>
-                              </Stack>
-                              <Divider />
-                              {!selectedMainId ? (
-                                   <Typography variant="body2" color="text.secondary">
-                                        Izaberite glavnu kategoriju.
-                                   </Typography>
-                              ) : filteredMid.length === 0 ? (
-                                   <Typography variant="body2" color="text.secondary">
-                                        Nema srednjih kategorija.
-                                   </Typography>
-                              ) : (
-                                   <Stack spacing={1}>
-                                        {filteredMid.map((cat) => (
-                                             <Box
-                                                  key={cat.id}
-                                                  onClick={() => setSelectedMidId(cat.id)}
-                                                  sx={{
-                                                       display: 'flex',
-                                                       alignItems: 'center',
-                                                       justifyContent: 'space-between',
-                                                       border: '1px solid',
-                                                       borderColor: selectedMidId === cat.id ? 'primary.main' : 'divider',
-                                                       backgroundColor: selectedMidId === cat.id ? 'primary.50' : 'transparent',
-                                                       borderRadius: 1,
-                                                       px: 1.5,
-                                                       py: 1,
-                                                       cursor: 'pointer',
-                                                       transition: 'all 0.15s',
-                                                       '&:hover': {
-                                                            borderColor: 'primary.main',
-                                                       },
-                                                  }}
-                                             >
-                                                  <Box>
-                                                       <Typography variant="subtitle2">{cat.label}</Typography>
-                                                       <Typography variant="caption" color="text.secondary">
-                                                            {cat.value}
-                                                       </Typography>
-                                                  </Box>
-                                                  <Stack direction="row" spacing={0.5}>
+                         <Divider />
+
+                         {/* ─── Mid category ───────────────────────────────────────── */}
+                         <TextField
+                              select
+                              fullWidth
+                              label="Srednja kategorija"
+                              value={selectedMidId ?? ''}
+                              onChange={handleMidSelectChange}
+                              disabled={isMidSelectDisabled}
+                              size="small"
+                              helperText={!selectedMainId ? 'Izaberite glavnu kategoriju.' : filteredMid.length === 0 ? 'Nema srednjih kategorija.' : ' '}
+                              slotProps={{
+                                   select: {
+                                        renderValue: (value: unknown) => filteredMid.find((c) => c.id === value)?.label ?? '',
+                                   },
+                                   input: {
+                                        endAdornment: (
+                                             <InputAdornment position="end" sx={{ mr: 2 }}>
+                                                  <IconButton
+                                                       size="small"
+                                                       color="primary"
+                                                       disabled={!selectedMainId}
+                                                       onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            openCreateDialog('mid');
+                                                       }}
+                                                       onMouseDown={(e) => e.stopPropagation()}
+                                                       title="Dodaj srednju kategoriju"
+                                                  >
+                                                       <AddIcon fontSize="small" />
+                                                  </IconButton>
+                                             </InputAdornment>
+                                        ),
+                                   },
+                              }}
+                         >
+                                   <MenuItem value="">
+                                        <em>Izaberite...</em>
+                                   </MenuItem>
+                                   {filteredMid.map((cat) => (
+                                        <MenuItem key={cat.id} value={cat.id}>
+                                             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: 1 }}>
+                                                  <Typography variant="body2" noWrap>{cat.label}</Typography>
+                                                  <Stack direction="row" spacing={0.5} flexShrink={0}>
                                                        <IconButton
                                                             size="small"
                                                             onClick={(e) => {
                                                                  e.stopPropagation();
                                                                  openEditDialog('mid', cat.id, cat.label);
                                                             }}
+                                                            title="Izmeni"
                                                        >
                                                             <EditIcon fontSize="small" />
                                                        </IconButton>
@@ -379,99 +383,102 @@ export const CategoriesTab = () => {
                                                                  e.stopPropagation();
                                                                  handleDelete('mid', cat.id);
                                                             }}
+                                                            title="Obriši"
                                                        >
                                                             <DeleteIcon fontSize="small" />
                                                        </IconButton>
                                                   </Stack>
                                              </Box>
-                                        ))}
-                                   </Stack>
-                              )}
-                         </Stack>
-                    </Card>
+                                        </MenuItem>
+                                   ))}
+                         </TextField>
 
-                    {/* ─── Column 3: Sub Categories ──────────────────────────── */}
-                    <Card sx={{ p: 2, height: 'fit-content', opacity: selectedMidId ? 1 : 0.4, display: { xs: selectedMidId ? 'block' : 'none', md: 'block' } }}>
-                         <Stack spacing={2}>
-                              <Stack direction="row" alignItems="center" justifyContent="space-between">
-                                   <Box>
-                                        <Typography variant="h6">Podkategorije</Typography>
-                                        {selectedMidLabel && (
-                                             <Typography variant="caption" color="text.secondary">
-                                                  za: {selectedMidLabel}
-                                             </Typography>
-                                        )}
-                                   </Box>
-                                   <Button
-                                        variant="contained"
-                                        size="small"
-                                        disabled={!selectedMidId}
-                                        onClick={() => openCreateDialog('sub')}
-                                   >
-                                        Dodaj
-                                   </Button>
-                              </Stack>
-                              <Divider />
-                              {!selectedMidId ? (
-                                   <Typography variant="body2" color="text.secondary">
-                                        Izaberite srednju kategoriju.
-                                   </Typography>
-                              ) : filteredSub.length === 0 ? (
-                                   <Typography variant="body2" color="text.secondary">
-                                        Nema podkategorija.
-                                   </Typography>
-                              ) : (
-                                   <Stack spacing={1}>
-                                        {filteredSub.map((cat) => (
-                                             <Box
-                                                  key={cat.id}
-                                                  sx={{
-                                                       display: 'flex',
-                                                       alignItems: 'center',
-                                                       justifyContent: 'space-between',
-                                                       border: '1px solid',
-                                                       borderColor: 'divider',
-                                                       borderRadius: 1,
-                                                       px: 1.5,
-                                                       py: 1,
-                                                  }}
-                                             >
-                                                  <Box>
-                                                       <Typography variant="subtitle2">{cat.label}</Typography>
-                                                       <Typography variant="caption" color="text.secondary">
-                                                            {cat.value}
-                                                       </Typography>
-                                                  </Box>
-                                                  <Stack direction="row" spacing={0.5}>
+                         <Divider />
+
+                         {/* ─── Sub category ───────────────────────────────────────── */}
+                         <TextField
+                              select
+                              fullWidth
+                              label="Podkategorija"
+                              value={selectedSubId ?? ''}
+                              onChange={handleSubSelectChange}
+                              disabled={isSubSelectDisabled}
+                              size="small"
+                              helperText={!selectedMidId ? 'Izaberite srednju kategoriju.' : filteredSub.length === 0 ? 'Nema podkategorija.' : ' '}
+                              slotProps={{
+                                   select: {
+                                        renderValue: (value: unknown) => filteredSub.find((c) => c.id === value)?.label ?? '',
+                                   },
+                                   input: {
+                                        endAdornment: (
+                                             <InputAdornment position="end" sx={{ mr: 2 }}>
+                                                  <IconButton
+                                                       size="small"
+                                                       color="primary"
+                                                       disabled={!selectedMidId}
+                                                       onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            openCreateDialog('sub');
+                                                       }}
+                                                       onMouseDown={(e) => e.stopPropagation()}
+                                                       title="Dodaj podkategoriju"
+                                                  >
+                                                       <AddIcon fontSize="small" />
+                                                  </IconButton>
+                                             </InputAdornment>
+                                        ),
+                                   },
+                              }}
+                         >
+                                   <MenuItem value="">
+                                        <em>Izaberite...</em>
+                                   </MenuItem>
+                                   {filteredSub.map((cat) => (
+                                        <MenuItem key={cat.id} value={cat.id}>
+                                             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: 1 }}>
+                                                  <Typography variant="body2" noWrap>{cat.label}</Typography>
+                                                  <Stack direction="row" spacing={0.5} flexShrink={0}>
                                                        <IconButton
                                                             size="small"
-                                                            onClick={() => openEditDialog('sub', cat.id, cat.label)}
+                                                            onClick={(e) => {
+                                                                 e.stopPropagation();
+                                                                 openEditDialog('sub', cat.id, cat.label);
+                                                            }}
+                                                            title="Izmeni"
                                                        >
                                                             <EditIcon fontSize="small" />
                                                        </IconButton>
                                                        <IconButton
                                                             size="small"
                                                             color="error"
-                                                            onClick={() => handleDelete('sub', cat.id)}
+                                                            onClick={(e) => {
+                                                                 e.stopPropagation();
+                                                                 handleDelete('sub', cat.id);
+                                                            }}
+                                                            title="Obriši"
                                                        >
                                                             <DeleteIcon fontSize="small" />
                                                        </IconButton>
                                                   </Stack>
                                              </Box>
-                                        ))}
-                                   </Stack>
-                              )}
-                         </Stack>
-                    </Card>
-               </Box>
+                                        </MenuItem>
+                                   ))}
+                         </TextField>
+                    </Stack>
+               </Card>
 
                {/* ─── Create / Edit Dialog ────────────────────────────────────────── */}
-               <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
+               <Dialog
+                    open={dialogOpen}
+                    onClose={() => setDialogOpen(false)}
+                    fullWidth
+                    PaperProps={{ sx: { width: { xs: '100%', sm: 400 }, m: { xs: 2, sm: 3 } } }}
+               >
                     <DialogTitle>
                          {editingId ? `Izmeni ${levelLabel} kategoriju` : `Dodaj ${levelLabel} kategoriju`}
                     </DialogTitle>
                     <DialogContent dividers>
-                         <Stack spacing={2} sx={{ mt: 1, minWidth: 320 }}>
+                         <Stack spacing={2} sx={{ mt: 1 }}>
                               <TextField
                                    label="Naziv"
                                    value={dialogLabel}
