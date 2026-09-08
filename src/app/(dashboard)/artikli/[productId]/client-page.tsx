@@ -50,7 +50,6 @@ const Page = ({ product, allManufacturers }: Props) => {
                               <ProductEditForm
                                    product={product}
                                    manufacturers={allManufacturers}
-                                   onUpdated={() => router.push('/artikli')}
                                    onDeleted={() => router.push('/artikli')}
                                    showCancelButton
                                    cancelLabel="Nazad na listu"
