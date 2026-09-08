@@ -5,7 +5,7 @@ import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Swal from 'sweetalert2'
-import { Box, Button, Card, Container, DialogActions, IconButton, Input, InputAdornment, List, ListItemButton, ListItemText, OutlinedInput, Stack, SvgIcon, Tab, Tabs, TextField, Theme, Typography, useMediaQuery } from '@mui/material';
+import { Box, Button, Card, CircularProgress, Container, DialogActions, IconButton, Input, InputAdornment, List, ListItemButton, ListItemText, OutlinedInput, Stack, SvgIcon, Tab, Tabs, TextField, Theme, Typography, useMediaQuery } from '@mui/material';
 import { useSelection } from 'src/hooks/use-selection';
 import { ProductsTable } from 'src/sections/products/products-table';
 import { useRouter } from 'next/navigation';
@@ -16,6 +16,11 @@ import { useMounted } from '@/hooks/use-mounted';
 import { generateSlug } from '@/utils/generate-slug';
 import MagnifyingGlassIcon from '@heroicons/react/24/solid/MagnifyingGlassIcon';
 import ClearIcon from '@mui/icons-material/Clear';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import SaveIcon from '@mui/icons-material/Save';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import Inventory2Icon from '@mui/icons-material/Inventory2';
 import { AuthProvider } from '@/context/auth-context';
 import { CategoriesTab } from '@/sections/products/categories-tab';
 
@@ -99,7 +104,7 @@ const Page = (props: any) => {
      const [logoUploadId, setLogoUploadId] = useState<string | null>(null);
      const [logoPage, setLogoPage] = useState(0);
      const [logoRowsPerPage, setLogoRowsPerPage] = useState(10);
-     const [blockedDeleteLogo, setBlockedDeleteLogo] = useState<{ name: string; products: { id: string; name: string }[] } | null>(null);
+     const [logoProductsDialog, setLogoProductsDialog] = useState<{ mode: 'blocked' | 'view'; name: string; products: { id: string; name: string }[] } | null>(null);
 
      const isMounted = useMounted();
 
@@ -305,7 +310,8 @@ const Page = (props: any) => {
                     });
                } else if (response.status === 409) {
                     const result = await response.json().catch(() => null);
-                    setBlockedDeleteLogo({
+                    setLogoProductsDialog({
+                         mode: 'blocked',
                          name: logo.name,
                          products: Array.isArray(result?.products) ? result.products : []
                     });
@@ -323,6 +329,18 @@ const Page = (props: any) => {
                     text: 'Brisanje nije uspelo.'
                });
           }
+     };
+
+     const handleViewLogoProducts = (logo: any) => {
+          const assignedProducts = productStore.allProducts.filter(
+               (product: any) => product.manufacturer_id === logo.id
+          );
+
+          setLogoProductsDialog({
+               mode: 'view',
+               name: logo.name,
+               products: assignedProducts.map((product: any) => ({ id: product.id, name: product.name }))
+          });
      };
 
      const handleCreateLogo = async () => {
@@ -486,7 +504,7 @@ const Page = (props: any) => {
                                    {activeTab === 'manufacturers' && (
                                         <Card sx={{ p: 2 }}>
                                              <Stack spacing={2}>
-                                                  <Stack direction="row" spacing={2} alignItems="center" justifyContent="space-between">
+                                                  <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ xs: 'stretch', sm: 'center' }} justifyContent="space-between">
                                                        <OutlinedInput
                                                             value={logoSearch}
                                                             onChange={(event) => setLogoSearch(event.target.value)}
@@ -516,7 +534,7 @@ const Page = (props: any) => {
                                                                       </IconButton>
                                                                  </InputAdornment>
                                                             )}
-                                                            sx={{ maxWidth: 500 }}
+                                                            sx={{ maxWidth: { xs: '100%', sm: 500 } }}
                                                        />
                                                        <Button
                                                             variant="contained"
@@ -537,8 +555,9 @@ const Page = (props: any) => {
                                                                       key={logo.id}
                                                                       sx={{
                                                                            display: 'flex',
+                                                                           flexDirection: { xs: 'column', sm: 'row' },
                                                                            gap: 2,
-                                                                           alignItems: 'center',
+                                                                           alignItems: { xs: 'stretch', sm: 'center' },
                                                                            border: '1px solid',
                                                                            borderColor: 'divider',
                                                                            borderRadius: 1,
@@ -564,7 +583,7 @@ const Page = (props: any) => {
                                                                                 onChange={(event) => handleLogoDraftChange(logo.id, 'name', event.target.value)}
                                                                                 disabled={!isEditing}
                                                                                 size="small"
-                                                                                sx={{ minWidth: 200 }}
+                                                                                sx={{ minWidth: { xs: '100%', sm: 200 }, flex: { xs: '1 1 100%', sm: '1 1 200px' } }}
                                                                            />
                                                                            <TextField
                                                                                 label="Value"
@@ -572,30 +591,45 @@ const Page = (props: any) => {
                                                                                 onChange={(event) => handleLogoDraftChange(logo.id, 'value', event.target.value)}
                                                                                 disabled
                                                                                 size="small"
-                                                                                sx={{ minWidth: 200 }}
+                                                                                sx={{ minWidth: { xs: '100%', sm: 200 }, flex: { xs: '1 1 100%', sm: '1 1 200px' } }}
                                                                            />
                                                                       </Box>
-                                                                      <Stack direction="row" spacing={1} alignItems="center">
+                                                                      <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap justifyContent={{ xs: 'flex-end', sm: 'flex-start' }}>
                                                                            {isEditing ? (
                                                                                 <>
-                                                                                     <Button variant="contained" onClick={() => handleLogoSave(logo.id)}>
-                                                                                          Sačuvaj
-                                                                                     </Button>
-                                                                                     <Button color="inherit" onClick={handleLogoEditCancel}>
-                                                                                          Odustani
-                                                                                     </Button>
+                                                                                     <IconButton
+                                                                                          color="primary"
+                                                                                          onClick={() => handleLogoSave(logo.id)}
+                                                                                          title="Sačuvaj"
+                                                                                     >
+                                                                                          <SaveIcon fontSize="small" />
+                                                                                     </IconButton>
+                                                                                     <IconButton
+                                                                                          onClick={handleLogoEditCancel}
+                                                                                          title="Odustani"
+                                                                                     >
+                                                                                          <ClearIcon fontSize="small" />
+                                                                                     </IconButton>
                                                                                 </>
                                                                            ) : (
                                                                                 <>
-                                                                                     <Button variant="contained" onClick={() => handleLogoEditStart(logo)}>
-                                                                                          Izmeni
-                                                                                     </Button>
-                                                                                     <Button
-                                                                                          component="label"
-                                                                                          variant="outlined"
-                                                                                          disabled={logoUploadId === logo.id}
+                                                                                     <IconButton
+                                                                                          color="primary"
+                                                                                          onClick={() => handleLogoEditStart(logo)}
+                                                                                          title="Izmeni"
                                                                                      >
-                                                                                          {logoUploadId === logo.id ? 'Uploadujem...' : 'Update logo'}
+                                                                                          <EditIcon fontSize="small" />
+                                                                                     </IconButton>
+                                                                                     <IconButton
+                                                                                          component="label"
+                                                                                          disabled={logoUploadId === logo.id}
+                                                                                          title={logoUploadId === logo.id ? 'Uploadujem...' : 'Update logo'}
+                                                                                     >
+                                                                                          {logoUploadId === logo.id ? (
+                                                                                               <CircularProgress size={20} />
+                                                                                          ) : (
+                                                                                               <CloudUploadIcon fontSize="small" />
+                                                                                          )}
                                                                                           <Input
                                                                                                type="file"
                                                                                                inputProps={{ accept: 'image/*' }}
@@ -617,12 +651,22 @@ const Page = (props: any) => {
                                                                                                     }
                                                                                                }}
                                                                                           />
-                                                                                     </Button>
-                                                                                     <Button color="error" onClick={() => handleLogoDelete(logo)}>
-                                                                                          Obriši
-                                                                                     </Button>
+                                                                                     </IconButton>
+                                                                                     <IconButton
+                                                                                          color="error"
+                                                                                          onClick={() => handleLogoDelete(logo)}
+                                                                                          title="Obriši"
+                                                                                     >
+                                                                                          <DeleteIcon fontSize="small" />
+                                                                                     </IconButton>
                                                                                 </>
                                                                            )}
+                                                                           <IconButton
+                                                                                onClick={() => handleViewLogoProducts(logo)}
+                                                                                title="Proizvodi"
+                                                                           >
+                                                                                <Inventory2Icon fontSize="small" />
+                                                                           </IconButton>
                                                                       </Stack>
                                                                  </Box>
                                                             );
@@ -698,17 +742,19 @@ const Page = (props: any) => {
                          </DialogContent>
                     </Dialog>
                     <Dialog
-                         open={Boolean(blockedDeleteLogo)}
-                         onClose={() => setBlockedDeleteLogo(null)}
+                         open={Boolean(logoProductsDialog)}
+                         onClose={() => setLogoProductsDialog(null)}
+                         fullWidth
                          PaperProps={{
                               sx: {
-                                   width: '480px'
+                                   width: { xs: '100%', sm: '480px' },
+                                   m: { xs: 2, sm: 3 }
                               }
                          }}
                     >
                          <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                              Proizvođač se ne može obrisati
-                              <IconButton onClick={() => setBlockedDeleteLogo(null)} size="small">
+                              {logoProductsDialog?.mode === 'blocked' ? 'Proizvođač se ne može obrisati' : 'Dodeljeni proizvodi'}
+                              <IconButton onClick={() => setLogoProductsDialog(null)} size="small">
                                    <SvgIcon fontSize="small">
                                         <ClearIcon />
                                    </SvgIcon>
@@ -716,33 +762,42 @@ const Page = (props: any) => {
                          </DialogTitle>
                          <DialogContent dividers>
                               <Typography variant="body2" sx={{ mb: 2 }}>
-                                   Proizvođač &quot;{blockedDeleteLogo?.name}&quot; ima dodeljene proizvode. Uklonite ili premestite ove proizvode pre brisanja proizvođača:
+                                   {logoProductsDialog?.mode === 'blocked'
+                                        ? <>Proizvođač &quot;{logoProductsDialog?.name}&quot; ima dodeljene proizvode. Uklonite ili premestite ove proizvode pre brisanja proizvođača:</>
+                                        : <>Proizvodi dodeljeni proizvođaču &quot;{logoProductsDialog?.name}&quot;:</>
+                                   }
                               </Typography>
-                              <List
-                                   dense
-                                   sx={{
-                                        maxHeight: 320,
-                                        overflowY: 'auto',
-                                        border: '1px solid',
-                                        borderColor: 'divider',
-                                        borderRadius: 1
-                                   }}
-                              >
-                                   {blockedDeleteLogo?.products.map((product) => (
-                                        <ListItemButton
-                                             key={product.id}
-                                             divider
-                                             component={NextLink}
-                                             href={`/artikli/${product.id}`}
-                                             onClick={() => setBlockedDeleteLogo(null)}
-                                        >
-                                             <ListItemText primary={product.name} />
-                                        </ListItemButton>
-                                   ))}
-                              </List>
+                              {logoProductsDialog?.products.length ? (
+                                   <List
+                                        dense
+                                        sx={{
+                                             maxHeight: 320,
+                                             overflowY: 'auto',
+                                             border: '1px solid',
+                                             borderColor: 'divider',
+                                             borderRadius: 1
+                                        }}
+                                   >
+                                        {logoProductsDialog?.products.map((product) => (
+                                             <ListItemButton
+                                                  key={product.id}
+                                                  divider
+                                                  component={NextLink}
+                                                  href={`/artikli/${product.id}`}
+                                                  onClick={() => setLogoProductsDialog(null)}
+                                             >
+                                                  <ListItemText primary={product.name} />
+                                             </ListItemButton>
+                                        ))}
+                                   </List>
+                              ) : (
+                                   <Typography variant="body2" color="text.secondary">
+                                        Nema dodeljenih proizvoda.
+                                   </Typography>
+                              )}
                          </DialogContent>
                          <DialogActions>
-                              <Button variant="contained" onClick={() => setBlockedDeleteLogo(null)}>
+                              <Button variant="contained" onClick={() => setLogoProductsDialog(null)}>
                                    U redu
                               </Button>
                          </DialogActions>
