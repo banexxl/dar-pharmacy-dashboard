@@ -12,9 +12,11 @@ export const newProductSchema = () => yup.object().shape({
           .string()
           .required('Glavna kategorija je obavezna'),
      mid_category: yup
-          .string(),
+          .string()
+          .nullable(),
      sub_category: yup
-          .string(),
+          .string()
+          .nullable(),
      available_stock: yup
           .number()
           .required('Stanje na lageru je obavezno'),

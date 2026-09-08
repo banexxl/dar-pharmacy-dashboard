@@ -87,20 +87,6 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail, manufacturers = 
      const isMidDisabled = !selectedMainValue || filteredMidCategories.length === 0;
      const isSubDisabled = !selectedMidValue || filteredSubCategories.length === 0;
 
-     // ─── Category validation ────────────────────────────────────────────────────
-     const midRequired = selectedMainValue && filteredMidCategories.length > 0;
-     const subRequired = selectedMidValue && filteredSubCategories.length > 0;
-
-     const categoryValidationError = useMemo(() => {
-          if (midRequired && !selectedMidValue) {
-               return 'Srednja kategorija je obavezna za izabranu glavnu kategoriju.';
-          }
-          if (subRequired && !selectedMidValue) {
-               return 'Podkategorija je obavezna za izabranu srednju kategoriju.';
-          }
-          return null;
-     }, [midRequired, subRequired, selectedMidValue]);
-
      // ─── Manufacturer options ───────────────────────────────────────────────────
      const manufacturerOptions = useMemo(() => {
           if (!Array.isArray(manufacturers)) {
@@ -164,15 +150,6 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail, manufacturers = 
                <Formik
                     initialValues={initialValues}
                     onSubmit={(values) => {
-                         // Category child validation
-                         if (midRequired && !values.mid_category) {
-                              Swal.fire({ icon: 'warning', title: 'Izaberite srednju kategoriju', text: 'Glavna kategorija ima podkategorije — morate izabrati srednju.' });
-                              return;
-                         }
-                         if (subRequired && !values.sub_category) {
-                              Swal.fire({ icon: 'warning', title: 'Izaberite podkategoriju', text: 'Srednja kategorija ima podkategorije — morate izabrati pod.' });
-                              return;
-                         }
                          handleSubmit(values)
                     }}
                     validationSchema={newProductSchema()}>
@@ -243,13 +220,11 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail, manufacturers = 
                                              formik.setFieldValue('sub_category', '');
                                         }}
                                         select
-                                        error={!!(midRequired && !selectedMidValue) || (formik.touched.mid_category && !!formik.errors.mid_category)}
+                                        error={formik.touched.mid_category && !!formik.errors.mid_category}
                                         helperText={
-                                             midRequired && !selectedMidValue
-                                                  ? 'Srednja kategorija je obavezna.'
-                                                  : isMidDisabled && selectedMainValue
-                                                       ? 'Nema srednjih kategorija za izabranu glavnu.'
-                                                       : formik.touched.mid_category && formik.errors.mid_category
+                                             isMidDisabled && selectedMainValue
+                                                  ? 'Nema srednjih kategorija za izabranu glavnu.'
+                                                  : formik.touched.mid_category && formik.errors.mid_category
                                         }
                                         value={formik.values.mid_category}
                                    >
@@ -272,13 +247,11 @@ export const AddProductForm = ({ onSubmitSuccess, onSubmitFail, manufacturers = 
                                         onBlur={formik.handleBlur}
                                         onChange={formik.handleChange}
                                         select
-                                        error={!!(subRequired && !formik.values.sub_category) || (formik.touched.sub_category && !!formik.errors.sub_category)}
+                                        error={formik.touched.sub_category && !!formik.errors.sub_category}
                                         helperText={
-                                             subRequired && !formik.values.sub_category
-                                                  ? 'Podkategorija je obavezna.'
-                                                  : isSubDisabled && selectedMidValue
-                                                       ? 'Nema podkategorija za izabranu srednju.'
-                                                       : formik.touched.sub_category && formik.errors.sub_category
+                                             isSubDisabled && selectedMidValue
+                                                  ? 'Nema podkategorija za izabranu srednju.'
+                                                  : formik.touched.sub_category && formik.errors.sub_category
                                         }
                                         value={formik.values.sub_category}
                                         disabled={loading || isSubDisabled}

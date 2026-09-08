@@ -211,14 +211,6 @@ export const ProductsTable = (props: any) => {
                }
           }
 
-          // Category child validation
-          if (filteredMidOptions.length > 0 && !currentProductObject?.mid_category) {
-               errors.push('Srednja kategorija je obavezna za izabranu glavnu kategoriju.');
-          }
-          if (filteredSubOptions.length > 0 && !currentProductObject?.sub_category) {
-               errors.push('Podkategorija je obavezna za izabranu srednju kategoriju.');
-          }
-
           if (errors.length > 0) {
                Swal.fire({
                     icon: 'error',
@@ -740,7 +732,6 @@ export const ProductsTable = (props: any) => {
                                                                       </TableCell>
                                                                       <TableCell width="25%">
                                                                            <LinearProgress
-
                                                                                 value={product.quantity ?? 0}
                                                                                 variant="determinate"
                                                                                 color={quantityColor}
